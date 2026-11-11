@@ -8,13 +8,17 @@ import threading
 
 from clawshot.app.paths import absolute_path, default_output_root
 
-KINDS = {"dump-folder", "dump-file", "game", "output", "seeds", "emulator_mods", "tracker-seed", "tracker-save"}
+KINDS = {
+    "dump-folder", "dump-file", "update-folder", "update-file", "game", "output", "seeds", "emulator_mods",
+    "tracker-seed", "tracker-save",
+}
+FILE_KINDS = {"dump-file": "Choose your game .nup", "update-file": "Choose your update .nup"}
 CANCELLED = -128  # AppleScript's "User canceled." error number
 
 
 def _title(kind):
-    if kind == "dump-file":
-        return "Choose your game .nup"
+    if kind in FILE_KINDS:
+        return FILE_KINDS[kind]
     if kind == "game":
         return "Choose Hookshot or Longshot game / launcher folder"
     return "Choose output parent folder" if kind == "output" else "Choose " + kind.replace("-", " ") + " folder"
@@ -32,7 +36,7 @@ def macos_script(kind):
     osascript activates itself, shows the panel centered and in front, and returns focus to the browser on exit.
     """
     prompt = "with prompt " + _applescript_text(_title(kind))
-    if kind == "dump-file":
+    if kind in FILE_KINDS:
         choose = f'choose file {prompt} of type {{"nup"}}'
     else:
         choose = "choose folder " + prompt
@@ -77,7 +81,7 @@ def choose_tk(kind, window):
             root.update_idletasks()
             root.lift()
             root.focus_force()
-        if kind == "dump-file":
+        if kind in FILE_KINDS:
             return filedialog.askopenfilename(parent=root, title=_title(kind), filetypes=[("NUP game dump", "*.nup")])
         return filedialog.askdirectory(
             parent=root,
@@ -143,7 +147,7 @@ def webview_chooser(window, webview):
         if not lock.acquire(blocking=False):
             raise ValueError("A path chooser is already open")
         try:
-            if kind == "dump-file":
+            if kind in FILE_KINDS:
                 selected = window.create_file_dialog(
                     open_dialog, allow_multiple=False, file_types=("NUP game dump (*.nup)",)
                 )

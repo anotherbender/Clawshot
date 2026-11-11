@@ -30,6 +30,7 @@ from clawshot.app.play import play_refusal
 from clawshot.app.preferences import Preferences, suggested_eden_folder
 from clawshot.app.sharing import import_settings, player_settings, share_settings
 from clawshot.ui import tracker
+from clawshot.ui.dialogs import FILE_KINDS, KINDS
 
 ASSETS = Path(__file__).with_name("static")
 STATIC = {
@@ -42,6 +43,12 @@ STATIC = {
 }
 MAX_BODY = 65536
 WINDOW_KEYS = ("x", "y", "width", "height")
+
+
+def check_id(value):
+    if type(value) is not int or not 0 <= value <= 2**53 - 1:
+        raise ValueError("Check id must be a whole number")
+    return value
 
 
 def browser_window(value):
@@ -68,6 +75,8 @@ class Application:
         self.selected = None
         self.editing = False
         self.tracker = tracker.TrackerController()
+        self.checks_lock = threading.Lock()
+        self.cancelled_checks = set()
 
     def remember_completed(self):
         state = self.jobs.snapshot()
@@ -160,14 +169,14 @@ class Application:
             return payload | ({"seed": number} if route == "shared-seed" else {})
         if method == "POST" and route == "normalize-path":
             kind = body.get("kind", "output")
-            if kind not in ("dump", "game", "output"):
-                raise ValueError("Choose a dump, Hookshot or Longshot game, or output path.")
+            if kind not in ("dump", "update", "game", "output"):
+                raise ValueError("Choose a dump, update, Hookshot or Longshot game, or output path.")
             return {"path": str(absolute_path(body.get("path"), "Path", allow_links=kind != "output"))}
         if method == "POST" and route == "browse":
             if self.chooser is None:
                 raise ValueError("Path dialogs are disabled in --no-open and tests; paste a path instead")
             kind = body.get("kind")
-            if kind not in ("dump-folder", "dump-file", "game", "output", "seeds", "emulator_mods"):
+            if kind not in KINDS:
                 raise ValueError("Unknown path chooser")
             seed = body.get("seed", 0)
             if type(seed) is not int or not -(2**53 - 1) <= seed <= 2**53 - 1:
@@ -177,7 +186,7 @@ class Application:
                 selected = absolute_path(
                     str(path), "Selected path", allow_links=kind not in ("output", "emulator_mods")
                 )
-                if kind == "dump-file":
+                if kind in FILE_KINDS:
                     if not selected.is_file() or selected.suffix.lower() != ".nup":
                         raise ValueError("Choose a .nup file")
                 elif not selected.is_dir():
@@ -188,16 +197,32 @@ class Application:
                 elif kind == "emulator_mods":
                     self.preferences.remember("emulator_mods", path)
             return {"path": path, "warning": self.preferences.warning}
+        if method == "POST" and route == "cancel-check":
+            check = check_id(body.get("check"))
+            with self.checks_lock:
+                if len(self.cancelled_checks) > 100:
+                    self.cancelled_checks.clear()
+                self.cancelled_checks.add(check)
+            return {"cancelled": check}
         if method == "POST" and route == "detect":
+            check = check_id(body.get("check", 0))
             result = {}
             if body.get("dump"):
-                result["dump"] = detect_dump(body["dump"])
-                self.preferences.remember("dump", result["dump"]["path"])
+                update = body.get("update") or None
+                result["dump"] = detect_dump(body["dump"], update)
             if body.get("game"):
                 result["game"] = detect_game(body["game"])
-                self.preferences.remember("game", result["game"]["selected_folder"])
             if not result:
                 raise ValueError("Enter a dump, Hookshot or Longshot path")
+            with self.checks_lock:  # a cancelled check's answer is dropped, and nothing is remembered from it
+                if check in self.cancelled_checks:
+                    self.cancelled_checks.discard(check)
+                    raise ValueError("Check cancelled.")
+            if "dump" in result:
+                self.preferences.remember("dump", result["dump"]["path"])
+                self.preferences.remember("update", result["dump"]["update"] or "")
+            if "game" in result:
+                self.preferences.remember("game", result["game"]["selected_folder"])
             result["warning"] = self.preferences.warning
             return result
         if method == "POST" and route == "generate":
@@ -225,6 +250,7 @@ class Application:
                 raise ValueError("Choose your emulator's mod folder for this game first.")
             protected = (
                 saved.get("dump"),
+                saved.get("update"),
                 *(game_folders(saved["game"]) if saved.get("game") else ()),
                 os.environ.get("OOT_ROMFS"),
             )

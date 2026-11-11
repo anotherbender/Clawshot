@@ -9,7 +9,7 @@ from tempfile import NamedTemporaryFile
 
 from clawshot.app.paths import SOURCE_ROOT
 
-KEYS = {"dump", "game", "emulator_mods"}
+KEYS = {"dump", "update", "game", "emulator_mods"}  # update: a separate update; "" when the dump has it
 # paths.json written before Longshot support: renamed on read, gone from the file at the next save; "game" wins.
 RENAMED = {"hookshot": "game"}
 

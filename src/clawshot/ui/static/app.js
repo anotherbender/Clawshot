@@ -31,6 +31,8 @@ let playAvailable = false,
 let openAvailable = false,
   libraryActions = [],
   lastLibraryOutput = "";
+let checkSeq = 0,
+  activeCheck = null;
 let emulatorFolder = "",
   edenFolder = "",
   copyAvailable = false;
@@ -45,8 +47,9 @@ function error(message) {
   $("alert").textContent = message;
   $("alert").hidden = !message;
 }
-async function api(route, body) {
+async function api(route, body, signal) {
   const response = await fetch(base + "api/" + route, {
+    signal,
     method: body === undefined ? "GET" : "POST",
     credentials: "omit",
     cache: "no-store",
@@ -661,8 +664,9 @@ async function refreshSeeds() {
 }
 async function browse(kind) {
   $("dump-dialog").close();
+  $("update-dialog").close();
   document
-    .querySelectorAll("[data-browse], #browse-dump")
+    .querySelectorAll("[data-browse], #browse-dump, #browse-update")
     .forEach((el) => (el.disabled = true));
   try {
     const data = await api("browse", {
@@ -686,17 +690,37 @@ async function browse(kind) {
       renderEmulator();
       return;
     }
-    const field = kind.startsWith("dump-") ? "dump" : kind;
+    const field = kind.startsWith("dump-")
+      ? "dump"
+      : kind.startsWith("update-")
+        ? "update"
+        : kind;
     $(field === "game" ? "game-folder" : field).value = data.path;
     if (field === "output") outputCustom = true;
-    else await detect(field);
+    else if (field === "update") {
+      if ($("dump").value) await detect("dump");
+    } else await detect(field);
   } catch (e) {
     error(e.message);
   } finally {
     document
-      .querySelectorAll("[data-browse], #browse-dump")
+      .querySelectorAll("[data-browse], #browse-dump, #browse-update")
       .forEach((el) => (el.disabled = !dialogsAvailable));
   }
+}
+function renderUpdate() {
+  $("update-row").hidden = !$("update-separate").checked;
+}
+function separateUpdate() {
+  return $("update-separate").checked ? $("update").value : "";
+}
+// A check blocks the page behind a modal until it answers or is cancelled; a
+// cancelled check's late answer is ignored here and dropped by the server.
+function cancelCheck() {
+  if (!activeCheck) return;
+  const { check, controller } = activeCheck;
+  controller.abort();
+  api("cancel-check", { check }).catch(() => {});
 }
 async function detect(kind, fillDump = true) {
   if (kind === "game") gameCanPlay = false;
@@ -704,11 +728,17 @@ async function detect(kind, fillDump = true) {
     checkedPath = field.value,
     button = $(kind === "dump" ? "check-dump" : "check-game"),
     status = $(kind + "-status");
+  const check = ++checkSeq,
+    controller = new AbortController();
+  activeCheck = { check, controller };
+  if (!$("check-dialog").open) openDialog("check-dialog");
   button.disabled = true;
   status.textContent = "Checking…";
   status.className = "value-cell detection";
   try {
-    const data = await api("detect", { [kind]: checkedPath }),
+    const body = { [kind]: checkedPath, check };
+    if (kind === "dump" && separateUpdate()) body.update = separateUpdate();
+    const data = await api("detect", body, controller.signal),
       info = data[kind];
     // Game blur normalization may finish in flight. Dump detection can also redirect a picked layer to its root.
     if (kind === "game" && field.value !== checkedPath && field.value !== info.selected_folder) return;
@@ -716,7 +746,15 @@ async function detect(kind, fillDump = true) {
     status.className = "value-cell detection good";
     if (kind === "dump") {
       $("dump").value = info.path;
-      status.textContent = "Verified " + info.kind + " · build " + info.build;
+      if (info.update) $("update").value = info.update;
+      status.textContent =
+        "Verified Version " +
+        info.version +
+        " · " +
+        info.kind +
+        (info.update ? " + separate update" : "") +
+        " · build " +
+        info.build;
     } else {
       gameCanPlay = info.supports_mods && !info.reason;
       gameLabel = info.game;
@@ -734,8 +772,16 @@ async function detect(kind, fillDump = true) {
     error("");
   } catch (e) {
     status.className = "value-cell detection bad";
-    status.textContent = e.message;
+    status.textContent = controller.signal.aborted
+      ? "Check cancelled. Press " +
+        (kind === "dump" ? "Check" : "Detect") +
+        " to try again."
+      : e.message;
   } finally {
+    if (activeCheck?.check === check) {
+      activeCheck = null;
+      closeDialog("check-dialog");
+    }
     button.disabled = false;
     describe(document.querySelector(`[data-interface=${kind === "game" ? "runtime" : kind}]`));
     renderPlay();
@@ -909,6 +955,7 @@ async function startJob() {
       await api("generate", {
         dump: $("dump").value,
         game: $("game-folder").value,
+        update: separateUpdate(),
         output: $("output").value,
         seed,
         settings: settingsString,
@@ -1004,6 +1051,20 @@ $("check-dump").addEventListener("click", () => detect("dump"));
 $("check-game").addEventListener("click", () => detect("game"));
 $("browse-dump").addEventListener("click", () => openDialog("dump-dialog"));
 $("close-dump").addEventListener("click", () => closeDialog("dump-dialog"));
+$("browse-update").addEventListener("click", () => openDialog("update-dialog"));
+$("close-update").addEventListener("click", () =>
+  closeDialog("update-dialog"),
+);
+$("update-separate").addEventListener("change", () => {
+  renderUpdate();
+  if ($("dump").value && (!$("update-separate").checked || $("update").value))
+    detect("dump");
+});
+$("cancel-check").addEventListener("click", cancelCheck);
+$("check-dialog").addEventListener("cancel", (event) => {
+  event.preventDefault(); // Esc cancels the check; the dialog closes when it ends
+  cancelCheck();
+});
 document
   .querySelectorAll("[data-browse]")
   .forEach((el) =>
@@ -1197,7 +1258,7 @@ window.addEventListener("beforeunload", (event) => {
     initialStages = data.stages;
     outputRoot = data.output_root;
     dialogsAvailable = data.dialogs_available;
-    document.querySelectorAll("[data-browse], #browse-dump").forEach((el) => {
+    document.querySelectorAll("[data-browse], #browse-dump, #browse-update").forEach((el) => {
       el.disabled = !dialogsAvailable;
       if (!dialogsAvailable)
         el.title = "Disabled in --no-open; paste a path instead";
@@ -1207,6 +1268,9 @@ window.addEventListener("beforeunload", (event) => {
     preferenceWarning(data.preferences_warning);
     $("dump").value = data.paths.dump || "";
     $("game-folder").value = data.paths.game || "";
+    $("update").value = data.paths.update || "";
+    $("update-separate").checked = Boolean(data.paths.update);
+    renderUpdate();
     emulatorFolder = data.paths.emulator_mods || "";
     edenFolder = data.eden_folder || "";
     copyAvailable = data.copy_available;
