@@ -8,7 +8,7 @@ try {
         $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
     } elseif ($Action -eq 'make') {
         $config = [pscustomobject]@{
-            romfs = (Read-Host 'Your game .nup file or extracted romfs folder (no quotes)').Trim()
+            romfs = (Read-Host 'Your game .nup or .nx file, or extracted romfs folder (no quotes)').Trim()
             game = (Read-Host 'Optional Hookshot or Longshot game folder containing bin, or Longshot Launcher folder (no quotes; empty = emulator)').Trim()
         }
     } else {
@@ -40,10 +40,10 @@ try {
             throw "RomFS does not match build $($manifest.build). Fingerprint $actual; expected $($manifest.romfs_sha256). Stop and report in help."
         }
     } else {
-        # NUP extents may use zstd: bootstrap the locked reader, not the generator.
+        # NUP and NX extents may use zstd: bootstrap the locked reader, not the generator.
         Get-Command uv -ErrorAction Stop | Out-Null
         & uv run --project $root --frozen --no-dev python -m clawshot.pack.source $config.romfs --expected $manifest.romfs_sha256
-        if ($LASTEXITCODE -ne 0) { throw 'NUP version/integrity check failed. No seed or cache was created.' }
+        if ($LASTEXITCODE -ne 0) { throw 'NUP/NX version/integrity check failed. No seed or cache was created.' }
     }
     # Packs made before Longshot support saved this folder as "hookshot"; read it as the game folder.
     $game = if ($config.PSObject.Properties['game']) { $config.game } else { $config.hookshot }
