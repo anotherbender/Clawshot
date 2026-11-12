@@ -165,6 +165,8 @@ def output_path(value: str, source: Path, game: Path | None = None, update: Path
         protected.append(update)
         if update.is_file() or update.name.lower() == "romfs":
             protected.append(update.parent)
+    # a layer picked inside a base+updates dump folder, as dump or as separate update: protect that whole folder
+    protected.extend(dump_root(path) for path in (source, update) if path is not None and path.is_dir())
     for root in protected:
         root = root.resolve()
         if out.is_relative_to(root) or root.is_relative_to(out):
