@@ -33,7 +33,7 @@ class GenerationRequest:
     seed: int
     settings: str
     game: str = ""  # the chosen Hookshot or Longshot folder, kept outside the output; unused by generation
-    update: str = ""  # a separate update folder or .nup laid over the dump; empty when the dump includes it
+    update: str = ""  # a separate update folder, .nup or .nx laid over the dump; empty when the dump includes it
 
     def update_path(self) -> Path | None:
         return absolute_path(self.update, "Update", allow_links=True) if self.update else None
