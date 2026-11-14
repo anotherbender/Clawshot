@@ -21,6 +21,7 @@ class TrackerController:
         self.session = TrackerSession()
         self.lock = threading.RLock()
         self.source = ""
+        self.update = ""  # the remembered separate update, "" when the dump holds it
         self.icons = None
         self.icon_warning = ""
         self.allowed_icons = set()
@@ -45,9 +46,10 @@ class TrackerController:
         if slot is not None and (not isinstance(slot, str) or not slot):
             raise ValueError("Choose a listed save slot, or newest slot.")
         with self.lock:
-            source = app.preferences.snapshot().get("dump", "")
-            if source != self.source:
-                self.source, self.icons, self.icon_warning = source, None, ""
+            saved = app.preferences.snapshot()
+            source, update = saved.get("dump", ""), saved.get("update", "")
+            if (source, update) != (self.source, self.update):
+                self.source, self.update, self.icons, self.icon_warning = source, update, None, ""
             self.session.configure(seed, save_folder=folder, slot=slot, show_locations=show_locations)
             return self.snapshot()
 
@@ -90,7 +92,7 @@ class TrackerController:
             if actor not in self.allowed_icons or not self.source:
                 return None
             if self.icons is None:
-                self.icons = IconCache(Path(self.source))
+                self.icons = IconCache(Path(self.source), update=Path(self.update) if self.update else None)
             path = self.icons.get(actor)
             if path is None:
                 self.icon_warning = "Some local icons are unavailable; text labels remain complete."

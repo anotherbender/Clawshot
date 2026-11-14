@@ -6,6 +6,7 @@ import struct
 from pathlib import Path
 
 import pytest
+from test_pack_nx import write_nx
 from test_tracker_icons import icon_file, noise, png_pixels, romfs_with, tree
 from test_ui import request, running_server
 
@@ -162,6 +163,25 @@ def test_tracker_assets_and_icons_keep_transport_guards(tracker_seed):
             assert request(server, "", path=server.prefix + "tracker-icons/" + actor + ".png")[0] == 404
         assert request(server, "tracker-obs", token=False)[0] == 403
         assert request(server, "", path="/s/wrong/tracker.html")[0] == 403
+
+
+def test_tracker_icons_come_from_the_remembered_nx_dump_and_separate_update(tracker_seed, tmp_path, monkeypatch):
+    root, _ = tracker_seed
+    monkeypatch.setattr(icons, "default_cache_dir", lambda: tmp_path / "icon-cache")
+    base, update = noise(60, 30), noise(60, 31)
+    dump = write_nx(tmp_path / "game.nx", [(0, 0, {"romfs/UI/Tex/Icon/Item_Bottle.bntx.zs": icon_file(pixels=base)})])
+    separate = romfs_with(tmp_path / "update", {"Item_Bottle": icon_file(pixels=update)})
+    preferences = Preferences()
+    preferences.remember("dump", str(dump))
+    with running_server(Application(preferences=preferences)) as server:
+        url = server.prefix + "tracker-icons/Item_Bottle.png"
+        for remembered, expected in (("", base), (str(separate), update), ("", base)):
+            preferences.remember("update", remembered)  # as choosing the dump on Generate remembers it
+            assert request(server, "tracker-configure", {"seed": str(root)})[0] == 200
+            status, _, image = request(server, "", path=url)
+            assert status == 200, image
+            assert png_pixels(image)[2] == expected
+    dump.rename(tmp_path / "closed.nx")  # no leaked handle (Windows)
 
 
 def test_tracker_folder_picker_is_explicit_and_read_only(tmp_path):

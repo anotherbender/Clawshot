@@ -25,7 +25,7 @@ import zstandard
 
 from clawshot.formats import zsdic
 from clawshot.pack import ROOT
-from clawshot.pack.source import dump_layers, open_nup
+from clawshot.pack.source import dump_layers, open_source
 from clawshot.tracker import bntx
 
 ICON_FOLDER = "UI/Tex/Icon"
@@ -373,34 +373,54 @@ def _inside(path: Path, folder: Path) -> bool:
 _FAILURES = (ValueError, OSError, LookupError, zstandard.ZstdError)
 
 
+def _kind(path: Path) -> str | None:
+    """How :func:`clawshot.pack.source.open_source` reads ``path``, or None when nothing is there."""
+    if path.is_dir():
+        return "dump" if dump_layers(path) is not None else "romfs"
+    if path.is_file():
+        return "nx" if path.suffix.lower() == ".nx" else "nup"
+    return None
+
+
 class IconCache:
     """PNG icons for whitelisted actor names, decoded once from the player's dump and kept in ``cache_dir``.
 
-    ``source`` is an extracted RomFS folder, a dump folder in the layout NUP packs from (``base/romfs`` and
-    optionally ``updates/<version>/romfs``, the newest update's copy winning, as
-    :class:`clawshot.pack.source.LayeredRomfs`) or a ``.nup`` read in place through
-    :func:`clawshot.pack.source.open_nup` (one opening reads the whitelisted icon files into memory, about 7 MB;
-    nothing is extracted and the file is closed again). The source is only read.
+    ``source`` is a game dump as :func:`clawshot.pack.source.open_source` takes it: an extracted RomFS folder, a dump
+    folder in the layout NUP packs from (``base/romfs`` and optionally ``updates/<version>/romfs``, the newest update's
+    copy winning, as :class:`clawshot.pack.source.LayeredRomfs`), a ``.nup`` or an ``.nx``. ``update`` is a separately
+    chosen update in any of those forms, laid over the dump as :class:`clawshot.pack.source.StackedRomfs` reads it:
+    the newest layer holding an icon's file wins. Folders are read file by file. An archive is opened through
+    ``open_source``, so it gives its newest package or snapshot exactly as generation reads it; one opening reads its
+    whitelisted icon files into memory (about 7 MB), nothing is extracted and the file is closed again. The sources
+    are only read.
 
-    ``cache_dir`` defaults to :func:`default_cache_dir`; it may not lie inside the source folder or the Clawshot
-    checkout. A PNG's name carries the SHA-256 of the stored icon file and :data:`CACHE_VERSION`, so another dump or a
-    changed file is decoded again and older PNGs of that icon are removed; a later :class:`IconCache` reuses the PNG.
+    ``cache_dir`` defaults to :func:`default_cache_dir`; it may not lie inside a source folder or the Clawshot
+    checkout. A PNG's name carries the SHA-256 of the stored icon file and :data:`CACHE_VERSION`, so another dump or
+    update, or a changed file, is decoded again and older PNGs of that icon are removed; a later :class:`IconCache`
+    reuses the PNG.
 
     :meth:`get` never raises for a missing source, file or decoder, or an unreadable or unsupported texture: it
     returns None and :attr:`problems` keeps why, for the tracker to show the item's name instead. No network access.
     Safe to share between threads.
     """
 
-    def __init__(self, source: str | os.PathLike, cache_dir: str | os.PathLike | None = None):
+    def __init__(
+        self,
+        source: str | os.PathLike,
+        cache_dir: str | os.PathLike | None = None,
+        *,
+        update: str | os.PathLike | None = None,
+    ):
         self.source = Path(source)
+        self.update = Path(update) if update is not None else None
         self.cache_dir = Path(cache_dir) if cache_dir is not None else default_cache_dir()
         cache = self.cache_dir.resolve()
-        if _inside(cache, ROOT.resolve()) or (self.source.is_dir() and _inside(cache, self.source.resolve())):
+        folders = [path.resolve() for path in (self.source, self.update) if path is not None and path.is_dir()]
+        if _inside(cache, ROOT.resolve()) or any(_inside(cache, folder) for folder in folders):
             raise ValueError(f"icon cache {self.cache_dir} must lie outside the game dump and the Clawshot folder")
         self._lock = threading.Lock()
         self._done: dict[str, tuple[tuple, Path]] = {}
-        self._nup_files: dict[str, bytes] = {}
-        self._nup_signature: tuple | None = None
+        self._archives: dict[Path, tuple[tuple, dict[str, bytes]]] = {}
         self._problems: dict[str, str] = {}
 
     @property
@@ -410,12 +430,14 @@ class IconCache:
             return dict(self._problems)
 
     def status(self) -> dict:
-        """JSON-able summary: source and its kind, cache folder, decoder, and the current problems."""
+        """JSON-able summary: source, update and their kinds, cache folder, decoder, and the current problems."""
         with self._lock:
             problems = dict(self._problems)
         return {
             "source": str(self.source),
-            "kind": self._kind(),
+            "kind": _kind(self.source),
+            "update": str(self.update) if self.update is not None else None,
+            "update_kind": _kind(self.update) if self.update is not None else None,
             "cache_dir": str(self.cache_dir),
             "decoder": decoder_version(),
             "problems": problems,
@@ -441,31 +463,49 @@ class IconCache:
             self._problems.pop(actor, None)
             return path
 
-    def _kind(self) -> str | None:
-        if self.source.is_dir():
-            return "dump" if dump_layers(self.source) is not None else "romfs"
-        return "nup" if self.source.is_file() else None
+    def _layers(self) -> list[tuple[Path, bool]]:
+        """Every layer oldest first, the dump's before the update's, each with whether it is an archive."""
+        layers = []
+        for path, name in ((self.source, "game dump"), (self.update, "update")):
+            if path is None:
+                continue
+            kind = _kind(path)
+            if kind is None:
+                raise IconUnavailable(f"the {name} {path} is not there")
+            if kind in ("nup", "nx"):
+                layers.append((path, True))
+            else:
+                layers.extend((layer, False) for layer in (dump_layers(path) if kind == "dump" else [path]))
+        return layers
+
+    def _find(self, icon: str, relative: str) -> tuple[tuple, Path | bytes] | None:
+        """The newest layer's copy of ``relative``: its signature and its file (a folder's) or stored bytes (an
+        archive's). A signature names the layer and its size and time, so a newer layer gaining the file, or a
+        changed file or archive, gives another one."""
+        for layer, archive in reversed(self._layers()):
+            if archive:
+                signature, files = self._archive(layer)
+                if icon in files:
+                    return signature, files[icon]
+                continue
+            file = layer / relative
+            if file.is_file():
+                stat = file.stat()
+                return (str(file), stat.st_size, stat.st_mtime_ns), file
+        return None
 
     def _png(self, icon: str) -> Path:
         relative = f"{ICON_FOLDER}/{icon}{ICON_SUFFIX}"
-        kind = self._kind()
-        if kind is None:
-            raise IconUnavailable(f"the game dump {self.source} is not there")
-        if kind == "nup":
-            stat = self.source.stat()
-            signature = ("nup", stat.st_size, stat.st_mtime_ns)
-            file = None
-        else:
-            layers = dump_layers(self.source) if kind == "dump" else [self.source]
-            file = next((layer / relative for layer in reversed(layers) if (layer / relative).is_file()), None)
-            if file is None:
-                raise IconUnavailable(f"the game dump has no romfs/{relative}")
-            stat = file.stat()
-            signature = (str(file), stat.st_size, stat.st_mtime_ns)
+        found = self._find(icon, relative)
+        if found is None:
+            where = "the game dump and its update have" if self.update is not None else "the game dump has"
+            raise IconUnavailable(f"{where} no romfs/{relative}")
+        signature, stored = found
         done = self._done.get(icon)
         if done is not None and done[0] == signature and done[1].is_file():
             return done[1]
-        stored = self._nup_icon(icon, relative, signature) if file is None else file.read_bytes()
+        if isinstance(stored, Path):
+            stored = stored.read_bytes()
         digest = hashlib.sha256(stored).hexdigest()[:32]
         target = self.cache_dir / f"{icon}.{digest}.v{CACHE_VERSION}.png"
         if not target.is_file():
@@ -473,15 +513,18 @@ class IconCache:
         self._done[icon] = (signature, target)
         return target
 
-    def _nup_icon(self, icon: str, relative: str, signature: tuple) -> bytes:
-        if self._nup_signature != signature:
-            with open_nup(self.source) as nup:
+    def _archive(self, path: Path) -> tuple[tuple, dict[str, bytes]]:
+        """A ``.nup`` or ``.nx`` layer's signature and whitelisted icon files, read again when its size or time
+        changes."""
+        stat = path.stat()
+        signature = (str(path), stat.st_size, stat.st_mtime_ns)
+        cached = self._archives.get(path)
+        if cached is None or cached[0] != signature:
+            with open_source(path) as archive:
                 paths = {name: f"{ICON_FOLDER}/{name}{ICON_SUFFIX}" for name in sorted(ICON_IDS)}
-                files = {name: nup.read(path) for name, path in paths.items() if path in nup.files}
-            self._nup_files, self._nup_signature = files, signature
-        if icon not in self._nup_files:
-            raise IconUnavailable(f"the NUP's newest package has no romfs/{relative}")
-        return self._nup_files[icon]
+                files = {name: archive.read(member) for name, member in paths.items() if archive.has(member)}
+            cached = self._archives[path] = (signature, files)
+        return cached
 
     def _write(self, icon: str, target: Path, png: bytes) -> None:
         self.cache_dir.mkdir(parents=True, exist_ok=True)

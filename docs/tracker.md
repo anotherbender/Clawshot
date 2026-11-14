@@ -122,7 +122,8 @@ into its corresponding source.
 ## Local icons and fallback
 
 No game art or fonts are included. Icons are decoded at runtime from **your own** checked Game
-dump (`UI/Tex/Icon/*.bntx.zs`), including `.nup` inputs, using the optional UI texture decoder.
+dump (`UI/Tex/Icon/*.bntx.zs`), including `.nup` and `.nx` inputs and a separately chosen update
+(its copy of an icon wins), using the optional UI texture decoder.
 The optional `ui` extra includes [texture2ddecoder 1.0.6](https://pypi.org/project/texture2ddecoder/1.0.6/)
 ([MIT licence](https://github.com/K0lb3/texture2ddecoder/blob/master/LICENSE)); compatible wheels exist
 for Windows, Linux and macOS. Use `uv run --extra ui python -m clawshot.ui` from source.
@@ -133,7 +134,7 @@ interface and icon extraction make no network requests. Linux/macOS icon executi
 Decoded PNGs are private game-derived data, never shipped in this repository or a seed pack.
 Cache folders: Windows `%LOCALAPPDATA%/Clawshot/Cache/icons`; macOS
 `~/Library/Caches/Clawshot/icons`; Linux `$XDG_CACHE_HOME/clawshot/icons` (default `~/.cache/clawshot/icons`).
-Do not share them. Filenames include the source icon's hash; changing the dump invalidates that icon.
+Do not share them. Filenames include the source icon's hash; changing the dump or its update invalidates that icon.
 Small keys, boss keys, maps and compasses use the game's `Item_Dungeon_*` icon files through
 the same decoder/cache. Songs, stones and medallions have no file in `UI/Tex/Icon`: labelled views
 use text, and compact OBS uses the CSS quest chips described above.

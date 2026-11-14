@@ -13,6 +13,7 @@ import zlib
 import pytest
 import zstandard
 from test_pack_nup import write_nup
+from test_pack_nx import write_nx
 
 from clawshot.pack import ROOT
 from clawshot.tracker import bntx, icons
@@ -402,6 +403,57 @@ def test_a_nup_is_read_in_place_and_closed(tmp_path):
     nup.rename(tmp_path / "closed.nup")  # no leaked handle (Windows)
 
 
+def test_an_nx_is_read_through_the_shared_source_and_closed(tmp_path, monkeypatch):
+    base, pixels = noise(60, 17), noise(60, 18)
+    member = "romfs/UI/Tex/Icon/{}.bntx.zs".format
+    older = {member("Item_Bomb"): icon_file(pixels=base), member("Item_Bombchu"): icon_file(pixels=noise(60, 19))}
+    newest = {member("Item_Bomb"): icon_file(pixels=pixels), "romfs/other": b"x"}
+    nx = write_nx(tmp_path / "game.nx", [(0, 0, older), (1, 131072, newest)], compress={"Item_Bomb.bntx.zs"})
+    cache = icons.IconCache(nx, cache_dir=tmp_path / "cache")
+    path = cache.get("Pouch_Bomb")
+    assert path is not None and png_pixels(path.read_bytes())[2] == pixels
+    assert cache.status()["kind"] == "nx" and cache.problems == {}
+    assert cache.get("Item_Bombchu") is None  # the newest snapshot is read alone, never mixed with the base's files
+    assert "no romfs/UI/Tex/Icon/Item_Bombchu.bntx.zs" in cache.problems["Item_Bombchu"]
+    monkeypatch.setattr(icons, "icon_png", lambda *_: pytest.fail("decoded again"))
+    assert icons.IconCache(nx, cache_dir=tmp_path / "cache").get("Item_Bomb") == path
+    nx.rename(tmp_path / "closed.nx")  # no leaked handle (Windows)
+
+
+def test_a_separate_update_is_laid_over_the_dump_and_its_changes_are_decoded_again(tmp_path):
+    base, first, second = noise(60, 20), noise(60, 21), noise(16 * 2 * 4, 22)
+    dump = romfs_with(tmp_path / "romfs", {"Item_Bomb": icon_file(pixels=base), "Item_Bombchu": icon_file(pixels=base)})
+    member = "romfs/UI/Tex/Icon/Item_Bomb.bntx.zs"
+    update = write_nx(tmp_path / "update.nx", [(1, 131072, {member: icon_file(pixels=first)})])
+    cache = icons.IconCache(dump, cache_dir=tmp_path / "cache", update=update)
+    status = cache.status()
+    assert (status["kind"], status["update"], status["update_kind"]) == ("romfs", str(update), "nx")
+    old = cache.get("Pouch_Bomb")
+    assert png_pixels(old.read_bytes())[2] == first  # the update's copy wins
+    assert png_pixels(cache.get("Item_Bombchu").read_bytes())[2] == base  # a file the update lacks: the dump's
+
+    before = update.stat().st_mtime_ns
+    write_nx(update, [(1, 131072, {member: icon_file(width=16, height=2, pixels=second)})])  # replaced in place
+    os.utime(update, ns=(before + 10_000_000, before + 10_000_000))
+    new = cache.get("Item_Bomb")
+    assert new != old and not old.exists() and png_pixels(new.read_bytes()) == (16, 2, second)
+    update.rename(tmp_path / "closed.nx")  # no leaked handle (Windows)
+
+    folder = tmp_path / "update"
+    folder.mkdir()
+    later = icons.IconCache(dump, cache_dir=tmp_path / "cache", update=folder)
+    assert png_pixels(later.get("Item_Bombchu").read_bytes())[2] == base
+    romfs_with(folder, {"Item_Bombchu": icon_file(pixels=first)})  # the update gains the file
+    assert png_pixels(later.get("Item_Bombchu").read_bytes())[2] == first
+    assert png_pixels(later.get("Item_Bomb").read_bytes())[2] == base
+    assert later.get("Item_Boomerang") is None
+    assert "the game dump and its update have no romfs/UI/Tex/Icon/Item_Boomerang" in later.problems["Item_Boomerang"]
+
+    gone = icons.IconCache(dump, cache_dir=tmp_path / "cache", update=tmp_path / "gone")
+    assert gone.get("Item_Bomb") is None and "the update" in gone.problems["Item_Bomb"]
+    assert "is not there" in gone.problems["Item_Bomb"] and gone.status()["update_kind"] is None
+
+
 def test_every_failure_falls_back_to_text_with_a_reason(tmp_path, monkeypatch):
     source = romfs_with(
         tmp_path / "romfs",
@@ -439,6 +491,8 @@ def test_the_cache_folder_stays_outside_the_dump_and_the_checkout(tmp_path):
     with pytest.raises(ValueError, match="outside"):
         icons.IconCache(source, cache_dir=ROOT / "icon-cache")
     assert not (ROOT / "icon-cache").exists()
+    with pytest.raises(ValueError, match="outside"):
+        icons.IconCache(tmp_path / "game.nx", cache_dir=source / "UI" / "cache", update=source)
 
 
 def test_threads_share_one_decode(tmp_path):
