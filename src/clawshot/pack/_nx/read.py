@@ -230,6 +230,8 @@ class NxArchive:
         """§4: applications and snapshots, plus the extension table's required types."""
         if data[:4] != b"NXCT" or _u16(data, 4) != 1 or _u16(data, 6) != 128 or _u64(data, 8) != len(data):
             raise NxError("bad catalog header")
+        if _u32(data, 16) or _u32(data, 44) or any(data[112:128]):
+            raise NxError("unsupported catalog flags or reserved fields")
         app_count, snap_count, ext_count = _u32(data, 20), _u32(data, 28), _u32(data, 40)
         app_table, snap_table, ext_table = _u64(data, 48), _u64(data, 64), _u64(data, 88)
         pool = _range(data, _u64(data, 96), _u64(data, 104), "catalog string pool")
@@ -238,6 +240,9 @@ class NxArchive:
         exts = _range(data, ext_table, ext_count * 32, "extension table")
         for i in range(ext_count):
             type_id, flags = _u32(exts, i * 32), _u32(exts, i * 32 + 4)
+            if flags & ~1 or _u16(exts, i * 32 + 10):
+                raise NxError("unsupported extension flags or reserved fields")
+            _range(data, _u64(exts, i * 32 + 16), _u64(exts, i * 32 + 24), "extension payload")
             if flags & 1 and type_id not in KNOWN_REQUIRED_EXTENSIONS:
                 raise NxError(f"unknown required catalog extension {type_id:#010x}")
 
@@ -276,6 +281,8 @@ class NxArchive:
         """§6: directory, file, entry and block-reference tables, and the path pool."""
         if data[:4] != b"NXMF" or _u16(data, 4) != 1 or _u16(data, 6) != 96 or _u64(data, 8) != len(data):
             raise NxError("bad manifest header")
+        if any(data[80:96]):
+            raise NxError("nonzero manifest reserved fields")
         dirs, files, entries, refs = _u32(data, 16), _u32(data, 20), _u32(data, 24), _u32(data, 28)
         self._dirs = _range(data, _u64(data, 32), dirs * 16, "directory table")
         self._files = _range(data, _u64(data, 40), files * 64, "file table")
@@ -292,12 +299,16 @@ class NxArchive:
         if file_id >= self._file_count:
             raise NxError(f"file id {file_id} out of range")
         row = self._files[file_id * 64 : file_id * 64 + 64]
+        if any(row[17:20]) or any(row[52:64]):
+            raise NxError(f"file {file_id}: unsupported flags or reserved fields")
         record = NxFile(_u64(row, 0), _u32(row, 8), _u32(row, 12), row[16], row[20:52])
         if not 16 <= record.chunk_log2 <= 20:
             raise NxError(f"file {file_id}: bad chunk size")
         expected = -(-record.size // (1 << record.chunk_log2))
         if record.block_count != expected:
             raise NxError(f"file {file_id}: {record.block_count} blocks for {record.size} bytes")
+        if record.first_reference + record.block_count > len(self._refs) // 4:
+            raise NxError(f"file {file_id}: block references out of range")
         return record
 
     def tree(self, snapshot: Snapshot) -> dict[str, NxFile]:
@@ -306,20 +317,33 @@ class NxArchive:
         seen_dirs: set[int] = set()
         seen_files: set[int] = set()
         pool_start, pool_size = self._pool
-        stack = [(snapshot.root, "")]
+        stack = [(snapshot.root, "", 0)]
         while stack:
-            directory, prefix = stack.pop()
+            directory, prefix, depth = stack.pop()
+            if depth > 256:
+                raise NxError("directory depth exceeds the 256-level resource limit")
             if directory >= self._dir_count or directory in seen_dirs:
                 raise NxError(f"snapshot {snapshot.index}: directory {directory} is out of range or a cycle")
             seen_dirs.add(directory)
             first, count = _u32(self._dirs, directory * 16), _u32(self._dirs, directory * 16 + 4)
+            if any(self._dirs[directory * 16 + 8 : directory * 16 + 16]):
+                raise NxError("unsupported directory flags or reserved fields")
             names = set()
+            previous_name = b""
             for e in range(first, first + count):
                 row = _range(self._entries, e * 24, 24, "directory entry")
+                if any(row[17:24]):
+                    raise NxError("unsupported directory entry flags or reserved fields")
                 name_offset, name_length = _u64(row, 0), _u32(row, 8)
+                if not 1 <= name_length <= 4096:
+                    raise NxError("path component exceeds the 4096-byte resource limit")
                 if name_offset < pool_start or name_offset + name_length > pool_start + pool_size:
                     raise NxError("entry name outside the path pool")
-                name = self._manifest[name_offset : name_offset + name_length].decode("utf-8")
+                raw_name = self._manifest[name_offset : name_offset + name_length]
+                if raw_name <= previous_name:
+                    raise NxError("unsorted or duplicate directory entry name")
+                previous_name = raw_name
+                name = raw_name.decode("utf-8")
                 if (
                     not name
                     or name in (".", "..")
@@ -333,7 +357,7 @@ class NxArchive:
                 target, kind = _u32(row, 12), row[16]
                 path = f"{prefix}{name}"
                 if kind == ENTRY_DIRECTORY:
-                    stack.append((target, path + "/"))
+                    stack.append((target, path + "/", depth + 1))
                 elif kind == ENTRY_FILE:
                     if target in seen_files:
                         raise NxError(f"snapshot {snapshot.index}: file {target} appears twice")
@@ -348,8 +372,10 @@ class NxArchive:
             raise NxError(f"block {block_id} out of range")
         row = self._blocks[block_id * 24 : block_id * 24 + 24]
         offset, stored, logical, codec = _u64(row, 0), _u32(row, 8), _u32(row, 12), row[16]
-        if not 0 < logical <= 1 << 20 or stored > 2 << 20:
+        if not 0 < logical <= 1 << 20 or not 0 < stored <= (1 << 20) + (64 << 10):
             raise NxError(f"block {block_id}: block exceeds the decoded/encoded resource limit")
+        if any(row[17:20]):
+            raise NxError(f"block {block_id}: unsupported flags or reserved fields")
         data = self._pread(offset, stored)
         if codec == CODEC_RAW:
             if stored != logical:

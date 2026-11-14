@@ -307,3 +307,17 @@ def test_a_zstd_block_must_be_exactly_one_frame(tmp_path):
     )
     with pytest.raises(PackError, match="invalid NX"), open_source(path) as source:
         source.read("a")
+
+
+def test_authenticated_unknown_catalog_flags_are_refused(tmp_path):
+    path = _game(tmp_path)
+    data = bytearray(path.read_bytes())
+    offset, size = struct.unpack_from("<QQ", data, 24)
+    data[offset + 16] = 1
+    digest = hashlib.sha256(data[offset : offset + size]).digest()
+    for slot in (0, 4096):
+        data[slot + 120 : slot + 152] = digest
+        struct.pack_into("<I", data, slot + 252, crc32c(data[slot : slot + 252]))
+    path.write_bytes(data)
+    with pytest.raises(NxError, match="flags"):
+        NxArchive(path)

@@ -131,7 +131,7 @@ Manifest and block-index hashes and every file read are checked; the fingerprint
 Only archives that hold a `romfs/` tree (converted from a NUP or an extracted dump) can be read; one packed
 from a decrypted NSP is refused with an explanation.
 Clawshot accepts portable filesystem names (no Windows-invalid components or case-colliding siblings).
-Mount metadata is limited to 256 MiB; decoded blocks and Zstandard windows to 1 MiB, stored blocks to 2 MiB.
+Mount metadata is limited to 256 MiB; decoded blocks and Zstandard windows to 1 MiB, stored blocks to 1 MiB + 64 KiB.
 Oversized, dictionary-dependent or multi-frame blocks are refused rather than guessed.
 
 After preflight, Make creates a unique `.romfs-*` working cache inside this extracted pack.
