@@ -49,6 +49,30 @@ def test_missing_dump_and_existing_wrong_kind_have_distinct_http_errors(made_ui_
         assert request(server, "schema")[2]["paths"]["dump"] == str(source)
 
 
+@pytest.mark.parametrize("exists", [False, True])
+def test_missing_update_and_existing_wrong_kind_have_distinct_http_errors(tmp_path, exists):
+    dump = tmp_path / "cart/romfs"
+    dump.mkdir(parents=True)
+    bad = tmp_path / ("existing.txt" if exists else "moved-update.nx")
+    if exists:
+        bad.write_bytes(b"synthetic wrong file kind")
+    preferences = Preferences()
+    preferences.remember("dump", str(dump))
+    preferences.remember("update", str(tmp_path / "remembered-update"))
+    before = preferences.snapshot()
+    app = Application(Jobs(synthetic_run), spec=synthetic_spec(), preferences=preferences)
+    with running_server(app) as server:
+        status, _, response = request(server, "detect", {"dump": str(dump), "update": str(bad)})
+    assert status == 400
+    expected = (
+        "Update: choose an extracted romfs folder, a .nup or an .nx file"
+        if exists
+        else f"Update not found: {bad}. Choose the update's romfs folder, .nup or .nx again."
+    )
+    assert response["error"] == expected
+    assert preferences.snapshot() == before
+
+
 @pytest.mark.parametrize("archive", ["no-romfs", "damaged"])
 def test_a_refused_nx_shows_the_readers_own_reason_over_http(tmp_path, archive):
     if archive == "no-romfs":  # packed from a decrypted NSP: native NCAs, no romfs/ tree

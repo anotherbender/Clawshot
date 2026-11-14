@@ -297,7 +297,9 @@ Choose its updated `romfs`, full `.nup` or `.nx`, or dump folder with `base/romf
 the folder name. It never starts or changes the game. A different update or incomplete dump is
 refused: check your own dump and update, rather than renaming files or bypassing the check.
 If Check says **Not found: …**, that path no longer exists (including a stale remembered dump).
-Choose your romfs folder or .nup again. An existing file of the wrong kind still gets the input-type advice.
+Choose your romfs folder, `.nup` or `.nx` again. **Update not found: …** means the same for a separate
+update: choose the update's romfs folder, `.nup` or `.nx` again. An existing file of the wrong kind still
+gets the input-type advice.
 
 ### Which Hookshot or Longshot version do I need?
 

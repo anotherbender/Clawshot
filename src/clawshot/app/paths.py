@@ -67,7 +67,9 @@ def dump_root(path: Path) -> Path:
 
 def _source_path(value: str, label: str) -> Path:
     path = absolute_path(value, label, allow_links=True)
-    if not path.exists():
+    if not path.exists():  # a moved or deleted input: name which one to choose again
+        if label == "Update":
+            raise ValueError(f"Update not found: {path}. Choose the update's romfs folder, .nup or .nx again.")
         raise ValueError(f"Not found: {path}. Choose your romfs folder, .nup or .nx again.")
     if not path.is_dir() and (not path.is_file() or path.suffix.lower() not in ARCHIVE_SUFFIXES):
         raise ValueError(f"{label}: choose an extracted romfs folder, a .nup or an .nx file")
