@@ -19,8 +19,8 @@ unpacks bundles. Added:
   ``NonEventMemberSetting`` is ``AllPause``: everything stopped, as the user saw); and a row in
   ``RSDB/GameAnalyzedEventInfo`` (the donor's, its sub-flow ``GetPouchContent``), each table in name order as the
   game keeps it;
-- the saved Bool :data:`FLAG`, whose presence tells the bridge the event is there (an older mod has none), and with
-  the slot's pick-up notices on, :data:`NOTICE_FLAG` (its presence turns the notice on).
+- the saved Bool :data:`FLAG`, whose presence tells the bridge the event is there (an older mod has none).
+  Each request's ``ShowNotice`` Bool controls its pick-up notice; no saved notice-toggle flag is installed.
 
 Seen in game (nxnative, 2026-11-12): the requested event runs and gives rupees with the counter (its first build,
 which called those two entry points as sub-flows, crashed there), stopping play as the donor's setting does. **Not
@@ -39,7 +39,6 @@ from clawshot.patch.write import NewFile
 
 EVENT = "Clawshot_Receive"
 FLAG = "Archipelago.ReceiveEvent"
-NOTICE_FLAG = "Archipelago.PickupNotice"
 FLOW_PATH = f"Event/EventFlow/{EVENT}.bfevfl.zs"
 DONOR = "Dm_SY_Get_WithoutPlayer"
 PLAYER_BASE = "Dm_SY_Get"  # whose EventBaseSetting (Link's position) the event takes

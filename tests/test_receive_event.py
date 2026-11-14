@@ -31,8 +31,11 @@ def walk(fc, actor_name, notice, recover, category=0):
         actor = fc.actors[e.actor]
         if isinstance(e, evfl.SwitchEvent):
             query = actor.queries[e.query]
+            notice_value = (e.params or {}).get("BoolValue", False)
+            if isinstance(notice_value, evfl.Argument):
+                notice_value = args[notice_value]
             answer = {
-                "EventQueryIsBool": 0 if args["ShowNotice"] else 1,
+                "EventQueryIsBool": 0 if notice_value else 1,
                 "EventQueryIsRecoverHeartOrMpActor": 0 if recover else 1,
                 "EventQueryCheckPouchContentCategory": category,
                 "EventQueryIsRupeeMax": 1,
@@ -63,6 +66,14 @@ def test_the_event_gives_consumables_as_the_game_does():
         ("EventTriggerRequestOpenPickUpWindow", "Obj_Heart"),
         ("EventTriggerRecoverByCureItem", "Obj_Heart"),
     ]
+
+
+@pytest.mark.parametrize("show_notice", [False, True])
+def test_notice_argument_changes_the_window_not_the_delivered_item(show_notice):
+    fc = evfl.read(receive_event.build_flow(donor())).flowchart
+    grant = ("EventTriggerAddOrRemovePouchContent", "Item_BombBundle_Small")
+    expected = [("EventTriggerRequestOpenPickUpWindow", grant[1]), grant] if show_notice else [grant]
+    assert walk(fc, grant[1], show_notice, False, category=3) == expected
 
 
 def test_its_rows_go_in_name_order():
