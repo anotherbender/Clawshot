@@ -23,6 +23,7 @@ REQUIRED_FEATURE_HEADER_PAGES = 1
 CHECK_SIZE = 16384
 MAX_CATALOG = 16 << 20
 MAX_MOUNT_METADATA = 256 << 20
+MAX_FILE_SIZE = 512 << 20
 ABSENT = 0xFFFFFFFF
 
 # §4 snapshot types and the required extensions this reader understands (unknown required ones reject, §11).
@@ -302,6 +303,8 @@ class NxArchive:
         if any(row[17:20]) or any(row[52:64]):
             raise NxError(f"file {file_id}: unsupported flags or reserved fields")
         record = NxFile(_u64(row, 0), _u32(row, 8), _u32(row, 12), row[16], row[20:52])
+        if record.size > MAX_FILE_SIZE:
+            raise NxError(f"file {file_id}: declared size {record.size} exceeds the {MAX_FILE_SIZE}-byte file limit")
         if not 16 <= record.chunk_log2 <= 20:
             raise NxError(f"file {file_id}: bad chunk size")
         expected = -(-record.size // (1 << record.chunk_log2))
@@ -392,8 +395,11 @@ class NxArchive:
         raise NxError(f"block {block_id}: unknown codec {codec}")
 
     def read(self, record: NxFile) -> bytes:
+        if record.size > MAX_FILE_SIZE:
+            raise NxError(f"declared file size {record.size} exceeds the {MAX_FILE_SIZE}-byte file limit")
         chunk = 1 << record.chunk_log2
         parts = []
+        digest = hashlib.sha256()
         for k in range(record.block_count):
             block_id = _u32(self._refs, (record.first_reference + k) * 4)
             data = self._block(block_id)
@@ -401,7 +407,7 @@ class NxArchive:
             if len(data) != want:
                 raise NxError(f"block {block_id}: {len(data)} bytes where the file needs {want}")
             parts.append(data)
-        data = b"".join(parts)
-        if hashlib.sha256(data).digest() != record.sha256:
+            digest.update(data)
+        if digest.digest() != record.sha256:
             raise NxError("file SHA-256 mismatch")
-        return data
+        return b"".join(parts)

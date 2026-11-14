@@ -2,11 +2,13 @@
 
 import hashlib
 import struct
+from dataclasses import replace
 
 import pytest
 import zstandard
 
 from clawshot.pack import PackError
+from clawshot.pack._nx import read as nx
 from clawshot.pack._nx.read import NxArchive, NxError, crc32c
 from clawshot.pack.source import game_version, open_source
 
@@ -321,3 +323,54 @@ def test_authenticated_unknown_catalog_flags_are_refused(tmp_path):
     path.write_bytes(data)
     with pytest.raises(NxError, match="flags"):
         NxArchive(path)
+
+
+def test_repeated_blocks_cannot_declare_an_unbounded_file(tmp_path):
+    path = write_nx(tmp_path / "expanded.nx", [(0, 0, {"romfs/repeat": b"x" * (1 << CHUNK_LOG2)})], compress={"repeat"})
+    data = bytearray(path.read_bytes())
+    offset, size = struct.unpack_from("<QQ", data, 72)
+    manifest = bytearray(data[offset : offset + size])
+    file_offset = struct.unpack_from("<Q", manifest, 40)[0]
+    declared_size = 2 << 30
+    count = declared_size >> CHUNK_LOG2
+    references = len(manifest)
+    manifest.extend(struct.pack("<I", 0) * count)
+    struct.pack_into("<QII", manifest, file_offset, declared_size, 0, count)
+    struct.pack_into("<I", manifest, 28, count)
+    struct.pack_into("<Q", manifest, 56, references)
+    struct.pack_into("<Q", manifest, 8, len(manifest))
+    growth = len(manifest) - size
+    data[offset : offset + size] = manifest
+    for slot in (0, 4096):
+        struct.pack_into("<Q", data, slot + 16, len(data))
+        struct.pack_into("<Q", data, slot + 80, len(manifest))
+        for field in (88, 104):
+            original = struct.unpack_from("<Q", data, slot + field)[0]
+            struct.pack_into("<Q", data, slot + field, original + growth)
+        data[slot + 152 : slot + 184] = hashlib.sha256(manifest).digest()
+        struct.pack_into("<I", data, slot + 252, crc32c(data[slot : slot + 252]))
+    path.write_bytes(data)
+    # Authenticated metadata and in-range repeated references, without allocating the declared payload.
+    assert path.stat().st_size < 256 << 10
+    with pytest.raises(PackError, match=r"declared size 2147483648 exceeds the .*byte file limit"), open_source(path):
+        pass
+
+
+def test_file_limit_accepts_the_boundary_and_refuses_one_byte_more(tmp_path, monkeypatch):
+    path = _game(tmp_path)
+    monkeypatch.setattr(nx, "MAX_FILE_SIZE", len(BIG))
+    with open_source(path) as source:
+        assert source.read("Big.bin") == BIG
+    monkeypatch.setattr(nx, "MAX_FILE_SIZE", len(BIG) - 1)
+    with pytest.raises(PackError, match="file limit"), open_source(path):
+        pass
+
+
+def test_direct_file_read_cannot_bypass_the_expansion_limit(tmp_path):
+    archive = NxArchive(_game(tmp_path))
+    try:
+        record = archive.tree(archive.snapshots[0])["romfs/Big.bin"]
+        with pytest.raises(NxError, match="file limit"):
+            archive.read(replace(record, size=nx.MAX_FILE_SIZE + 1))
+    finally:
+        archive.close()

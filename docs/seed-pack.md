@@ -133,6 +133,8 @@ from a decrypted NSP is refused with an explanation.
 Clawshot accepts portable filesystem names (no Windows-invalid components or case-colliding siblings).
 Mount metadata is limited to 256 MiB; decoded blocks and Zstandard windows to 1 MiB, stored blocks to 1 MiB + 64 KiB.
 Oversized, dictionary-dependent or multi-frame blocks are refused rather than guessed.
+Individual files are limited to 512 MiB, above the largest supported dump member. File hashes are checked
+incrementally before joining decoded blocks, so invalid repeated-block expansion is bounded and refused.
 
 After preflight, Make creates a unique `.romfs-*` working cache inside this extracted pack.
 It contains only the generator's resource working set (placements, flows, messages, supported
