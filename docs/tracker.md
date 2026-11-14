@@ -61,7 +61,8 @@ even while the app tab's spoiler mode is on.
 ## OBS Browser Source
 
 1. Configure the Tracker tab and keep Clawshot running.
-2. Choose **OBS columns** (1–8), **OBS item labels**, and **Transparent OBS background**, then **Copy URL**.
+2. Choose **OBS columns** (1–8), **OBS item labels**, the **OBS items/quest/dungeons** checkboxes,
+   and **Transparent OBS background**, then **Copy URL**.
    These OBS-only controls do not change the in-app tracker layout.
 3. In OBS add a **Browser Source** and use that URL. Groups stack vertically in a narrow block.
    Four columns is the default: about 340 pixels wide with labels, suitable for a side overlay.
@@ -75,7 +76,7 @@ chat. Closing/restarting Clawshot invalidates it; copy the new URL into OBS. Not
 on the network: the server binds only `127.0.0.1` on a random port, keeps its Host/Origin checks,
 and makes no external requests. OBS must run on the same computer.
 
-The URL fragment carries `columns=4&labels=1&icons=1&transparent=0` by default.
+The URL fragment defaults to `columns=4&labels=1&icons=1&transparent=0&sections=items,quest,dungeons`.
 `columns` accepts whole numbers 1–8; missing/invalid values use four. Copy the updated URL into
 OBS after changing controls. With labels off, successfully loaded icons sit in close cells:
 top-left badges show upgrade tiers and bottom-right badges show counts (bottles, ammo, rupees
@@ -98,6 +99,25 @@ The small-key badge is **held**, available to spend; the number below is **found
 including spent keys. Other icons are greyed out when missing. Hover for the full description;
 unknown flags show `?`. With icons disabled or unavailable, each indicator uses its name and
 saved value instead. Dungeon names and collection counts stay visible with item labels off.
+
+`sections` accepts comma-separated `items`, `quest` and `dungeons`. Quest includes hearts/tokens,
+songs, stones and medallions; Items includes inventory and equipment. Missing, empty or any unknown
+section value shows all. The original group order is preserved, not the order typed in the URL.
+Clearing the last section checkbox restores all three. Partial views omit **Checks by area**;
+the app tab always keeps every group.
+
+### Two browser sources for a 1080p stream
+
+1. Choose four columns, turn **OBS item labels** off, and leave **Local item icons** on.
+2. Check only **OBS dungeons**, **Copy URL**, and use it for the first Browser Source
+   (`sections=dungeons`).
+3. Check only **OBS items** and **OBS quest**, copy that URL, and use it for the second source
+   (`sections=items,quest`). Place the sources side by side; both follow the same seed/save.
+
+Start each source at **290×1080**. Increase columns if text fallbacks make a part taller.
+Changing checkboxes updates the copied URL, not URLs already configured in OBS; paste each new URL
+into its corresponding source.
+
 
 ## Local icons and fallback
 

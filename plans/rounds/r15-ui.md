@@ -41,6 +41,8 @@ Rapid-edit regression: synchronously clicking Free time travel On then another s
 
 ## OBS review — Claude, 2026-11-14
 
+Claude accepted the revised four-column compact shot on 2026-11-14: chips, circles and dungeon icon rows correct; no broken words, stray tiers or long paragraphs. Revision committed as `3ea7d6f`.
+
 - Compact songs use fixed, unbroken `ZL`, `Ep`, `Sa`, `Su`, `SoT`, `SoS`, `Min`, `Bol`, `Ser`, `Req`, `Noc`, `Pre`, `Scr` CSS chips; stones use `Kok`, `Gor`, `Zor`. Six medallions are plain colored circles (forest green, fire red, water blue, shadow purple, spirit orange, light yellow). Colors are semantic tokens in the existing palette root, not game art; no font or image assets added.
 - All 22 cells retain full title/ARIA names, grey-out for missing holdings, and visible `?` badges for unknowns. Chip bounds are at most 32×32 inside the normal compact cell; circles are 24×24. Single-tier items, songs and rewards never show a tier in either surface; 60 such entries checked in the app.
 - Compact OBS hides the heading paragraph, warning paragraphs and Checks by area; following normally has no status line. Actual empty synthetic save-folder smoke showed one short “Waiting for a saved game” line and 22 unknown quest badges. Tab status/warnings/areas, six-column dungeon table and 40-pixel icons remain unchanged.
@@ -54,12 +56,31 @@ Current compact native-icon matrix geometry (CSS pixels):
 | 4 | 280 | 1834 |
 | 6 | 283 | 1588 |
 
+## Split browser sources — Kareem via Claude, 2026-11-14
+
+- Added `sections=items,quest,dungeons` filtering. Quest owns collection counts, songs, stones and medallions; items owns inventory/equipment. Missing, empty or any unknown member falls back to all. Duplicate/reordered selections do not reorder the original groups. Partial views omit area checks. No server/save/seed contract changes.
+- Tracker-tab OBS items/quest/dungeons checkboxes update only the copied URL. A single click clearing the last checked group restores all three. Actual app smoke retained all six tab groups and the six-column table while the copied URL selected only dungeons or items/quest.
+- Both independent headless browser sources were opened simultaneously from the actual copied URLs (including encoded comma), followed synthetic seed 73 and showed their distinct groups without changing each other. `shots/two-source-live.json` records the result.
+- Added `tests/test_tracker_options.py`: two Node-backed tests exercise the actual shipped JS parser through missing/empty/unknown/mixed-invalid and valid/encoded/reordered/duplicate selections. **2 passed in 0.48s**, with tasklist selecting 3 workers (neither game running). Node is optional for these frontend tests, not an app/runtime/build dependency.
+- First test-harness attempt passed multiline code through Volta's Windows `node -e` shim and got no JSON output. Printed executable/version/argv/stdout/stderr isolated quoting failure (`node: -e requires an argument` for a minimal multiline diagnostic). The harness now executes a temporary `.cjs` file; production parsing needed no workaround.
+- HTTP/browser scenarios checked single groups, items/quest, missing/empty/unknown/mixed-invalid fallback, and preserved order. Requested files: `shots/obs-c4-labels0-icons1-sections-dungeons.png` and `shots/obs-c4-labels0-icons1-sections-items-quest.png`; new control capture `shots/tracker-tab-sections.png`. `docs/tracker.md` contains the two-source recipe.
+- Initial burst capture received two TCP `ERR_CONNECTION_REFUSED` image requests (Bomb Bag and Bullet Bag), while the server's icon-provider warning list stayed empty; later captures showed the source files available. No production retry/server workaround was added. Final image-complete captures bound the capture harness to two concurrent real icon requests, retain real HTTP/native art, and record that condition in `shots/split-source-metrics.json`; original fallback metrics remain in `shots/sections-metrics.json`.
+
+Four-column compact sources, local icons on (CSS pixels; both fit 1080 high without cropping):
+
+| Sections | Width | Height |
+|---|---:|---:|
+| dungeons | 280 | 845 |
+| items,quest | 280 | 1029 |
+
+The earlier queued runner was cancelled before this edit, as Claude directed. Re-queue only after committing the final sections change and verifying a clean tree. The revised runner pins a full expected HEAD, refuses changes before/after every stage, and records HEAD/clean status in `gate-results.json`.
+
 ## Gates and handoff
 
 Pre-review full synthetic passed (details below); reviewed full synthetic and dump gates pending in the ordered queue. No in-game check required: tracker reads are unchanged, and app exposure uses the existing free-time-travel patch. Prior played behavior is documented in settings/roadmap; this round does not claim new in-game evidence or certify unplayed early-door returns.
 
 - Targeted `CLAWSHOT_WORKERS=3 uv run pytest tests/test_tracker_http.py tests/test_tracker_icons.py -m "not dump" -q`: **75 passed in 3.35s**. Synthetic HTTP coverage includes all four distinct decoded textures, absent/current-state icon authorization, wrong token/foreign Origin refusal, no source/seed writes, true/false/unknown flags, separate held/found counts, replaced-save polling and permanent OBS spoiler stripping.
-- Queue after OBS review: reviewed B synthetic follows cs15d's corrected synthetic and precedes dumps; D dump precedes B dump, with other slots/away window controlled by Claude. The runner checks unfiltered CSV tasklist at every stage start, selects one worker while either game executable runs, and reserves/releases `gate.lock` atomically. No full-suite supervisor deadline.
+- Latest queue (Claude, after accepting OBS): D's running dump holds the lock; B's revised synthetic takes it next, then A's two synthetics, then B's dump (after D). The runner checks unfiltered CSV tasklist at every stage start, selects one worker while either game executable runs, and reserves/releases `gate.lock` atomically. No full-suite supervisor deadline.
 - Initial global format check: 369 files formatted. Lint printed I001 because the new tracker constant had two blank lines after imports; reduced to one. The final gate reruns both checks after that printed-cause correction.
 - Process-check correction: the targeted command's two `tasklist /FI` image filters were combined as AND, so that prefix alone cannot prove both games absent. The earlier unfiltered list showed neither; a process could still have started between checks. Subsequent independent checks found Longshot, and every full gate uses a fresh unfiltered CSV parse matching either exact executable, choosing one worker while present.
 - Pre-review final gates on `eff7dab` plus `ca8ecfa`/`4bf3432`: `uv run ruff format --check` **370 files already formatted**; `uv run ruff check` **all checks passed**; `uv run pytest` **2354 passed, 187 skipped in 1433.40s**. Every stage saw `longshot.exe` and used `CLAWSHOT_WORKERS=1`. Logs: `work/r15-ui/gate-{format,lint,synthetic}.log`; results in `gate-results.json`. The lock was released before D acquired it. Review rerun uses separate `gate-reviewed-*` logs so this evidence is retained.

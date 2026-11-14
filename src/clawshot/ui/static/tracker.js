@@ -1,5 +1,15 @@
 "use strict";
 
+const TRACKER_SECTIONS = ["items", "quest", "dungeons"];
+
+function parseTrackerSections(fragment) {
+  const value = new URLSearchParams(fragment.replace(/^#/, "")).get("sections");
+  if (!value) return TRACKER_SECTIONS.slice();
+  const selected = value.split(",").map((part) => part.trim());
+  if (selected.some((part) => !TRACKER_SECTIONS.includes(part))) return TRACKER_SECTIONS.slice();
+  return TRACKER_SECTIONS.filter((part) => selected.includes(part));
+}
+
 // One renderer for the app tab and the control-free OBS surface. All labels are text nodes.
 (() => {
   const root = document.getElementById("tracker-root");
@@ -9,6 +19,7 @@
   const token = prefix.split("/")[2];
   const options = new URLSearchParams(location.hash.slice(1));
   const compact = standalone && options.get("labels") === "0";
+  const sections = new Set(standalone ? parseTrackerSections(location.hash) : TRACKER_SECTIONS);
   if (standalone && options.get("transparent") === "1") document.body.classList.add("tracker-transparent");
   let icons = options.get("icons") !== "0";
   const defaultColumns = 4;
@@ -43,6 +54,7 @@
   const content = node("div", "tracker-content");
   root.append(heading);
   let controls, seedInput, saveInput, slotSelect, reveal, obsUrl, iconToggle, transparent, labelToggle, columnSelect;
+  const sectionToggles = {};
   if (!standalone) {
     controls = node("form", "tracker-controls");
     function pathRow(label, placeholder, kind) {
@@ -123,6 +135,18 @@
     columnSelect.addEventListener("change", updateObs);
     columnLabel.append(columnSelect);
     flags.append(columnLabel);
+    for (const name of TRACKER_SECTIONS) {
+      const input = checkbox("OBS " + name, true);
+      input.id = "tracker-obs-sections-" + name;
+      if (name === "quest") input.parentElement.title = "Songs, stones, medallions, hearts and tokens";
+      sectionToggles[name] = input;
+      input.addEventListener("change", () => {
+        // No selection means all, matching empty/unknown fragment fallback.
+        if (!Object.values(sectionToggles).some((toggle) => toggle.checked))
+          for (const toggle of Object.values(sectionToggles)) toggle.checked = true;
+        updateObs();
+      });
+    }
     controls.append(flags);
     const obs = node("div", "tracker-obs-link");
     const obsLabel = node("label", "", "OBS Browser Source URL (private; changes each app start)");
@@ -147,6 +171,7 @@
     const fragment = new URLSearchParams({
       transparent: transparent.checked ? "1" : "0", icons: icons ? "1" : "0",
       labels: labelToggle.checked ? "1" : "0", columns: columnSelect.value,
+      sections: TRACKER_SECTIONS.filter((name) => sectionToggles[name].checked).join(","),
     });
     obsUrl.value = new URL(prefix + "tracker.html#" + fragment, location.origin).href;
   }
@@ -303,40 +328,48 @@
     content.replaceChildren();
     const seed = state.seed || {};
     heading.querySelector("p").textContent = "Seed " + show(seed.seed ?? seed.number) + " · saved inventory · " + (standalone ? "spoiler-free" : reveal.checked ? "LOCATION SPOILERS ON" : "spoiler-free");
-    const dungeonGroup = section("Dungeon keys");
-    if (standalone) dungeonRows(dungeonGroup, state);
-    else {
-      const table = node("table", "tracker-dungeons");
-      const head = node("thead"), row = node("tr");
-      for (const title of ["Dungeon", "Held", "Found / total", "Boss", "Map", "Compass"]) row.append(node("th", "", title));
-      head.append(row); table.append(head);
-      const body = node("tbody");
-      for (const dungeon of state.dungeons || []) {
-        const tr = node("tr"), keys = dungeon.small_keys || {};
-        for (const value of [dungeon.name, show(keys.held), show(keys.found) + " / " + show(keys.total), yes(dungeon.boss_key), yes(dungeon.map), yes(dungeon.compass)]) tr.append(node("td", "", value));
-        body.append(tr);
+    if (sections.has("dungeons")) {
+      const dungeonGroup = section("Dungeon keys");
+      if (standalone) dungeonRows(dungeonGroup, state);
+      else {
+        const table = node("table", "tracker-dungeons");
+        const head = node("thead"), row = node("tr");
+        for (const title of ["Dungeon", "Held", "Found / total", "Boss", "Map", "Compass"]) row.append(node("th", "", title));
+        head.append(row); table.append(head);
+        const body = node("tbody");
+        for (const dungeon of state.dungeons || []) {
+          const tr = node("tr"), keys = dungeon.small_keys || {};
+          for (const value of [dungeon.name, show(keys.held), show(keys.found) + " / " + show(keys.total), yes(dungeon.boss_key), yes(dungeon.map), yes(dungeon.compass)]) tr.append(node("td", "", value));
+          body.append(tr);
+        }
+        table.append(body); dungeonGroup.append(table);
       }
-      table.append(body); dungeonGroup.append(table);
     }
-    const health = state.hearts || {};
-    const counts = section("Collection");
-    counts.append(node("p", "tracker-counts", "Hearts " + show(health.containers ?? health.capacity) + " · Pieces " + show(health.pieces) + " · Gold Skulltulas " + show(state.tokens)));
-    cells("Items & equipment", state.items);
-    cells("Songs", state.songs);
-    cells("Stones & medallions", state.rewards);
-    const areas = section("Checks by area");
-    areas.classList.add("tracker-areas-group");
-    areas.append(node("p", "tracker-explanation", "Saved collection only; ? means the collection contract is not established. Repeatable shops are not permanent checks."));
-    const areaGrid = node("div", "tracker-areas");
-    for (const area of state.areas || []) {
-      const item = node("div", "tracker-area");
-      item.append(node("strong", "", area.name), node("span", "", show(area.collected) + " / " + show(area.total) + (area.unknown ? " · " + area.unknown + " unknown" : "")));
-      if (!standalone && reveal.checked) for (const check of area.checks || []) {
-        item.append(node("p", "tracker-check", (check.collected == null ? "? " : check.collected ? "✓ " : "— ") + (check.label || check.name || check.id) + (check.item ? ": " + (check.item_label || check.item) : "")));
+    if (sections.has("quest")) {
+      const health = state.hearts || {};
+      const counts = section("Collection");
+      counts.append(node("p", "tracker-counts", "Hearts " + show(health.containers ?? health.capacity) + " · Pieces " + show(health.pieces) + " · Gold Skulltulas " + show(state.tokens)));
+    }
+    if (sections.has("items")) cells("Items & equipment", state.items);
+    if (sections.has("quest")) {
+      cells("Songs", state.songs);
+      cells("Stones & medallions", state.rewards);
+    }
+    if (sections.size === TRACKER_SECTIONS.length) {
+      const areas = section("Checks by area");
+      areas.classList.add("tracker-areas-group");
+      areas.append(node("p", "tracker-explanation", "Saved collection only; ? means the collection contract is not established. Repeatable shops are not permanent checks."));
+      const areaGrid = node("div", "tracker-areas");
+      for (const area of state.areas || []) {
+        const item = node("div", "tracker-area");
+        item.append(node("strong", "", area.name), node("span", "", show(area.collected) + " / " + show(area.total) + (area.unknown ? " · " + area.unknown + " unknown" : "")));
+        if (!standalone && reveal.checked) for (const check of area.checks || []) {
+          item.append(node("p", "tracker-check", (check.collected == null ? "? " : check.collected ? "✓ " : "— ") + (check.label || check.name || check.id) + (check.item ? ": " + (check.item_label || check.item) : "")));
+        }
+        areaGrid.append(item);
       }
-      areaGrid.append(item);
+      areas.append(areaGrid);
     }
-    areas.append(areaGrid);
     document.documentElement.dataset.trackerReady = "true";
   }
   async function refresh() {
