@@ -8,6 +8,7 @@
   const prefix = location.pathname.slice(0, location.pathname.lastIndexOf("/") + 1);
   const token = prefix.split("/")[2];
   const options = new URLSearchParams(location.hash.slice(1));
+  const compact = standalone && options.get("labels") === "0";
   if (standalone && options.get("transparent") === "1") document.body.classList.add("tracker-transparent");
   let icons = options.get("icons") !== "0";
   const defaultColumns = 4;
@@ -15,7 +16,7 @@
   const columns = Number.isInteger(requestedColumns) && requestedColumns >= 1 && requestedColumns <= 8 ? requestedColumns : defaultColumns;
   if (standalone) {
     root.style.setProperty("--tracker-columns", columns);
-    document.body.classList.toggle("tracker-no-labels", options.get("labels") === "0");
+    document.body.classList.toggle("tracker-no-labels", compact);
   }
   let lastRevision = "", pending = false, initialized = false;
   const node = (tag, cls = "", text) => {
@@ -194,6 +195,13 @@
     value.title = description;
     el.append(value);
   }
+  // Flat CSS quest chips, not bundled game art. Full names remain on the cell's title/ARIA label.
+  const questChips = {
+    zeldas_lullaby: "ZL", eponas_song: "Ep", sarias_song: "Sa", suns_song: "Su",
+    song_of_time: "SoT", song_of_storms: "SoS", minuet: "Min", bolero: "Bol",
+    serenade: "Ser", requiem: "Req", nocturne: "Noc", prelude: "Pre", scarecrows_song: "Scr",
+    kokiri_emerald: "Kok", goron_ruby: "Gor", zora_sapphire: "Zor",
+  };
   function cells(title, entries) {
     if (!entries?.length) return;
     const group = section(title), grid = node("div", "tracker-cells");
@@ -201,12 +209,24 @@
       const held = cell.held;
       const el = node("div", "tracker-cell" + (held === false ? " tracker-missing" : "") + (held == null ? " tracker-unknown" : ""));
       const label = cell.label || cell.name || cell.id;
-      localIcon(el, cell.icon);
-      el.append(node("span", "tracker-cell-label", label));
+      const medallion = cell.group === "rewards" && cell.id.endsWith("_medallion");
+      if (compact && (questChips[cell.id] || medallion)) {
+        el.classList.add("tracker-quest-cell");
+        el.setAttribute("role", "img");
+        const chip = node("span", "tracker-quest-chip", questChips[cell.id] || "");
+        if (medallion) {
+          chip.classList.add("tracker-medallion");
+          chip.dataset.medallion = cell.id;
+        }
+        el.append(chip);
+      } else {
+        localIcon(el, cell.icon);
+        el.append(node("span", "tracker-cell-label", label));
+      }
       let detail = held == null ? "Unknown" : held ? "Held" : "Not held";
       if (cell.basis === "slots") detail = cell.count == null ? "Count unknown" : cell.count + " bottle" + (cell.count === 1 ? "" : "s");
       else {
-        if (cell.tier != null && cell.tier > 0) detail = "Tier " + cell.tier;
+        if (cell.max_tier > 1 && cell.tier != null && cell.tier > 0) detail = "Tier " + cell.tier;
         if (cell.count != null) detail += " · " + cell.count;
       }
       el.append(node("small", "", detail));
@@ -260,6 +280,10 @@
     status.textContent = idle ? "Choose a seed to begin. Reads saves only; never changes them." :
       (labels[data.status] || data.status) +
       (data.selected_slot ? " · " + data.selected_slot : "") + (data.save_folder && !standalone ? " · " + data.save_folder : "");
+    if (compact) {
+      status.hidden = data.status === "ok" || data.status === "ready";
+      status.textContent = idle ? "Choose a seed in the app" : labels[data.status] || "Tracker unavailable";
+    }
     warnings.replaceChildren();
     for (const warning of [...new Set([...(data.warnings || []), ...(state?.warnings || [])])]) warnings.append(node("p", "", warning));
     if (!standalone) {
@@ -301,6 +325,7 @@
     cells("Songs", state.songs);
     cells("Stones & medallions", state.rewards);
     const areas = section("Checks by area");
+    areas.classList.add("tracker-areas-group");
     areas.append(node("p", "tracker-explanation", "Saved collection only; ? means the collection contract is not established. Repeatable shops are not permanent checks."));
     const areaGrid = node("div", "tracker-areas");
     for (const area of state.areas || []) {
@@ -324,7 +349,10 @@
         // Seed choice is explicit. Loading a tab never opens or reveals the selected seed's spoiler.
         status.textContent = "Use selected seed, or choose a seed output and Track seed.";
       }
-    } catch (error) { status.textContent = error.message; }
+    } catch (error) {
+      status.hidden = false;
+      status.textContent = compact ? "Tracker connection lost" : error.message;
+    }
     finally { pending = false; }
   }
   if (!standalone) request("schema").then((data) => {

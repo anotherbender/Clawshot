@@ -334,8 +334,8 @@ There is no new in-game key list: the standing HUD, pause-map counters and float
 dungeon you are in. A key credited to another dungeon can show no notice or no counter change
 where you stand (in the played gates an overworld pickup showed no increment and an Ice Cavern
 one no notice, both with the saved count correct); the notices do not track the key's target
-dungeon. The planned Tracker tab will show keys per dungeon from that seed's own save; it is
-not in this release.
+dungeon. The [Tracker tab](tracker.md) shows per-dungeon held and found keys from that seed's own
+save, with a compact OBS view; it is separate from the game's current-dungeon counters.
 
 Acceptance: Gates 1–4 passed in game — native and named key chests of both sizes, in-dungeon
 and out, child and adult, correct remote credit, door spending and reload persistence, ending

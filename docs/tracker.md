@@ -65,8 +65,8 @@ even while the app tab's spoiler mode is on.
    These OBS-only controls do not change the in-app tracker layout.
 3. In OBS add a **Browser Source** and use that URL. Groups stack vertically in a narrow block.
    Four columns is the default: about 340 pixels wide with labels, suitable for a side overlay.
-   Start at 350×3000 with labels, or 290×2600 without, then crop/scale or increase columns to fit
-   your scene. Text fallbacks and warnings can increase height; do not crop away a warning unknowingly.
+   Start at 350×3000 with labels, or 290×2400 without, then crop/scale or increase columns to fit
+   your scene. Text fallbacks can increase height. Check save/seed warnings in the app tab.
    The surface has no controls and follows the same seed/save/slot as the app tracker.
 4. Disable OBS's shutdown-when-not-visible option if you want continuous refresh while hidden.
 
@@ -81,13 +81,23 @@ OBS after changing controls. With labels off, successfully loaded icons sit in c
 top-left badges show upgrade tiers and bottom-right badges show counts (bottles, ammo, rupees
 or magic capacity). Greyed-out items are not held; dashed cells and `?` mean unknown.
 Heart, piece and token counts stay visible. Names/details remain available as tooltips and
-accessible labels. Without a usable icon, text stays visible even with labels off.
+accessible labels. Without a usable item icon, text stays visible even with labels off.
+
+Compact quest cells use flat CSS, not game art: songs are `ZL`, `Ep`, `Sa`, `Su`, `SoT`, `SoS`,
+`Min`, `Bol`, `Ser`, `Req`, `Noc`, `Pre`, `Scr`; stones are `Kok`, `Gor`, `Zor`.
+Medallions are circles: forest green, fire red, water blue, shadow purple, spirit orange,
+light yellow. Missing holdings use the same grey-out. Full names remain in tooltips and accessible
+labels. Single-tier entries never display a tier number, in either the tab or OBS.
+
+With labels off, OBS hides the heading's extra text, warning paragraphs and **Checks by area**.
+Normal following needs no status line; waiting/unavailable states show one short line. The app tab
+keeps its status, warnings and area checks. Use that tab to inspect compatibility/read warnings.
 
 Each dungeon keeps its name and a compact row of small key, boss key, map and compass icons.
 The small-key badge is **held**, available to spend; the number below is **found / seed total**,
 including spent keys. Other icons are greyed out when missing. Hover for the full description;
 unknown flags show `?`. With icons disabled or unavailable, each indicator uses its name and
-saved value instead. Dungeon names and collection/area summaries are not hidden by the item-label toggle.
+saved value instead. Dungeon names and collection counts stay visible with item labels off.
 
 ## Local icons and fallback
 
@@ -105,7 +115,8 @@ Cache folders: Windows `%LOCALAPPDATA%/Clawshot/Cache/icons`; macOS
 `~/Library/Caches/Clawshot/icons`; Linux `$XDG_CACHE_HOME/clawshot/icons` (default `~/.cache/clawshot/icons`).
 Do not share them. Filenames include the source icon's hash; changing the dump invalidates that icon.
 Small keys, boss keys, maps and compasses use the game's `Item_Dungeon_*` icon files through
-the same decoder/cache. Songs, stones and medallions have no file in `UI/Tex/Icon` and use text.
+the same decoder/cache. Songs, stones and medallions have no file in `UI/Tex/Icon`: labelled views
+use text, and compact OBS uses the CSS quest chips described above.
 If a dump, decoder or texture is unavailable, the same view still works; uncheck **Local item icons**
 to force text/CSS.
 All fonts are installed system fonts.

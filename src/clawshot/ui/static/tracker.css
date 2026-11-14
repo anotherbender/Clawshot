@@ -47,11 +47,26 @@ body[data-tracker="obs"] .tracker-area { min-width: 0; overflow-wrap: anywhere; 
 body[data-tracker="obs"] .tracker-counts, body[data-tracker="obs"] .tracker-explanation { font-size: 11px; }
 body[data-tracker="obs"] .tracker-badge { display: none; }
 body[data-tracker="obs"].tracker-no-labels #tracker-root { --tracker-cell-width: 42px; }
+body[data-tracker="obs"].tracker-no-labels .heading p,
+body[data-tracker="obs"].tracker-no-labels .tracker-warnings,
+body[data-tracker="obs"].tracker-no-labels .tracker-areas-group { display: none; }
+body[data-tracker="obs"] .tracker-quest-cell { min-height: 38px; height: 38px; padding: 2px; }
+body[data-tracker="obs"] .tracker-quest-chip { display: grid; place-items: center; width: 32px; height: 32px; font-size: 11px; font-weight: 600; white-space: nowrap; overflow-wrap: normal; }
+body[data-tracker="obs"] .tracker-missing .tracker-quest-chip { filter: grayscale(1); }
+body[data-tracker="obs"] .tracker-medallion { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border); }
+body[data-tracker="obs"] [data-medallion="forest_medallion"] { background: var(--medallion-forest); }
+body[data-tracker="obs"] [data-medallion="fire_medallion"] { background: var(--medallion-fire); }
+body[data-tracker="obs"] [data-medallion="water_medallion"] { background: var(--medallion-water); }
+body[data-tracker="obs"] [data-medallion="shadow_medallion"] { background: var(--medallion-shadow); }
+body[data-tracker="obs"] [data-medallion="spirit_medallion"] { background: var(--medallion-spirit); }
+body[data-tracker="obs"] [data-medallion="light_medallion"] { background: var(--medallion-light); }
 body[data-tracker="obs"].tracker-no-labels .tracker-has-icon { min-height: 38px; padding: 2px; }
 body[data-tracker="obs"].tracker-no-labels .tracker-has-icon .tracker-cell-label,
-body[data-tracker="obs"].tracker-no-labels .tracker-has-icon > small:not(.tracker-key-total) { display: none; }
+body[data-tracker="obs"].tracker-no-labels .tracker-has-icon > small:not(.tracker-key-total),
+body[data-tracker="obs"].tracker-no-labels .tracker-quest-cell > small { display: none; }
 body[data-tracker="obs"].tracker-no-labels .tracker-has-icon .tracker-icon { margin: 0; }
 body[data-tracker="obs"].tracker-no-labels .tracker-has-icon .tracker-badge,
+body[data-tracker="obs"].tracker-no-labels .tracker-quest-cell .tracker-badge,
 body[data-tracker="obs"] .tracker-dungeon-item .tracker-badge { display: block; position: absolute; bottom: 0; right: 1px; padding: 0 2px; border-radius: 2px; background: var(--panel); color: var(--fg); font: bold 11px var(--sans); line-height: 14px; font-variant-numeric: tabular-nums; }
 body[data-tracker="obs"].tracker-no-labels .tracker-has-icon .tracker-badge-tier { top: 0; left: 1px; right: auto; bottom: auto; color: var(--amber); }
 body[data-tracker="obs"] .tracker-dungeon-row { display: grid; grid-template-columns: minmax(0, 1fr) repeat(4, minmax(32px, 40px)); gap: 2px; align-items: center; margin: 2px 0; }
@@ -66,5 +81,4 @@ body.tracker-transparent, body.tracker-transparent .tracker-cell { background: t
 @media (max-width: 720px) {
   .tracker-path { grid-template-columns: minmax(0, 1fr) auto; }
   .tracker-path label { grid-column: 1 / -1; }
-  body[data-tracker="obs"] .tracker-content { display: flex; }
 }

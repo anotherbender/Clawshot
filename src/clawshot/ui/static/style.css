@@ -18,6 +18,12 @@
   --focus: #fff8e8;
   --success: #a4cca4;
   --error: #f0b6a2;
+  --medallion-forest: #35934b;
+  --medallion-fire: #d94d43;
+  --medallion-water: #438fd6;
+  --medallion-shadow: #9a65c7;
+  --medallion-spirit: #e78c32;
+  --medallion-light: #edcf4f;
   --sans:
     Candara, Optima, "Gill Sans", "Gill Sans MT", "Segoe UI", "Noto Sans",
     system-ui, sans-serif;
