@@ -4,7 +4,7 @@ worlds from test_generate, and the repository's own logic data for the spoiler's
 import pytest
 from test_generate import dungeon_world
 
-from clawshot.generate import FillError, Settings, from_placements, generate, spoiler
+from clawshot.generate import FillError, Settings, from_placements, generate, prepare, spoiler
 from clawshot.generate.fill import shuffled_locations
 from clawshot.world import build_world
 from clawshot.world.load import load_spec
@@ -63,3 +63,25 @@ def test_a_seed_from_given_placements_has_no_opening_route_instead_of_failing_th
     out = from_placements(spec, 1, settings, placements)
     assert all(out.placements[name] == item for name, item in placements.items())
     assert spoiler(out)["opening_route"] is None
+
+
+def test_external_copies_remain_chest_only_and_native_quest_rewards_stay_at_their_source():
+    spec = load_spec()
+    settings = Settings(shuffle=("Chest", "NPC"))
+    settings, world = prepare(spec, settings)
+    placements = dict.fromkeys(shuffled_locations(world, settings), "Rupees (5)")
+    chest = next(name for name in placements if world.locations[name].type == "Chest")
+    gift = next(name for name in placements if world.locations[name].type == "NPC")
+    placements[chest] = "Progressive Hookshot"
+    out = from_placements(spec, 1, settings, placements)
+    assert out.placements[chest] == "Progressive Hookshot"
+    assert out.world.progressive_copies_only
+    placements[gift] = placements.pop(chest)
+    placements[chest] = "Rupees (5)"
+    with pytest.raises(FillError, match="may not hold 'Progressive Hookshot'"):
+        from_placements(spec, 1, settings, placements)
+    chest_settings = Settings()
+    _, chest_world = prepare(spec, chest_settings)
+    chest_placements = dict.fromkeys(shuffled_locations(chest_world, chest_settings), "Rupees (5)")
+    chest_only = from_placements(spec, 1, chest_settings, chest_placements)
+    assert chest_only.placements["GC Darunias Joy"] == "Goron Bracelet"

@@ -69,5 +69,3 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
         settings = replace(settings, item_location_types={**settings.item_location_types, **held})
     world = build_world(world_spec(spec, settings), settings.logic)
     return restrict_settings(world, settings), world
-
-
