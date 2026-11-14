@@ -126,10 +126,13 @@ the container**, not from its name or display-version metadata.
 
 An `.nx` archive ([fab918's MIT NX format](https://github.com/fab918/nxformat)) is read the same way:
 **read-only**, by a reader written from its specification and shipped with its licence, with the same
-uv/zstd note as NUP. The newest base/update snapshot is used as a complete tree, every structure and
-every file read is checked against its SHA-256, and the fingerprint is computed from inside the archive.
+uv/zstd note as NUP. The newest base/update snapshot is used as a complete tree. Its Catalog,
+Manifest and block-index hashes and every file read are checked; the fingerprint is computed from inside the archive.
 Only archives that hold a `romfs/` tree (converted from a NUP or an extracted dump) can be read; one packed
 from a decrypted NSP is refused with an explanation.
+Clawshot accepts portable filesystem names (no Windows-invalid components or case-colliding siblings).
+Mount metadata is limited to 256 MiB; decoded blocks and Zstandard windows to 1 MiB, stored blocks to 2 MiB.
+Oversized, dictionary-dependent or multi-frame blocks are refused rather than guessed.
 
 After preflight, Make creates a unique `.romfs-*` working cache inside this extracted pack.
 It contains only the generator's resource working set (placements, flows, messages, supported

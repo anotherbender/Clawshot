@@ -21,7 +21,7 @@ def _pad(data: bytearray, alignment: int) -> None:
     data.extend(b"\0" * (_align(len(data), alignment) - len(data)))
 
 
-def write_nx(path, snapshots, *, compress=frozenset(), application_id=0x0400486024DEC000):
+def write_nx(path, snapshots, *, compress=frozenset(), application_id=0x0400486024DEC000, frames=None):
     """A minimal valid archive: one application, one program, ``snapshots`` = [(type, version, {path: bytes})]."""
     blocks, refs, files, block_ids = [], [], [], {}
     data = bytearray(b"\0" * 8192)
@@ -34,6 +34,8 @@ def write_nx(path, snapshots, *, compress=frozenset(), application_id=0x04004860
             piece = content[k : k + chunk]
             if piece not in block_ids:
                 stored = zstandard.ZstdCompressor().compress(piece) if name in compress else piece
+                if frames and name in frames:
+                    stored = frames[name]
                 _pad(data, 16)
                 checks = -(-len(piece) // 16384)
                 first_check = sum(-(-row[2] // 16384) for row in block_rows)
@@ -269,3 +271,39 @@ def test_an_archive_without_a_romfs_tree_is_explained(tmp_path):
     path = write_nx(tmp_path / "nsp.nx", [(0, 0, {"main.nca": b"native"})])
     with pytest.raises(PackError, match="no romfs/ tree"), open_source(path):
         pass
+
+
+@pytest.mark.parametrize("field", [72, 80, 96])
+def test_metadata_ranges_are_refused_before_seeking_or_allocating(tmp_path, field):
+    path = _game(tmp_path)
+    data = bytearray(path.read_bytes())
+    for slot in (0, 4096):
+        struct.pack_into("<Q", data, slot + field, 2**64 - 1)
+        struct.pack_into("<I", data, slot + 252, crc32c(data[slot : slot + 252]))
+    path.write_bytes(data)
+    with pytest.raises(NxError, match="outside"):
+        NxArchive(path)
+
+
+@pytest.mark.parametrize("name", ["trailing.", "trailing ", "a:b", "a?b", "a|b", 'a"b', "a<b", "a>b", "a*b"])
+def test_archive_members_cannot_alias_windows_paths(tmp_path, name):
+    path = write_nx(tmp_path / "unsafe.nx", [(0, 0, {f"romfs/{name}": b"unsafe"})])
+    with pytest.raises(PackError, match="path component"), open_source(path):
+        pass
+
+
+def test_case_colliding_members_cannot_overwrite_a_working_file(tmp_path):
+    path = write_nx(tmp_path / "duplicate.nx", [(0, 0, {"romfs/Pack/a": b"a", "romfs/Pack/A": b"A"})])
+    with pytest.raises(PackError, match="duplicate"), open_source(path):
+        pass
+
+
+def test_a_zstd_block_must_be_exactly_one_frame(tmp_path):
+    path = write_nx(
+        tmp_path / "trailing.nx",
+        [(0, 0, {"romfs/a": b"content"})],
+        compress={"a"},
+        frames={"a": zstandard.ZstdCompressor().compress(b"content") + b"trailing"},
+    )
+    with pytest.raises(PackError, match="invalid NX"), open_source(path) as source:
+        source.read("a")

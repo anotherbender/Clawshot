@@ -22,6 +22,7 @@ SLOT_OFFSETS = (0, 4096)
 REQUIRED_FEATURE_HEADER_PAGES = 1
 CHECK_SIZE = 16384
 MAX_CATALOG = 16 << 20
+MAX_MOUNT_METADATA = 256 << 20
 ABSENT = 0xFFFFFFFF
 
 # §4 snapshot types and the required extensions this reader understands (unknown required ones reject, §11).
@@ -163,6 +164,8 @@ class NxArchive:
         self._stream.close()
 
     def _pread(self, offset: int, size: int) -> bytes:
+        if offset < 0 or size < 0 or offset + size > self._read_limit:
+            raise NxError(f"archive range {offset}+{size} is outside its {self._read_limit}-byte region")
         self._stream.seek(offset)
         data = self._stream.read(size)
         if len(data) != size:
@@ -173,6 +176,7 @@ class NxArchive:
 
     def _open(self) -> None:
         file_size = self.path.stat().st_size
+        self._read_limit = file_size
         valid: list[Header] = []
         errors: list[str] = []
         for offset in SLOT_OFFSETS:
@@ -199,6 +203,12 @@ class NxArchive:
         raise NxError(f"no header generation mounts: {last_error}")
 
     def _mount(self, header: Header) -> None:
+        self._read_limit = header.archive_size
+        metadata_size = header.catalog[1] + header.manifest[1] + header.block_count * 24 + header.integrity[1]
+        if metadata_size > header.archive_size:
+            raise NxError("metadata ranges are outside the declared archive size")
+        if metadata_size > MAX_MOUNT_METADATA:
+            raise NxError("NX metadata exceeds the 256 MiB mount resource limit")
         catalog = self._pread(*header.catalog)
         if hashlib.sha256(catalog).digest() != header.catalog_sha256:
             raise NxError("catalog SHA-256 mismatch")
@@ -303,14 +313,23 @@ class NxArchive:
                 raise NxError(f"snapshot {snapshot.index}: directory {directory} is out of range or a cycle")
             seen_dirs.add(directory)
             first, count = _u32(self._dirs, directory * 16), _u32(self._dirs, directory * 16 + 4)
+            names = set()
             for e in range(first, first + count):
                 row = _range(self._entries, e * 24, 24, "directory entry")
                 name_offset, name_length = _u64(row, 0), _u32(row, 8)
                 if name_offset < pool_start or name_offset + name_length > pool_start + pool_size:
                     raise NxError("entry name outside the path pool")
                 name = self._manifest[name_offset : name_offset + name_length].decode("utf-8")
-                if not name or name in (".", "..") or "/" in name or "\\" in name or "\0" in name:
+                if (
+                    not name
+                    or name in (".", "..")
+                    or any(c in name for c in '/\\:<>"|?*\0')
+                    or name.endswith((".", " "))
+                ):
                     raise NxError(f"bad path component {name!r}")
+                if name.casefold() in names:
+                    raise NxError(f"duplicate path component {name!r}")
+                names.add(name.casefold())
                 target, kind = _u32(row, 12), row[16]
                 path = f"{prefix}{name}"
                 if kind == ENTRY_DIRECTORY:
@@ -329,13 +348,18 @@ class NxArchive:
             raise NxError(f"block {block_id} out of range")
         row = self._blocks[block_id * 24 : block_id * 24 + 24]
         offset, stored, logical, codec = _u64(row, 0), _u32(row, 8), _u32(row, 12), row[16]
+        if not 0 < logical <= 1 << 20 or stored > 2 << 20:
+            raise NxError(f"block {block_id}: block exceeds the decoded/encoded resource limit")
         data = self._pread(offset, stored)
         if codec == CODEC_RAW:
             if stored != logical:
                 raise NxError(f"block {block_id}: RAW sizes differ")
             return data
         if codec == CODEC_ZSTD:
-            out = zstandard.ZstdDecompressor().decompress(data, max_output_size=logical)
+            frame = zstandard.get_frame_parameters(data)
+            if frame.content_size != logical or frame.window_size > 1 << 20 or frame.dict_id:
+                raise NxError(f"block {block_id}: unsupported Zstandard size, window or dictionary")
+            out = zstandard.ZstdDecompressor().decompress(data, max_output_size=logical, allow_extra_data=False)
             if len(out) != logical:
                 raise NxError(f"block {block_id}: decoded {len(out)} bytes, expected {logical}")
             return out
