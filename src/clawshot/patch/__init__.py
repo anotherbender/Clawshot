@@ -113,6 +113,8 @@ def make_seed(
     out = generate(spec, seed, settings, vanilla=vanilla)
     changes = tuple(step(out.placements) for step in extra_steps)
     # Fast-start initial values compose before gift flag additions; its flow edits run before other flow steps.
+    if scrubs.SHUFFLE not in settings.shuffle:
+        changes += (scrubs.changes({}),)
     changes = (gamedata.changes(chosen), *changes)
     if world.settings.get("free_time_travel", False):
         from clawshot.patch.age import changes as age_changes

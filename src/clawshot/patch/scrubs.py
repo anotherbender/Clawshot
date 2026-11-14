@@ -2,8 +2,9 @@
 
 Keep the Banc offer selectors: the common flow dispatches known names, not arbitrary
 items. Rewrite every grant of a logical check, including both capacity tiers, and
-its explicit selection identity. Puzzle, cancel/shortfall paths and success-only
-saved flags stay native; optional exact fees cover only supported shuffled families.
+its explicit selection identity. When native gates hide every repeat offer, finish
+before opening the shop UI. Puzzle, cancel/shortfall paths, ordinary menus and
+success-only saved flags stay native; optional fees cover only shuffled families.
 """
 
 import tomllib
@@ -70,7 +71,7 @@ SALES = {
 def patch_flowchart(
     fc: evfl.Flowchart, placements: Mapping[str, str], *, prices: Mapping[str, int] | None = None
 ) -> None:
-    """Validate every target before mutation; preserve all control flow and flags."""
+    """Validate before mutation; guard empty menus and preserve purchase/flag gates."""
     if fc.name != FLOW or set(placements) - SALES.keys():
         raise PatchError(f"{FLOW}: invalid flow or unsupported scrub checks {sorted(placements)}")
     prices = dict(prices or {})
@@ -111,16 +112,83 @@ def patch_flowchart(
             ):
                 raise PatchError(f"{FLOW}/{sale.selection}: stale selection {event!r}")
             edits.append((event.params, "Value", item))
+    # Both repeat-vendor initializers finish their native offer filtering here,
+    # before Event119 opens the shop UI. A degenerate Leave-only menu can strand
+    # the dialog (#26); reuse the native no-goods goodbye instead. Do not alter
+    # the normal initial/return menus or the purchase/cancel cleanup.
+    index = {event.name: i for i, event in enumerate(fc.events)}
+    required = ("Event192", "Event334", "Event119", "Event395", "Event140")
+    if any(sum(event.name == name for event in fc.events) != 1 for name in required):
+        raise PatchError(f"{FLOW}: missing or duplicate empty-offer guard anchors")
+    incoming = [fc.events[index[name]] for name in required[:2]]
+    target, goodbye, finish = (fc.events[index[name]] for name in required[2:])
+    if not all(
+        isinstance(event, evfl.SubFlowEvent)
+        and event.flowchart in ("", FLOW)
+        and event.entry_point == "Unopened_Check"
+        and event.next == index["Event119"]
+        and (event.params or {}).get("GameData_Item") == "Scrub_Business_TempItemName_02"
+        and event.params.get("GameDate_Unopend") == "Enemy_Scrub_Business_Unopened03"
+        for event in incoming
+    ):
+        raise PatchError(f"{FLOW}: stale offer-filter completion {incoming!r}")
+    if not (
+        isinstance(target, evfl.ActionEvent)
+        and fc.actors[target.actor].name == "UISystemActor"
+        and fc.actors[target.actor].actions[target.action] == "EventTriggerSetDisplayHeartGauge"
+        and (target.params or {}).get("IsDisplayHeartGauge") is True
+        and isinstance(goodbye, evfl.ActionEvent)
+        and fc.actors[goodbye.actor].name == "Enemy_Scrub_Business"
+        and fc.actors[goodbye.actor].actions[goodbye.action] == "EventTalk"
+        and (goodbye.params or {}).get("IsCloseDialog") is True
+        and goodbye.params.get("ChoiceNumber") == 0
+        and goodbye.params.get("MessageId") == "EventFlowMsg/Enemy_Event:Enemy_Scrub_Business_Common_018"
+        and goodbye.next == index["Event140"]
+        and isinstance(finish, evfl.ActionEvent)
+        and fc.actors[finish.actor].name == "Enemy_Scrub_Business"
+        and fc.actors[finish.actor].actions[finish.action] == "EventScrubBusinessOnIsFinishDoEvent"
+        and finish.next == evfl.NONE
+    ):
+        raise PatchError(f"{FLOW}: stale no-goods exit {target!r}, {goodbye!r}, {finish!r}")
+    actors = [(i, actor) for i, actor in enumerate(fc.actors) if actor.name == "GameDataActor"]
+    if len(actors) != 1 or not {"EventQueryIsGameDataBool", "EventQueryIsGameDataString64"}.issubset(
+        actors[0][1].queries
+    ):
+        raise PatchError(f"{FLOW}: missing offer-gate queries")
+    actor_id, actor = actors[0]
+    start = len(fc.events)
+    guards = []
+    for slot in range(3):
+        unavailable = start + 2 * (slot + 1) if slot < 2 else index["Event395"]
+        guards.extend(
+            (
+                evfl.SwitchEvent(
+                    f"ClawshotScrubOfferEmpty{slot}",
+                    actor_id,
+                    actor.queries.index("EventQueryIsGameDataString64"),
+                    [(0, unavailable), (1, start + 2 * slot + 1)],
+                    {"GameDataName": f"Scrub_Business_TempItemName_{slot:02}", "Value": "", "Index": -1},
+                ),
+                evfl.SwitchEvent(
+                    f"ClawshotScrubOfferHidden{slot}",
+                    actor_id,
+                    actor.queries.index("EventQueryIsGameDataBool"),
+                    [(0, unavailable), (1, index["Event119"])],
+                    {"GameDataName": f"Enemy_Scrub_Business_Unopened{slot + 1:02}", "Index": -1},
+                ),
+            )
+        )
     for params, key, value in edits:
         params[key] = value
+    for event in incoming:
+        event.next = start
+    fc.events.extend(guards)
 
 
 def changes(placements: Mapping[str, str], *, prices: Mapping[str, int] | None = None) -> FileChanges:
-    """Actor-name placements for supported checks, for the common writer."""
+    """One-time rewards plus the no-offers guard, even without Scrub shuffle."""
     if unknown := set(placements) - SALES.keys():
         raise PatchError(f"unsupported scrub checks: {sorted(unknown)}")
-    if not placements:
-        return {}
     placements = dict(placements)
     prices = dict(prices or {})
 

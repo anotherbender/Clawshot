@@ -5,6 +5,7 @@ from collections import Counter
 
 import pytest
 from test_scrubs import fixture as scrub_chart
+from test_scrubs import restore_offer_guard
 
 from clawshot.__main__ import main
 from clawshot.formats import evfl
@@ -123,6 +124,7 @@ def test_every_scrub_tier_changes_price_without_touching_payment_or_once_control
             events[event].params.update(ActorName=old_actor, Price=sale.price)
         if sale.selection:
             events[sale.selection].params["Value"] = "Obj_Heart_Piece"
+    restore_offer_guard(after)
     assert after == before
 
 

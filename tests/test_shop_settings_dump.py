@@ -3,6 +3,7 @@
 import copy
 
 import pytest
+from test_scrubs import restore_offer_guard
 
 from clawshot.formats import byml, evfl, sarc, zsdic
 from clawshot.generate import Settings
@@ -79,7 +80,8 @@ def test_partial_shelves_and_fixed_scrub_fees_preserve_unselected_stock_and_nati
         assert not rule(counts, "child", 1)
         counts["Progressive Wallet"] = 1
         assert rule(counts, "child", 1)
-    assert after == before  # Includes every repeat vendor, payment, cancellation and saved gate.
+    restore_offer_guard(after.flowchart)
+    assert after == before  # Every offer, payment, cancellation branch and saved gate is unchanged.
     oracle = Search(output.seed.world)
     oracle.collect_spheres(output.seed.placements)
     assert oracle.won()

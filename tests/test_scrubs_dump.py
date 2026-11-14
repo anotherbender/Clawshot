@@ -1,6 +1,7 @@
 import copy
 
 import pytest
+from test_scrubs import guard_destination, restore_offer_guard
 
 from clawshot.census.scan import GAME_DATA_LIST, read_romfs_byml, scan
 from clawshot.formats import evfl, zsdic
@@ -24,6 +25,7 @@ def test_once_sales_change_all_copies_and_tiers_but_no_price_or_saved_gate(romfs
         if sale.selection:
             assert index[sale.selection].params["Value"] == "Item_Boomerang"
             index[sale.selection].params["Value"] = "Obj_Heart_Piece"
+    restore_offer_guard(restored.flowchart)
     assert restored == before
     gd = read_romfs_byml(romfs, dicts, GAME_DATA_LIST)
     flags = {int(e["Hash"]): e for e in gd["Data"]["Bool"]}
@@ -69,7 +71,27 @@ def test_whole_seed_assigns_one_item_to_every_tier_and_copy_without_changing_pri
         if sale.selection:
             assert index[sale.selection].params["Value"] == item
             index[sale.selection].params["Value"] = "Obj_Heart_Piece"
+    restore_offer_guard(after.flowchart)
     assert after == before
     for name in output.seed.shuffled:
         if output.seed.placements[name] in scrubs.CAPACITIES:
             assert name in scrubs.SALES
+
+
+@pytest.mark.dump
+def test_unshuffled_scrubs_guard_every_empty_or_hidden_offer_before_shop_ui(romfs):
+    dicts = zsdic.Dictionaries.from_romfs(romfs)
+    data = dicts.decompress(scrubs.PATH, (romfs / scrubs.PATH).read_bytes())
+    before = evfl.read(data)
+    changed = scrubs.changes({})[scrubs.PATH](data)
+    after = evfl.read(changed)
+    for incoming in ("Event192", "Event334"):
+        for offers in (
+            (("Item_Test", True),) * 3,
+            (("", False),) * 3,
+            (("Item_Test", True), ("", False), ("Item_Test", False)),
+        ):
+            expected = "Event119" if any(actor and not hidden for actor, hidden in offers) else "Event395"
+            assert guard_destination(after.flowchart, incoming, offers) == expected
+    restore_offer_guard(after.flowchart)
+    assert after == before

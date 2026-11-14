@@ -202,6 +202,17 @@ gates. These fields replay through CS1. The 10-rupee Kokiri shield/nuts purchase
 observed (R6-PRICES); partial shelves and fixed scrub fees are built/tested, not independently
 certified in game by that observation.
 
+**Scrub offer wording:** shuffled one-time sales still describe their vanilla item, even
+when their actual reward differs. Check the get window/inventory or spoiler, not that sales
+pitch ([recorded since round 6](../plans/rounds/r6-tokens.md#purchase-and-patch-contract)).
+Repeat vendors are not shuffled; their native weapon/magic/bottle gates can hide every offer.
+The no-offers guard for [#26](https://github.com/hiKareeem/Clawshot/issues/26) ends that
+conversation before opening an empty shop menu. It applies even without Scrub shuffle.
+Kareem reproduced the control's second-talk softlock on Longshot rc.3 and passed the repair:
+repeated empty-offer talks, Song of Storms for 10 rupees, normal seed refill and Save/Continue
+(2026-11-14). Decline-then-Leave and full-capacity refusal were not exercised.
+Existing seed folders are not changed.
+
 ## Forest and fast start
 
 `--forest closed` is the vanilla-like default: Mido guards the Deku Tree and the bridge exit stays
