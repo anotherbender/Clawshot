@@ -66,6 +66,8 @@ def dump_root(path: Path) -> Path:
 
 def _source_path(value: str, label: str) -> Path:
     path = absolute_path(value, label, allow_links=True)
+    if not path.exists():
+        raise ValueError(f"Not found: {path}. Choose your romfs folder or .nup again.")
     if not path.is_dir() and (not path.is_file() or path.suffix.lower() != ".nup"):
         raise ValueError(f"{label}: choose an extracted romfs folder or a .nup file")
     return path

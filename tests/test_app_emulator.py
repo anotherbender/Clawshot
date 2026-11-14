@@ -99,3 +99,21 @@ def test_eden_suggestion_requires_an_existing_game_folder(tmp_path, monkeypatch)
     expected = tmp_path / "eden/load/0400486024DEC000"
     expected.mkdir(parents=True)
     assert suggested_eden_folder() == str(expected)
+
+
+def test_emulator_copy_keeps_separately_selected_dump_layers_read_only(made_ui_seed, tmp_path):
+    result, _, _ = made_ui_seed
+    dump = tmp_path / "dump"
+    cart, update = dump / "base/romfs", dump / "updates/131072/romfs"
+    cart.mkdir(parents=True)
+    update.mkdir(parents=True)
+    preferences = Preferences()
+    preferences.remember("dump", str(cart))
+    preferences.remember("update", str(update))
+    preferences.remember("emulator_mods", str(dump))
+    app = Application(Jobs(synthetic_run), spec=synthetic_spec(), preferences=preferences, chooser=lambda *_: dump)
+    app.library.add_folder(str(result["output"]))
+    with running_server(app) as server:
+        status, _, answer = request(server, "copy-emulator", {"output": result["output"], "confirmed": True})
+    assert status == 400, answer
+    assert not (dump / "Clawshot-seed-7").exists()

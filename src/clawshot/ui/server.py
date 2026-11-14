@@ -25,7 +25,7 @@ from clawshot.app import (
 )
 from clawshot.app.emulator import copy_to_emulator
 from clawshot.app.library import SeedLibrary
-from clawshot.app.paths import absolute_path, default_output_root, game_folders
+from clawshot.app.paths import absolute_path, default_output_root, dump_root, game_folders
 from clawshot.app.play import play_refusal
 from clawshot.app.preferences import Preferences, suggested_eden_folder
 from clawshot.app.sharing import import_settings, player_settings, share_settings
@@ -257,6 +257,12 @@ class Application:
                 *(game_folders(saved["game"]) if saved.get("game") else ()),
                 os.environ.get("OOT_ROMFS"),
             )
+            for key in ("dump", "update"):
+                if saved.get(key):
+                    source = Path(saved[key]).resolve()
+                    protected += (dump_root(source),)
+                    if source.is_file() or source.name.lower() == "romfs":
+                        protected += (source.parent,)
             return copy_to_emulator(self.result_for(body), saved["emulator_mods"], protected=protected)
         if method == "POST" and route == "play":
             if not self.allow_play:

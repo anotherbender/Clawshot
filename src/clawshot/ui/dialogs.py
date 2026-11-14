@@ -9,8 +9,16 @@ import threading
 from clawshot.app.paths import absolute_path, default_output_root
 
 KINDS = {
-    "dump-folder", "dump-file", "update-folder", "update-file", "game", "output", "seeds", "emulator_mods",
-    "tracker-seed", "tracker-save",
+    "dump-folder",
+    "dump-file",
+    "update-folder",
+    "update-file",
+    "game",
+    "output",
+    "seeds",
+    "emulator_mods",
+    "tracker-seed",
+    "tracker-save",
 }
 FILE_KINDS = {"dump-file": "Choose your game .nup", "update-file": "Choose your update .nup"}
 CANCELLED = -128  # AppleScript's "User canceled." error number
