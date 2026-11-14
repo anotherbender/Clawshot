@@ -146,6 +146,64 @@ compared with the original PR commits and match. Claude reviews/pushes/merges.
   ActorInfo/GameActorInfo resources as well as the supplied r14 contents.
 
 
+## Independent-review adaptations (Claude, after `dba2d8a`)
+
+Six separate adaptation commits; no castle commit amended:
+
+1. `9c20c03`: cap NX file declarations and direct reads at **512 MiB**, above
+   the largest of the real archive's 188,284 members (**404,285,906 bytes**).
+   Hash chunks incrementally and check the digest before assembling the result.
+   Synthetic tests cover authenticated tiny-archive/2-GiB repeated references,
+   exact-boundary acceptance, one-byte-over refusal and direct-record bypass.
+2. `31a3c3c`: preserve the reader's refusal through dump inspection and HTTP.
+   Tests cover decrypted-NSP NX guidance and damaged-file SHA refusal, with
+   unchanged remembered dump. Missing-file version guidance still takes priority.
+   Only failed, otherwise-complete checks re-read fingerprints for reader diagnosis.
+3. `277c23b`: tracker archives use shared `open_source`, including NX and the
+   remembered separate update. Folder/archived overlays, cache invalidation,
+   newest-snapshot non-fallback, closed handles and HTTP update switches are tested.
+4. `05831ba`: cart-only refusal keeps the new separate-update guidance and names
+   the missing update resources; the removed fingerprint-filename assertion is restored.
+5. `5a32f96`: missing update says **Update not found** and asks for the update.
+   Exact missing/wrong-kind HTTP errors and unchanged dump/update preferences tested;
+   existing missing-game-dump messages stay unchanged.
+6. `0a89114`: notices are controlled by each request's `ShowNotice`, not an
+   installed saved toggle. Correct the docstring and remove the unused constant.
+   The serialized-flow interpreter now reads its actual Bool argument; both
+   notice values deliver the same item, with only the requested window differing.
+
+- Targeted integration (not full gates): **216 passed, 1 skipped (21.40 s)**.
+  Suites: `test_pack_nx`, `test_ui_first_run`, `test_pack_dump_folder`,
+  `test_tracker_icons`, `test_tracker_http`, `test_receive_event`, `test_ui`,
+  `test_key_bindings`, `test_scrubs`; workers 1. Scoped format and lint pass.
+  After installing that locked UI extra, the previously skipped decoder regression
+  (`test_compressed_texture_pixels_keep_channels_block_order_and_partial_edges`)
+  passed: **1 passed (0.15 s)**.
+- Installed the already-locked UI extra for native visual verification; no dependency
+  metadata changed. Actual NX Bottle icon decoded with texture2ddecoder 1.0.6,
+  served through the real tracker icon HTTP route and visually inspected in Chromium:
+  **341×341**, complete image. NX + separate real RomFS update gives identical PNG bytes.
+  Isolated in-memory server/tab closed and throwaway server script removed.
+  No seed or normal save opened for this smoke.
+- Bounded NX reader still detects Version1.1.1/build e0f3ccfa; fingerprint remains
+  `fc09c4af707a0ca092188cf014f6fdf3d40514def773f097b798f52f9f28bc93`.
+  Archive size/mtime unchanged. No game launched.
+- Fresh main `d66d35f` versus the fully adapted series code head `0a89114`:
+  **zero differences** for all three recipes, including every relative path,
+  resource, spoiler and play note. Both sides generated anew, workers 1.
+  The verified `src` tree is `9dc59684ce904fff87c5cb26d3eaa7afdd5c2a95`;
+  the following round-record-only commit does not change that source tree.
+  Manifests: `work/r15-castle/review-main-d66d35f-manifest.json` and
+  `work/r15-castle/review-series-0a89114-manifest.json` (outside the repo).
+
+  | Recipe | Files | Matching manifest SHA-256 |
+  |---|---:|---|
+  | 1505 Defaults | 103 | `90c3916bd00713fabcd2288582806e3b714302ebbdbc8bff928311a997f625f7` |
+  | 1506 Chest/Shop/Gift | 153 | `28d9a7767b6eb19363c5a253b54f0b97fce67fc5b8e89b41d5ad8d60343d62e3` |
+  | 1507 Defaults + `dungeon_items="anywhere"` | 102 | `bbe445d44e1e78c7d87520824df12e5aa6b901a229ccf6c91706070c2570dc0a` |
+
+- Full gates remain stopped: no lock, runner or watcher has been created.
+
 ## In-game boundary
 
 No game started. #6 pickup windows/receive event remain unplayed on rebased code.
