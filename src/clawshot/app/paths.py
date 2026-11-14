@@ -100,9 +100,9 @@ def _refusal(version: str | None, missing: list[str], problem: str | None, updat
                 f"({', '.join(missing)}). Choose the {SUPPORTED_UPDATE} folder, .nup or .nx."
             )
         return (
-            f"Found Version 1.0.0 (the cart files only). Clawshot needs Version {SUPPORTED_VERSION}: tick "
-            f"'{UPDATE_OPTION}' and choose the update, or choose the folder that holds both base/romfs and "
-            "updates/<version>/romfs."
+            f"Found Version 1.0.0 (the cart files only), without the Version {SUPPORTED_VERSION} files "
+            f"({', '.join(missing)}). Clawshot needs Version {SUPPORTED_VERSION}: tick '{UPDATE_OPTION}' and choose "
+            "the update, or choose the folder that holds both base/romfs and updates/<version>/romfs."
         )
     if missing and version == SUPPORTED_VERSION:
         return (
