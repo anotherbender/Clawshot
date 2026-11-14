@@ -481,3 +481,131 @@ source. Accepted as Track D's only token input, with these amendments, which tak
 4. **Runtime caution (reported by another project, not tested by us):** an edited `AI.Global` pack crashed Hookshot.
    Prefer a design that needs no `AI.Global` edit; if one is needed, boot-check it on Longshot before anything
    else depends on it.
+
+## 10. Facts amendment for the implementer
+
+cs15c, 2026-11-14, answering Claude's three relayed questions. Based on main `d66d35f`; section 9's phase and
+admission decisions are unchanged. This amendment contains native facts and evidence limits, not an actor
+construction procedure. No contact with the implementer and no Clawshot code change.
+
+### Additional sources
+
+- **N12 (native/static):** `E:/OOTRemake/work/r15-tokens/amendment_facts.py` ->
+  `amendment-facts.json`. Read-only current
+  `Event/EventFlow/{Dm_SY_Get,Dm_SY_Get_WithoutPlayer,Dm_SY_GetInEvent,GetPouchContent}.bfevfl.zs`, plus the N8
+  native `PouchContent.event.root.ainb` decode. Records named events, resolved actions/queries and branch targets;
+  input flow hashes are retained outside the repository.
+- **R3 (source-inspected output facts, not played):** ootrr remains pinned to
+  `b7d9c86a0897c0423a1b63bc5ea7ac281bb98ea7` (HEAD checked again for this amendment). Exact file/line citations
+  below identify factual resource outputs or assumptions only; no third-party helper names, generated naming
+  scheme, code or construction sequence are transferred.
+- **Relayed/native finding:** Claude's question reports that native `RSDB/Tag.Product.111.rstbl.byml` contains
+  binary bit-table data and that only `Obj_Token_Gold` carries `Token_Gold`. This is accepted as the implementer's
+  observation, not a new independent Tag-table decode by cs15c. The on-disk compressed resource is
+  `RSDB/Tag.Product.111.rstbl.byml.zs`. [R3: `crates/core/src/pickup_pack/tag.rs:6-14`]
+
+### 10.1 Token_Gold is read, but the demonstrated collection callback does not test it
+
+**Native/static — positive consumer:** native `PouchContent.event.root.ainb` implements
+`EventQueryCheckTagOnPouchActor`. Its node 138 is `QueryActorIsTagOn` with `TagName=Token_Gold`; a positive result
+reaches node 137, returning **3**. If none of that query's recognised tags match, node 123 returns **4**.
+This is a tag classification query, separate from the native reason-10 graph and Hash writes. [N8/N12, native
+graph nodes 116–123, 126–128, 136–138]
+
+**Native/static — visible effect:** `Dm_SY_Get` Event151 and Event153 call that query; case 3 enters
+`GoldTokenFirstTime` through Event152/Event157. That subflow reads native token stock and the father's first-talk
+state and requests Navi balloon messages (for example Event13, Event135–140 and Event142). Thus absence of the
+tag can omit token-specific first-pickup/threshold advice. It is not accurate to say PouchContent never reads the
+tag, nor to equate those advice branches with recording which Skulltula was collected. [N12]
+
+**Native/static — ordinary grant convergence:** in `Dm_SY_Get` Event43, both tag-query case 3 (token) and case 4
+(other) reach Event39, then **Event35 `EventTriggerAddOwnToPouch`**. The token tag is not a prerequisite for that
+ordinary grant action. Independently, `Dm_SY_Get_WithoutPlayer` Event9 sends case 3 directly to Event3 and case 4
+through `Dm_SY_Get:CheckHeart` (Event17) to the same Event3, then Event0 `EventTriggerAddOwnToPouch`. These
+observations establish those named paths, not every get-event caller or every possible item. [N12]
+
+**Native/static — collection boundary:** no tag query occurs in native `Item_Token_Gold.root.ainb`'s demonstrated
+death-reason-10 completion branch, in the inspected enemy utility Hash-transfer graph, or in the native drop
+definition described in section 2.1. The inspected `OneShotGoldTokenDeadAfter` Hash-update body reads the
+`GoldTokenGmdHash` blackboard value and writes H/H xor 2; it does not query `Token_Gold`. [N1/N2/N4/N8]
+
+**[INFERENCE / limit]:** once a replacement actually reaches that native reason-10 callback with the right
+nonzero Hash, missing `Token_Gold` is not a condition in the demonstrated Hash-update path. The available
+evidence does **not** establish the stronger universal negative “no deeper native pickup/drop engine code ever
+reads this tag”, or guarantee that an arbitrary replacement reaches reason 10. Those native engine paths were
+not exhaustively audited. This is not a played tag-on/tag-off comparison on Longshot. [N4/N8/N12]
+
+**R3 — generated pickup tag facts:** the inspected generated collection-pickup output does **not** assign
+`Token_Gold` to its new actor and does **not** add a Tag-table row for that actor. The inspected source also
+explicitly disallows assigning `Token_Gold` as an added pickup tag. Its ordinary emitted resource set has new
+actor packs, the three actor/pouch registry tables and size-table changes, not a new Token_Gold tag assignment.
+An existing Tag table from a previously supplied mod may be retained unchanged; that is not the token feature
+editing it. [R3: `crates/core/src/pickup_pack/tag.rs:254-275`;
+`crates/core/src/slice/skull_kit.rs:21,70-105`; `crates/core/src/pickup_pack/kit.rs:580-638`;
+`crates/core/src/pickup_pack/write.rs:147-159`]
+
+For a source whose assigned reward remains a token, the inspected normal seed output retains the **native**
+token drop, including its existing native tag; it does not require a generated token replacement there.
+[R3: `crates/core/src/slice/skull_edit.rs:36-42`]
+
+**Reported/ootrr limit:** R1 calls the played object a generated Gold Skulltula token actor, but supplies no
+actor name, emitted files, tag dump, build revision or runtime log. The source-output facts above therefore do
+not identify the exact artefact used in that reported play. They are not evidence that its tested artefact
+carried a tag absent from the inspected output, or that every possible generated token follows the native
+token's advice branches. [R1/R3]
+
+### 10.2 New actor pack paths and runtime evidence
+
+**R3 — output facts:** generated non-token collection pickups use **new actor names and new
+`Pack/Actor/<new actor>.pack.zs` paths**, rather than globally replacing the existing native token pack.
+The inspected standalone output explicitly refuses a destination actor-pack path that already exists in the
+base RomFS. The normal seed output likewise writes generated actor packs and corresponding registry entries;
+native token assignments remain native as noted above. No third-party generated names or naming scheme are
+needed to state this resource distinction. [R3: `crates/core/src/pickup_pack/kit.rs:588-605,631-637`;
+`crates/core/src/slice/skull_kit.rs:70-105`]
+
+**R3 — accompanying resource facts:** emitted output registers the new actors in
+`RSDB/ActorInfo.Product.111.rstbl.byml.zs`, `RSDB/GameActorInfo.Product.111.rstbl.byml.zs` and
+`RSDB/PouchActorInfo.Product.111.rstbl.byml.zs`. Its `ResourceSizeTable` has entries for the new outer pack paths
+and newly named parameter resources inside those packs; existing shared native dependencies also need valid
+entries. Matching ActorInfo/GameActorInfo row positions are checked by that source. These are output/registration
+facts, not proof that the same set is sufficient on another runtime, and not an imported allocation formula.
+[R3: `crates/core/src/pickup_pack/kit.rs:455-487,515-536`;
+`crates/core/src/pickup_pack/write.rs:103-133,236-257`;
+`crates/core/src/slice/skull_kit.rs:88-104`]
+
+**Evidence limit:** R1 is a positive report that a generated actor was used in game. It does not include a
+`mods: <new path> <- <path>` line, identify the runtime, or say whether the tested path was absent from the base.
+The inspected source's own static tests check registered output and size entries, not a running game's file
+opens; none were run by Track C. No new-path runtime-loading experiment or Longshot log was obtained for this
+amendment. Consequently, “the source emits new paths with registrations” is established, but **Longshot loading
+an arbitrary new path is not certified by this research**. [R1/R3; section 9 runtime caution unchanged]
+
+### 10.3 Other facts relevant to preserving reason-10 completion
+
+| Native fact or evidence boundary | Source |
+|---|---|
+| Source identity reaches the drop through `GoldTokenGmdHash`; the declared default is zero. The native callback's demonstrated update requires a nonzero transferred value and existing H/H xor 2 saved rows. A generated actor's own new name does not replace that source identity. | N1/N2/N4/N5/N8 |
+| The token graph runs its completion callback and death signal only for reason 10, not for every death. Its `PickedUp` death procedure waits for a signal. Enemy death itself does not commit the saved collection pair. | N2/N3/N4/N8 |
+| The native graph also asks for physics controller **Body**, rigid body **Body**, and feeds that result to `ExecuteKeepStandingPosture`. A replacement lacking that native resource contract can fail independently of tags or inventory identity. This is a native dependency, not proof that all other physical parameters may be changed safely. | N8, `Item_Token_Gold.root.ainb` nodes 3–4; N2 native controller data |
+| Native token blackboard data includes `IsEnableAttention=true` as well as the U64 source Hash. The inspected generated pickups keep get events enabled for repeated acquisition and full-pouch cases (`PlayGetEventManyTimes`, `IsPlayGetEventPouchMax`). | N2/N8; R3 `crates/core/src/pickup_pack/kit.rs:191-200,372-410` |
+| The reason for the event-policy precaution is reported by the inspected source, not independently proved by a full-pouch play: an item taken without its get event may miss the completion path. A completed get window, usable reward and both saved source rows after reload are distinct observations. | R3 `crates/core/src/pickup_pack/kit.rs:382-410`; native separation N4/N7/N8 |
+| Falling/touch collection and compatibility with high-source retrieval are physical accessibility facts, not substitute completion flags. The inspected generated pickups assume touch collection, falling bodies and an appropriate lifetime; this does not certify every wall, vine, water or abyss case. | R3 `crates/core/src/pickup_pack/kit.rs:203-209,388-410`; N2/N8; section 6's unplayed packet |
+
+These facts do not establish a minimal sufficient list of component edits, new-resource heap sizes, or a
+tag-independent guarantee across every native engine entry point. In particular, the evidence supplies no
+basis for replacing a missing reason-10 transition by marking the Skulltula collected at death. [N3/N4/N8]
+
+### Amendment verification and handoff boundary
+
+The rebase encountered an add/add conflict because main already contains the accepted specification plus
+section 9; the superseded original documentation commit was skipped, retaining main's accepted text.
+`git rebase --skip` completed on the requested baseline. Only section 10 is added by this amendment.
+
+`CLAWSHOT_WORKERS=3 uv run python E:/OOTRemake/work/r15-tokens/amendment_facts.py` read the four actual native
+flows successfully (187, 17, 783 and 114 events respectively) and recorded the native tag-query branch.
+Tasklist showed neither game running at the research-stage start. No game launch, generated actor, output
+mod, save edit or native-folder write occurred. No Clawshot gate suite was run, consistent with Claude's
+documentation-only Track C instruction. N12 and R3 support the bounded answers above; neither changes the
+unplayed status of the phase-1 packet. The commit id is posted to Claude on `cs-r15`, not sent to the implementer.
+
