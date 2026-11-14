@@ -42,7 +42,7 @@ new-main adaptations in separate assisted commits. Claude reviews/pushes/merges.
     `65e1e4c6451034789177089ff0757b719dc8c91326ab86d1c1d79d4fe70e5123`;
   - seed1506 Chest/Shop/Gift: 152 files, manifest SHA256
     `796469949802d5ac3b86690046a58abb25a94f8b736d80b268cf1b1690f04f02`.
-  #5 and #4 exactly match both main manifests, every relative path and file hash,
+  #5, #4, #20 and #6 exactly match both main manifests, every relative path and file hash,
   including spoiler/play-note. No output normalization or ignored metadata.
 - #4 targeted `test_ui`, `test_app`, `test_pack_dump_folder`, `test_ui_games`,
   `test_ui_dialogs`: 54 passed (14.96 s).
@@ -53,7 +53,8 @@ new-main adaptations in separate assisted commits. Claude reviews/pushes/merges.
   real read-only RomFS check displays Verified Version1.1.1 / build e0f3ccfa;
   separate-update toggle exposes its field; moved input reports Not found and
   choose-again guidance; screenshot inspected; browser errors empty; tab/server closed.
-- Full gates and #20/#6 comparisons pending. A handful of baseline seeds need
+- NX generation also matches the same-commit #20 folder outputs for both seeds.
+  Full gates pending the serialized queue. A handful of baseline seeds need
   no gate.lock (Claude in conversation); full suites lock atomically, one at a time.
 - #20 original reader/release/UI/source tests: 20 passed (3.61 s).
 - Real NX: 25,511,029,796 bytes, size/mtime unchanged after read-only checking.
@@ -90,12 +91,28 @@ new-main adaptations in separate assisted commits. Claude reviews/pushes/merges.
   checked. Presentation metadata is not interpreted or used for version proof.
   `_nx/__init__.py` now says written from specification, not vendored-by-port.
   Final focused safety suite: 19 passed (0.34 s); real NX fingerprint unchanged.
+- Actual #20 browser smoke: checked the real NX, observed the blocking modal,
+  cancelled a live check, then retried successfully (Version1.1.1 / nx / e0f3ccfa).
+  Final modal closed, Check enabled, active check cleared. Only expected
+  ERR_ABORTED for cancellation; observed request hosts were loopback only.
+  Screenshot inspected; tab and isolated in-memory server closed.
+- First #20 full gates: format and lint passed; synthetic 2349 passed,
+  188 skipped, two stale refusal-message expectations in
+  `tests/test_ui_first_run.py:30`. Claude identified these as released
+  moved-dump/wrong-kind boundary coverage (#23/#24), not disposable wording.
+  Replaced the deletion commit `8fe6714` with `581fa0e`: keep the test, update
+  only #4's expected wrong-kind message. #20's separate `a163380` adaptation
+  extends both expected messages for NX. Exact distinct messages, HTTP refusal,
+  remembered-dump assertions all retained; targeted suite 3 passed on each branch.
+  Full rerun required. Synthetics queue B → D → #6 → #20; dumps wait for
+  Kareem to stop playing and Claude's dump order.
+  #6 gate attempts saw gate.lock held and started no suite; queue request posted.
 
 ## In-game boundary
 
 No game started. #6 pickup windows/receive event remain unplayed on rebased code.
-A staged Longshot checklist and launcher follow after #6 adaptation; Claude boot-checks,
-Kareem plays. No contents of community seed24 opened or named.
+The staged Longshot checklist and launcher are below; Claude boot-checks, Kareem
+plays. No contents of community seed24 opened or named.
 
 
 ## #6 integration and native evidence
