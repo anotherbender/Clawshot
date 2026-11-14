@@ -37,10 +37,12 @@ Through the actual authenticated HTTP server, all six Door of Time/free-travel c
 
 Integration rejected a lossy projection (explicit false became implicit false after unrelated edits) and a new duplicate-key restriction; preserving raw logic plus the existing clears convention avoids both. The two raw-JSON/switch resynchronization cases required the generic frontend update described above. No new arbitrary validation policy.
 
+Rapid-edit regression: synchronously clicking Free time travel On then another switch reproduced lost travel state (`free=false`, `cheap=false`, raw logic `{}`). Publishing the projected edit into the logic textarea before awaiting HTTP fixes the race: same sequence retained `free=true`, `cheap=false`, raw true; rapid Off then the other switch restored `free=false`, `cheap=true`, CS1. A smoke-harness timeout came from waiting on the preset's eagerly assigned string rather than its completed response; printed `Defaults preset applied` identified the readiness boundary, and the corrected harness waits for that completion first.
+
 ## Gates and handoff
 
 Serialized full suites pending. No in-game check required: tracker reads are unchanged, and app exposure uses the existing free-time-travel patch. Prior played behavior is documented in settings/roadmap; this round does not claim new in-game evidence or certify unplayed early-door returns.
 
 - Targeted `CLAWSHOT_WORKERS=3 uv run pytest tests/test_tracker_http.py tests/test_tracker_icons.py -m "not dump" -q`: **75 passed in 3.35s**. Synthetic HTTP coverage includes all four distinct decoded textures, absent/current-state icon authorization, wrong token/foreign Origin refusal, no source/seed writes, true/false/unknown flags, separate held/found counts, replaced-save polling and permanent OBS spoiler stripping.
-- Claude's queue: cs15d synthetic first, cs15b synthetic next; dump gates after both synthetics, cs15d first. Longshot appeared in a subsequent independent tasklist check; future stages use one worker while present. The runner checks CSV tasklist at each stage start and reserves/releases `gate.lock` atomically. No full-suite supervisor deadline.
+- Claude's final queue: cs15b synthetic now, then cs15d's corrected synthetic; dump gates cs15d first, then cs15b. Longshot appeared in an independent tasklist check; stages use one worker while present. The runner checks CSV tasklist at each stage start and reserves/releases `gate.lock` atomically. No full-suite supervisor deadline.
 - Initial global format check: 369 files formatted. Lint printed I001 because the new tracker constant had two blank lines after imports; reduced to one. The final gate reruns both checks after that printed-cause correction.

@@ -486,6 +486,12 @@ async function syncControls(changed) {
     const next = readValues(changed);
     for (const [target, keys] of Object.entries(changed?.clears || {}))
       for (const key of keys) delete next[target][key];
+    if (changed?.logic_override) {
+      // Publish the edit locally before awaiting HTTP, so a second control cannot lose it.
+      if (next[changed.key] !== changed.default)
+        next.logic[changed.logic_override] = next[changed.key];
+      $("setting-logic").value = JSON.stringify(next.logic, null, 2);
+    }
     const data = await api("settings", { values: next });
     if (current !== revision) return;
     values = data.values;
