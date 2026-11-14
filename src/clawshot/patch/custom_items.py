@@ -24,7 +24,7 @@ One actor is the Nothing item (:data:`NOTHING`); each location holding another p
 
 **Not yet seen in game:** that a romfs mod may add a pack the game did not ship, that the get window opens and the
 chest stays open with a ``NotPushToPouch`` content of a new name, and the size-table entries of grown RSDB tables
-(``rstb.OWN_FORMULA``). ``plans/03-game-data.md`` section 46 gives the check.
+(``rstb.OWN_FORMULA``). ``plans/03-game-data.md`` section 49 gives the check.
 """
 
 import bisect
@@ -236,9 +236,12 @@ def single_box_transform(data: bytes) -> bytes:
 def own_text_keys(romfs: str | Path, actors: Iterable[str]) -> list[str]:
     """The text keys of native actors (their ``ActorNameRef``; ``clawshot.patch.text.text_key``)."""
     romfs = Path(romfs)
+    actors = sorted(set(actors))
+    if not actors:
+        return []
     dicts = zsdic.Dictionaries.from_romfs(romfs)
     keys = set()
-    for actor in sorted(set(actors)):
+    for actor in actors:
         path = PACK.format(actor=actor)
         if (romfs / path).is_file():
             keys.add(text_key(sarc.read(dicts.decompress(path, (romfs / path).read_bytes())), actor))

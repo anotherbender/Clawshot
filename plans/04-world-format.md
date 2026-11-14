@@ -397,6 +397,31 @@ resources under `<dir>/romfs/` plus `<dir>/spoiler.json`:
 Same seed, settings, data and generator version give the same bytes: the generator is the only randomness, and the
 fill walks lists in world-file order, never a set (a test compares two interpreters with different hash seeds).
 
+### External placements (Python callers only)
+
+`generate.from_placements(spec, seed, settings, placements, vanilla=...)` and
+`patch.make_seed(..., placements=...)` accept exactly the prepared world's shuffled
+locations, with known items satisfying `fill.allowed`. Unshuffled sources retain
+their native rewards. These calls deliberately skip local beatability/return proofs:
+the external placer must prove its whole world or multiworld. They choose no hints,
+have no spheres and report a null opening route; they are not certified solo seeds.
+Ordinary CLI/app generation still fills and proves the seed.
+
+Native progressive preparation and chest-only copies, source-bound key/progressive
+compilers, quest-step repairs and Darunia's native bonus guard still apply.
+`Nothing` and `Archipelago Item` are chest-only placeholders. For the latter,
+`make_seed(foreign={location: custom_items.Foreign(player, item, own=False)})`
+supplies its window text. `own=True` says “your” but remains a placeholder: no native
+item is granted locally. A directly placed native progressive family instead grants
+the selected tier normally. `possessive_text=True` covers every possible native tier,
+not only a family's rising base model.
+
+`receive_event=True` adds the opt-in native receive event; it does not implement a
+network connection, external client, slot format or progressive-selection protocol.
+Caller-specific saved flags use `extra_steps`. Custom transforms compose before
+native grant compilers, and new files pass through the normal guarded writer and
+resource-size table. None of these optional switches changes an ordinary solo seed.
+
 ### Replayable generator settings
 
 Generator defaults live in `data/settings.toml`, separate from the translated `data/world/settings.toml`.

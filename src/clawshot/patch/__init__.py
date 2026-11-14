@@ -129,8 +129,8 @@ def make_seed(
         out = generate(spec, seed, settings, vanilla=vanilla)
     else:
         out = from_placements(spec, seed, settings, placements, vanilla=vanilla)
-    changes = tuple(step(out.placements) for step in extra_steps)
     custom = custom_step(romfs, out, links, table, foreign or {}, possessive_text=possessive_text)
+    changes = tuple(step(out.placements) for step in extra_steps)
     flags = list(custom.flags)
     new_files = dict(custom.new_files)
     if custom.changes:
@@ -206,6 +206,10 @@ def custom_step(
     if stray:
         raise PatchError(f"other players' items named for locations that do not hold one: {stray[:5]}")
     own = [table.actors[item] for item in seed.placements.values() if item in table.actors] if possessive_text else []
+    if possessive_text:
+        from clawshot.progressive import CHAINS
+
+        own.extend(tier.actor for item in seed.placements.values() if item in CHAINS for tier in CHAINS[item])
     return custom_items.changes(
         romfs, nothing_locations=by_item[custom_items.NOTHING_ITEM], foreign=foreign, own_actors=own
     )
