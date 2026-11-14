@@ -1,6 +1,8 @@
 # Round 15 — castle PRs (cs15a)
 
-Original base `1db6e63`, rebased onto docs-only main `eff7dab` as Claude requested before final gates; version remains 0.2.1. Agent/model `cs15a`, `openai-codex/gpt-6.1-sol`.
+Current linear-series base `d66d35f` (includes #26), pending cs15b's merge.
+Earlier comparisons used `1db6e63` / docs-only `eff7dab`; version remains 0.2.1.
+Agent/model `cs15a`, `openai-codex/gpt-6.1-sol`.
 Read required plans, README/CONTRIBUTING, decisions, native §46–48, and all four
 PR descriptions, comments and review-thread endpoints before editing.
 Review endpoints had no inline comments. No push, merge, GitHub writes or game launch.
@@ -8,9 +10,11 @@ Scratch/evidence: `E:/OOTRemake/work/r15-castle/`. No version bump.
 
 ## Branches and ownership
 
-Rebase order #5, #4, #20, #6. Two stacks: `r15/castle-5` → `r15/castle-6`
-and `r15/castle-4` → `r15/castle-20`. Castle author/messages/trailers retained;
-new-main adaptations in separate assisted commits. Claude reviews/pushes/merges.
+Current series: main → #5 → #6 + adaptations → #4 → #20 + adaptations.
+Refs: `r15/castle-series-5`, `r15/castle-series-6`, `r15/castle-series-4`,
+and top `r15/castle-series`. Earlier two-stack branches are historical.
+All ten castle author names/emails/dates and complete messages/trailers were
+compared with the original PR commits and match. Claude reviews/pushes/merges.
 
 ## Decisions and findings
 
@@ -54,8 +58,8 @@ new-main adaptations in separate assisted commits. Claude reviews/pushes/merges.
   separate-update toggle exposes its field; moved input reports Not found and
   choose-again guidance; screenshot inspected; browser errors empty; tab/server closed.
 - NX generation also matches the same-commit #20 folder outputs for both seeds.
-  Full gates pending the serialized queue. A handful of baseline seeds need
-  no gate.lock (Claude in conversation); full suites lock atomically, one at a time.
+  Those comparisons preceded the current linear series. A handful of baseline
+  seeds need no gate.lock (Claude in conversation); full gates require ownership.
 - #20 original reader/release/UI/source tests: 20 passed (3.61 s).
 - Real NX: 25,511,029,796 bytes, size/mtime unchanged after read-only checking.
   Detected Version 1.1.1 / build e0f3ccfa. NX and RomFS fingerprints both
@@ -104,9 +108,43 @@ new-main adaptations in separate assisted commits. Claude reviews/pushes/merges.
   only #4's expected wrong-kind message. #20's separate `a163380` adaptation
   extends both expected messages for NX. Exact distinct messages, HTTP refusal,
   remembered-dump assertions all retained; targeted suite 3 passed on each branch.
-  Full rerun required. Synthetics queue B → D → #6 → #20; dumps wait for
-  Kareem to stop playing and Claude's dump order.
-  #6 gate attempts saw gate.lock held and started no suite; queue request posted.
+  The earlier B → D → #6 → #20 queue is superseded by the linear-series plan
+  and explicit gate stop below.
+  Initial #6 gate attempts saw gate.lock held and started no suite.
+
+## Linear-series adaptation and gate stop
+
+- Claude changed the plan: build one series in #5/#6/#4/#20 order, wait for
+  cs15b's merge, rebase onto main, then run full gates only when Claude says so.
+  Top head gets synthetic + dump; the interior #6 head gets synthetic.
+- The old background watchers incorrectly continued under the superseded order.
+  Their empty lock directory let another agent treat it as stale, overlapping
+  full suites. The #6 diagnostic run recorded 2346 passed, 189 skipped and two
+  failures: the invented `make_plan` lambda rejected the new `overrides` keyword.
+  No pass is claimed from that overlapping run. #20 was cancelled without a verdict.
+- On STOP: cancelled bg_20 and checked both reported PIDs (135284/165980) gone.
+  No matching owned Python/uv gate runner remained; bg_19 had finished.
+  Removed only the empty owned lock and posted RELEASED at 17:24 for cs15b.
+  Deleted the watcher script; no gate job is queued or waiting.
+- Separate adaptation explicitly accepts `overrides=None` in the invented-plan
+  stand-in. All named-key credit, first-weapon bag and Navi assertions remain.
+  On the new series' #6 head, `CLAWSHOT_WORKERS=1 uv run pytest
+  tests/test_key_bindings.py tests/test_scrubs.py -q`: **77 passed (1.09 s)**.
+  #26's unshuffled Business Scrub guard merged intact; no source conflict occurred.
+  On the top head, focused external-placement/custom-text/receive-event/NX/
+  moved-dump suites: **44 passed (8.26 s)**. These are local targeted runs,
+  not full gates; no lock was taken.
+- Future helper stages a populated `owner.txt` in a private claim directory and
+  publishes it with one Windows rename; there is no observable empty lock.
+  Release verifies ownership and renames away before deleting private files.
+  Explicit per-label authorization is required; an unauthorized smoke invocation
+  returned 78 before creating any lock or running any suite.
+- Main ancestry and all four PR-head boundaries were checked. **No full gate on
+  the linear series has run.** After cs15b merges and Claude authorizes: rebase
+  with intermediate refs updated, then run the requested head-specific gates.
+  Use the expanded r15 layered fixture for the top dump gate; it includes #6's
+  ActorInfo/GameActorInfo resources as well as the supplied r14 contents.
+
 
 ## In-game boundary
 
@@ -137,7 +175,7 @@ plays. No contents of community seed24 opened or named.
   Copied the supplied r14 layered fixture and added **ActorInfo** and
   **GameActorInfo** to its newest update. All **1,250** selected native resources
   match the read-only real RomFS by SHA256. ZeldaLetter donor was already present.
-  Final #6 dump gates use this fixture; #20 uses the supplied r14 fixture.
+  The authorized top-of-series dump gate will use this expanded fixture.
   A scratch flat copy was detected as the wrong OOT_DUMP layout before any suite;
   no fixture-only production failure is claimed.
 - Actual `make_seed(placements=..., foreign=..., possessive_text=True,
