@@ -544,7 +544,7 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
     )
     # The placement plan is invented; unrelated Sheik localization does not participate in this grant.
     monkeypatch.setattr(patch_api.item_actors, "load", lambda: patch_api.item_actors.loads(""))
-    monkeypatch.setattr(patch_api, "make_plan", lambda *args: plan)
+    monkeypatch.setattr(patch_api, "make_plan", lambda *args, overrides=None: plan)
     monkeypatch.setattr(text, "sheik_hint_changes", lambda *args: {})
     output = patch_api.make_seed(
         tmp_path,
