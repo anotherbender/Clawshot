@@ -239,6 +239,13 @@ document.addEventListener("pointerover", (event) =>
   describe(event.target.closest("[data-help]")),
 );
 
+function syncSwitch(input) {
+  const toggle = input.closest(".switch-control");
+  const [off, on] = toggle.querySelectorAll("button");
+  off.classList.toggle("chosen", !input.checked);
+  on.classList.toggle("chosen", input.checked);
+  toggle.setAttribute("aria-checked", String(input.checked));
+}
 function control(info) {
   const cards = info.display === "cards";
   const full = cards || info.kind === "multi" || info.kind === "json";
@@ -325,11 +332,7 @@ function control(info) {
     const off = element("button", "", "Off"),
       on = element("button", "", "On");
     off.tabIndex = on.tabIndex = -1;
-    const update = () => {
-      off.classList.toggle("chosen", !input.checked);
-      on.classList.toggle("chosen", input.checked);
-      toggle.setAttribute("aria-checked", String(input.checked));
-    };
+    const update = () => syncSwitch(input);
     off.addEventListener("click", () => {
       input.checked = false;
       input.dispatchEvent(new Event("change", { bubbles: true }));
@@ -341,8 +344,8 @@ function control(info) {
       toggle.focus();
     });
     input.addEventListener("change", update);
-    update();
     toggle.append(input, off, on);
+    update();
     valueCell.append(toggle);
   } else if (info.kind === "json") {
     input = document.createElement("textarea");
@@ -448,9 +451,11 @@ function markPreset() {
     button.setAttribute("aria-pressed", String(selected));
   }
 }
-function readValues() {
+function readValues(changed) {
   const result = {};
   for (const info of metadata) {
+    // Projected switches are edits, not a second copy of the explicit logic object.
+    if (info.logic_override && info.key !== changed?.key) continue;
     const input = $("setting-" + info.key);
     if (info.kind === "multi")
       result[info.key] = [...input.querySelectorAll("input:checked")].map(
@@ -478,7 +483,7 @@ async function syncControls(changed) {
   syncing = true;
   $("start-job").disabled = true;
   try {
-    const next = readValues();
+    const next = readValues(changed);
     for (const [target, keys] of Object.entries(changed?.clears || {}))
       for (const key of keys) delete next[target][key];
     const data = await api("settings", { values: next });
@@ -492,6 +497,11 @@ async function syncControls(changed) {
     markPreset();
     for (const target of Object.keys(changed?.clears || {}))
       $("setting-" + target).value = JSON.stringify(values[target], null, 2);
+    for (const info of metadata.filter((row) => row.logic_override)) {
+      const input = $("setting-" + info.key);
+      input.checked = values[info.key];
+      syncSwitch(input);
+    }
     valid = true;
     $("settings-state").textContent =
       "Settings validated · string is up to date";

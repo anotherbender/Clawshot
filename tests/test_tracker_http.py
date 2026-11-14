@@ -6,24 +6,35 @@ import struct
 from pathlib import Path
 
 import pytest
+from test_tracker_icons import icon_file, noise, png_pixels, romfs_with, tree
 from test_ui import request, running_server
 
 from clawshot.app.preferences import Preferences
 from clawshot.generate import Settings
 from clawshot.save import BOOL, BOOL64, INT, MAGIC, key
+from clawshot.tracker import icons
 from clawshot.tracker.seeds import Place
 from clawshot.ui.server import Application
 
+# The HTTP state's presentation contract for dungeon rows (round 15): the generic UI/Tex/Icon dungeon files.
+DUNGEON_ICONS = {
+    "small_key": "Item_Dungeon_SmallKey",
+    "boss_key": "Item_Dungeon_BossKey",
+    "map": "Item_Dungeon_Map",
+    "compass": "Item_Dungeon_Compass",
+}
+FOREST_FLAGS = {"IsGetBossKey": False, "IsGetMap": True, "IsGetCompass": False}
 
-def save_bytes(*, opened=False, held=1, found=2):
+
+def save_bytes(*, opened=False, held=1, found=2, flags=None):
+    """A complete synthetic progress.sav. A ``flags`` value of None leaves that Forest Temple Bool out of the save."""
+    forest_flags = {
+        f"DungeonInfo.ForestTemple.{name}": value
+        for name, value in (FOREST_FLAGS | (flags or {})).items()
+        if value is not None
+    }
     fields = {
-        BOOL: {
-            "IsTreasureBoxOpen.123": opened,
-            "IsTreasureBoxOpen.124": False,
-            "DungeonInfo.ForestTemple.IsGetBossKey": False,
-            "DungeonInfo.ForestTemple.IsGetMap": True,
-            "DungeonInfo.ForestTemple.IsGetCompass": False,
-        },
+        BOOL: {"IsTreasureBoxOpen.123": opened, "IsTreasureBoxOpen.124": False, **forest_flags},
         INT: {
             "DungeonInfo.ForestTemple.SmallKeyNum": held,
             "DungeonInfo.ForestTemple.SmallKeyTotalNum": found,
@@ -83,8 +94,21 @@ def tracker_seed(tmp_path, monkeypatch):
     return root, slot
 
 
+@pytest.fixture
+def icon_cache(tmp_path, monkeypatch):
+    """Decoded PNGs go to this private folder instead of the user's real cache."""
+    cache = tmp_path / "icon-cache"
+    monkeypatch.setattr(icons, "default_cache_dir", lambda: cache)
+    return cache
+
+
 def forest(snapshot):
     return next(d for d in snapshot["state"]["dungeons"] if d["name"] == "Forest Temple")
+
+
+def icon(server, actor, **options):
+    """An icon as the OBS page's <img> loads it: authorised by the token path alone."""
+    return request(server, "", path=server.prefix + f"tracker-icons/{actor}.png", token=False, **options)
 
 
 def test_http_save_refresh_named_chests_keys_and_spoiler_consent(tracker_seed):
@@ -154,3 +178,86 @@ def test_tracker_folder_picker_is_explicit_and_read_only(tmp_path):
         assert Path(picked["path"]) == tmp_path
         assert calls == [("tracker-save", None)]
         assert list(tmp_path.iterdir()) == []
+
+
+def test_dungeon_icons_are_served_only_while_a_configured_state_names_them(tracker_seed, tmp_path, icon_cache):
+    root, _ = tracker_seed
+    pictures = {actor: noise(5 * 3 * 4, seed) for seed, actor in enumerate(DUNGEON_ICONS.values(), 20)}
+    # A decodable file sits behind every refused name: refusal must come from the state, not a missing file.
+    files = {actor: icon_file(name=actor, pixels=pixels) for actor, pixels in pictures.items()}
+    source = romfs_with(tmp_path / "romfs", files | {"Unlisted_Actor": icon_file(name="Unlisted_Actor")})
+    preferences = Preferences()
+    preferences.remember("dump", str(source))
+    with running_server(Application(preferences=preferences)) as server:
+        for route in ("tracker", "tracker-obs"):
+            assert request(server, route)[2]["state"] is None
+        for actor in DUNGEON_ICONS.values():
+            assert icon(server, actor)[0] == 404
+        assert not icon_cache.exists()  # nothing is decoded before a state names an icon
+
+        status, _, app = request(server, "tracker-configure", {"seed": str(root)})
+        assert status == 200, app
+        obs = request(server, "tracker-obs")[2]  # the OBS page polls, then loads the icons its state names
+        assert app["state"]["dungeon_icons"] == obs["state"]["dungeon_icons"] == DUNGEON_ICONS
+        named = {cell["icon"] for group in ("items", "songs", "rewards") for cell in obs["state"][group]}
+        assert not {"Obj_Dungeon_SmallKey", "Unlisted_Actor"} & named
+        spare = min(icons.ICON_IDS - named - set(DUNGEON_ICONS.values()))
+        romfs_with(source, {spare: icon_file(name=spare)})
+        before = tree(source), tree(root)
+        for actor, pixels in pictures.items():
+            status, headers, body = icon(server, actor)
+            assert status == 200, (actor, body)
+            assert headers["Content-Type"].startswith("image/png")
+            assert png_pixels(body) == (5, 3, pixels)
+        # A whitelisted file the state does not name, an alias of a served icon, and an unknown name stay refused.
+        for actor in (spare, "Obj_Dungeon_SmallKey", "Unlisted_Actor"):
+            assert icon(server, actor)[0] == 404
+        assert icon(server, "Item_Dungeon_Map", headers={"Origin": "https://evil.example"})[0] == 403
+        assert request(server, "", path="/s/wrong/tracker-icons/Item_Dungeon_Map.png")[0] == 403
+        # Decoded copies live only in the private cache; the dump and the seed output are only read.
+        assert sorted(p.name.split(".")[0] for p in icon_cache.iterdir()) == sorted(DUNGEON_ICONS.values())
+        assert (tree(source), tree(root)) == before
+
+        status, _, failed = request(server, "tracker-configure", {"seed": str(tmp_path / "not-a-seed")})
+        assert status == 200, failed
+        assert failed["status"] == "error" and failed["state"] is None
+        assert request(server, "tracker-obs")[2]["state"] is None
+        for actor in DUNGEON_ICONS.values():
+            assert icon(server, actor)[0] == 404  # an earlier seed's icons do not outlive its state
+
+
+def test_dungeon_keys_and_flags_stay_distinct_while_obs_polls_spoiler_free(tracker_seed):
+    root, slot = tracker_seed
+    first = {"IsGetBossKey": True, "IsGetMap": False, "IsGetCompass": None}
+    slot.write_bytes(save_bytes(held=3, found=5, flags=first))
+    with running_server(Application(preferences=Preferences())) as server:
+        body = {"seed": str(root), "show_locations": True, "confirmed": True}
+        status, _, app = request(server, "tracker-configure", body)
+        assert status == 200, app
+        obs = request(server, "tracker-obs")[2]
+        assert app["show_locations"] is True and "Synthetic secret reward" in json.dumps(app)
+        assert obs["show_locations"] is False and obs["state"]["show_locations"] is False
+        assert obs["state"]["dungeons"] == app["state"]["dungeons"]
+        keys = forest(obs)
+        # Held (spendable) and found (acquired) stay separate counts; a saved true, a saved false and a missing
+        # field stay true, false and unknown instead of collapsing into "not found".
+        assert (keys["small_keys"]["held"], keys["small_keys"]["found"]) == (3, 5)
+        assert keys["small_keys"]["first_found"] is None
+        assert keys["boss_key"] is True and keys["map"] is False and keys["compass"] is None
+        others = [d for d in obs["state"]["dungeons"] if d["name"] != "Forest Temple"]
+        assert others and all(d["small_keys"]["held"] is None and d["boss_key"] is None for d in others)
+
+        mtime = slot.stat().st_mtime_ns + 10_000_000
+        changed = {"IsGetBossKey": None, "IsGetMap": True, "IsGetCompass": False}
+        slot.write_bytes(save_bytes(opened=True, held=2, found=5, flags=changed))
+        os.utime(slot, ns=(mtime, mtime))
+        polled = request(server, "tracker-obs")[2]  # the OBS poll alone re-reads the replaced save
+        assert polled["revision"] != obs["revision"]
+        keys = forest(polled)
+        assert (keys["small_keys"]["held"], keys["small_keys"]["found"]) == (2, 5)
+        assert keys["boss_key"] is None and keys["map"] is True and keys["compass"] is False
+        assert polled["state"]["areas"][0]["collected"] == 1
+        assert all("checks" not in area for area in polled["state"]["areas"])
+        assert "Synthetic secret reward" not in json.dumps(polled)
+        assert polled["state"]["dungeon_icons"] == DUNGEON_ICONS
+        assert request(server, "tracker")[2]["state"]["dungeons"] == polled["state"]["dungeons"]

@@ -1,4 +1,5 @@
-# Presentation only. Defaults and validation remain in Settings/data/settings.toml.
+# Presentation only. Defaults and validation remain in Settings/data settings.toml.
+# A table with logic_override is a switch for one supported boolean logic override, not a Settings field.
 [shuffle]
 label = "What to shuffle"
 kind = "multi"
@@ -33,6 +34,13 @@ choices = ["closed", "song_only", "open"]
 group = "World"
 help = "Choose whether the door needs the Spiritual Stones, Ocarina of Time and Song of Time, just the song and an ocarina, or nothing. All three door modes have passed a first in-game check."
 clears = { logic = ["door_of_time"] }
+[free_time_travel]
+label = "Free time travel (experimental)"
+kind = "boolean"
+group = "World"
+logic_override = "free_time_travel"
+clears = { logic = ["free_time_travel"] }
+help = "Experimental, off by default. After Sheik's first scene with adult Link, Sheik no longer blocks the Master Sword pedestal, so adult Link can return to child before the Forest Temple and change age freely. Seeds made with it on may expect those early trips back to child. The Prelude of Light scene still plays after the Forest Temple. Early return, repeated age changes, the first adult arrival and the Prelude scene have passed in-game checks; returning to child after an early Door of Time has not been checked in game."
 [fast_start]
 label = "Fast start"
 kind = "multi"
@@ -92,7 +100,7 @@ help = "Choose how helpful the Gossip Stone clues are."
 label = "Logic overrides (JSON object)"
 kind = "json"
 group = "Advanced"
-help = "Advanced: change which routes the generator assumes you can use. Leave this alone for normal play. Free back-and-forth time travel is experimental, and untested tricks are not allowed."
+help = "Advanced: change which routes the generator assumes you can use. Leave this alone for normal play. Free time travel has its own switch under World; untested tricks are not allowed."
 [areas]
 label = "Playtest areas (JSON array)"
 kind = "json"

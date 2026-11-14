@@ -67,9 +67,12 @@ The game folder is saved as `game`; a folder an older Clawshot saved as `hooksho
 - **Settings:** Defaults restores generator defaults. Recommended selects Chest, Shop, Gift,
   Scrub and BossHeart, with the remaining generator defaults. Every control and choice comes
   from the app schema. Cards explain their coverage and actual gameplay evidence. Unavailable
-  choices remain visible with a reason. Ineffective dependent settings are dimmed, retaining
-  their values for later reactivation. Changes update the versioned share string; paste and Apply does the
-  reverse. Copy copies it, or selects it with keyboard-copy instructions if permission is denied.
+  choices remain visible with a reason. **Free time travel (experimental)** under World, off by
+  default, is the command line's `--logic free_time_travel=true` with the same settings string
+  ([settings](settings.md#door-of-time-and-returning-to-child)). Ineffective dependent settings are
+  dimmed, retaining their values for later reactivation. Changes update the versioned share string;
+  paste and Apply does the reverse. Copy copies it, or selects it with keyboard-copy instructions if
+  permission is denied.
   **Copy for Discord** (here and under Seed ready) copies the same string inside single backticks.
   Discord reads text between two `_` as italics and drops them, which breaks a pasted string; inside
   backticks it stays exact. If you copy the plain string, wrap it in single backticks yourself.
@@ -193,6 +196,11 @@ The Generate action fits without scrolling at 1280×860.
 4. Group/display options are presentation metadata. Multi-choice cards can supply `status_labels`;
    fast start uses Skipped/Plays. `clears` identifies derived override keys to clear when a control
    changes, rather than hard-coding a field dependency in JavaScript.
+   A table with `logic_override` presents one supported boolean logic override (a `false`/`true`
+   entry of `[logic_overrides]` in `data/settings.toml`) as a switch without a new Settings field.
+   Payload values include a derived switch key and retain the explicit override in `logic` for exact
+   replay. Explicit logic takes precedence; the switch's `clears` metadata removes the old override
+   when edited, and validation supplies a nondefault switch value only without an explicit override.
    Check totals belong to the generator's actual result, not schema prose or a second UI eligibility
    algorithm: new Gift checks must not require editing a copied count or an unavailable-check list here.
 5. Run the synthetic app/HTTP tests, then exercise the actual UI and any changed generator path.

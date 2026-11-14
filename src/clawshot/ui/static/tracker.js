@@ -10,6 +10,13 @@
   const options = new URLSearchParams(location.hash.slice(1));
   if (standalone && options.get("transparent") === "1") document.body.classList.add("tracker-transparent");
   let icons = options.get("icons") !== "0";
+  const defaultColumns = 4;
+  const requestedColumns = Number(options.get("columns") ?? defaultColumns);
+  const columns = Number.isInteger(requestedColumns) && requestedColumns >= 1 && requestedColumns <= 8 ? requestedColumns : defaultColumns;
+  if (standalone) {
+    root.style.setProperty("--tracker-columns", columns);
+    document.body.classList.toggle("tracker-no-labels", options.get("labels") === "0");
+  }
   let lastRevision = "", pending = false, initialized = false;
   const node = (tag, cls = "", text) => {
     const el = document.createElement(tag);
@@ -34,7 +41,7 @@
   const warnings = node("div", "tracker-warnings");
   const content = node("div", "tracker-content");
   root.append(heading);
-  let controls, seedInput, saveInput, slotSelect, reveal, obsUrl, iconToggle, transparent;
+  let controls, seedInput, saveInput, slotSelect, reveal, obsUrl, iconToggle, transparent, labelToggle, columnSelect;
   if (!standalone) {
     controls = node("form", "tracker-controls");
     function pathRow(label, placeholder, kind) {
@@ -104,6 +111,17 @@
     iconToggle.addEventListener("change", () => { icons = iconToggle.checked; lastRevision = ""; updateObs(); refresh(); });
     transparent = checkbox("Transparent OBS background", false);
     transparent.addEventListener("change", updateObs);
+    labelToggle = checkbox("OBS item labels", true);
+    labelToggle.id = "tracker-obs-labels";
+    labelToggle.addEventListener("change", updateObs);
+    const columnLabel = node("label", "", "OBS columns ");
+    columnSelect = node("select");
+    columnSelect.id = "tracker-obs-columns";
+    for (let count = 1; count <= 8; count++) columnSelect.append(new Option(String(count), String(count)));
+    columnSelect.value = String(defaultColumns);
+    columnSelect.addEventListener("change", updateObs);
+    columnLabel.append(columnSelect);
+    flags.append(columnLabel);
     controls.append(flags);
     const obs = node("div", "tracker-obs-link");
     const obsLabel = node("label", "", "OBS Browser Source URL (private; changes each app start)");
@@ -125,7 +143,10 @@
   }
   root.append(status, warnings, content);
   function updateObs() {
-    const fragment = new URLSearchParams({transparent: transparent.checked ? "1" : "0", icons: icons ? "1" : "0"});
+    const fragment = new URLSearchParams({
+      transparent: transparent.checked ? "1" : "0", icons: icons ? "1" : "0",
+      labels: labelToggle.checked ? "1" : "0", columns: columnSelect.value,
+    });
     obsUrl.value = new URL(prefix + "tracker.html#" + fragment, location.origin).href;
   }
   async function configure() {
@@ -153,6 +174,26 @@
     content.append(section);
     return section;
   }
+  function localIcon(el, actor) {
+    if (!icons || !actor) return;
+    const image = node("img", "tracker-icon");
+    image.alt = "";
+    image.width = 40;
+    image.height = 40;
+    image.loading = "lazy";
+    image.addEventListener("load", () => el.classList.add("tracker-has-icon"), {once: true});
+    image.addEventListener("error", () => {
+      el.classList.remove("tracker-has-icon");
+      image.remove();
+    }, {once: true});
+    image.src = prefix + "tracker-icons/" + encodeURIComponent(actor) + ".png";
+    el.append(image);
+  }
+  function badge(el, text, kind, description) {
+    const value = node("span", "tracker-badge tracker-badge-" + kind, text);
+    value.title = description;
+    el.append(value);
+  }
   function cells(title, entries) {
     if (!entries?.length) return;
     const group = section(title), grid = node("div", "tracker-cells");
@@ -160,16 +201,7 @@
       const held = cell.held;
       const el = node("div", "tracker-cell" + (held === false ? " tracker-missing" : "") + (held == null ? " tracker-unknown" : ""));
       const label = cell.label || cell.name || cell.id;
-      if (icons && cell.icon) {
-        const image = node("img", "tracker-icon");
-        image.alt = "";
-        image.width = 40;
-        image.height = 40;
-        image.loading = "lazy";
-        image.src = prefix + "tracker-icons/" + encodeURIComponent(cell.icon) + ".png";
-        image.addEventListener("error", () => image.remove(), {once: true});
-        el.append(image);
-      }
+      localIcon(el, cell.icon);
       el.append(node("span", "tracker-cell-label", label));
       let detail = held == null ? "Unknown" : held ? "Held" : "Not held";
       if (cell.basis === "slots") detail = cell.count == null ? "Count unknown" : cell.count + " bottle" + (cell.count === 1 ? "" : "s");
@@ -179,9 +211,46 @@
       }
       el.append(node("small", "", detail));
       if (cell.contents?.length) el.append(node("small", "", cell.contents.map((bottle) => bottle.content || "?").join(", ")));
+      el.title = label + " · " + detail + (cell.contents?.length ? " · " + cell.contents.map((bottle) => bottle.content || "?").join(", ") : "");
+      el.setAttribute("aria-label", el.title);
+      if (standalone) {
+        if (cell.max_tier > 1 && cell.basis !== "slots") badge(el, show(cell.tier), "tier", "Tier " + show(cell.tier));
+        if (cell.count != null || cell.basis === "slots") badge(el, show(cell.count), "count", detail);
+        if (held == null && cell.max_tier <= 1) badge(el, "?", "count", "Unknown holding");
+      }
       grid.append(el);
     }
     group.append(grid);
+  }
+  function dungeonRows(group, state) {
+    const list = node("div", "tracker-dungeon-rows");
+    for (const dungeon of state.dungeons || []) {
+      const row = node("div", "tracker-dungeon-row"), keys = dungeon.small_keys || {};
+      row.append(node("strong", "tracker-dungeon-name", dungeon.name));
+      for (const [kind, label, held] of [
+        ["small_key", "Small keys", keys.held == null ? null : keys.held > 0],
+        ["boss_key", "Boss key", dungeon.boss_key],
+        ["map", "Map", dungeon.map],
+        ["compass", "Compass", dungeon.compass],
+      ]) {
+        const cell = node("div", "tracker-cell tracker-dungeon-item" + (held === false ? " tracker-missing" : "") + (held == null ? " tracker-unknown" : ""));
+        localIcon(cell, state.dungeon_icons?.[kind]);
+        const detail = kind === "small_key" ? show(keys.held) + " held · " + show(keys.found) + " / " + show(keys.total) + " found / total" : held == null ? "Unknown" : held ? "Held" : "Not held";
+        cell.title = dungeon.name + " · " + label + " · " + detail;
+        cell.setAttribute("aria-label", cell.title);
+        cell.append(node("span", "tracker-cell-label", label));
+        if (kind === "small_key") {
+          badge(cell, show(keys.held), "count", "Keys held");
+          cell.append(node("small", "tracker-key-total", show(keys.found) + "/" + show(keys.total)));
+        } else {
+          cell.append(node("small", "tracker-dungeon-flag", yes(held)));
+          if (held == null) badge(cell, "?", "count", "Unknown holding");
+        }
+        row.append(cell);
+      }
+      list.append(row);
+    }
+    group.append(list);
   }
   function render(data) {
     const idle = data.status === "idle" || data.status === "unconfigured";
@@ -211,17 +280,20 @@
     const seed = state.seed || {};
     heading.querySelector("p").textContent = "Seed " + show(seed.seed ?? seed.number) + " · saved inventory · " + (standalone ? "spoiler-free" : reveal.checked ? "LOCATION SPOILERS ON" : "spoiler-free");
     const dungeonGroup = section("Dungeon keys");
-    const table = node("table", "tracker-dungeons");
-    const head = node("thead"), row = node("tr");
-    for (const title of ["Dungeon", "Held", "Found / total", "Boss", "Map", "Compass"]) row.append(node("th", "", title));
-    head.append(row); table.append(head);
-    const body = node("tbody");
-    for (const dungeon of state.dungeons || []) {
-      const tr = node("tr"), keys = dungeon.small_keys || {};
-      for (const value of [dungeon.name, show(keys.held), show(keys.found) + " / " + show(keys.total), yes(dungeon.boss_key), yes(dungeon.map), yes(dungeon.compass)]) tr.append(node("td", "", value));
-      body.append(tr);
+    if (standalone) dungeonRows(dungeonGroup, state);
+    else {
+      const table = node("table", "tracker-dungeons");
+      const head = node("thead"), row = node("tr");
+      for (const title of ["Dungeon", "Held", "Found / total", "Boss", "Map", "Compass"]) row.append(node("th", "", title));
+      head.append(row); table.append(head);
+      const body = node("tbody");
+      for (const dungeon of state.dungeons || []) {
+        const tr = node("tr"), keys = dungeon.small_keys || {};
+        for (const value of [dungeon.name, show(keys.held), show(keys.found) + " / " + show(keys.total), yes(dungeon.boss_key), yes(dungeon.map), yes(dungeon.compass)]) tr.append(node("td", "", value));
+        body.append(tr);
+      }
+      table.append(body); dungeonGroup.append(table);
     }
-    table.append(body); dungeonGroup.append(table);
     const health = state.hearts || {};
     const counts = section("Collection");
     counts.append(node("p", "tracker-counts", "Hearts " + show(health.containers ?? health.capacity) + " · Pieces " + show(health.pieces) + " · Gold Skulltulas " + show(state.tokens)));

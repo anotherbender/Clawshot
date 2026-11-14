@@ -111,7 +111,10 @@ def wait_job(jobs):
 
 
 def test_schema_is_exhaustive_and_replay_preserves_values():
-    assert {row["key"] for row in schema()} == {field.name for field in fields(Settings)}
+    rows = schema()
+    assert {row["key"] for row in rows if "logic_override" not in row} == {field.name for field in fields(Settings)}
+    switches = {row["key"]: row["logic_override"] for row in rows if "logic_override" in row}
+    assert switches == {"free_time_travel": "free_time_travel"}  # presentations of logic overrides
     settings = validate(
         {"dungeon_items": "anywhere", "forest": "open", "shop_slots": 3, "logic": {"free_time_travel": True}}
     )

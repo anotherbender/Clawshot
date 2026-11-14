@@ -258,7 +258,7 @@ credit is a separate bug, not a failure of this map-access correction.
 | `--door-of-time closed` | Default, native: meet Zelda and Impa at the child castle, complete the three Spiritual Stones, then obtain the Ocarina of Time and playable Song of Time. |
 | `--door-of-time song_only` | Either child ocarina and the learned Song of Time. Passed a first in-game check with the Fairy Ocarina and two stones (R10-DOOR-SONG); the opening scene still shows all three stones. |
 | `--door-of-time open` | Opens the door and first-pull pedestal without items. Passed a first in-game check: open door, first pull and first-adult scenes (R10-DOOR-OPEN). |
-| `--logic free_time_travel=true` | Experimental, default off: adult return before Forest completion. |
+| `--logic free_time_travel=true` | Experimental, default off: adult return before Forest completion. The app's **Free time travel (experimental)** switch is the same override. |
 
 Door mode and reverse travel are independent. The default return guarantee proves an adult can
 unlock return from the minimum mandatory first-pull inventory and adult checks; optional child
@@ -280,6 +280,8 @@ With the return guarantee enabled, this generator cannot build Chest-only seeds 
 remain at child gifts. Validation names the fixed checks and offers a closed door or Gift
 shuffle. This is a construction limitation, not proof that no physical route exists;
 in particular, an unshuffled Time-song gift already requires all three stones.
+Free time travel replaces that return proof, so with it on all three door modes are accepted
+with Chest only; returning to child after an early door has not been checked in game.
 
 An open-bridge, early-door seed can validly require adult Link before Gohma. Its play note
 explains when no child-only opening guide exists instead of rejecting the beatable seed.
@@ -290,6 +292,13 @@ Early return, repeated age changes, the post-Forest Prelude and the fixed first 
 recorded in-game acceptance (R9-FREE-TRAVEL, R9-PRELUDE-PATCHED, R10-FIRST-PULL-FIXED). Default stays off.
 Adult song logic requires the Ocarina of Time; that age restriction comes from the game's inventory
 metadata, **not a played adult Fairy Ocarina test**.
+
+The app shows this override as the **Free time travel (experimental)** switch under World, not as a
+separate generator setting. On writes the same settings string as `--logic free_time_travel=true`;
+turning it Off removes the override (the default meaning). Importing a CLI or spoiler string sets
+the switch from its value. Explicit overrides, including `free_time_travel=false`, keep their exact
+settings string through unrelated form edits. Editing the switch replaces its old override; editing
+the advanced logic JSON resynchronizes the switch from that explicit value.
 
 `--dungeon-items own_dungeon` keeps dungeon items in their dungeon and is the default; both UI
 presets keep it. While it is set, the two chests on the Desert Colossus statue's hands cannot

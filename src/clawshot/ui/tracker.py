@@ -7,6 +7,14 @@ from clawshot.app.paths import absolute_path
 from clawshot.tracker.icons import IconCache, icon_id
 from clawshot.tracker.saves import TrackerSession
 
+# Presentation only: the generic dungeon actors already have runtime-decodable UI/Tex/Icon files.
+DUNGEON_ICONS = {
+    "small_key": "Item_Dungeon_SmallKey",
+    "boss_key": "Item_Dungeon_BossKey",
+    "map": "Item_Dungeon_Map",
+    "compass": "Item_Dungeon_Compass",
+}
+
 
 class TrackerController:
     def __init__(self):
@@ -48,6 +56,9 @@ class TrackerController:
             data = self.session.snapshot()
             state = data.get("state")
             self.allowed_icons = set()
+            if (state or {}).get("dungeons"):
+                state["dungeon_icons"] = dict(DUNGEON_ICONS)
+                self.allowed_icons.update(DUNGEON_ICONS.values())
             for group in ("items", "songs", "rewards"):
                 for cell in (state or {}).get(group, []):
                     actor = cell.get("icon")

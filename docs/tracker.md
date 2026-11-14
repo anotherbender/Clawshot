@@ -61,15 +61,33 @@ even while the app tab's spoiler mode is on.
 ## OBS Browser Source
 
 1. Configure the Tracker tab and keep Clawshot running.
-2. Select **Transparent OBS background** if desired, then **Copy URL**.
-3. In OBS add a **Browser Source**, use that URL, and start with 1000×900. Resize/crop as needed.
-   The compact surface has no controls and follows the same seed/save/slot as the app tracker.
+2. Choose **OBS columns** (1–8), **OBS item labels**, and **Transparent OBS background**, then **Copy URL**.
+   These OBS-only controls do not change the in-app tracker layout.
+3. In OBS add a **Browser Source** and use that URL. Groups stack vertically in a narrow block.
+   Four columns is the default: about 340 pixels wide with labels, suitable for a side overlay.
+   Start at 350×3000 with labels, or 290×2600 without, then crop/scale or increase columns to fit
+   your scene. Text fallbacks and warnings can increase height; do not crop away a warning unknowingly.
+   The surface has no controls and follows the same seed/save/slot as the app tracker.
 4. Disable OBS's shutdown-when-not-visible option if you want continuous refresh while hidden.
 
 The URL includes a private, random per-run token. Do not publish it or paste it into a public
 chat. Closing/restarting Clawshot invalidates it; copy the new URL into OBS. Nothing is exposed
 on the network: the server binds only `127.0.0.1` on a random port, keeps its Host/Origin checks,
 and makes no external requests. OBS must run on the same computer.
+
+The URL fragment carries `columns=4&labels=1&icons=1&transparent=0` by default.
+`columns` accepts whole numbers 1–8; missing/invalid values use four. Copy the updated URL into
+OBS after changing controls. With labels off, successfully loaded icons sit in close cells:
+top-left badges show upgrade tiers and bottom-right badges show counts (bottles, ammo, rupees
+or magic capacity). Greyed-out items are not held; dashed cells and `?` mean unknown.
+Heart, piece and token counts stay visible. Names/details remain available as tooltips and
+accessible labels. Without a usable icon, text stays visible even with labels off.
+
+Each dungeon keeps its name and a compact row of small key, boss key, map and compass icons.
+The small-key badge is **held**, available to spend; the number below is **found / seed total**,
+including spent keys. Other icons are greyed out when missing. Hover for the full description;
+unknown flags show `?`. With icons disabled or unavailable, each indicator uses its name and
+saved value instead. Dungeon names and collection/area summaries are not hidden by the item-label toggle.
 
 ## Local icons and fallback
 
@@ -86,8 +104,10 @@ Decoded PNGs are private game-derived data, never shipped in this repository or 
 Cache folders: Windows `%LOCALAPPDATA%/Clawshot/Cache/icons`; macOS
 `~/Library/Caches/Clawshot/icons`; Linux `$XDG_CACHE_HOME/clawshot/icons` (default `~/.cache/clawshot/icons`).
 Do not share them. Filenames include the source icon's hash; changing the dump invalidates that icon.
-Songs, stones and medallions have no file in `UI/Tex/Icon` and use text. If a dump, decoder or texture
-is unavailable, the same view still works; uncheck **Local item icons** to force text/CSS.
+Small keys, boss keys, maps and compasses use the game's `Item_Dungeon_*` icon files through
+the same decoder/cache. Songs, stones and medallions have no file in `UI/Tex/Icon` and use text.
+If a dump, decoder or texture is unavailable, the same view still works; uncheck **Local item icons**
+to force text/CSS.
 All fonts are installed system fonts.
 
 ## Safe headless operation
