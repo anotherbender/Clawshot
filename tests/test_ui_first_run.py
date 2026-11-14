@@ -40,9 +40,9 @@ def test_missing_dump_and_existing_wrong_kind_have_distinct_http_errors(made_ui_
         status, _, response = request(server, "detect", {"dump": str(bad)})
         assert status == 400
         expected = (
-            "Game dump: choose an extracted romfs folder or a .nup file"
+            "Game dump: choose an extracted romfs folder, a .nup or an .nx file"
             if exists
-            else f"Not found: {bad}. Choose your romfs folder or .nup again."
+            else f"Not found: {bad}. Choose your romfs folder, .nup or .nx again."
         )
         assert response["error"] == expected
         assert request(server, "schema")[2]["paths"]["dump"] == str(source)
