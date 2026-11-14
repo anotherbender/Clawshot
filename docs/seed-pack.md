@@ -91,6 +91,10 @@ your normal saves and has not been played with Clawshot. Facts below are from th
    overlay subfolders such as `Banc`, not another nested `romfs`.
 4. Keep only this seed in `mods`. When two mods have the same file, the one whose folder name sorts last
    wins, and only one mod's size table is used; a folder whose name starts with `-` or `_` is off.
+   Other mods are not supported with a seed. For example, Character Select replaces the same three files
+   as every seed (`GameData/GameDataList.Product.110.byml.zs`, `Mals/EUen.Product.110.sarc.zs` and
+   `Mals/USen.Product.110.sarc.zs`), whole: whichever mod sorts last wins those files, and the other mod's
+   changes to them are lost, even while both mods show as on (reported by mooki000, #17).
 5. Start a **New Game in an empty slot**.
 6. While it is in `mods`, the seed applies to **every save slot**. Remove the `Clawshot-seed-<number>`
    folder before playing your normal saves; removing the mod does not undo changes to a save.
