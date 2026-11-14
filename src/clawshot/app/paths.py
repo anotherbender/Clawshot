@@ -74,18 +74,25 @@ def _source_path(value: str, label: str) -> Path:
     return path
 
 
-def _inspect(path: Path, update: Path | None) -> tuple[str | None, list[str]]:
-    """The version the files name and which fingerprint files are missing, without judging the build."""
-    from clawshot.pack.source import game_version, open_source
+def _inspect(path: Path, update: Path | None, *, read: bool = False) -> tuple[str | None, list[str], str | None]:
+    """The version the files name, which fingerprint files are missing and the reader's own refusal, if any (an .nx
+    packed from a decrypted NSP), without judging the build. With ``read``, a complete set of fingerprint files is
+    read too, so a file the reader refuses (a damaged one) explains itself instead of reading as another build."""
+    from clawshot.pack.source import fingerprint, game_version, open_source
 
     try:
         with open_source(path, update) as source:
-            return game_version(source), [name for name in VERSION_FILES if not source.has(name)]
-    except (OSError, PackError):
-        return None, []
+            version, missing = game_version(source), [name for name in VERSION_FILES if not source.has(name)]
+            if read and not missing:
+                fingerprint(source.read)
+            return version, missing, None
+    except PackError as error:
+        return None, [], str(error)
+    except OSError:
+        return None, [], None
 
 
-def _refusal(version: str | None, missing: list[str], update: Path | None) -> str:
+def _refusal(version: str | None, missing: list[str], problem: str | None, update: Path | None) -> str:
     if missing and version == "1.0.0":
         if update is not None:
             return (
@@ -104,6 +111,8 @@ def _refusal(version: str | None, missing: list[str], update: Path | None) -> st
         )
     if missing:
         return f"These game files are missing {', '.join(missing)}. Choose the full romfs folder, .nup or .nx."
+    if problem is not None:
+        return f"These game files cannot be used: {problem}."
     if version is None:
         return "These game files cannot be read or name no known version. Choose the full romfs folder, .nup or .nx."
     return (
@@ -122,8 +131,8 @@ def detect_dump(value: str, update: str | None = None) -> dict:
     try:
         check_version(path, update_path)
     except (OSError, PackError) as error:
-        raise ValueError(_refusal(*_inspect(path, update_path), update_path)) from error
-    version, _ = _inspect(path, update_path)
+        raise ValueError(_refusal(*_inspect(path, update_path, read=True), update_path)) from error
+    version, _, _ = _inspect(path, update_path)
     return {
         "path": str(path),
         "kind": "romfs" if path.is_dir() else path.suffix.lower().lstrip("."),

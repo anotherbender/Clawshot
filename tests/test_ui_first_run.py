@@ -4,11 +4,12 @@ import pytest
 from test_app import app_source as app_source
 from test_app import synthetic_run, synthetic_spec
 from test_app_play import made_ui_seed as made_ui_seed
+from test_pack_nx import write_nx
 from test_ui import request, running_server
 
 from clawshot.app import Jobs
 from clawshot.app.preferences import Preferences
-from clawshot.pack import VERSION_FILES
+from clawshot.pack import VERSION_FILES, PackError, check_version
 from clawshot.ui.server import Application
 
 
@@ -46,3 +47,28 @@ def test_missing_dump_and_existing_wrong_kind_have_distinct_http_errors(made_ui_
         )
         assert response["error"] == expected
         assert request(server, "schema")[2]["paths"]["dump"] == str(source)
+
+
+@pytest.mark.parametrize("archive", ["no-romfs", "damaged"])
+def test_a_refused_nx_shows_the_readers_own_reason_over_http(tmp_path, archive):
+    if archive == "no-romfs":  # packed from a decrypted NSP: native NCAs, no romfs/ tree
+        nx = write_nx(tmp_path / "nsp.nx", [(0, 0, {"main.nca": b"synthetic native content"})])
+    else:  # every fingerprint file is there, but the first stored one no longer matches its SHA-256
+        files = {f"romfs/{name}": b"synthetic fingerprint input " * 4 + name.encode() for name in VERSION_FILES}
+        nx = write_nx(tmp_path / "game.nx", [(0, 0, files)])
+        data = bytearray(nx.read_bytes())
+        data[8192 + 20] ^= 0xFF
+        nx.write_bytes(bytes(data))
+    with pytest.raises(PackError) as reader:
+        check_version(nx)
+    remembered = str(tmp_path / "remembered-dump")
+    preferences = Preferences(tmp_path / "paths.json")
+    preferences.remember("dump", remembered)
+    app = Application(Jobs(synthetic_run), spec=synthetic_spec(), preferences=preferences)
+    with running_server(app) as server:
+        status, _, response = request(server, "detect", {"dump": str(nx)})
+    assert status == 400
+    assert response["error"] == f"These game files cannot be used: {reader.value}."
+    reason = "no romfs/ tree (packed from a decrypted NSP?)" if archive == "no-romfs" else "SHA-256"
+    assert reason in response["error"]
+    assert preferences.snapshot()["dump"] == remembered
