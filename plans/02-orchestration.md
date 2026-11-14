@@ -96,7 +96,9 @@ OOT_ROMFS=E:/Games/Hookshot/romfs uv run pytest -m dump
   `hookshot.exe` runs, `CLAWSHOT_WORKERS` overrides); set `CLAWSHOT_WORKERS=1` on every gate run while he plays and
   never overlap two gate runs then (round 9: two overlapping 8-worker runs held the CPU at 100% and the game crashed
   twice, Hookshot#1112). From round 10, agents take a gate lock (`mkdir work/rounds/r<N>/gate.lock`, `rmdir` after) around
-  full gate runs and sweeps.
+  full gate runs and sweeps. Write `owner.txt` (agent, branch, head) in the same step as the `mkdir`, and never remove
+  a lock directory you didn't create, even an empty one: ask on the thread (round 15: an owner-less fresh lock was
+  taken for stale and two full suites ran at once).
 - **Outputs load as a mod, not through `HOS_FS_OVERLAY`** (from 2026-11-10, Hookshot v2.0.12+; answers.md
   R11-HOOKSHOT-2012). A size table served through `HOS_FS_OVERLAY` crashes the game at start, because Hookshot's
   controller-icon font no longer fits it. Launchers clear `HOS_FS_OVERLAY` and set `HOS_MODS` to a folder that holds
