@@ -27,6 +27,11 @@ PRODUCTION = {actor: family for actor, family in token_policy.REWARDS.values()}
 
 
 @pytest.fixture(scope="module")
+def production_seed(romfs):
+    return make_seed(romfs, 7, Settings(shuffle=("Chest", "Token")))
+
+
+@pytest.fixture(scope="module")
 def census(romfs):
     return [location for location in scan(romfs) if location.kind == GOLD_SKULLTULA]
 
@@ -337,11 +342,13 @@ def test_every_source_copy_accepts_a_generated_pickup(romfs, census, original):
     print(f"100 sources / {copies} copies: exact field diff, not gameplay proof")
 
 
-def test_production_token_seed_writes_only_source_selectors_and_pickups(romfs, census, original, tmp_path):
+def test_production_token_seed_writes_only_source_selectors_and_pickups(
+    romfs, census, original, production_seed, tmp_path
+):
     """A real Chest+Token seed through make_seed and write_seed: every live Skulltula is one Token check linked to its
     census source, the pool keeps one token per live source, and each source's copies either stay native (token) or
     name the generated pickup of the placed reward; nothing global changes."""
-    output = make_seed(romfs, 7, Settings(shuffle=("Chest", "Token")))
+    output = production_seed
     seed = output.seed
     token_checks = sorted(name for name in seed.shuffled if seed.world.locations[name].type == token_policy.SHUFFLE)
     rows = output.spoiler()["patch"]["tokens"]
@@ -386,3 +393,68 @@ def test_token_off_seed_has_no_token_output(romfs):
     assert "tokens" not in output.spoiler()["patch"]
     assert not any(tokens.GAME_ACTOR_INFO in changes for changes in output.extra_changes)
     assert token_policy.SHUFFLE not in {location.type for location in output.seed.world.locations.values()}
+
+
+def test_custom_chest_items_and_token_pickups_write_one_valid_set_of_tables(romfs, original, production_seed, tmp_path):
+    from clawshot.generate.fill import allowed
+    from clawshot.patch.custom_items import NOTHING, TABLES, Foreign
+
+    seed = production_seed.seed
+    placements = {name: seed.placements[name] for name in seed.shuffled}
+    eligible = sorted(
+        {
+            change.location
+            for change in production_seed.plan.changes
+            if not seed.world.items[placements[change.location]].progression
+            and change.event is None
+            and change.kept_event is None
+            and change.key_event is None
+            and change.dungeon_item is None
+            and all(
+                allowed(seed.world, seed.settings, change.location, item) for item in ("Nothing", "Archipelago Item")
+            )
+        }
+    )
+    assert len(eligible) >= 2, eligible
+    placements[eligible[0]], placements[eligible[1]] = "Nothing", "Archipelago Item"
+    output = make_seed(
+        romfs,
+        seed.seed,
+        seed.settings,
+        placements=placements,
+        foreign={eligible[1]: Foreign("Other player", "Other item")},
+    )
+    generated = {row.drop_actor for row in output.token_sources} - {None}
+    expected = {NOTHING, "Item_Clawshot_AP_000"} | generated
+    assert generated and set(output.new_files) == {tokens.pack_path(actor) for actor in expected}
+    before = {path: original(path) for path in TABLES}
+    out = tmp_path / "combined"
+    write_seed(output, romfs, out)
+    for path in TABLES:
+        native = {row["__RowId"]: row for row in byml.read(before[path])}
+        rows = byml.read(original(path, out / "romfs"))
+        ids = [row["__RowId"] for row in rows]
+        assert ids == sorted(set(ids))
+        assert set(ids) == native.keys() | expected
+        actual = {row["__RowId"]: row for row in rows}
+        assert all(byml.same(row, actual[name]) for name, row in native.items()), path
+        assert original(path) == before[path]
+    old_sizes = rstb.read(original(rstb.TABLE_PATH))
+    sizes = rstb.read(original(rstb.TABLE_PATH, out / "romfs"))
+    assert rstb.read(rstb.write(sizes)) == sizes
+    dictionaries = zsdic.Dictionaries.from_romfs(romfs)
+    for path, file in output.new_files.items():
+        content = dictionaries.decompress(path, (out / "romfs" / path).read_bytes())
+        assert content == file.data
+        assert sizes.get(path) == rstb.required_size(path, len(content))
+        assert not (romfs / path).exists()
+        for name, data in sarc.read(content).items():
+            if name in file.members:
+                donor, growth = file.members[name]
+                expected_size = old_sizes.get(donor) + growth
+            elif name in file.copied or file.members:
+                expected_size = old_sizes.get(name)
+            else:
+                components = len(byml.read(data)["Components"]) if name.endswith(rstb.ACTOR_PARAM) else None
+                expected_size = rstb.required_size(name, len(data), components)
+            assert expected_size is not None and sizes.get(name) == expected_size, name

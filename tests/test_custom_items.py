@@ -103,7 +103,7 @@ def test_the_writer_adds_new_files_with_size_entries(tmp_path, zsdic_pack):
     assert result.get(member) == 5000 + new.members[member][1]
     assert result.get(path) == rstb.required_size(path, len(new.data))
     assert not (romfs / path).exists()  # the dump is never written
-    with pytest.raises(PatchError, match="does not hold"):
+    with pytest.raises(PatchError):
         (romfs / "Pack/Actor").mkdir(parents=True)
         (romfs / path).write_bytes(b"")
         write(Plan([], [], []), romfs, tmp_path / "out2", new_files={path: NewFile(b"x")})

@@ -511,3 +511,37 @@ The probe includes the actual data-held House40 policy unchanged; it shuffles Ho
 Evidence: `work/r15-token-impl/off-logic-parity-4734-f7dde54-gift-native-definitions/report.json`
 and both process logs. Real native Gift setup/comparison remains part of the held rebased verification.
 
+### Authorized castle-main rebase and composed actor writer
+
+Claude reported **main moved to e5fe7e2**, authorized rebase, and ordered full synthetic, then full dump,
+then the native Token-off comparison against that exact main; three workers, game closed overnight.
+Rebase completed with conflicts in generator preparation, `patch/__init__.py` and `patch/write.py`.
+The shared settings/world compiler remains main's `generate/prepare.py`; Token hooks and the Shop-only
+hold screen moved into that existing path, with no duplicate compiler in `generate/__init__.py`.
+
+There is one writer contract: **path→NewFile(data, members, copied)**. Castle custom packs retain their
+native donor-entry-plus-growth sizing; Token pickups retain strict copied-native byte validation and measured
+new-member entries. All Token producers/diagnostics/tests use the mapping, with no old path-first class,
+tuple/list API or compatibility shim. Duplicate RSDB size formulas from the textual merge were removed.
+
+The combined-row investigation found a real order dependency: Token insertion checks the original dump's
+exact row-count/ID digest and donor rows. Adding custom rows first would violate that snapshot.
+Token transforms now run **before** castle's sorted name-based insertions; neither producer overwrites the
+other's rows and the snapshot check was not relaxed. New-file maps also refuse an overlap before merging.
+
+Added composition coverage at both boundaries: a normal synthetic producer/writer regression, and a
+dump-marked real `make_seed`/`write_seed` regression with Nothing, another player's item and generated
+Skulltula pickups in one seed. The native test checks all three actor registries are sorted/unique with every
+native row retained plus both generated families, validates pack/member resource-size entries, and checks
+source inputs unchanged. A separate actual native composition smoke and cross-process replay are scheduled
+under the ordinary gate before full dump tests. No staged gameplay packet bytes/profile are changed.
+
+The earlier2740/203 gate remains pre-rebase evidence only. Fresh frozen-source artifacts use
+`work/r15-token-impl/phase2-rebased-e5-*`; old logs/results remain preserved.
+
+Initial integrated scoped verification: **211 passed in14.30s** across combined composition, custom items,
+new-file safety, tokens, fill policy, size tables and chest patching. Full Ruff lint clean. Removed redundant
+producer-output echoes/file-existence assertions from the new composition test rather than keeping
+tautological wiring coverage; fixed-value row/grant, native preservation, collision/sizing and placement
+assertions remain. Final frozen-head gates below supersede this scoped checkpoint.
+

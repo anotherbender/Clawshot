@@ -61,7 +61,6 @@ class Seed:
     """One hint per Gossip Stone (``clawshot.generate.hints``), in world order; none for a world without stones."""
 
 
-
 def generate(
     spec: Mapping[str, Any],
     seed: int,

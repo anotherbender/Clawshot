@@ -49,8 +49,6 @@ class WrittenFile:
     new_entry: int | None = None  # and after
 
 
-
-
 def check_romfs(romfs: Path) -> None:
     """A plain error for a folder that is not the supported romfs (Version 1.1.1, update v131072), instead of a
     traceback from the first missing file. The base game's romfs alone keeps the update's files at version 100."""
