@@ -73,7 +73,11 @@ core packet is the evidence for the `Token` families above.
 
 Maintainer packet/checker tools live in `tools/token_packets/`, outside the release package.
 From the repository root, run `uv run python -m tools.token_packets.token_family_packet`
-with `--manifest`, `--baseline`, `--save` and `--phase` to check families2 read-only.
+with `--manifest`, `--baseline`, `--save` and `--phase` to check a staged family or route packet read-only.
+
+**Fairy Ocarina stays excluded at Skulltulas:** its native actor has no AnimationRef and there is no native
+world-pickup donor. Ocarina of Time has a suitable native world donor, but its first-grant/song/reload
+diagnostic is separate and remains unplayed; neither ocarina is admitted to Token seeds by staging a packet.
 
 The floor palette is **Heart Container, Piece of Heart, Deku Shield, Hylian Shield and red rupee**.
 Major items on the floor can crash. Heart Containers from chests have no recorded in-game acceptance.

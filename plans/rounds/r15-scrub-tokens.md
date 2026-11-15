@@ -676,3 +676,98 @@ Final evidence under `work/r15-token-impl/`:
 
 Families2 remains the same staged packet/checklist and baseline; **no new played PASS is claimed**.
 Its excluded families, including Bombchus, are still excluded until the staged in-game checks pass.
+
+### Families2 PLAYED PASS — Kareem on rc.3; Claude's acceptance
+
+Claude reports all six generated pickup packs loaded in the runtime log, no crash, and every phase passed in
+order across19 watcher snapshots. The newest save passed `used-reload` **83/83** using
+`tools.token_packets.token_family_packet` from3e2dd50. Din's Fire, Lens, Bombchus, Gold Rupee and Echo Gem
+were usable. This is supplied maintainer evidence, not an agent replay or confirmation run.
+
+**Echo Gem correction:** Kareem did **not** visit the wooded grotto. After collecting the Gem at the gate
+source, it reacted at the **Kakariko watchtower Skulltula**. That played observation is the Gem-effect proof.
+The old “child Kakariko placement has no reaction area, so watchtower cannot prove the effect” inference was
+wrong; the checklist and future diagnostic proof text are corrected. No additional source or grotto was played.
+
+Claude requests one final packet under20 minutes: four ordinary small ammo representatives with their existing
+containers, Double Defense, Scrub Business Seed and adult/Bow Ice Arrows; assess whether Ocarinas fit a small
+binding change or retain their exclusion. Branch `r15/token-final-families` starts at3e2dd50. **Production
+admission of packets2+3 and one final gate run remain held until packet3's played results.**
+
+### Packet3 and Ocarina short part — staged, awaiting played results
+
+Claude approved the seven-representative packet3 plan and then requested a separate approximately3-minute
+Ocarina of Time first-grant part from S1. Both are staged on `r15/token-final-families`, based on3e2dd50.
+This adds diagnostic tooling only, not production reward admission or a completed gameplay claim.
+
+**Verified eligibility:** after-Forest original SHAe36c32a6…6bd3 has canonical **Weapon_Range_Bow stock1,
+IsGettrue** and Hookshot/Boomerang; Arrow20/30, Bomb10/20, Nut20/20, Stick10/10; every real small container
+owned. Double Defense/Ice unowned, Seed2/30, MPMax0, MaxLife/Life28, token18, rupees148.
+The six old child source pairs and the adult Impa rooftop pair are unset. Nut/Stick labels still mean native
+bundles of3, not5/1; the checklist requires measured native consumption down to17/7 before refilling.
+If a swing does not consume a stick, stop/record rather than fake the stock.
+
+| Packet3 source | Forced reward | Expected observation |
+|---|---|---|
+|Ranch tree341792603838029977 |Arrows5, Obj_ArrowBundle_Medium |20→25 in existing cap30 |
+|Ranch tower2730878115209290675 |Bombs5, Item_BombBundle_Small |10→15 in existing Bomb Bag/cap20 |
+|Ranch window15889002414176907668 |Deku Nuts5 label, TBox_DekuNutBundle |Native +3:17→20 |
+|Field lone tree2177746409373494991 |Deku Stick1 label, Item_DekuStickBundle_Small |Native +3:7→10 |
+|Kak gate11629189455828560791 |Double Defense |New saved ownership plus matched unguarded before/after bomb-damage observations |
+|Kak watchtower15118290503807073158 |Scrub Business Seed, Obj_ScrubBusinessSeed |2→3, assign/use once back to2; actual use observed |
+|Adult above Impa3310819903461047792 |Ice Arrows |Abandon/recover, native magic floor240, actual adult/Bow Ice shot25→24, reload |
+
+Packet3 uses native pedestal returns to child and adult, not age cheats. Container/weapon ownership, capacities,
+rupees and all other93 Skulltula source pairs are conserved. Damage1 must be positive and lower than a genuinely
+comparable pre-upgrade hit; the checker does not invent a defense flag or assume an unmeasured exact factor.
+Life and current MP are explicitly variable observations, not blindly pinned phase values. No30-stock farming,
+new ammo container grant, source reset, vanilla quest bypass or additional route admission is hidden in the plan.
+Estimate17–19 minutes is **not timed**; stop at20 and report partial evidence instead of skipping conditions.
+
+**Ocarina decision and new S1 proof:** the native `Obj_Ocarina_Time` already composes without any adapter.
+Both `Item_` ocarinas lack AnimationRef; Fairy has no world donor and remains excluded at Skulltulas.
+The after-Forest save owns **both** instruments (each stock1/IsGettrue), so a new Time pickup there would
+not prove first ownership. Claude instead approved a fresh original S1 fork: SHA450eaf01…b8b7, child,
+Fairy1/owned, Time0/unowned, Boomerang0, tree pair unset, token9, rupees68, MaxLife16. Sun's Song is
+already known (IsGettrue, no stock record); the short part grants Time at the rolled ranch tree, plays the
+known song with the **new Time instrument**, and saves/reloads with Time still owned. No Boomerang bootstrap.
+Fairy baseline stock is observed, not a fabricated prediction of native instrument-replacement semantics.
+
+Both launchers use the current Longshot template, were run with `CLAWSHOT_DRY_RUN=1` only, and point to
+separate new mod/profile trees. All copied progress/caption/account/option bytes match their original backups;
+backup hashes and all prior staged files were preserved. No game launched. Neither packet is a beatable seed.
+
+| Staged part | Native resources | Baseline checker | Existing staged files preserved |
+|---|---:|---:|---:|
+|token-families-3-next |16 (7 new pickup packs) |139 pass,0 fail,0 unknown |141 |
+|token-ocarina-time-next |7 (1 new pickup pack) |71 pass,0 fail,0 unknown |164 |
+
+Exact launchers:
+- `work/r15-token-impl/ingame/Test - token-families-3-next.bat`
+- `work/r15-token-impl/ingame/Test - token-ocarina-time-next.bat`
+
+Checklists beside them: `FAMILIES-3-CHECKLIST.md`, `OCARINA-TIME-CHECKLIST.md`.
+Each mod contains its own manifest (`token-families-3.json` / `token-ocarina-time.json`), with source revision,
+implementation SHA256s, native grants, required load paths and cumulative phase fields.
+The new `--packet 3` and `--packet 4` paths preserve the old packet1/2 interfaces; the existing shared checker
+is unchanged. The packet2 built-grant inspector was also migrated to the canonical new-files mapping API;
+it no longer attempts to iterate mapping keys as path-carrying objects.
+
+**Exercised checks (not the held final gates):** scoped Ruff format/lint clean;161 synthetic checker/token
+tests passed in2.51s; two real-dump tests passed in13.54s, including every diagnostic member's native
+shape/grant/written pickup and the Fairy refusal/Time donor boundary. Actual builders/writers, both launcher
+dry runs and both staged baselines passed. A separate entirely synthetic18-phase packet3 scenario passed
+and rejected nine corruptions: wrong arrow delta, lost bag, changed capacity, lost defense, wrong age, lost
+Ice ownership, extra token, partial source and an unrelated source change. Its first draft omitted the synthetic
+token record, printed unknown, and was corrected; no product state or real save was changed.
+The targeted native/staging sequence held and released our `gate.lock`, workers1, game processes absent.
+
+Evidence outside the repository: `work/r15-token-impl/packet3-scoped-results.json`, `packet3-*.log`,
+`families-3-stage-summary.json`, `ocarina-time-stage-summary.json`, corresponding build/staged-baseline/dry-run
+files, `packet3-inventory.json` and `packet3-sources.json`. Existing packet2 mod/save bytes were not rebuilt;
+its external checklist and future proof text alone were corrected to Kareem's watchtower Gem observation.
+
+**HOLD:** Claude boot-checks both new launchers, Kareem supplies the load+played results. Then this single
+follow-up branch admits only the successful packet2/3 families and, if its separate part passes, Ocarina of Time;
+Fairy stays excluded. Bombchus and all admitted ammo retain D25/container screens. Run exactly one final full
+gate sequence after those combined policy/test/docs edits; do not claim these scoped checks as that sequence.

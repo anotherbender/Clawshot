@@ -1,10 +1,9 @@
-"""Build an approved reward-family packet (``--packet 1`` or ``2``), not a randomized seed or admission proof.
+"""Build an approved reward-family packet, not a randomized seed or admission proof.
 
-Packet 1 (played): the historical ranch checkpoint; six representatives plus the played Boomerang bootstrap occupy
-seven accessible child sources. Packet 2: the untouched approved after-Forest slot04 (the route packet's checkpoint);
-six representatives, no bootstrap, collected after a native return to child. The external isolated launcher copies
-the checkpoint, which is never edited. Production admission is independent: each packet declares its diagnostic
-actors explicitly.
+Packet 1 (played) uses the historical ranch checkpoint and a Boomerang bootstrap. Packets 2 and 3 use
+the untouched approved after-Forest slot04. Packet 3 tests six child rewards then adult/Bow Ice Arrows.
+The external isolated launcher copies the checkpoint, which is never edited. Production admission is
+independent: each packet declares its diagnostic actors explicitly.
 """
 
 import argparse
@@ -81,6 +80,27 @@ ASSIGNMENTS_2 = (
     (GATE, "Kak GS Near Gate Guard", "Item_AgonyStone", "agony_stone"),
     (WATCHTOWER, "Kak GS Watchtower", "Obj_Rupee_Gold", "gold_rupee"),
 )
+
+# Packet 3 keeps the six played packet2 source routes and adds one native adult rooftop source.
+IMPA = 3310819903461047792
+ASSIGNMENTS_3 = (
+    (TREE, "LLR GS Tree", "Obj_ArrowBundle_Medium", "refill"),
+    (TOWER, "LLR GS Tower", "Item_BombBundle_Small", "refill"),
+    (WINDOW, "LLR GS House Window", "TBox_DekuNutBundle", "refill"),
+    (LONE, "HF GS Lone Tree", "Item_DekuStickBundle_Small", "refill"),
+    (GATE, "Kak GS Near Gate Guard", "Item_FairyBless_DefenseDouble", "double_defense"),
+    (WATCHTOWER, "Kak GS Watchtower", "Obj_ScrubBusinessSeed", "scrub_seed"),
+    (IMPA, "Kak GS Above Impas House", "Item_Arrow_Ice", "magic_arrow"),
+)
+GRANTS_3 = {
+    "Obj_ArrowBundle_Medium": ("BundleActor", "Item_Arrow_Normal"),
+    "Item_BombBundle_Small": ("BundleActor", "Item_Bomb"),
+    "TBox_DekuNutBundle": ("BundleActor", "Item_DekuNut"),
+    "Item_DekuStickBundle_Small": ("BundleActor", "Item_DekuStick"),
+    "Item_FairyBless_DefenseDouble": ("PouchActor", "Item_FairyBless_DefenseDouble"),
+    "Obj_ScrubBusinessSeed": ("PouchActor", "Item_ScrubBusinessSeed"),
+    "Item_Arrow_Ice": ("PouchActor", "Item_Arrow_Ice"),
+}
 CHU, DIN, LENS, AGONY = "Item_Bombchu", "Item_DinFire", "Armor_GlassTruth", "Item_AgonyStone"
 # What each built pickup's effective pouch grants: a PouchActor (the saved identity) or a bundle of its BundleActor.
 GRANTS_2 = {
@@ -172,6 +192,81 @@ COUNTS_2 = (
     ("Obj_MagicJar_Large", "MPRecover"),
     ("Obj_Rupee_Gold", "BundleActorNum"),
 )
+
+# Packet3 starts with every real weapon/container already present. Full nuts/sticks need native consumption
+# before a measurable +3 refill; no diagnostic edits stock or grants a bag.
+ARROW, BOMB, NUT, STICK = "Item_Arrow_Normal", "Item_Bomb", "Item_DekuNut", "Item_DekuStick"
+ICE, DEFENSE, SEED, BOW = (
+    "Item_Arrow_Ice",
+    "Item_FairyBless_DefenseDouble",
+    "Item_ScrubBusinessSeed",
+    "Weapon_Range_Bow",
+)
+AMMO_3 = {
+    "Obj_ArrowBundle_Medium": (ARROW, "Arrow", "Item_Quiver_Small", 5),
+    "Item_BombBundle_Small": (BOMB, "Bomb", "Item_BombBag_Small", 5),
+    "TBox_DekuNutBundle": (NUT, "DekuNut", "Item_NutBag_Small", 3),
+    "Item_DekuStickBundle_Small": (STICK, "DekuStick", "Item_StickBag_Small", 3),
+}
+OWNED_3 = (
+    BOW,
+    "Item_Hookshot",
+    "Item_Quiver_Small",
+    "Item_NutBag_Small",
+    "Item_StickBag_Small",
+    ARROW,
+    BOMB,
+    NUT,
+    STICK,
+    ICE,
+    DEFENSE,
+    SEED,
+)
+CAPS_3 = {
+    f"PouchContentMaxNum.{name}": cap for name, cap in (("Arrow", 30), ("Bomb", 20), ("DekuNut", 20), ("DekuStick", 10))
+}
+CARRIED_3 = tuple(
+    dict.fromkeys(
+        (
+            *CARRIED_2,
+            *(key for actor in OWNED_3 for key in (_stock(actor), _got(actor))),
+            *(("int", name) for name in CAPS_3),
+        )
+    )
+)
+OBSERVED_3 = (("int", MAGIC), ("int", "PlayerStatus.Life"))
+REQUIRED_3 = {
+    **REQUIRED_2,
+    **{("int", name): value for name, value in CAPS_3.items()},
+    **{
+        _stock(actor): 1
+        for actor in (BOW, "Item_Hookshot", "Item_Quiver_Small", "Item_NutBag_Small", "Item_StickBag_Small")
+    },
+    **{
+        _got(actor): True
+        for actor in (
+            BOW,
+            "Item_Hookshot",
+            "Item_Quiver_Small",
+            "Item_NutBag_Small",
+            "Item_StickBag_Small",
+            ARROW,
+            BOMB,
+            NUT,
+            STICK,
+            SEED,
+        )
+    },
+    _stock(ARROW): 20,
+    _stock(BOMB): 10,
+    _stock(NUT): 20,
+    _stock(STICK): 10,
+    _stock(SEED): 2,
+    **{_stock(actor): 0 for actor in (ICE, DEFENSE)},
+    **{_got(actor): False for actor in (ICE, DEFENSE)},
+    ("int", MAGIC): 0,
+    ("int", "PlayerStatus.Life"): 28,
+}
 
 
 def _fields(values: dict[tuple[str, str | int], int | bool]) -> list[dict]:
@@ -372,10 +467,10 @@ def _obligations_2(facts: Mapping[str, Mapping]) -> dict[str, str]:
             f"{recover}. Report m0 -> m1 and the visible refill; this is not a claim one jar fills every empty meter."
         ),
         "agony-collected": (
-            "Any time after this pickup: equip the Echo Gem, Map-Teleport and bomb open (a bomb, never a Bombchu) the "
-            "child wooded Near Kak grotto (cover -156,144,338) and approach its native AgonyStoneReactArea "
-            "17897764476642920225 at (-149.06,128.84,320.78); report the effect. Never kill or collect its Gold "
-            "12007978132755687032 (the checker's other-source conservation). Kakariko child static has no react area."
+            "Equip the Echo Gem and observe its native reaction at an uncollected source. Kareem's accepted rc.3 "
+            "packet2 result: reaction at Kakariko watchtower after collecting the Gem at the gate source. "
+            "The earlier claim that child Kakariko could not react was a disproved inference; the wooded grotto "
+            "was not visited. Do not collect any source outside this packet."
         ),
         "gold-collected": (
             f"Gold Rupee get: rupees exactly +{gold} inside wallet capacity {wallet} (checker {rupees} -> "
@@ -402,12 +497,171 @@ def _plan_2(baseline: save.Save, romfs: Path, dictionaries: zsdic.Dictionaries) 
     }
 
 
-def _grants_2(delivery: tokens.Delivery, manifest: Mapping) -> dict:
+def _baseline_3(baseline: save.Save) -> tuple[dict, dict]:
+    read = {"int": baseline.int_value, "bool": baseline.flag, "enum": baseline.enum_value}
+    values = {}
+    for kind, name in (*CARRIED_3, *OBSERVED_3):
+        value = read[kind](name)
+        if value is None:
+            raise PatchError(f"families-3 baseline missing {kind} {name!r}")
+        values[kind, name] = value
+    wrong = {
+        str(key): {"expected": want, "actual": values[key]} for key, want in REQUIRED_3.items() if values[key] != want
+    }
+    if wrong:
+        raise PatchError(f"families-3 checkpoint preconditions differ: {wrong}")
+    observed = {key: values.pop(key) for key in OBSERVED_3}
+    return values, observed
+
+
+def _native_3(rows: Mapping[str, Mapping]) -> dict:
+    expected = {}
+    for donor, (actor, capacity, bag, count) in AMMO_3.items():
+        expected[donor, "BundleActor"] = actor
+        expected[donor, "BundleActorNum"] = count
+        expected[actor, "SmallBagActor"] = bag
+        expected[actor, "MaxNumGameData"] = capacity
+    expected.update(
+        {
+            ("Obj_ScrubBusinessSeed", "FixedMaxNum"): 30,
+            ("Obj_ScrubBusinessSeed", "PouchStockable"): True,
+            (DEFENSE, "PouchSpecialDeal"): "FairyBlessDefenseDouble",
+            (ICE, "ExpansionAvility"): "MPMaxUP",
+            (ICE, "MPMax"): 24,
+            (ICE, "AssignableItem"): "IceArrow",
+            (ICE, "ShootableActor"): "NormalArrow",
+        }
+    )
+    facts, wrong = {}, {}
+    for (actor, key), want in expected.items():
+        actual = _actor_name(rows.get(actor, {}).get(key))
+        facts.setdefault(actor, {})[key] = actual
+        if actual != want:
+            wrong[f"{actor}.{key}"] = {"expected": want, "actual": actual}
+    if wrong:
+        raise PatchError(f"families-3 native rows differ: {wrong}")
+    return facts
+
+
+def _phases_3(carried: dict, observed: dict, facts: Mapping) -> dict:
+    arrows = carried[_stock(ARROW)] + facts["Obj_ArrowBundle_Medium"]["BundleActorNum"]
+    bombs = carried[_stock(BOMB)] + facts["Item_BombBundle_Small"]["BundleActorNum"]
+    magic = facts[ICE]["MPMax"] * MAGIC_SAVE_SCALE
+    steps = (
+        ("child-ready", None, {("bool", AGE): True}),
+        ("ammo-ready", None, {_stock(NUT): 17, _stock(STICK): 7}),
+        ("arrows-collected", TREE, {_stock(ARROW): arrows}),
+        ("bombs-collected", TOWER, {_stock(BOMB): bombs}),
+        ("nuts-collected", WINDOW, {_stock(NUT): 17 + facts["TBox_DekuNutBundle"]["BundleActorNum"]}),
+        ("sticks-collected", LONE, {_stock(STICK): 7 + facts["Item_DekuStickBundle_Small"]["BundleActorNum"]}),
+        ("damage-before", None, {_stock(BOMB): bombs - 1}),
+        ("defense-collected", GATE, {_stock(DEFENSE): 1, _got(DEFENSE): True}),
+        ("damage-after", None, {_stock(BOMB): bombs - 2}),
+        ("seed-collected", WATCHTOWER, {_stock(SEED): carried[_stock(SEED)] + 1}),
+        ("seed-used", None, {_stock(SEED): carried[_stock(SEED)]}),
+        ("reload", None, {}),
+        ("adult-ready", None, {("bool", AGE): False}),
+        ("ice-abandoned", None, {}),
+        ("ice-collected", IMPA, {_stock(ICE): 1, _got(ICE): True, ("int", MAGIC_MAX): magic}),
+        ("ice-used", None, {_stock(ARROW): arrows - 1}),
+        ("used-reload", None, {}),
+    )
+    if [source for _, source, _ in steps if source is not None] != [row[0] for row in ASSIGNMENTS_3]:
+        raise PatchError("families-3 phases do not collect the assignments in route order")
+    values, completed = dict(carried), []
+    phases = {"baseline": {"completed": [], "fields": _fields({**values, **observed})}}
+    for name, source, change in steps:
+        values.update(change)
+        if source is not None:
+            completed.append(str(source))
+        phases[name] = {"completed": list(completed), "fields": _fields(values)}
+    return phases
+
+
+def _plan_3(baseline: save.Save, romfs: Path, dictionaries: zsdic.Dictionaries) -> tuple[dict, dict]:
+    carried, observed = _baseline_3(baseline)
+    rows = {row["__RowId"]: row for row in read_romfs_byml(romfs, dictionaries, tokens.POUCH_ACTOR_INFO)}
+    facts = _native_3(rows)
+    return _phases_3(carried, observed, facts), {
+        "native_rows": facts,
+        "magic_save_scale": MAGIC_SAVE_SCALE,
+        "baseline_only": [{"name": name, "kind": kind} for kind, name in OBSERVED_3],
+        "observations": [
+            {"kind": "int", "name": "PlayerStatus.Life", "purpose": "matched damage before/after Double Defense"},
+            {"kind": "int", "name": MAGIC, "purpose": "actual Ice Arrow magic spend"},
+        ],
+        "proof_obligations": {
+            "child-ready": "Native pedestal return to child; no age cheat.",
+            "ammo-ready": "Measure three nuts/sticks consumed natively: require17/7; a swing may not consume stock.",
+            "arrows-collected": "Actual Arrows5 get:20->25, quiver30 and owned Bow unchanged.",
+            "bombs-collected": "Actual Bombs5 get:10->15, Bomb Bag/cap20 unchanged (D25).",
+            "nuts-collected": "Logical Nuts5 label is native bundle3:17->20, cap20 unchanged.",
+            "sticks-collected": "Logical Stick1 label is native bundle3:7->10, cap10 unchanged.",
+            "damage-before": "Record raw Life immediately before/after one unguarded bomb blast at a clear flat spot.",
+            "defense-collected": "Observe native Double Defense presentation; saved ownership is not effect proof.",
+            "damage-after": (
+                "Same comparable unguarded blast/position: record Life loss d1 and require0<d1<d0. "
+                "No guessed engine defense flag or assumed exact multiplier; reject zero/mismatched hits."
+            ),
+            "seed-collected": "Actual native Scrub Business Seed stock2->3; own world donor, not Magic Bean.",
+            "seed-used": "Assign/use once: see native effect and stock3->2; observe age usability, do not assume it.",
+            "reload": "Save and Continue; every completed source and grant persists.",
+            "adult-ready": "Native pedestal return to adult with the checkpoint's real Bow, no age/inventory cheat.",
+            "ice-abandoned": "Kill night rooftop source, abandon pickup, leave/reload; source pair stays unset.",
+            "ice-collected": "Recover/retrigger and Hookshot-retrieve Ice Arrows; native magic floor raw240.",
+            "ice-used": "Adult with Bow: one visible Ice Arrow projectile/effect, Arrow25->24 and actual MP spend.",
+            "used-reload": "Save and Continue; all7 assigned pairs persist, other93 source pairs unchanged; token18.",
+        },
+        "estimate": "17-19 minutes, not timed; stop at20 and retain partial evidence",
+    }
+
+
+def _plan_ocarina(baseline: save.Save, romfs: Path, dictionaries: zsdic.Dictionaries) -> tuple[dict, dict]:
+    values = _baseline_fields(baseline)
+    time, fairy, song = "Item_Ocarina_Time", "Item_Ocarina_Fairy", "Item_Melody_SunSong"
+    required = {
+        ("bool", AGE): True,
+        _stock(time): 0,
+        _got(time): False,
+        _stock(fairy): 1,
+        _got(fairy): True,
+        _got(song): True,
+    }
+    read = {"int": baseline.int_value, "bool": baseline.flag}
+    actual = {key: read[key[0]](key[1]) for key in required}
+    if actual != required:
+        raise PatchError(f"ocarina-time S1 preconditions: expected {required}, actual {actual}")
+    # Fairy stock belongs to the baseline, not a prediction of native instrument replacement semantics.
+    observed = {key: actual.pop(key) for key in (_stock(fairy), _got(fairy))}
+    values.update(actual)
+    phases = {"baseline": {"completed": [], "fields": _fields({**values, **observed})}}
+    values.update({_stock(time): 1, _got(time): True})
+    for phase in ("time-collected", "song-played", "reload"):
+        phases[phase] = {"completed": [str(TREE)], "fields": _fields(values)}
+    rows = {row["__RowId"]: row for row in read_romfs_byml(romfs, dictionaries, tokens.POUCH_ACTOR_INFO)}
+    if rows.get("Obj_Ocarina_Time", {}).get("PouchSpecialDeal") != "Ocarina":
+        raise PatchError(f"ocarina-time native row changed: {rows.get('Obj_Ocarina_Time')}")
+    return phases, {
+        "native_rows": {"Obj_Ocarina_Time": {"PouchSpecialDeal": "Ocarina"}},
+        "baseline_only": [{"kind": key[0], "name": key[1]} for key in observed],
+        "proof_obligations": {
+            "time-collected": "Fresh S1: roll ranch tree, kill, collect new Ocarina of Time; no Boomerang bootstrap.",
+            "song-played": (
+                "Equip the new Time ocarina and play the already-known Sun's Song; native recognition/time change. "
+                "No clock cheat during this proof. Ownership alone is not a playable-instrument proof."
+            ),
+            "reload": "Save and Continue: Time ocarina still owned, source pair committed, token9 unchanged.",
+        },
+        "estimate": "about3 minutes, not timed",
+    }
+
+
+def _grants(delivery: tokens.Delivery, manifest: Mapping, expected_grants: Mapping) -> dict:
     """Each built pickup's effective pouch grant, refused unless it is the identity or bundle the phases expect."""
     facts = manifest["native_rows"]
-    packs = {file.path: file.data for file in delivery.new_files}
+    packs = {path: file.data for path, file in delivery.new_files.items()}
     found, wrong = {}, {}
-    for item, (key, expected) in GRANTS_2.items():
+    for item, (key, expected) in expected_grants.items():
         pickup = delivery.pickups[item]
         members = sarc.read(packs[tokens.pack_path(pickup)])
         components = actor_packs.resolve([members], actor_packs.actor_member(pickup))[0]["Components"]
@@ -422,8 +676,12 @@ def _grants_2(delivery: tokens.Delivery, manifest: Mapping) -> dict:
         if grant[key] != expected or grant["IsBundle"] != bundle or (bundle and grant["BundleActorNum"] != count):
             wrong[item] = {"expected": {key: expected, "IsBundle": bundle, "BundleActorNum": count}, "built": grant}
     if wrong:
-        raise PatchError(f"families-2 built pickups grant otherwise: {wrong}")
+        raise PatchError(f"family packet built pickups grant otherwise: {wrong}")
     return {"built_grants": found}
+
+
+def _grants_2(delivery: tokens.Delivery, manifest: Mapping) -> dict:
+    return _grants(delivery, manifest, GRANTS_2)
 
 
 @dataclass(frozen=True)
@@ -434,6 +692,7 @@ class Packet:
     kind: str
     plan: Callable[[save.Save, Path, zsdic.Dictionaries], tuple[dict, dict]]  # phases, further manifest keys
     built: Callable[[tokens.Delivery, Mapping], dict]  # further manifest keys from the built pickups
+    adult_sources: tuple[int, ...] = ()
 
 
 PACKETS = {
@@ -452,6 +711,25 @@ PACKETS = {
         "forced families-2 diagnostic; not a randomized or beatable seed",
         _plan_2,
         _grants_2,
+    ),
+    3: Packet(
+        AFTER_FOREST_SHA256,
+        ASSIGNMENTS_3,
+        "token-families-3.json",
+        "forced families-3 diagnostic; not a randomized or beatable seed",
+        _plan_3,
+        lambda delivery, manifest: _grants(delivery, manifest, GRANTS_3),
+        (IMPA,),
+    ),
+    4: Packet(
+        CHECKPOINT_SHA256,
+        ((TREE, "LLR GS Tree", "Obj_Ocarina_Time", "ocarina"),),
+        "token-ocarina-time.json",
+        "forced Ocarina of Time first-grant diagnostic; not a randomized seed",
+        _plan_ocarina,
+        lambda delivery, manifest: _grants(
+            delivery, manifest, {"Obj_Ocarina_Time": ("PouchActor", "Item_Ocarina_Time")}
+        ),
     ),
 }
 
@@ -505,8 +783,9 @@ def build(romfs: Path, checkpoint: Path, out: Path, *, revision: str, packet: in
     by_source = {location.id: location for location in census}
     for source, name, _, _ in spec.assignments:
         location = by_source[source]
-        if location.ages not in ("child", "both"):
-            raise PatchError(f"{label} child source {name}: {location}")
+        age = "adult" if source in spec.adult_sources else "child"
+        if location.ages not in (age, "both"):
+            raise PatchError(f"{label} {age} source {name}: {location}")
     delivery = tokens.build(
         romfs,
         {source: actor for source, _, actor, _ in spec.assignments},
