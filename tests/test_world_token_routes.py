@@ -1,16 +1,14 @@
-"""The three remake-only token routes: sourced identity, retrieval, clock and cross-age history.
+"""The three remake-only token routes in the production world: sourced identity, retrieval, clock and cross-age
+history.
 
-The small temporal harness uses the real loaded route rules/events and helpers, with controlled
-pull/return/clock gates. It does not certify the still-unplayed native routes or enable Token fill.
+Admitted by Kareem's rc.3 route packet (Claude, 2026-11-14), whose unplayed final revisit is not claimed. The small
+temporal harness uses the real loaded route rules/events and helpers, with controlled pull/return/clock gates.
 """
-
-import tomllib
 
 import pytest
 
 from clawshot.census.definitions import load as load_definitions
-from clawshot.world import ADULT, CHILD, DATA_DIR, Search, build_world, load_spec, load_world
-from clawshot.world.load import apply_overrides
+from clawshot.world import ADULT, CHILD, Search, build_world, load_spec, load_world
 from clawshot.world.rules import DAY, NIGHT
 
 LONE = "HF GS Lone Tree"
@@ -23,16 +21,8 @@ PERMITS = ["Route Clock Permit", "Route Pull Permit", "Route Return Permit"]
 GEAR = ["Boomerang", "Hookshot", "Bomb Bag", "Goron Bracelet", *PERMITS[:2]]
 
 
-def pending_spec():
-    spec = load_spec()
-    path = DATA_DIR / "remake" / "pending" / "token_routes.toml"
-    with path.open("rb") as file:
-        apply_overrides(spec, [("remake/pending/token_routes.toml", tomllib.load(file))])
-    return spec
-
-
 def route_world(*, adult_start=False, free_travel=False, adult_bombs=False):
-    spec = pending_spec()
+    spec = load_spec()
     spec["start"] = "Route Root"
     spec["settings"].update(
         starting_age="adult" if adult_start else "child",
@@ -66,12 +56,12 @@ def route_world(*, adult_start=False, free_travel=False, adult_bombs=False):
     return build_world(spec)
 
 
-def test_all_100_native_definitions_have_one_live_world_check():
-    world = build_world(pending_spec())
+def test_all_100_native_definitions_have_one_live_production_check():
+    world = load_world()
     definitions = [d for d in load_definitions() if d.kind == "gold_skulltula"]
     linked = {d.oot_randomizer_name or d.name: d for d in definitions}
     live = {name for name, loc in world.locations.items() if loc.type == "GS Token" and not loc.n64_only}
-    assert len(linked) == len(definitions) == 100
+    assert len(linked) == len(definitions) == len(live) == 100
     assert set(linked) == live
     for name, source in IDENTITIES.items():
         assert linked[name].id == source
@@ -83,32 +73,27 @@ def test_all_100_native_definitions_have_one_live_world_check():
     assert not world.locations["LLR GS Tree"].rule({}, ADULT, NIGHT)
 
 
-def test_unplayed_routes_are_not_loaded_into_the_production_world():
-    current = load_world()
-    assert set(IDENTITIES).isdisjoint(current.locations)
-    assert sum(loc.type == "GS Token" and not loc.n64_only for loc in current.locations.values()) == 97
-
-
-@pytest.mark.parametrize("name,weapon", [(LONE, "Kokiri Sword"), (TOWER, "Boomerang")])
-def test_child_night_still_needs_the_story_clock_when_tod_is_folded(name, weapon):
+def test_child_lone_tree_is_a_day_route_while_the_tower_still_needs_the_story_clock():
     world = route_world()
-    search = Search(world, [weapon])
-    assert not search.can_access(world.locations[name], CHILD)
+    search = Search(world, ["Kokiri Sword", "Boomerang"])
+    assert not search.holds("Time Flows")
+    assert search.can_access(world.locations[LONE], CHILD)
+    assert not search.can_access(world.locations[TOWER], CHILD)
     search.collect("Route Clock Permit")
-    assert search.can_access(world.locations[name], CHILD)
+    assert search.can_access(world.locations[TOWER], CHILD)
 
 
-def test_lone_tree_requires_attack_roll_and_conservative_night():
-    world = build_world(pending_spec(), {"ensure_tod_access": True, "deadly_bonks": "ohko"})
+@pytest.mark.parametrize("tod", [DAY, NIGHT])
+def test_lone_tree_needs_the_roll_and_a_kill_at_any_time_without_the_clock(tod):
+    world = load_world({"ensure_tod_access": True, "deadly_bonks": "ohko"})
     rule = world.locations[LONE].rule
-    child = {"Kokiri Sword": 1, "Time Flows": 1}
-    assert not rule(child, CHILD, NIGHT)  # OHKO bonk without protection
+    child = {"Kokiri Sword": 1}
     protection = {"Fairy": 1, "Bottle": 1}
-    assert rule(child | protection, CHILD, NIGHT)
-    assert not rule(child | protection, CHILD, DAY)
-    assert not rule({"Time Flows": 1} | protection, CHILD, NIGHT)  # no way to kill
-    assert rule(protection, ADULT, NIGHT)
-    assert not rule(protection, ADULT, DAY)
+    assert not rule(child, CHILD, tod)  # OHKO bonk without protection
+    assert rule(child | protection, CHILD, tod)  # no 'Time Flows'
+    assert not rule(protection, CHILD, tod)  # no way to kill
+    assert rule(protection, ADULT, tod)
+    assert not rule({}, ADULT, tod)
 
 
 @pytest.mark.parametrize(
@@ -123,8 +108,8 @@ def test_lone_tree_requires_attack_roll_and_conservative_night():
         (ADULT, ["Bow"], False),
     ],
 )
-def test_tower_requires_age_appropriate_high_reward_retrieval(age, gear, expected):
-    world = build_world(pending_spec(), {"ensure_tod_access": True})
+def test_tower_requires_age_appropriate_high_reward_retrieval_at_night(age, gear, expected):
+    world = load_world({"ensure_tod_access": True})
     counts = Search(world, gear).counts | {"Time Flows": 1}
     rule = world.locations[TOWER].rule
     assert rule(counts, age, NIGHT) is expected

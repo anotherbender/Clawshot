@@ -330,3 +330,35 @@ Remaining schedule stays **at most three child packets plus one adult**: child p
 ### Route play landmark correction
 
 Kareem initially entered the wooded “Near Kak” grotto, not the wetlands; Claude resolved the location before proceeding. Posted both native covers and source IDs on `cs-r15`: wooded cover **4105624336310342731**, `(-156.07,144.24,338.43)`, south of the ranch tower, Gold **12007978132755687032**; wetlands cover **2786334400301738354**, `(39.92,144.73,342.30)`, roughly196 units east in the open marsh. Added the distinguishing landmark to `ROUTES-CHECKLIST.md`. An accidental unrelated wooded-Gold collection must be retained/flagged as a conservation/token-count confound, **not mislabeled a route failure**; no silent checker waiver, reset or save edit.
+
+### Route packet PLAYED PASS — all100 admitted
+
+**Kareem, rc.3; accepted by Claude, 2026-11-14.** Shield pickup pack loaded per log, no crash. Claude's watcher-snapshot checker passed baseline/adult-before-child, child-ready, child-wall-killed (also tower-abandoned), lone-collected, adult-ready, tower-collected, wetland-abandoned, wetland-reloaded and wetland-collected. Newest `reload` passed **21/21**: tokens **20**, all three pairs set, child flagtrue, every other source unchanged. Therefore the wooded “Near Kak” source was **not** accidentally collected. Agent did not rerun these reported results.
+
+Observed: adult wetlands before the child kill had a Skullwalltula and ordinary crate (bomb inside), **no Gold Skulltula**. Child killed the wall Skullwalltula, receiving a green rupee; no crate as child. Native Temple return played Prelude of Light without trouble. Tower shield abandoned as child was Hookshot-retrieved as adult despite an already-owned shield. Lone-tree Skulltula **appeared and dropped during DAY**. Adult wetlands after the child kill had the token-bearing crate; the uncollected token survived leaving, stayed on the ground without retrigger and paid **19→20** when collected.
+
+**Not played:** final revisit steps, because the game ran at10fps. Claude explicitly accepts saved state plus earlier packets; do not turn this into a claimed final child/adult revisit or complete playthrough.
+
+**Decisions (Claude):** promote all three pending definitions into the production world, bringing native live sources **97→100**. Remove Lone Tree's night requirement (native data has no Nocturnal field and child daytime was observed), and its night-only story-clock dependency; preserve roll, attack and retrieval. Tower keeps its night/child-clock and age-appropriate retrieval requirements. Wetlands keeps child-kill history, native age return, adult crate access and usable explosives. No other location policy changes.
+
+Family packet2 staging is now authorized from the original approved after-Forest backup, not the completed route profile. Bombchus still await their with-bag **+5** representative; route acceptance does not lift any reward-family hold.
+
+### Overnight Phase2 completion scope
+
+Claude authorized finishing production integration with **all100 locations and the played core/packet1 families**. Added five successful packet1 families to the core three: new bottles, ordinary rupees, Heart Pieces, Heart Containers, fixed Nut/Stick capacity. The explicit catalogue has **22 logical members**, each still guarded by its own native row/components. Milk drinking, original-bottle preservation, Red+20, separate quarter/whole-heart behavior and Nut30 are played evidence; other members/edge cases are structural, not invented play.
+
+**Still excluded:** Bombchus until their with-bag +5 proof, ordinary ammo, gold rupees, magic recovery/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed, ocarinas, all bought goods outside shops, progressive copies and dungeon items outside their existing policies. No packet2 admission is inferred merely from staging.
+
+Overnight heavy-job permission: game stays closed; **full synthetic may overlap cs15a's dump** using separate `work/rounds/r15/gate2.lock` with `owner.txt`, **CLAWSHOT_WORKERS=3**. Dump fixture construction and dump verification still acquire the ordinary `gate.lock`; no other owner's lock is removed. Finish/stage packet2 and post READY for Claude's boot check tonight before claiming any gameplay result.
+
+### Integrated admission smoke and packet2 build contract
+
+Production loader/Search smoke now loads **100** native sources, reaches every source with ordinary vanilla collection and full inventory, pays each new source once, collects100 tokens and reaches the goal. Child-prefix wetlands kill persists to the adult crate; child cannot collect that crate. Real CLI Chest+Token seed7 generated **265 shuffled checks** and wrote native resources successfully; this is generation/search evidence, not a played seed.
+
+Integrated scoped suite after clean route promotion and eight-family admission: **247 passed in19.68s**, three workers, scoped Ruff clean. Removed an incidental source-text/date assertion rather than pinning proof wording in tests. Native structural member tests now distinguish the22 production members from the still-held diagnostic families.
+
+Packet2 producer retains explicit packet1 support without rebuilding it. It checks the original after-Forest SHA/layout/inventory, native grant rows and each actual built pickup's grant identity/count before output. Uses **native world Obj_MagicJar_Large**, not its Tbox wrapper or a Buy refill. Echo Gem family is native `agony_stone`.
+
+Magic notation correction to the earlier design: native MPMax24 corresponds to **saved raw MPMax240**, per existing played meter data; the producer labels that prediction. Magic Jar's MPRecover120 is **not** asserted to fill every empty meter. Before its pickup, briefly use the Lens only, then turn it off/save with **120 < raw MP < 240**; expect that bounded deficit to refill to240, capacity unchanged. Actual Din's Fire cast is proved after reload, with variable current MP not guessed. All effect/current-MP evidence remains separate from source completion.
+
+Native child Kakariko static has no AgonyStoneReactArea. Echo Gem reaction is therefore tested in the **child wooded grotto**, verified reaction area **17897764476642920225** at `(-149.06,128.84,320.78)`, without killing/collecting unrelated Gold **12007978132755687032**. Open with an ordinary bomb, preserving the independently tested Bombchu stock4. `FAMILIES-2-CHECKLIST.md` records the complete bounded sequence and required load names; no new played result is claimed.

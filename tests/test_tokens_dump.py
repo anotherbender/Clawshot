@@ -8,7 +8,6 @@ from pathlib import PurePosixPath
 
 import pytest
 
-from clawshot.census import definitions
 from clawshot.census.scan import GAME_DATA_LIST, GOLD_SKULLTULA, scan
 from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.generate import Settings
@@ -224,14 +223,28 @@ def test_core_delivery_written_and_compared_with_the_original_dump(romfs, census
     assert grants == {item: (name, name) for item, name in CANONICAL.items()}
 
 
+def grant_fields(row):
+    """The grant fields a donor world pickup must share with the item's chest actor."""
+    keys = ("BundleActor", "BundleActorNum", "PouchGetType", "PouchSpecialDeal", "BottleItem", "MPMax")
+    return {key: row.get(key) for key in keys}
+
+
 def test_every_admitted_member_has_its_native_shape_and_a_checked_pickup(romfs, census, original, tmp_path):
-    """Every token_rewards.toml member: its dump row has the declared family's shape, and its generated pickup (one
-    source each) passes every written-output check. Structure only: members beyond the played two are unplayed."""
+    """Every token_rewards.toml member: its dump row has the declared family's shape, a member of a family admitted
+    after the core packet grants as its chest actor does, and its generated pickup (one source each) passes every
+    written-output check. Structure only: members beyond each family's played representative are unplayed."""
+    table = items.load()
     rows = {row["__RowId"]: row for row in byml.read(original(tokens.POUCH_ACTOR_INFO))}
     shapes = {actor: tokens.grant_family(rows[actor]) for actor in PRODUCTION}
     print(f"native shapes {shapes}")
     assert shapes == PRODUCTION
     assert set(PRODUCTION.values()) <= token_policy.ADMITTED_FAMILIES
+    for item, (actor, family) in token_policy.REWARDS.items():
+        if family in CORE_REWARDS.values():
+            continue  # the core packet's families, played with their own actors
+        chest = table.actor(item)
+        assert tokens.grant_family(rows[chest]) == family, (item, actor, chest)
+        assert grant_fields(rows[actor]) == grant_fields(rows[chest]), item
     members = sorted(actor for actor in PRODUCTION if actor != "Item_Token_Gold")
     sources = sorted(location.id for location in census)
     placements = {**dict(zip(sources, members, strict=False)), sources[-1]: "Item_Token_Gold"}
@@ -240,28 +253,18 @@ def test_every_admitted_member_has_its_native_shape_and_a_checked_pickup(romfs, 
     assert len(delivery.new_files) == len(members)
 
 
-# Every member of Claude's approved Round 15 family table that is neither bought goods nor policy-excluded, beyond
-# the production members: logic item -> (donor actor, family). The donor is the native world pickup where one grants
-# the same (Obj_Rupee_Red, not TBox_Rupee_Red), as for production's Obj_Shield_Hylian. Diagnostic only: no member is
-# admitted to production seeds before its family's representative plays.
+# Every member of Claude's approved Round 15 family table that is neither bought goods nor policy-excluded, outside
+# the admitted families: logic item -> (donor actor, family). The donor is the native world pickup where one grants
+# the same, as for production's Obj_Shield_Hylian. Diagnostic only: no member is admitted to production seeds before
+# its family's representative plays.
 DIAGNOSTIC = {
-    "Rupee (1)": ("Obj_Rupee_Green", "rupee"),
-    "Rupees (5)": ("Obj_Rupee_Blue", "rupee"),
-    "Rupees (20)": ("Obj_Rupee_Red", "rupee"),
-    "Rupees (50)": ("Obj_Rupee_Purple", "rupee"),
     "Rupees (200)": ("Obj_Rupee_Gold", "gold_rupee"),
-    "Piece of Heart": ("Obj_Heart_Piece", "heart_piece"),
-    "Heart Container": ("Obj_Heart_Container", "heart_container"),
-    "Bottle": ("Item_Bottle", "bottle"),
-    "Bottle with Milk": ("Item_Bottle_Milk", "bottle"),
     "Arrows (5)": ("Obj_ArrowBundle_Medium", "refill"),
     "Arrows (10)": ("Obj_ArrowBundle_Large", "refill"),
     "Bombs (5)": ("Item_BombBundle_Small", "refill"),
     "Deku Nuts (5)": ("TBox_DekuNutBundle", "refill"),
     "Deku Stick (1)": ("Item_DekuStickBundle_Small", "refill"),
     "Bombchus (5)": ("Item_BombchuBundle_Small", "bombchu"),
-    "Deku Nut Capacity": ("Item_NutBag_Medium", "fixed_capacity"),
-    "Deku Stick Capacity": ("Item_StickBag_Medium", "fixed_capacity"),
     "Magic Jar": ("Obj_MagicJar_Large", "magic_recovery"),
     "Dins Fire": ("Item_DinFire", "spell"),
     "Farores Wind": ("Item_FaroreWind", "spell"),
@@ -282,17 +285,13 @@ def test_every_diagnostic_member_has_its_native_shape_and_a_checked_pickup(romfs
     table = items.load()
     rows = {row["__RowId"]: row for row in byml.read(original(tokens.POUCH_ACTOR_INFO))}
     rewards = {actor: family for actor, family in DIAGNOSTIC.values()}
-    assert {tokens.grant_family(rows[actor]) for actor in rewards} == set(tokens.FAMILIES) - {
-        "token",
-        "fixed_major",
-        "equipment",
-    }
+    unadmitted = set(tokens.FAMILIES) - token_policy.ADMITTED_FAMILIES
+    assert {tokens.grant_family(rows[actor]) for actor in rewards} == unadmitted
     assert not set(rewards.values()) & token_policy.ADMITTED_FAMILIES
     for item, (actor, family) in DIAGNOSTIC.items():
         chest = table.actor(item)
         assert tokens.grant_family(rows[actor]) == tokens.grant_family(rows[chest]) == family, (item, actor, chest)
-        same = ("BundleActor", "BundleActorNum", "PouchGetType", "PouchSpecialDeal", "BottleItem", "MPMax")
-        assert {key: rows[actor].get(key) for key in same} == {key: rows[chest].get(key) for key in same}, item
+        assert grant_fields(rows[actor]) == grant_fields(rows[chest]), item
     sources = sorted(location.id for location in census)
     placements = dict(zip(sources, sorted(rewards), strict=False))
     delivery, grants = check_written_delivery(romfs, census, original, tmp_path / "out", placements, rewards)
@@ -350,10 +349,9 @@ def test_production_token_seed_writes_only_source_selectors_and_pickups(romfs, c
     assert len({row["id"] for row in rows}) == len(rows) == len(token_checks)
     assert sum(seed.placements[name] == token_policy.TOKEN_ITEM for name in seed.shuffled) == len(token_checks)
     by_id = {location.id: location for location in census}
-    held = sorted(location.id for location in census if str(location.id) not in {row["id"] for row in rows})
-    remake_only = sorted(d.id for d in definitions.load() if d.kind == GOLD_SKULLTULA and not d.oot_randomizer_name)
-    print(f"{len(rows)} Token checks; native, unshuffled sources: {held}")
-    assert held == remake_only  # the three remake-only Skulltulas wait for their route packet, native and unmodelled
+    print(f"{len(rows)} Token checks")
+    # All 100 census sources, the three remake-only routes included (Claude, 2026-11-14): none stays native.
+    assert {int(row["id"]) for row in rows} == set(by_id)
     for row in rows:
         location = by_id[int(row["id"])]
         assert row["files"] == list(location.files)

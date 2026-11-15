@@ -1,0 +1,53 @@
+# Round 15, Track D (cs15d): the three remake-only Gold Skulltulas, admitted to the loaded world.
+# Accepted clean-room specification: plans/rounds/r15-tokens-spec.md section 4 at 9e5008e, cs15c, native build
+# e0f3ccfa. Admission: Kareem's rc.3 three-route packet, PLAYED PASS by Claude's 2026-11-14 ruling. Every watcher
+# phase passed; the newest reload (21/21) reads 20 tokens, all three H / H xor 2 pairs set,
+# HaveReadHrlField_Note12_Enemy true and the other 97 sources unchanged; the tower's Hylian Shield pickup loaded its
+# pack without a crash. The final revisit steps were not played (10 fps): acceptance rests on that saved state and
+# the earlier packets, and no played revisit is claimed. The only relaxation of the accepted spec is Lone Tree's
+# day route (no night or Time Flows gate); the tower and wetlands rules are the spec's.
+# No imported N64 location is repurposed; census names/Hashes remain unchanged.
+
+[locations."HF GS Lone Tree"]
+new = true
+region = "Hyrule Field"
+type = "GS Token"
+vanilla = "Gold Skulltula Token"
+rule = "can_bonk and (is_adult or can_child_attack)"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N11 (e0f3ccfa): Enemy_Skulltula_Gold Hash 2177746409373494991 in Banc/HyruleField/HyruleField_{Child,Adult}_Static.bcett.byml.zs, tree-roll binding near (71,167,264); r3-census.md:52-58 and r4-logic-child.md:363-374. Roll/bonk, kill (adult, or child attack) and touch-retrieve the low drop. No Nocturnal field, and Kareem's rc.3 route packet (Claude, 2026-11-14) observed the child collecting it by day, so the spec's conservative night restriction and its child Time Flows gate are removed; the daytime appearance is native, no patch. Its source pair is set on the packet's newest reload (21/21); the unplayed final revisit is not claimed."
+
+[locations."LLR GS Tower"]
+new = true
+region = "Lon Lon Ranch"
+type = "GS Token"
+vanilla = "Gold Skulltula Token"
+rule = "((is_child and can_use(Boomerang)) or (is_adult and can_use(Hookshot))) and at_night and (is_adult or 'Time Flows')"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N11 (e0f3ccfa): Enemy_Skulltula_Gold Hash 2730878115209290675 in Banc/HyruleField/HyruleField_{Child,Adult}_Static.bcett.byml.zs, Nocturnal/night-appearance binding, vines near (-147,159,268); r3-census.md:58 and r4-logic-child.md:421-423. Child Boomerang or adult Hookshot kills/retrieves the high reward; night retained, and child night needs Time Flows. Ranch access suffices: the separate tower chest's unresolved upper ledge is not this route. Kareem's rc.3 route packet (Claude, 2026-11-14): the generated Hylian Shield pickup here loaded its pack without a crash, and the source pair is set on the newest reload (21/21); the unplayed final revisit is not claimed."
+
+[regions."HF Wetland Grotto"]
+area = "HyruleField"
+scene = "HF Wetland Grotto"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N10 (e0f3ccfa): wetlands entrance near (40,145,342), cover Land_HrlField_HidingHoleCover_A_01 Hash 2786334400301738354, child Skullwalltula and adult alternative crates. A dedicated region avoids identifying either ambiguous imported generic grotto as this room. Admitted with Kareem's rc.3 route packet (Claude, 2026-11-14)."
+
+[exits."Hyrule Field"."HF Wetland Grotto"]
+new = true
+rule = "has_explosives"
+source = "Accepted r15-tokens-spec section 4: explosive opening at (40,145,342), r3-census.md:57 and r4-logic-child.md:372-374. Use the existing supported has_explosives capability, including remake/bombs.toml's Bomb Bag plus age-appropriate lift strength; no Echo Gem, note-reading, Hammer-only opening or assumed persistent open cover substitutes for access."
+
+[exits."HF Wetland Grotto"."Hyrule Field"]
+new = true
+rule = "True"
+source = "Native wetlands room/entrance in HyruleField, accepted r15-tokens-spec section 4 N9; return to the same surface region, as the existing Field grotto exits. No extra item gate on leaving."
+
+[events."HF Wetland Grotto"."HF Wetland Skullwalltula Defeated"]
+new = true
+rule = "is_child and can_child_attack"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N10 (e0f3ccfa): child Enemy_Skullwalltula Hash 8266046215447170481 Dead output in Logic/HyruleField_Child_Level_Prefab_29fc.logic.module.ainb sets HaveReadHrlField_Note12_Enemy. Persistent child kill, not note reading, Echo Gem ownership, adult presence or a token collection. Room access already requires usable explosives; retain r4-logic-child.md:372-374's child attack requirement. Kareem's rc.3 route packet (Claude, 2026-11-14): the flag is true on the newest reload (21/21)."
+
+[locations."HF GS Wetland Grotto Crate"]
+new = true
+region = "HF Wetland Grotto"
+type = "GS Token"
+vanilla = "Gold Skulltula Token"
+rule = "is_adult and 'HF Wetland Skullwalltula Defeated' and can_break_crate"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N10 (e0f3ccfa): Enemy_Skulltula_Gold Hash 9047381233010434881 in Banc/HyruleField/HyruleField_Adult_Static.bcett.byml.zs near (57,126,343). Logic/HyruleField_Adult_Level_Prefab_c022.logic.module.ainb reads HaveReadHrlField_Note12_Enemy to create Obj_BrokenBox_A_06 Hash 4392858802949544986 instead of ordinary Obj_BrokenBox_A_01; its Dead output creates the source. Require the earlier child event plus adult room/crate access; adult combat/touch retrieval is the existing low-drop convention. This logic event does not patch crate alternatives, sync links, native flags or collection lifecycle. Kareem's rc.3 route packet (Claude, 2026-11-14): the source pair is set on the newest reload (21/21) with the child flag true; the unplayed final revisit is not claimed."

@@ -1,7 +1,7 @@
 # Round 15 (issue #30): what a shuffled Gold Skulltula (a ``Token`` check) may give. Clawshot data; no game
 # resources. Read by clawshot.generate.tokens (fill admission) and clawshot.patch.tokens (writer).
 #
-# Claude, 2026-11-14, after Kareem's PLAYED PASS of the rc.3 core packet: admission is by native grant family,
+# Claude, 2026-11-14, after Kareem's PLAYED core, families-1 and route packets: admission is by native grant family,
 # and each admitted member must pass the writer's structural check of its own dump row
 # (clawshot.patch.tokens.grant_family over RSDB/PouchActorInfo, build e0f3ccfa) before any output.
 # A family not listed here is not admitted. Claude's approved Round 15 family table (2026-11-14):
@@ -11,8 +11,10 @@
 # - progressive copies and small keys stay chest-only; boss keys, maps and compasses stay in their own dungeon;
 #   songs, the Gerudo captain's card and trade items keep their existing holds; items outside every pool stay out;
 # - ocarinas are excluded unless a later small packet proves them;
-# - non-bought equivalents (rupees, Heart Pieces and Containers, ammo bundles, bottles, Bombchus, masks, magic
-#   spells) wait for their representative's packet; until then only the three families below are production.
+# - families-1 admits new bottles, ordinary rupees, Heart Pieces/Containers and fixed nut/stick capacity;
+# - Bombchus remain excluded: the no-bag diagnostic completed but gave 0/0, pending the with-bag +5 packet;
+# - gold rupees, ordinary ammo, magic recovery/spells/arrows, Lens and Echo Gem await packets2/3;
+#   masks and other out-of-pool items remain excluded.
 #
 # [families]: family -> the played evidence that admits it.
 # [rewards."<logic item>"]: actor = the native actor whose grant the Token check delivers (a native world
@@ -23,6 +25,11 @@
 token = "Kareem, rc.3 core packet PASS: HF GS Lone Tree native token (count 9 -> 10, its own source pair set) and a token in KF Storms Grotto Chest (count 10 -> 11, only that chest's flag); House 10 paid once from chest + source tokens"
 fixed_major = "Kareem, rc.3 core packet PASS: Boomerang at LLR GS Tree, recovered after leaving and after Save and Continue, then usable; no token added"
 equipment = "Kareem, rc.3 core packet PASS: Hylian Shield (Obj_Shield_Hylian) at LLR GS Tower, retrieved with the Boomerang and equipped; no token added"
+bottle = "Kareem, rc.3 families-1: new Milk bottle and source committed; drank to Empty, original bottle unchanged, final saved checker matched"
+rupee = "Kareem, rc.3 families-1: Obj_Rupee_Red from Field lone tree, rupees 68 -> 88, source pair set and token count unchanged"
+heart_piece = "Kareem, rc.3 families-1: first Heart Piece, stock1 with MaxLife unchanged, source committed; abandoned drop recovered"
+heart_container = "Kareem, rc.3 families-1: whole container raises MaxLife16 -> 20 with Piece stock unchanged, source committed"
+fixed_capacity = "Kareem, rc.3 families-1: Item_NutBag_Medium establishes native30 capacity/refill and source completion; fixed StickBag member retains its own native20 fields"
 
 [rewards."Gold Skulltula Token"]
 actor = "Item_Token_Gold"
@@ -83,3 +90,53 @@ source = "PouchActorInfo Obj_Armor_Goron: Armor/Equipment tab, Large, None, Adul
 actor = "Obj_Armor_Zora"
 family = "equipment"
 source = "PouchActorInfo Obj_Armor_Zora: Armor/Equipment tab, Large, None, AdultEquipment Armor_Adult_Zora"
+
+[rewards."Bottle"]
+actor = "Item_Bottle"
+family = "bottle"
+source = "PouchActorInfo Item_Bottle: Material/Item, Large/Bottle, AssignableItem BottleA; creates an empty owned bottle, not a Shop refill"
+
+[rewards."Bottle with Milk"]
+actor = "Item_Bottle_Milk"
+family = "bottle"
+source = "PouchActorInfo Item_Bottle_Milk: Material/Item, Large/Bottle, BottleItem MaxMilk; played new slot and drinking, original bottle retained"
+
+[rewards."Rupee (1)"]
+actor = "Obj_Rupee_Green"
+family = "rupee"
+source = "PouchActorInfo Obj_Rupee_Green: Rupee/KeyItem, Small/None, stockable; native wallet-capacity binding and one rupee"
+
+[rewards."Rupees (5)"]
+actor = "Obj_Rupee_Blue"
+family = "rupee"
+source = "PouchActorInfo Obj_Rupee_Blue: Rupee/KeyItem, Small/None, BundleActor Obj_Rupee_Green x5"
+
+[rewards."Rupees (20)"]
+actor = "Obj_Rupee_Red"
+family = "rupee"
+source = "PouchActorInfo Obj_Rupee_Red: Rupee/KeyItem, Small/None, BundleActor Obj_Rupee_Green x20; played saved delta68 -> 88"
+
+[rewards."Rupees (50)"]
+actor = "Obj_Rupee_Purple"
+family = "rupee"
+source = "PouchActorInfo Obj_Rupee_Purple: Rupee/KeyItem, Small/None, BundleActor Obj_Rupee_Green x50; not the Medium gold-rupee path"
+
+[rewards."Piece of Heart"]
+actor = "Obj_Heart_Piece"
+family = "heart_piece"
+source = "PouchActorInfo Obj_Heart_Piece: KeyItem/KeyItem, Medium/HeartPiece; played first-piece increment, fourth-piece conversion not separately played"
+
+[rewards."Heart Container"]
+actor = "Obj_Heart_Container"
+family = "heart_container"
+source = "PouchActorInfo Obj_Heart_Container: KeyItem/KeyItem, Heart/HeartContainer; played MaxLife +4, distinct from quarter-heart stock"
+
+[rewards."Deku Nut Capacity"]
+actor = "Item_NutBag_Medium"
+family = "fixed_capacity"
+source = "PouchActorInfo Item_NutBag_Medium: KeyItem/KeyItem, Large/None, ExpansionMaxNumActor Item_DekuNut, AfterExpansionMaxNum30, MaxNumGameData DekuNut, native stock-max refill"
+
+[rewards."Deku Stick Capacity"]
+actor = "Item_StickBag_Medium"
+family = "fixed_capacity"
+source = "PouchActorInfo Item_StickBag_Medium: KeyItem/KeyItem, Large/None, ExpansionMaxNumActor Item_DekuStick, AfterExpansionMaxNum20, MaxNumGameData DekuStick, native stock-max refill"

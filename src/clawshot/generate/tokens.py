@@ -5,8 +5,8 @@ stay ``GS Token`` checks that keep their native token. On:
 
 1. :func:`prepare_spec` makes every ``GS Token`` check of the spec a ``Token`` check. Each is one physical
    Skulltula (every age/Alternative copy of it is the same check), so the pool gets exactly one token per live
-   source, never a bonus. Today's world has 97 live sources; the three remake-only Skulltulas stay out of the
-   world, keeping their native tokens unmodelled, until their route packet passes (Claude, 2026-11-14).
+   source, never a bonus. All 100 native sources are live after Kareem's rc.3 route packet passed
+   (Claude, 2026-11-14); age/Alternative copies still count once.
 2. :func:`restrict_settings` holds a ``Token`` check to :data:`REWARDS` (``location_type_items``) and the token
    item to Chest and Token checks (``item_location_types``), so no fill stage, swap or filler can put anything
    else there or a token anywhere else. Explicit settings may narrow these, never widen them: a palette naming
@@ -39,7 +39,9 @@ SOURCE_TYPE = "GS Token"
 TOKEN_ITEM = "Gold Skulltula Token"
 TOKEN_DESTINATIONS = ("Chest", SHUFFLE)
 """The check kinds a token item may go to: no exact-one native grant is proven for gifts, scrubs, shops or floors."""
-ADMITTED_FAMILIES = frozenset({"token", "fixed_major", "equipment"})
+ADMITTED_FAMILIES = frozenset(
+    {"token", "fixed_major", "equipment", "bottle", "rupee", "heart_piece", "heart_container", "fixed_capacity"}
+)
 DATA = Path(__file__).resolve().parents[1] / "data" / "token_rewards.toml"
 
 

@@ -26,10 +26,12 @@ from clawshot.world.load import build_world, load_spec
 GS = SOURCE_TYPE
 SPILL = ("GS A", "GS B", "GS C", "GS D")
 FORCED = {"Boomerang": (SHUFFLE,), "Hylian Shield": (SHUFFLE,)}
+ADMITTED_RUPEES = "Rupees (5)"  # a member of the admitted rupee family
+UNPLAYED = "Rupees (200)"  # gold_rupee: an unplayed family, outside the Token rewards
 
 
 def spill_spec(other: str = "Chest") -> dict:
-    """Four Skulltulas, two chests (Boomerang, Hylian Shield) and two checks of ``other`` kind (rupees)."""
+    """Four Skulltulas, two chests (Boomerang, Hylian Shield) and two checks of ``other`` kind (gold rupees)."""
     return {
         "start": "Start",
         "goal": "Boomerang and Hylian_Shield and (Gold_Skulltula_Token, 4)",
@@ -37,7 +39,7 @@ def spill_spec(other: str = "Chest") -> dict:
             TOKEN_ITEM: {"type": "Token"},
             "Boomerang": {},
             "Hylian Shield": {},
-            "Rupees (5)": {"class": "normal"},
+            UNPLAYED: {"class": "normal"},
         },
         "regions": [
             {
@@ -46,8 +48,8 @@ def spill_spec(other: str = "Chest") -> dict:
                     **{name: {"rule": "True", "type": GS, "vanilla": TOKEN_ITEM} for name in SPILL},
                     "Chest A": {"rule": "True", "type": "Chest", "vanilla": "Boomerang"},
                     "Chest B": {"rule": "True", "type": "Chest", "vanilla": "Hylian Shield"},
-                    "Other A": {"rule": "True", "type": other, "vanilla": "Rupees (5)"},
-                    "Other B": {"rule": "True", "type": other, "vanilla": "Rupees (5)"},
+                    "Other A": {"rule": "True", "type": other, "vanilla": UNPLAYED},
+                    "Other B": {"rule": "True", "type": other, "vanilla": UNPLAYED},
                 },
             }
         ],
@@ -63,14 +65,15 @@ def temple_spec(held: str | None = None) -> dict:
         "items": {
             TOKEN_ITEM: {"type": "Token"},
             "Small Key (Temple)": {"type": "SmallKey", "dungeon": "Temple"},
-            "Rupees (5)": {"class": "normal"},
+            ADMITTED_RUPEES: {"class": "normal"},
+            UNPLAYED: {"class": "normal"},
         },
         "regions": [
             {
                 "name": "Start",
                 "exits": {"Temple": "True"},
                 "locations": {
-                    "Start Chest": {"rule": "True", "type": "Chest", "vanilla": "Rupees (5)"},
+                    "Start Chest": {"rule": "True", "type": "Chest", "vanilla": UNPLAYED},
                     "Start GS": {**temple, **({"keep_vanilla": held} if held else {})},
                 },
             },
@@ -132,7 +135,7 @@ def test_a_skulltula_reward_and_a_chest_token_in_one_seed_keep_one_token_per_sou
     assert not tokens_at(seed, GS)
     assert sorted(seed.placements[name] for name in SPILL) == sorted(["Boomerang", "Hylian Shield", *[TOKEN_ITEM] * 2])
     chests = ("Chest A", "Chest B", "Other A", "Other B")  # all four are chests here
-    assert Counter(seed.placements[name] for name in chests) == Counter({TOKEN_ITEM: 2, "Rupees (5)": 2})
+    assert Counter(seed.placements[name] for name in chests) == Counter({TOKEN_ITEM: 2, UNPLAYED: 2})
     assert Counter(seed.placements.values())[TOKEN_ITEM] == len(SPILL)  # no bonus token, none lost
 
 
@@ -141,22 +144,23 @@ def test_tokens_spill_only_into_chests_never_another_shuffled_kind(other):
     settings = Settings(shuffle=("Chest", other, SHUFFLE), item_location_types=FORCED)
     seed = generate(spill_spec(other), 5, settings)
     assert [seed.placements[name] for name in ("Chest A", "Chest B")] == [TOKEN_ITEM, TOKEN_ITEM]
-    assert [seed.placements[name] for name in ("Other A", "Other B")] == ["Rupees (5)", "Rupees (5)"]
+    assert [seed.placements[name] for name in ("Other A", "Other B")] == [UNPLAYED, UNPLAYED]
     assert seed.settings.item_location_types[TOKEN_ITEM] == TOKEN_DESTINATIONS
 
 
 @pytest.mark.parametrize("dungeon_items", ["own_dungeon", "anywhere"])
-def test_small_keys_and_filler_never_take_a_skulltula_even_in_their_dungeon(dungeon_items):
+def test_small_keys_and_unadmitted_filler_never_take_a_skulltula_even_in_their_dungeon(dungeon_items):
     spec = temple_spec()
     settings = Settings(shuffle=("Chest", SHUFFLE), dungeon_items=dungeon_items)
     effective, world = prepare(spec, settings)
     unheld = replace(effective, location_type_items={})
     assert allowed(world, unheld, "Temple GS 1", "Small Key (Temple)")  # in its dungeon: only the palette stops it
     assert not allowed(world, effective, "Temple GS 1", "Small Key (Temple)")
-    assert not allowed(world, effective, "Temple GS 1", "Rupees (5)")
+    assert allowed(world, effective, "Temple GS 1", ADMITTED_RUPEES)
+    assert not allowed(world, effective, "Temple GS 1", UNPLAYED)
     seed = generate(spec, 1, settings)
     assert {seed.placements[name] for name in ("Start GS", "Temple GS 1", "Temple GS 2")} == {TOKEN_ITEM}
-    assert {seed.placements["Start Chest"], seed.placements["Temple Chest"]} == {"Small Key (Temple)", "Rupees (5)"}
+    assert {seed.placements["Start Chest"], seed.placements["Temple Chest"]} == {"Small Key (Temple)", UNPLAYED}
 
 
 def test_off_leaves_skulltulas_native_and_the_settings_untouched():
@@ -188,23 +192,21 @@ def test_effective_settings_replay_to_the_same_constraints_and_seed():
     "settings, message",
     [
         (Settings(shuffle=("Chest", GS)), "not a shuffle kind"),
-        (Settings(shuffle=("Chest", SHUFFLE), location_type_items={SHUFFLE: ("Bottle",)}), "cannot give"),
+        (Settings(shuffle=("Chest", SHUFFLE), location_type_items={SHUFFLE: (UNPLAYED,)}), "cannot give"),
         (Settings(shuffle=("Chest", SHUFFLE), item_location_types={TOKEN_ITEM: ("NPC",)}), "may go only to"),
-        (Settings(shuffle=("Chest", SHUFFLE), item_location_types={"Bottle": ("Chest", SHUFFLE)}), "cannot give it"),
+        (Settings(shuffle=("Chest", SHUFFLE), item_location_types={UNPLAYED: ("Chest", SHUFFLE)}), "cannot give it"),
     ],
 )
 def test_explicit_settings_cannot_widen_what_a_skulltula_may_give(settings, message):
-    spec = spill_spec()
-    spec["items"]["Bottle"] = {}
     with pytest.raises(FillError, match=message):
-        prepare(spec, settings)
+        prepare(spill_spec(), settings)
 
 
 def test_bought_goods_stay_on_shop_shelves_beside_skulltulas_and_chests():
     seed = generate(shop_spec(), 4, SHOP_TOKEN)
     assert sorted(seed.placements[shelf] for shelf in SHELVES) == sorted(GOODS)
     assert tokens_at(seed, SHUFFLE) == ["GS A", "GS B"]
-    assert {seed.placements[name] for name in ("GS A", "GS B")} <= {TOKEN_ITEM, "Boomerang"}
+    assert {seed.placements[name] for name in ("GS A", "GS B")} <= {TOKEN_ITEM, "Boomerang", ADMITTED_RUPEES}
     effective, world = prepare(shop_spec(), SHOP_TOKEN)
     for good in GOODS:
         assert effective.item_location_types[good] == ("Shop",)

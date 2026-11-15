@@ -803,9 +803,10 @@ def test_a_changed_grant_row_is_refused_with_its_values(world):
         tokens.build(world, CORE, census(), rewards=ALLOWED)
 
 
-def test_a_diagnostic_family_needs_an_explicit_declaration_and_the_matching_native_shape(world):
+def test_a_grant_family_needs_an_explicit_declaration_and_the_matching_native_shape(world):
     """A rupee-shaped row (as Obj_Rupee_Red's) builds only when the caller declares that family: the allowed set is
-    the only gate, and production never declares it (clawshot.generate.tokens.ADMITTED_FAMILIES)."""
+    the only gate. The core set here (:data:`ALLOWED`) declares no 'rupee'; production declares a family only through
+    the members ``clawshot.generate.tokens.REWARDS`` admits."""
     rupee = {
         "BundleActor": "Work/Actor/Obj_Rupee_Green.engine__actor__ActorParam.gyml",
         "BundleActorNum": I32(20),
@@ -1236,8 +1237,8 @@ def test_token_locations_link_only_to_agreeing_native_identities(names, definiti
 
 def test_seed_delivery_refuses_an_unadmitted_item_or_a_twice_declared_actor(world):
     linked = tokens.link_sources([GS_NAMES[TREE]], DEFINITIONS, census())
-    with pytest.raises(PatchError, match="'Rupees \\(5\\)' is not an admitted Token reward"):
-        tokens.seed_delivery(world, {GS_NAMES[TREE]: "Rupees (5)"}, linked, {}, census(), rewards=SEED_REWARDS)
+    with pytest.raises(PatchError, match="'Rupees \\(200\\)' is not an admitted Token reward"):
+        tokens.seed_delivery(world, {GS_NAMES[TREE]: "Rupees (200)"}, linked, {}, census(), rewards=SEED_REWARDS)
     twice = {**SEED_REWARDS, "Shield Again": ("Obj_Shield_Hylian", "fixed_major")}
     with pytest.raises(PatchError, match="Obj_Shield_Hylian is declared in two grant families"):
         tokens.seed_delivery(world, {GS_NAMES[TREE]: "Boomerang"}, linked, {}, census(), rewards=twice)

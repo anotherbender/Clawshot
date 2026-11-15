@@ -13,8 +13,8 @@ moves the event gifts that can be changed (``clawshot.patch.gifts``); the others
 ``--shuffle Scrub`` adds the four saved one-time scrub families; repeat vendors stay vanilla.
 ``--shuffle BossHeart`` adds native-only boss-heart pickups (off; in-game acceptance pending).
 ``--shuffle Freestanding`` adds the fourteen saved heart-piece floor checks (native palette only; off).
-``--shuffle Token`` (off) shuffles the 97 live Gold Skulltulas: a Skulltula gives a token or an admitted fixed item
-or equipment (``clawshot.generate.tokens``), and tokens can also be in chests. Token without Chest is refused.
+``--shuffle Token`` (off) shuffles all 100 native Gold Skulltulas across explicitly played reward families
+(``clawshot.generate.tokens``); tokens may also go to chests. Token without Chest is refused.
 """
 
 import argparse
