@@ -13,7 +13,8 @@ moves the event gifts that can be changed (``clawshot.patch.gifts``); the others
 ``--shuffle Scrub`` adds the four saved one-time scrub families; repeat vendors stay vanilla.
 ``--shuffle BossHeart`` adds native-only boss-heart pickups (off; in-game acceptance pending).
 ``--shuffle Freestanding`` adds the fourteen saved heart-piece floor checks (native palette only; off).
-``Token`` is reserved and refused until replacement-pickup persistence is verified.
+``--shuffle Token`` (off) shuffles the 97 live Gold Skulltulas: a Skulltula gives a token or an admitted fixed item
+or equipment (``clawshot.generate.tokens``), and tokens can also be in chests. Token without Chest is refused.
 """
 
 import argparse
@@ -63,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help=(
             "types; Shop: native displays; Gift: supported; Scrub: once sales; "
-            "BossHeart/Freestanding: native pickups; Token: disabled"
+            "BossHeart/Freestanding: native pickups; Token: Gold Skulltulas, with Chest"
         ),
     )
     parser.add_argument(

@@ -4,7 +4,9 @@
     write_seed(out, romfs, Path("seed-12345"))     # romfs overlay, spoiler.json and play-note.md
 
 The chest pool uses ``remake_vanilla``; opt-in Shop locations use the native shop
-catalog. The fill and beatability search are ``clawshot.generate``'s.
+catalog; opt-in Token checks keep their native token pool and are written by
+``clawshot.patch.tokens`` (new pickup packs, spoiler ``patch.tokens``). The fill and
+beatability search are ``clawshot.generate``'s.
 """
 
 import json
@@ -18,8 +20,9 @@ from clawshot.census.scan import scan
 from clawshot.generate import Seed, Settings, from_placements, generate, play_note, prepare, spoiler
 from clawshot.generate import hints as stone_hints
 from clawshot.generate import names as location_names
+from clawshot.generate import tokens as token_policy
 from clawshot.generate.fill import shuffled_locations
-from clawshot.patch import bags, custom_items, darunia, drops, freestanding, gamedata, scrubs, shops, text
+from clawshot.patch import bags, custom_items, darunia, drops, freestanding, gamedata, scrubs, shops, text, tokens
 from clawshot.patch import events as chest_events
 from clawshot.patch import items as item_actors
 from clawshot.patch import receive_event as receive_event_patch
@@ -46,10 +49,15 @@ class SeedOutput:
     item_names: dict[str, str] = field(default_factory=dict)
     """The game's (English) names of the items the hints name, as the stones say them."""
     new_files: dict[str, NewFile] = field(default_factory=dict)
-    """Files the dump does not hold (the custom items' actor packs, the receive event's flow)."""
+    """Files the dump does not hold: custom item/Skulltula actor packs and receive-event flow."""
+    token_sources: tuple[tokens.SourceChange, ...] = ()
+    """Every shuffled Token location's source and grant, for the spoiler's ``patch.tokens``."""
 
     def spoiler(self) -> dict[str, Any]:
-        return spoiler(self.seed, self.item_names) | {"patch": self.plan.as_dict()}
+        patch = self.plan.as_dict()
+        if self.token_sources:
+            patch["tokens"] = [source.as_dict() for source in self.token_sources]
+        return spoiler(self.seed, self.item_names) | {"patch": patch}
 
     def spoiler_json(self) -> str:
         return json.dumps(self.spoiler(), indent=2, ensure_ascii=False) + "\n"
@@ -75,11 +83,6 @@ def make_seed(
     the get line of every item the seed holds say "your" (``clawshot.patch.custom_items``); ``receive_event`` adds
     the event a runtime module requests to give an item with the game's own notice (``patch.receive_event``).
     A solo seed places neither custom item and sets neither switch, so none of this changes its output."""
-    if "Token" in settings.shuffle:
-        raise PatchError(
-            "Token shuffle is not enabled: per-enemy grant selection and GoldTokenGmdHash persistence "
-            "are unverified. The r7-drops native-token-boomerang experiment changes all tokens, not a seed."
-        )
     spec = load_spec() if spec is None else spec
     validate_logic_overrides(spec, settings.logic)
     definitions = census_definitions.load()
@@ -94,17 +97,16 @@ def make_seed(
     _, world = prepare(spec, settings)
     table = item_actors.load()
     table.check(world.items)
-    chests = [name for name in shuffled_locations(world, settings) if world.locations[name].type == "Chest"]
-    shop_locations = tuple(name for name in shuffled_locations(world, settings) if world.locations[name].type == "Shop")
-    floor_pickups = sum(
-        world.locations[name].type in (drops.SHUFFLE, freestanding.SHUFFLE)
-        for name in shuffled_locations(world, settings)
-    )
-    if (
-        len(chests) + len(shop_locations) + floor_pickups != len(shuffled_locations(world, settings))
-        and not extra_steps
-    ):
+    shuffled = shuffled_locations(world, settings)
+    chests = [name for name in shuffled if world.locations[name].type == "Chest"]
+    shop_locations = tuple(name for name in shuffled if world.locations[name].type == "Shop")
+    floor_pickups = sum(world.locations[name].type in (drops.SHUFFLE, freestanding.SHUFFLE) for name in shuffled)
+    token_locations = [name for name in shuffled if world.locations[name].type == token_policy.SHUFFLE]
+    if len(chests) + len(shop_locations) + floor_pickups + len(token_locations) != len(shuffled) and not extra_steps:
         raise PatchError("non-chest shuffle needs a kind-specific extra patch step")
+    token_rewards = token_policy.REWARDS if token_locations else {}
+    if unadmitted := sorted({family for _, family in token_rewards.values()} - token_policy.ADMITTED_FAMILIES):
+        raise PatchError(f"Token rewards name grant families production does not admit: {unadmitted}")
     if shop_locations or settings.cheap_deku_shield:
         extra_steps = (
             *extra_steps,
@@ -117,6 +119,7 @@ def make_seed(
         )
     census = scan(romfs)
     links = link(world, chests, definitions, census)
+    token_sources = tokens.link_sources(token_locations, definitions, census) if token_locations else {}
     vanilla = remake_vanilla(world, links, table)
     spec = restrict_event_openings(spec, world, links, chest_events.load())
     if freestanding.SHUFFLE in settings.shuffle:
@@ -133,6 +136,16 @@ def make_seed(
     changes = tuple(step(out.placements) for step in extra_steps)
     flags = list(custom.flags)
     new_files = dict(custom.new_files)
+    token_rows: tuple[tokens.SourceChange, ...] = ()
+    if token_sources:
+        # Token insertion validates the original dump row snapshot; custom rows then insert by name.
+        delivery, token_rows = tokens.seed_delivery(
+            romfs, out.placements, token_sources, links.names, census, rewards=token_rewards
+        )
+        changes += (delivery.changes,)
+        if overlap := sorted(new_files.keys() & delivery.new_files.keys()):
+            raise PatchError(f"custom items and Skulltula pickups both create {overlap}")
+        new_files.update(delivery.new_files)
     if custom.changes:
         changes += (custom.changes,)
     if receive_event:
@@ -178,7 +191,7 @@ def make_seed(
     changes += (key_changes,)
     plan, progressive_changes = progressive.changes(romfs, plan, prior_changes=changes)
     changes += (progressive_changes, bags.changes(romfs))
-    return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files)
+    return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files, token_rows)
 
 
 def custom_step(

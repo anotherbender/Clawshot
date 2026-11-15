@@ -1,0 +1,85 @@
+# Round 15 (issue #30): what a shuffled Gold Skulltula (a ``Token`` check) may give. Clawshot data; no game
+# resources. Read by clawshot.generate.tokens (fill admission) and clawshot.patch.tokens (writer).
+#
+# Claude, 2026-11-14, after Kareem's PLAYED PASS of the rc.3 core packet: admission is by native grant family,
+# and each admitted member must pass the writer's structural check of its own dump row
+# (clawshot.patch.tokens.grant_family over RSDB/PouchActorInfo, build e0f3ccfa) before any output.
+# A family not listed here is not admitted. Claude's approved Round 15 family table (2026-11-14):
+# - bought goods (every ``Buy ...`` item: refills, ammo, Bombchus, bottle contents, Buy Heart, Buy Magic Jar) go
+#   only to shop shelves in every seed, enforced by the fill (clawshot.generate.fill.SHOP_ONLY_PREFIX); no adapter
+#   to a world pickup this round, so a ``NotPushToPouch`` shop bottle content never becomes a new bottle;
+# - progressive copies and small keys stay chest-only; boss keys, maps and compasses stay in their own dungeon;
+#   songs, the Gerudo captain's card and trade items keep their existing holds; items outside every pool stay out;
+# - ocarinas are excluded unless a later small packet proves them;
+# - non-bought equivalents (rupees, Heart Pieces and Containers, ammo bundles, bottles, Bombchus, masks, magic
+#   spells) wait for their representative's packet; until then only the three families below are production.
+#
+# [families]: family -> the played evidence that admits it.
+# [rewards."<logic item>"]: actor = the native actor whose grant the Token check delivers (a native world
+# pickup, Obj_*, where one exists; never a chest wrapper TBox_* or shop display Shop_*), family, source = that
+# actor's PouchActorInfo grant fields as read from the dump.
+
+[families]
+token = "Kareem, rc.3 core packet PASS: HF GS Lone Tree native token (count 9 -> 10, its own source pair set) and a token in KF Storms Grotto Chest (count 10 -> 11, only that chest's flag); House 10 paid once from chest + source tokens"
+fixed_major = "Kareem, rc.3 core packet PASS: Boomerang at LLR GS Tree, recovered after leaving and after Save and Continue, then usable; no token added"
+equipment = "Kareem, rc.3 core packet PASS: Hylian Shield (Obj_Shield_Hylian) at LLR GS Tower, retrieved with the Boomerang and equipped; no token added"
+
+[rewards."Gold Skulltula Token"]
+actor = "Item_Token_Gold"
+family = "token"
+source = "PouchActorInfo Item_Token_Gold: KeyItem/KeyItem tab, GetType Medium, SpecialDeal TokenGold, PouchStockable, FixedMaxNum 100. A Token check that keeps the token keeps the native drop"
+
+[rewards."Boomerang"]
+actor = "Item_Boomerang"
+family = "fixed_major"
+source = "PouchActorInfo Item_Boomerang: Material/Item tab, GetType Large, SpecialDeal None, BundleActorNum 1, AssignableItem Boomerang; the played control"
+
+[rewards."Megaton Hammer"]
+actor = "Item_Hammer"
+family = "fixed_major"
+source = "PouchActorInfo Item_Hammer: the same grant fields as Item_Boomerang (Material/Item tab, Large, None, BundleActorNum 1), AssignableItem Hammer"
+
+[rewards."Hylian Shield"]
+actor = "Obj_Shield_Hylian"
+family = "equipment"
+source = "PouchActorInfo Obj_Shield_Hylian: Shield/Equipment tab, GetType Large, SpecialDeal None, Adult/ChildEquipment Weapon_Shield_Hylian; the played control"
+
+[rewards."Deku Shield"]
+actor = "Obj_Shield_Deku"
+family = "equipment"
+source = "PouchActorInfo Obj_Shield_Deku: Shield/Equipment tab, Large, None, Adult/ChildEquipment Weapon_Shield_Deku"
+
+[rewards."Mirror Shield"]
+actor = "Item_Shield_Mirror"
+family = "equipment"
+source = "PouchActorInfo Item_Shield_Mirror: Shield/Equipment tab, Large, None, Adult/ChildEquipment Weapon_Shield_Mirror (no native Obj_ pickup)"
+
+[rewards."Kokiri Sword"]
+actor = "Item_Sword_Kokiri"
+family = "equipment"
+source = "PouchActorInfo Item_Sword_Kokiri: Weapon/Equipment tab, Large, None, ChildEquipment Weapon_Sword_Kokiri (no native Obj_ pickup)"
+
+[rewards."Biggoron Sword"]
+actor = "Item_Sword_Biggoron"
+family = "equipment"
+source = "PouchActorInfo Item_Sword_Biggoron: Weapon/Equipment tab, Large, None, Adult/ChildEquipment Weapon_Sword_Biggoron (no native Obj_ pickup). The trade chain's reward, not a trade-cell item"
+
+[rewards."Iron Boots"]
+actor = "Item_HeavyBoot"
+family = "equipment"
+source = "PouchActorInfo Item_HeavyBoot: Boot/Equipment tab, Large, None, AdultEquipment Armor_Adult_HeavyBoot (no native Obj_ pickup)"
+
+[rewards."Hover Boots"]
+actor = "Item_HoverBoot"
+family = "equipment"
+source = "PouchActorInfo Item_HoverBoot: Boot/Equipment tab, Large, None, AdultEquipment Armor_Adult_HoverBoot (no native Obj_ pickup)"
+
+[rewards."Goron Tunic"]
+actor = "Obj_Armor_Goron"
+family = "equipment"
+source = "PouchActorInfo Obj_Armor_Goron: Armor/Equipment tab, Large, None, AdultEquipment Armor_Adult_Goron"
+
+[rewards."Zora Tunic"]
+actor = "Obj_Armor_Zora"
+family = "equipment"
+source = "PouchActorInfo Obj_Armor_Zora: Armor/Equipment tab, Large, None, AdultEquipment Armor_Adult_Zora"

@@ -26,6 +26,11 @@ from clawshot.world.search import Search
 DUNGEON_ITEM_CHOICES = ("own_dungeon", "anywhere")
 SMALL_KEY = "SmallKey"
 """The item type ``anywhere`` lets out of its dungeon, into chests only."""
+SHOP_ONLY_PREFIX = "Buy "
+"""Bought goods (``Buy ...``: refills, ammo, Bombchus, bottle contents, hearts, magic jars) go only to shop shelves, in
+every seed, whatever the settings hold (Claude, 2026-11-14, Round 15 family table: no adapter this round). A shelf
+keeps its native display and restock; a purchase's grant (``NotPushToPouch`` bottle contents fill an owned bottle,
+never give a new one) has no proven equivalent at a chest, gift, scrub, floor pickup or Skulltula."""
 _BOMB_AMMO_PREFIXES = ("Bombs (", "Bombchus (")
 STAGE_ATTEMPTS = 15
 """Tries of a stage placed on its own before the fill fails (``Fill.fill_ownworld_restrictive``'s ``attempts``)."""
@@ -57,7 +62,8 @@ class FillError(RuntimeError):
 @dataclass(frozen=True)
 class Settings:
     """What a seed shuffles. ``shuffle`` lists OoT Randomizer location types whose items are shuffled among
-    themselves; every other location keeps its vanilla item. ``dungeon_items`` keeps a dungeon's keys, maps and
+    themselves, or ``Token`` for the Gold Skulltulas (``clawshot.generate.tokens``, never the raw ``GS Token``);
+    every other location keeps its vanilla item. ``dungeon_items`` keeps a dungeon's keys, maps and
     compasses in that dungeon (``own_dungeon``) or also lets its small keys out, into any chest (``anywhere``; boss
     keys, maps and compasses still stay). ``logic`` overrides logic settings from ``settings.toml``.
 
@@ -250,6 +256,8 @@ def allowed(world: World, settings: Settings, location: str, item: str) -> bool:
         if destinations is not None and location not in destinations:
             return False
     location_type = world.locations[location].type
+    if item.startswith(SHOP_ONLY_PREFIX) and location_type != "Shop":
+        return False
     if location_type == "Missable" and world.items[item].progression:
         return False
     # Only a supported kind of check can grant the next tier of a raw progressive copy (``World.progressive``).
@@ -886,6 +894,14 @@ def fill(
     if locations:
         raise FillError(f"locations left empty: {sorted(locations)}")
     result = {name: placements[name] for name in world.locations if name in placements}
+    # Every stage and swap applies ``allowed``; the unchecked fast fill relies on the restricted kinds being full.
+    unsafe = [
+        (name, item)
+        for name, item in result.items()
+        if name in shuffled_set and not allowed(world, settings, name, item)
+    ]
+    if unsafe:
+        raise FillError(f"placements outside their restrictions (location, item): {unsafe[:4]}", stage="restrictions")
     violations = tier_order_violations(world, result)
     if violations:
         raise FillError(

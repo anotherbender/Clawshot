@@ -24,6 +24,10 @@ no such field); ``False``/``0`` mean the save has the field and it says absent. 
   items, ``PouchData.<name>.StockNum``) is a GameDataList entry present in copied real saves; so are
   ``PlayerStatus.MaxLife`` (plans/playtest/answers.md R10-DIGGING reads it), ``PlayerStatus.MPMax`` and
   ``PlayerStatus.CurrentRupee``, and the bottle Struct described at :data:`BOTTLE_SLOTS`.
+- [T] plans/rounds/r15-tokens-spec.md sections 2.1, 2.3 and 3.4: a Gold Skulltula source is collected once both its
+  ``Bool64bitKey`` records, Hash H and H xor 2, are set; the token count is the native stock [S6], which a token
+  received anywhere raises and a non-token reward at a source does not. The save layout that certifies an unset pair
+  is at :data:`clawshot.tracker.seeds.SOURCE_SAVE_VERSION`.
 
 Held versus ever acquired: a counted item is *held* only while its stock is above 0, so a broken Giant's Knife, a
 burnt Deku Shield or a handed-over trade item shows ``held: false, ever: true``. Songs have no stock field and are
@@ -39,6 +43,10 @@ from clawshot.tracker.seeds import (
     NAMED_BOOL,
     NATIVE_SAVED_BOOLS,
     PLACEMENT_HASH,
+    SOURCE_COMPANION_XOR,
+    SOURCE_PAIR,
+    SOURCE_SAVE_TYPE,
+    SOURCE_SAVE_VERSION,
     Check,
     Seed,
 )
@@ -456,6 +464,39 @@ def dungeons(seed: Seed, save: save_format.Save | None) -> list[dict[str, Any]]:
     return out
 
 
+def _source_layout(save: save_format.Save) -> str | None:
+    """Why ``save`` is not the layout whose Gold Skulltula source records are audited [T]
+    (:data:`clawshot.tracker.seeds.SOURCE_SAVE_VERSION`), or None when it is."""
+    if save.save_type is None:
+        return "the save has no placement list"
+    if (save.version, save.save_type) != (SOURCE_SAVE_VERSION, SOURCE_SAVE_TYPE):
+        return (
+            f"the save's layout (version 0x{save.version:x}, list type 0x{save.save_type:08x}) is not the progress.sav "
+            f"layout whose Skulltula records are audited (version 0x{SOURCE_SAVE_VERSION:x}, type "
+            f"0x{SOURCE_SAVE_TYPE:08x})"
+        )
+    bools = len(save.entries.get(save_format.BOOL, {}))
+    if bools < NATIVE_SAVED_BOOLS:
+        return f"the save holds {bools} saved Bools, fewer than build e0f3ccfa's {NATIVE_SAVED_BOOLS}"
+    return None
+
+
+def _source_pair(check: Check, save: save_format.Save) -> tuple[bool | None, str | None]:
+    """A Gold Skulltula source [T]: collected when one of its sources has H and H xor 2 set; not collected when none
+    has either, in the audited layout only; one record without the other is unknown (the native collection writes
+    both)."""
+    if why := _source_layout(save):
+        return None, why
+    pairs = [(save.is_set(h), save.is_set(h ^ SOURCE_COMPANION_XOR)) for h in check.hashes]
+    if not pairs:
+        return None, check.reason or "no source Hash"
+    if any(primary and companion for primary, companion in pairs):
+        return True, None
+    if any(primary or companion for primary, companion in pairs):
+        return None, "only one of the source's two saved records (its Hash and Hash xor 2) is set"
+    return False, None
+
+
 def collected(check: Check, save: save_format.Save | None) -> tuple[bool | None, str | None]:
     """(collected, reason when unknown) for one check; see :class:`clawshot.tracker.seeds.Check`."""
     if save is None:
@@ -475,6 +516,8 @@ def collected(check: Check, save: save_format.Save | None) -> tuple[bool | None,
         if any(save.is_set(h) for h in check.hashes):
             return True, None
         return None, "not seen collected; a replaced pickup's saved state is not certified"
+    if check.method == SOURCE_PAIR:
+        return _source_pair(check, save)
     return None, check.reason or "no audited save record"
 
 
@@ -555,7 +598,8 @@ def areas(seed: Seed, save: save_format.Save | None, *, show_locations: bool = F
 
 
 def build_state(seed: Seed, save: save_format.Save | None, *, show_locations: bool = False) -> dict[str, Any]:
-    """The tracker's whole view, JSON-able. ``save`` may be ``None`` (seed totals with every save value unknown)."""
+    """The tracker's whole view, JSON-able. ``save`` may be ``None`` (seed totals with every save value unknown).
+    ``tokens`` is the native token stock [S6], never a count of collected Skulltula sources [T]."""
     reader = _Reader(save)
     warnings = list(seed.warnings)
     identity = _identity(seed, save)
@@ -566,6 +610,9 @@ def build_state(seed: Seed, save: save_format.Save | None, *, show_locations: bo
     chests = [c for c in seed.checks if c.kind == "chest" and c.method == NAMED_BOOL]
     if save is not None and chests and all(all(save.flag(f) is None for f in c.flags) for c in chests):
         warnings.append("The save has none of this seed's chest records: another game version or not a game save.")
+    sources = any(c.method == SOURCE_PAIR for c in seed.checks)
+    if save is not None and sources and (why := _source_layout(save)):
+        warnings.append(f"Gold Skulltula sources show as unknown: {why}.")
     return {
         "seed": dict(seed.metadata),
         "identity": identity,

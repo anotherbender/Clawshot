@@ -21,5 +21,6 @@ patterns = [
     "Mals/*.Product.110.sarc.zs", # every language is patched
     "Pack/Actor/Shop_Board_Bundle_*.pack.zs",
 ]
-# Actor names are derived from item_actors.toml and shops.toml, not duplicated here.
+# Actor names are derived from item_actors.toml and shops.toml, and Token shuffle's native inputs from
+# clawshot.patch.tokens.native_inputs over token_rewards.toml; none is duplicated here.
 actor_pack = "Pack/Actor/{actor}.pack.zs"

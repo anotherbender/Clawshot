@@ -1,6 +1,6 @@
-"""Write a patch plan as a mod folder: ``<out>/romfs/<romfs path>`` for each changed placement file, and the
-resource size table when a changed file needs a bigger entry, through ``clawshot.formats``. Nothing under the
-romfs is written."""
+"""Write a patch plan as a mod folder: ``<out>/romfs/<romfs path>`` for each changed placement file, each file the
+game does not have (:class:`NewFile`), and the resource size table when a changed file needs a bigger entry or a new
+resource needs one, through ``clawshot.formats``. Nothing under the romfs is written."""
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -8,7 +8,8 @@ from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING
 
 from clawshot.census.scan import DEFAULT_CHEST_DROP, GAME_DATA_LIST
-from clawshot.formats import byml, rstb, zsdic
+from clawshot.formats import byml, rstb, sarc, zsdic
+from clawshot.formats.rstb import RstbError
 from clawshot.patch.getitem import member_growth as getitem_member_growth
 from clawshot.patch.plan import DROP_KEY, EVENT_KEY, SUBSTITUTE_KEY, PatchError, Plan
 from clawshot.patch.shops import member_growth
@@ -23,12 +24,15 @@ FileChanges = Mapping[str, Callable[[bytes], bytes]]
 
 @dataclass(frozen=True)
 class NewFile:
-    """A file the game did not ship (``clawshot.patch.custom_items``): its decompressed bytes, and for each pack
-    member it adds the existing member whose size-table entry it takes, plus the growth of its 32-byte-rounded size
-    (the same-shape rule of ``getitem.member_growth``)."""
+    """A new file's decompressed bytes and native sizing/copy provenance.
+
+    ``members`` names renamed pack members and their native donor entry plus rounded growth (custom items).
+    ``copied`` names byte-identical members and their native donor pack (Skulltula pickups); other pickup members
+    get measured entries. Both producers share the same path-to-file mapping and size table."""
 
     data: bytes
     members: Mapping[str, tuple[str, int]] = field(default_factory=dict)
+    copied: Mapping[str, str] = field(default_factory=dict)
 
 
 NewFiles = Mapping[str, NewFile]
@@ -37,12 +41,14 @@ NewFiles = Mapping[str, NewFile]
 @dataclass(frozen=True)
 class WrittenFile:
     path: str  # romfs-relative
-    size: int  # decompressed, before
+    size: int  # decompressed, before (0 for a file new to the game)
     new_size: int  # decompressed, after
     compressed_size: int
     new_compressed_size: int
-    entry: int | None = None  # its resource-size-table entry, before (None for the table itself)
+    entry: int | None = None  # its resource-size-table entry, before (None for the table itself or a new file)
     new_entry: int | None = None  # and after
+
+
 
 
 def check_romfs(romfs: Path) -> None:
@@ -126,6 +132,96 @@ def _patch_path(path: str) -> PurePosixPath:
     return relative
 
 
+def _absent(romfs: Path, table: rstb.ResourceSizeTable, path: str, what: str) -> None:
+    """``path`` must be new to the game: no romfs file of that name and no size-table entry. An entry means an
+    existing resource or another path with the same CRC32, whose allocation a new entry would silently replace."""
+    resource = rstb.resource_path(path)
+    for candidate in (resource, resource + ".zs"):
+        if (romfs / PurePosixPath(candidate)).exists():
+            raise PatchError(f"{what} {path}: the romfs already has {candidate}")
+    if table.get(path) is not None:
+        raise PatchError(
+            f"{what} {path}: the size table already has entry {table.get(path)} for its CRC32 "
+            f"0x{rstb.path_hash(path):08x} (an existing resource or a collision)"
+        )
+
+
+def _entry_for(path: str, data: bytes) -> int:
+    """The measured size entry of a resource new to the game (an actor parameter counts its own components)."""
+    components = None
+    if path.endswith(rstb.ACTOR_PARAM):
+        node = byml.read(data)
+        own = node.get("Components", {}) if isinstance(node, dict) else None
+        if not isinstance(own, dict):
+            raise PatchError(f"{path}: an actor parameter file without a Components map")
+        components = len(own)
+    try:
+        return rstb.required_size(path, len(data), components)
+    except RstbError as error:
+        raise PatchError(f"{path}: {error}") from error
+
+
+def _new_file(
+    path: str,
+    file: NewFile,
+    romfs: Path,
+    dicts: zsdic.Dictionaries,
+    table: rstb.ResourceSizeTable,
+    native_packs: dict[str, dict[str, bytes]],
+    new_members: dict[str, bytes],
+) -> tuple[WrittenFile, bytes]:
+    """Build one new file, retaining native/custom sizing and validating pickup copy provenance."""
+    _patch_path(path)
+    _absent(romfs, table, path, "new file")
+    if path.endswith(".pack.zs"):
+        members = sarc.read(file.data)
+        if sarc.write(members) != file.data:
+            raise PatchError(f"{path}: the new pack does not read back to the same bytes")
+        if stray := sorted((set(file.copied) | set(file.members)) - set(members)):
+            raise PatchError(f"{path}: declared members {stray} are not in the pack")
+        for name in sorted(members):
+            content, source = members[name], file.copied.get(name)
+            if name in file.members:
+                donor, growth = file.members[name]
+                entry = table.get(donor)
+                if entry is None:
+                    raise PatchError(f"{name}: its donor {donor} has no resource size table entry")
+                _absent(romfs, table, name, f"{path}: new member")
+                table.set(name, entry + growth)
+                new_members[name] = content
+            elif source is not None:
+                if source not in native_packs:
+                    source_path = _patch_path(source)
+                    if not (source.startswith("Pack/") and source.endswith(".pack.zs")):
+                        raise PatchError(f"{path}: {name} names {source!r}, not a native pack")
+                    if not (romfs / source_path).is_file():
+                        raise PatchError(f"{path}: {name} is copied from {source}, which the romfs lacks")
+                    native_packs[source] = sarc.read(dicts.decompress(source, (romfs / source_path).read_bytes()))
+                if native_packs[source].get(name) != content:
+                    raise PatchError(f"{path}: member {name} is not byte-identical to its copy in {source}")
+                if table.get(name) is None:
+                    raise PatchError(f"{path}: copied member {name} has no native size entry")
+            elif file.members:
+                # Custom-item packs retain the donor's other members under their original native paths.
+                continue
+            elif name in new_members:
+                if new_members[name] != content:
+                    raise PatchError(f"{path}: new member {name} differs from another new file's")
+            else:
+                _patch_path(name)
+                _absent(romfs, table, name, f"{path}: new member")
+                table.set(name, _entry_for(name, content))
+                new_members[name] = content
+    elif file.copied or file.members:
+        raise PatchError(f"{path}: only a pack has members to copy")
+    entry = _entry_for(path, file.data)
+    table.set(path, entry)
+    compressed = dicts.compress(path, file.data) if path.endswith(".zs") else file.data
+    if path.endswith(".zs") and dicts.decompress(path, compressed) != file.data:
+        raise PatchError(f"{path}: the compressed file does not decompress to the written bytes")
+    return WrittenFile(path, 0, len(file.data), 0, len(compressed), None, entry), compressed
+
+
 def write(
     plan: Plan,
     romfs: str | Path,
@@ -188,29 +284,12 @@ def write(
         table.set(path, new_entry)
         info = WrittenFile(path, len(data), len(new_data), len(compressed), len(new_compressed), entry, new_entry)
         built.append((info, new_compressed))
-    for path in sorted(new_files):
-        relative = _patch_path(path)
-        new_file = new_files[path]
-        if path in paths or (romfs / relative).exists():
+    native_packs: dict[str, dict[str, bytes]] = {}
+    new_members: dict[str, bytes] = {}
+    for path, file in sorted(new_files.items()):
+        if path in paths:
             raise PatchError(f"{path}: a new file must be one the dump does not hold")
-        if table.get(path) is not None:
-            raise PatchError(f"{path}: the resource size table already has an entry for it")
-        for member, (donor, growth) in sorted(new_file.members.items()):
-            entry = table.get(donor)
-            if entry is None:
-                raise PatchError(f"{member}: its donor {donor} has no resource size table entry")
-            if table.get(member) is not None:
-                raise PatchError(f"{member}: the resource size table already has an entry for it")
-            table.set(member, entry + growth)
-            members_grew = True
-        new_compressed = dicts.compress(path, new_file.data) if path.endswith(".zs") else new_file.data
-        if path.endswith(".zs") and dicts.decompress(path, new_compressed) != new_file.data:
-            raise PatchError(f"{path}: the compressed file does not decompress to the written bytes")
-        new_entry = rstb.required_size(path, len(new_file.data))
-        table.set(path, new_entry)
-        members_grew = True
-        info = WrittenFile(path, 0, len(new_file.data), 0, len(new_compressed), None, new_entry)
-        built.append((info, new_compressed))
+        built.append(_new_file(path, file, romfs, dicts, table, native_packs, new_members))
     occupied = set(paths) | set(new_files)
     for file in sorted(fast_start_files, key=lambda f: f.path):
         relative = _patch_path(file.path)

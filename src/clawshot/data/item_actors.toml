@@ -38,6 +38,7 @@
 "Bullet Bag (50)" = { actor = "Item_BulletBag_Large", source = "RSDB/PouchActorInfo native large tier, Round 14 section 47; capacity alone is not Slingshot" }
 "Quiver (50)" = { actor = "Item_Quiver_Large", source = "RSDB/PouchActorInfo native large tier, Round 14 section 47; capacity alone is not Bow" }
 "Piece of Heart" = { actor = "Obj_Heart_Piece", source = "GF Chest, Graveyard Heart Piece Grave Chest, Graveyard Dampe Race Freestanding PoH, ZD Chest" }
+"Gold Skulltula Token" = { actor = "Item_Token_Gold", source = "Token shuffle: native token inventory actor (PouchActorInfo Item_Token_Gold, TokenGold, FixedMaxNum 100); both native chest flows add ContentName through GetPouchContent; KF Storms Grotto Chest token played, Kareem 2026-11-14, rounds/r15-scrub-tokens.md" }
 
 "Rupee (1)" = { actor = "TBox_Rupee_Green", source = "KF Midos Bottom Left Chest" }
 "Rupees (5)" = { actor = "TBox_Rupee_Blue", source = "KF Midos Top Left Chest, KF Midos Top Right Chest" }

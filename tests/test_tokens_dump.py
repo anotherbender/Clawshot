@@ -1,50 +1,390 @@
+"""Gold Skulltula reward delivery against the player's real dump (``OOT_ROMFS``): native identities, saved collection
+rows, the enemy and token contracts, every admitted reward member's native grant shape and generated pickup, the
+core delivery and a production Token seed written by the common writer, each compared with the original dump, never
+a patched fixture. Data and structure evidence only; gameplay is Kareem's Longshot packets."""
+
+import copy
+from pathlib import PurePosixPath
+
 import pytest
 
-from clawshot.census.scan import scan
-from clawshot.formats import byml, sarc, zsdic
-from clawshot.patch import tokens
+from clawshot.census import definitions
+from clawshot.census.scan import GAME_DATA_LIST, GOLD_SKULLTULA, scan
+from clawshot.formats import byml, rstb, sarc, zsdic
+from clawshot.generate import Settings
+from clawshot.generate import tokens as token_policy
+from clawshot.patch import actor_packs, items, make_seed, tokens, write_seed
+from clawshot.patch.plan import PatchError, Plan
+from clawshot.patch.write import write
+from clawshot.save import murmur3_32
+
+pytestmark = pytest.mark.dump
+
+TREE, TOWER, LONE = 341792603838029977, 2730878115209290675, 2177746409373494991  # LLR tree/tower, HF lone tree
+CORE = {TREE: "Item_Boomerang", TOWER: "Obj_Shield_Hylian", LONE: "Item_Token_Gold"}
+CORE_REWARDS = {"Item_Boomerang": "fixed_major", "Obj_Shield_Hylian": "equipment", "Item_Token_Gold": "token"}
+CANONICAL = {"Item_Boomerang": "Item_Boomerang", "Obj_Shield_Hylian": "Weapon_Shield_Hylian"}
+PRODUCTION = {actor: family for actor, family in token_policy.REWARDS.values()}
 
 
-@pytest.mark.dump
-def test_all_token_copies_keep_hash_and_logic_when_drop_changes(romfs):
-    census = [loc for loc in scan(romfs) if loc.kind == "gold_skulltula"]
-    transforms = tokens.changes({loc.id: "Obj_Shield_Hylian" for loc in census}, census)
-    dicts = zsdic.Dictionaries.from_romfs(romfs)
-    seen = set()
-    for path, transform in transforms.items():
-        raw = dicts.decompress(path, (romfs / path).read_bytes())
-        before, after = byml.read(raw), byml.read(transform(raw))
-        for actor in after["Actors"]:
-            if actor["Gyaml"] == tokens.ENEMY:
-                assert actor["Dynamic"].pop(tokens.DROP) == "Obj_Shield_Hylian"
-                seen.add(int(actor["Hash"]))
-                original = next(a for a in before["Actors"] if a["Hash"] == actor["Hash"])
-                if "Dynamic" not in original:
-                    assert actor["Dynamic"] == {}
-                    del actor["Dynamic"]
+@pytest.fixture(scope="module")
+def census(romfs):
+    return [location for location in scan(romfs) if location.kind == GOLD_SKULLTULA]
+
+
+@pytest.fixture(scope="module")
+def original(romfs):
+    dictionaries = zsdic.Dictionaries.from_romfs(romfs)
+
+    def read(path, root=romfs):
+        data = (root / path).read_bytes()
+        return dictionaries.decompress(path, data) if path.endswith(".zs") else data
+
+    return read
+
+
+def pouch_of(sources, components):
+    """An actor's effective pouch component."""
+    reference = actor_packs.reference(components["PouchContentRef"])
+    return actor_packs.resolve_node(sources, reference, builtin=tokens.POUCH_DEFAULT)
+
+
+def actor_name(path):
+    return PurePosixPath(actor_packs.reference(path)).name.split(".", 1)[0]
+
+
+def test_every_delivery_input_is_in_this_romfs(romfs):
+    inputs = tokens.native_inputs(PRODUCTION)
+    missing = [path for path in inputs if not (romfs / path).is_file()]
+    print(f"{len(inputs)} delivery inputs: {list(inputs)}")
+    assert missing == [], f"Gold Skulltula delivery inputs missing from this romfs or working set: {missing}"
+
+
+def test_native_sources_copies_and_saved_collection_rows(romfs, census, original):
+    assert len(census) == 100
+    assert sum(len(location.files) for location in census) == 114
+    for location in census:
+        assert location.actor == tokens.ENEMY and location.has_save_flag, location
+        for path in location.files:
+            placed = [a for a in byml.read(original(path))["Actors"] if a.get("Hash") == location.id]
+            assert len(placed) == 1, (path, location.id)
+            dynamic = placed[0].get("Dynamic") or {}
+            drop = {key: value for key, value in dynamic.items() if str(key).startswith(tokens.DROP_FIELDS)}
+            assert (placed[0]["Gyaml"], drop) == (tokens.ENEMY, {}), (path, location.id, drop)
+    tokens.check_save_rows(byml.read(original(GAME_DATA_LIST)), [location.id for location in census])
+    print("100 sources / 114 copies; 200 permanent collection rows (H and H xor 2); no native drop selector")
+
+
+def test_native_enemy_and_token_contracts_resolve_semantically(romfs):
+    native = tokens.Romfs(romfs)
+    tokens.check_source(native)
+    pack = tokens.check_token(native)
+    token = actor_packs.closure([pack], tokens.TOKEN).components
+    picked = tokens.death_procedures(native, pack, token["DeathRef"])["PickedUp___Data"]
+    enemy = native.pack(tokens.ENEMY)
+    components = actor_packs.resolve([enemy], actor_packs.actor_member(tokens.ENEMY))[0]["Components"]
+    life = tokens.death_procedures(native, enemy, components["DeathRef"])["LifeDepleted___Data"]
+    print(f"token PickedUp {picked}\nenemy LifeDepleted {life}")
+    assert picked["IsWaitForSignal"] is True  # collection waits for the reason-10 callback's signal
+    # A kill retires the instance and saves nothing.
+    assert (life["IsSetGmdRespawnFlagToFalse"], life["IsSetRespawnFlagToFalse"]) == (False, True)
+    assert tokens.source_hash_keys([pack], token) == [
+        {"BBKey": tokens.SOURCE_HASH_KEY, "InitVal": 0, "IsInstanceParam": False}
+    ]
+    assert set(native.inputs) <= set(tokens.NATIVE_INPUTS)
+
+
+def check_written_delivery(romfs, census, original, out, placements, rewards):
+    """Build and write ``placements`` with the common writer, then compare every output with the original dump:
+    only the selectors on the assigned sources' copies, new registry rows and size entries, and generated packs whose
+    mechanism is the token's and whose identity and grant are the donor's. Returns item -> (canonical, grant)."""
+    delivery = tokens.build(romfs, placements, census, rewards=rewards)
+    assert set(delivery.inputs) <= set(tokens.native_inputs(rewards))
+    written = write(Plan([], [], []), romfs, out, extra_changes=(delivery.changes,), new_files=delivery.new_files)
+
+    def output(path):
+        return original(path, out / "romfs")
+
+    locations = {location.id: location for location in census}
+    banc = sorted({path for source in delivery.drops for path in locations[source].files})
+    created = set(delivery.new_files)
+    paths = {info.path for info in written}
+    assert paths == {*banc, *tokens.REGISTRIES, rstb.TABLE_PATH, *created}
+    assert all(info.entry is None and info.size == 0 for info in written if info.path in created)
+    assert not paths & {tokens.TOKEN_PACK, tokens.ENEMY_PACK, "Pack/AI.Global.Product.111.pack.zs"}
+
+    for path in banc:  # only the selector on the assigned sources' copies; Hash, links, groups, appearance native
+        before, after = byml.read(original(path)), byml.read(output(path))
+        for placed in after["Actors"]:
+            if int(placed["Hash"]) in delivery.drops:
+                assert placed["Dynamic"].pop(tokens.DROP) == delivery.drops[int(placed["Hash"])]
+                if not next(a for a in before["Actors"] if a["Hash"] == placed["Hash"]).get("Dynamic"):
+                    assert placed.pop("Dynamic") == {}
         assert byml.same(before, after), path
-    assert seen == {loc.id for loc in census}
-    print(
-        f"{len(census)} enemies / {sum(len(loc.files) for loc in census)} copies; exact field diff, not gameplay proof"
-    )
+
+    names = set(delivery.pickups.values())
+    tables = {path: byml.read(output(path)) for path in tokens.REGISTRIES}
+    ids = {path: [row["__RowId"] for row in table] for path, table in tables.items()}
+    assert ids[tokens.ACTOR_INFO] == ids[tokens.GAME_ACTOR_INFO]
+    for path, table in tables.items():
+        assert byml.same([row for row in table if row["__RowId"] not in names], byml.read(original(path))), path
+    rows = {path: {row["__RowId"]: row for row in table} for path, table in tables.items()}
+    native_rows = {path: {row["__RowId"]: row for row in byml.read(original(path))} for path in tokens.REGISTRIES}
+
+    natives = {actor: sarc.read(original(tokens.pack_path(actor))) for actor in (tokens.TOKEN, *delivery.pickups)}
+    token = actor_packs.closure([natives[tokens.TOKEN]], tokens.TOKEN).components
+    token_pouch = pouch_of([natives[tokens.TOKEN]], token)
+    native = tokens.Romfs(romfs)
+    token_death = tokens.death_procedures(native, natives[tokens.TOKEN], token["DeathRef"])
+    game_data = byml.read(original(GAME_DATA_LIST))
+    saved = {int(e["Hash"]) for kind, rows_ in game_data["Data"].items() if kind != "Bool64bitKey" for e in rows_}
+    native_table = rstb.read(original(rstb.TABLE_PATH))
+    expected_table = copy.deepcopy(native_table)
+    for info in written:
+        if info.path not in created and info.path != rstb.TABLE_PATH:
+            need = rstb.required_size(info.path, info.new_size)
+            expected_table.set(info.path, max(native_table.get(info.path), need))
+
+    grants = {}
+    for item, pickup in sorted(delivery.pickups.items()):
+        path = tokens.pack_path(pickup)
+        file = delivery.new_files[path]
+        assert output(path) == file.data
+        pack = sarc.read(file.data)
+        sources = {source: sarc.read(original(source)) for source in set(file.copied.values())}
+        for name, source in file.copied.items():
+            assert sources[source][name] == pack[name], (name, source)
+        found = actor_packs.closure([pack], pickup)
+        assert set(found.members) == set(pack)
+        effective = found.components
+        donor = actor_packs.closure([natives[item]], item).components
+        # Mechanism: the token's pinned graph, source-Hash blackboard and death procedures, unchanged.
+        assert pack[tokens.TOKEN_GRAPH] == natives[tokens.TOKEN][tokens.TOKEN_GRAPH]
+        assert tokens.source_hash_keys([pack], effective) == tokens.source_hash_keys([natives[tokens.TOKEN]], token)
+        attention = ("BlackboardParamBoolArray", tokens.ATTENTION_KEY)
+        assert tokens.blackboard_entries([pack], effective, *attention) == [
+            {"BBKey": tokens.ATTENTION_KEY, "InitVal": True, "IsInstanceParam": False}
+        ]
+        controllers, bodies = tokens.physics_bodies([pack], effective)
+        assert tokens.PHYSICS_BODY in controllers and tokens.PHYSICS_BODY in bodies
+        assert tokens.death_procedures(native, pack, effective["DeathRef"]) == token_death
+        # Identity: canonical name, pouch grant, registry row and the granted item's own saved record agree; the pouch
+        # is the donor's (category, get type, special deal, bundle, caps) but for the pickup policy and grant.
+        pouch, native_pouch = pouch_of([pack], effective), pouch_of([natives[item]], donor)
+        ignored = {*tokens.POLICY, tokens.GRANT_KEY}
+        assert {k: v for k, v in pouch.items() if k not in ignored} == {
+            k: v for k, v in native_pouch.items() if k not in ignored
+        }
+        row = rows[tokens.ACTOR_INFO][pickup]
+        assert tokens.canonical(effective) == row["ActorName"] == tokens.canonical(donor)
+        if pouch.get(tokens.GRANT_KEY):
+            grant = actor_name(pouch[tokens.GRANT_KEY])
+            recorded = [grant]
+        else:  # a bundle naming none, as its native does: N of its BundleActor, the canonical name recorded
+            assert pouch[tokens.BUNDLE_KEY] is True and not native_pouch.get(tokens.GRANT_KEY)
+            grant = None
+            recorded = [tokens.canonical(donor), actor_name(pouch["BundleActor"])]
+        for name in recorded:
+            assert name in native_rows[tokens.POUCH_ACTOR_INFO] and murmur3_32(f"IsGet.{name}".encode()) in saved
+        assert pouch.get("SpecialDeal") != token_pouch["SpecialDeal"]  # never token stock
+        assert all(pouch.get(key) == value for key, value in tokens.POLICY.items())
+        model = byml.read(pack[actor_packs.reference(effective["ModelInfoRef"])])
+        animation = byml.read(pack[actor_packs.reference(effective["AnimationRef"])])
+        assert (row["FmdbName"], row["ModelProjectName"]) == (model["FmdbName"], model["ModelProjectName"])
+        assert byml.same(row["AnimationResources"], animation["AnimationResources"])
+        assert byml.same(
+            {**rows[tokens.POUCH_ACTOR_INFO][pickup], "__RowId": item},
+            native_rows[tokens.POUCH_ACTOR_INFO][item],
+        )
+        assert byml.same(
+            {**rows[tokens.GAME_ACTOR_INFO][pickup], "__RowId": tokens.TOKEN},
+            native_rows[tokens.GAME_ACTOR_INFO][tokens.TOKEN],
+        )
+        # Allocation: the pack and each member new to the game get measured entries; copies keep native ones.
+        expected_table.set(path, rstb.required_size(path, len(file.data)))
+        for name, content in pack.items():
+            if name in file.copied:
+                assert native_table.get(name) is not None, name
+            else:
+                assert native_table.get(name) is None, name
+                components = len(byml.read(content)["Components"]) if name.endswith(rstb.ACTOR_PARAM) else None
+                expected_table.set(name, rstb.required_size(name, len(content), components))
+        grants[item] = (tokens.canonical(effective), grant)
+        print(f"{pickup}: grants {grant}; {len(pack)} members, {len(pack) - len(file.copied)} new, {len(file.data)} B")
+    assert rstb.read(output(rstb.TABLE_PATH)) == expected_table
+    return delivery, grants
 
 
-@pytest.mark.dump
-def test_native_token_grant_keeps_enemy_callback_ai_byte_identical(romfs):
-    dicts = zsdic.Dictionaries.from_romfs(romfs)
-    raw = dicts.decompress(tokens.PACK_PATH, (romfs / tokens.PACK_PATH).read_bytes())
-    before = sarc.read(raw)
-    transform = tokens.grant_experiment()[tokens.PACK_PATH]
-    after = sarc.read(transform(raw))
-    assert set(after) == set(before)
-    for member in before:
-        if member == tokens.POUCH_MEMBER:
-            pouch = byml.read(after[member])
-            assert pouch["PouchActor"] == tokens.EXPERIMENT_GRANT
-            pouch["PouchActor"] = tokens.NATIVE_GRANT
-            assert byml.same(pouch, byml.read(before[member]))
-            assert len(after[member]) <= len(before[member])
-        else:
-            assert after[member] == before[member], member
-    assert b"OneShotGoldTokenDeadAfter" in after[tokens.TOKEN_AI_MEMBER]
-    print("Native callback, model, blackboard and pickup rules unchanged; only global PouchActor changed")
+def test_core_delivery_written_and_compared_with_the_original_dump(romfs, census, original, tmp_path):
+    delivery, grants = check_written_delivery(romfs, census, original, tmp_path / "out", CORE, CORE_REWARDS)
+    assert delivery.drops == {
+        TREE: tokens.pickup_name("Item_Boomerang"),
+        TOWER: tokens.pickup_name("Obj_Shield_Hylian"),
+    }
+    assert grants == {item: (name, name) for item, name in CANONICAL.items()}
+
+
+def test_every_admitted_member_has_its_native_shape_and_a_checked_pickup(romfs, census, original, tmp_path):
+    """Every token_rewards.toml member: its dump row has the declared family's shape, and its generated pickup (one
+    source each) passes every written-output check. Structure only: members beyond the played two are unplayed."""
+    rows = {row["__RowId"]: row for row in byml.read(original(tokens.POUCH_ACTOR_INFO))}
+    shapes = {actor: tokens.grant_family(rows[actor]) for actor in PRODUCTION}
+    print(f"native shapes {shapes}")
+    assert shapes == PRODUCTION
+    assert set(PRODUCTION.values()) <= token_policy.ADMITTED_FAMILIES
+    members = sorted(actor for actor in PRODUCTION if actor != "Item_Token_Gold")
+    sources = sorted(location.id for location in census)
+    placements = {**dict(zip(sources, members, strict=False)), sources[-1]: "Item_Token_Gold"}
+    delivery, _ = check_written_delivery(romfs, census, original, tmp_path / "out", placements, PRODUCTION)
+    assert sorted(delivery.pickups) == members
+    assert len(delivery.new_files) == len(members)
+
+
+# Every member of Claude's approved Round 15 family table that is neither bought goods nor policy-excluded, beyond
+# the production members: logic item -> (donor actor, family). The donor is the native world pickup where one grants
+# the same (Obj_Rupee_Red, not TBox_Rupee_Red), as for production's Obj_Shield_Hylian. Diagnostic only: no member is
+# admitted to production seeds before its family's representative plays.
+DIAGNOSTIC = {
+    "Rupee (1)": ("Obj_Rupee_Green", "rupee"),
+    "Rupees (5)": ("Obj_Rupee_Blue", "rupee"),
+    "Rupees (20)": ("Obj_Rupee_Red", "rupee"),
+    "Rupees (50)": ("Obj_Rupee_Purple", "rupee"),
+    "Rupees (200)": ("Obj_Rupee_Gold", "gold_rupee"),
+    "Piece of Heart": ("Obj_Heart_Piece", "heart_piece"),
+    "Heart Container": ("Obj_Heart_Container", "heart_container"),
+    "Bottle": ("Item_Bottle", "bottle"),
+    "Bottle with Milk": ("Item_Bottle_Milk", "bottle"),
+    "Arrows (5)": ("Obj_ArrowBundle_Medium", "refill"),
+    "Arrows (10)": ("Obj_ArrowBundle_Large", "refill"),
+    "Bombs (5)": ("Item_BombBundle_Small", "refill"),
+    "Deku Nuts (5)": ("TBox_DekuNutBundle", "refill"),
+    "Deku Stick (1)": ("Item_DekuStickBundle_Small", "refill"),
+    "Bombchus (5)": ("Item_BombchuBundle_Small", "bombchu"),
+    "Deku Nut Capacity": ("Item_NutBag_Medium", "fixed_capacity"),
+    "Deku Stick Capacity": ("Item_StickBag_Medium", "fixed_capacity"),
+    "Magic Jar": ("Obj_MagicJar_Large", "magic_recovery"),
+    "Dins Fire": ("Item_DinFire", "spell"),
+    "Farores Wind": ("Item_FaroreWind", "spell"),
+    "Nayrus Love": ("Item_NayruLove", "spell"),
+    "Ice Arrows": ("Item_Arrow_Ice", "magic_arrow"),
+    "Light Arrows": ("Item_Arrow_Light", "magic_arrow"),
+    "Lens of Truth": ("Item_GlassTruth", "lens"),
+    "Stone of Agony": ("Item_AgonyStone", "agony_stone"),
+    "Double Defense": ("Item_FairyBless_DefenseDouble", "double_defense"),
+    "Scrub Business Seed": ("Obj_ScrubBusinessSeed", "scrub_seed"),
+    "Ocarina of Time": ("Obj_Ocarina_Time", "ocarina"),
+}
+
+
+def test_every_diagnostic_member_has_its_native_shape_and_a_checked_pickup(romfs, census, original, tmp_path):
+    """Each diagnostic member's dump row has its family's shape, its chest actor grants the same, and its generated
+    pickup (one source each) passes every written-output check. Structure only, not gameplay evidence."""
+    table = items.load()
+    rows = {row["__RowId"]: row for row in byml.read(original(tokens.POUCH_ACTOR_INFO))}
+    rewards = {actor: family for actor, family in DIAGNOSTIC.values()}
+    assert {tokens.grant_family(rows[actor]) for actor in rewards} == set(tokens.FAMILIES) - {
+        "token",
+        "fixed_major",
+        "equipment",
+    }
+    assert not set(rewards.values()) & token_policy.ADMITTED_FAMILIES
+    for item, (actor, family) in DIAGNOSTIC.items():
+        chest = table.actor(item)
+        assert tokens.grant_family(rows[actor]) == tokens.grant_family(rows[chest]) == family, (item, actor, chest)
+        same = ("BundleActor", "BundleActorNum", "PouchGetType", "PouchSpecialDeal", "BottleItem", "MPMax")
+        assert {key: rows[actor].get(key) for key in same} == {key: rows[chest].get(key) for key in same}, item
+    sources = sorted(location.id for location in census)
+    placements = dict(zip(sources, sorted(rewards), strict=False))
+    delivery, grants = check_written_delivery(romfs, census, original, tmp_path / "out", placements, rewards)
+    assert sorted(delivery.pickups) == sorted(rewards) and len(delivery.new_files) == len(rewards)
+    bundles = {actor for actor, (_, grant) in grants.items() if grant is None}
+    print(f"diagnostic grants {grants}")
+    assert bundles == {actor for actor in rewards if rows[actor].get("BundleActor")}
+
+
+def test_fairy_ocarina_is_excluded_for_want_of_its_own_animation(romfs):
+    """The documented ocarina boundary: the Item_ ocarinas (Common performer; Fairy Ocarina has no world pickup) have
+    no AnimationRef to give a pickup, so they compose nothing; Ocarina of Time goes through Obj_Ocarina_Time."""
+    native = tokens.Romfs(romfs)
+    token = tokens.check_token(native)
+    registries = {path: {row["__RowId"]: row for row in byml.read(native.read(path))} for path in tokens.REGISTRIES}
+    generic = native.pack(tokens.GENERIC_DISPLAY)
+    for item in ("Item_Ocarina_Fairy", "Item_Ocarina_Time"):
+        with pytest.raises(PatchError, match=f"{item}: no AnimationRef to give the pickup"):
+            tokens.compose(item, token, native.pack(item), generic, registries)
+    assert tokens.compose("Obj_Ocarina_Time", token, native.pack("Obj_Ocarina_Time"), generic, registries).rows
+
+
+def test_every_source_copy_accepts_a_generated_pickup(romfs, census, original):
+    rewards = ("Item_Boomerang", "Obj_Shield_Hylian")
+    placements = {location.id: rewards[i % 2] for i, location in enumerate(census)}
+    delivery = tokens.build(romfs, placements, census, rewards=CORE_REWARDS)
+    assert len(delivery.new_files) == 2
+    copies = 0
+    for path, transform in delivery.changes.items():
+        if path in tokens.REGISTRIES:
+            continue
+        data = original(path)
+        before, after = byml.read(data), byml.read(transform(data))
+        for placed in after["Actors"]:
+            if int(placed["Hash"]) in delivery.drops:
+                assert placed["Dynamic"].pop(tokens.DROP) == delivery.drops[int(placed["Hash"])]
+                copies += 1
+                native = next(a for a in before["Actors"] if a["Hash"] == placed["Hash"])
+                if "Dynamic" not in native:
+                    assert placed.pop("Dynamic") == {}
+        assert byml.same(before, after), path
+    assert copies == 114
+    print(f"100 sources / {copies} copies: exact field diff, not gameplay proof")
+
+
+def test_production_token_seed_writes_only_source_selectors_and_pickups(romfs, census, original, tmp_path):
+    """A real Chest+Token seed through make_seed and write_seed: every live Skulltula is one Token check linked to its
+    census source, the pool keeps one token per live source, and each source's copies either stay native (token) or
+    name the generated pickup of the placed reward; nothing global changes."""
+    output = make_seed(romfs, 7, Settings(shuffle=("Chest", "Token")))
+    seed = output.seed
+    token_checks = sorted(name for name in seed.shuffled if seed.world.locations[name].type == token_policy.SHUFFLE)
+    rows = output.spoiler()["patch"]["tokens"]
+    assert [row["location"] for row in rows] == token_checks
+    assert len({row["id"] for row in rows}) == len(rows) == len(token_checks)
+    assert sum(seed.placements[name] == token_policy.TOKEN_ITEM for name in seed.shuffled) == len(token_checks)
+    by_id = {location.id: location for location in census}
+    held = sorted(location.id for location in census if str(location.id) not in {row["id"] for row in rows})
+    remake_only = sorted(d.id for d in definitions.load() if d.kind == GOLD_SKULLTULA and not d.oot_randomizer_name)
+    print(f"{len(rows)} Token checks; native, unshuffled sources: {held}")
+    assert held == remake_only  # the three remake-only Skulltulas wait for their route packet, native and unmodelled
+    for row in rows:
+        location = by_id[int(row["id"])]
+        assert row["files"] == list(location.files)
+        assert token_policy.REWARDS[row["item"]][0] == row["pickup"]
+        assert (row["drop_actor"] is None) == (row["pickup"] == "Item_Token_Gold")
+    out = tmp_path / "seed"
+    written = {info.path for info in write_seed(output, romfs, out)}
+    assert not written & {tokens.TOKEN_PACK, tokens.ENEMY_PACK, "Pack/AI.Global.Product.111.pack.zs"}
+    assert not any(path.startswith("RSDB/Tag.") for path in written)
+    expected = {row["drop_actor"] for row in rows} - {None}
+    assert set(output.new_files) == {tokens.pack_path(actor) for actor in expected} <= written
+    drops = {int(row["id"]): row["drop_actor"] for row in rows}
+    for location in census:  # every copy of every source: the selector the spoiler names, or none at all
+        for path in location.files:
+            source = out / "romfs" / path
+            tree = byml.read(original(path, out / "romfs") if source.is_file() else original(path))
+            placed = next(a for a in tree["Actors"] if a.get("Hash") == location.id)
+            native = next(a for a in byml.read(original(path))["Actors"] if a.get("Hash") == location.id)
+            assert (placed.get("Dynamic") or {}).get(tokens.DROP) == drops.get(location.id), (path, location.id)
+            if drops.get(location.id) is not None:
+                placed["Dynamic"].pop(tokens.DROP)
+                if not native.get("Dynamic"):
+                    placed.pop("Dynamic")
+            assert byml.same(placed, native), (path, location.id)
+    ids = [row["__RowId"] for row in byml.read(original(tokens.ACTOR_INFO, out / "romfs"))]
+    assert {name for name in ids if name.startswith(tokens.PICKUP_PREFIX)} == expected
+
+
+def test_token_off_seed_has_no_token_output(romfs):
+    output = make_seed(romfs, 7, Settings())
+    assert (dict(output.new_files), output.token_sources) == ({}, ())
+    assert "tokens" not in output.spoiler()["patch"]
+    assert not any(tokens.GAME_ACTOR_INFO in changes for changes in output.extra_changes)
+    assert token_policy.SHUFFLE not in {location.type for location in output.seed.world.locations.values()}

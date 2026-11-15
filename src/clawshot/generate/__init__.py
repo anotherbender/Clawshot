@@ -61,6 +61,7 @@ class Seed:
     """One hint per Gossip Stone (``clawshot.generate.hints``), in world order; none for a world without stones."""
 
 
+
 def generate(
     spec: Mapping[str, Any],
     seed: int,
@@ -392,8 +393,8 @@ def play_note(seed: Seed, log: Mapping[str, Any] | None = None) -> str:
             "",
             "Hookshot, strength, scale, wallet, bomb bag, quiver, slingshot bag and magic upgrades are always"
             " progressive (Kareem, 2026-11-13); no setting turns them back into fixed items.",
-            "Only chests hold progressive copies. Every other check kind (gifts, shops, scrubs, floor pickups) cannot"
-            " choose a tier, so it never carries one.",
+            "Only chests hold progressive copies. Every other check kind (gifts, shops, scrubs, floor pickups,"
+            " Skulltulas) cannot choose a tier, so it never carries one.",
             "Where a native check still gives a fixed upgrade (Darunia's Bracelet, a Great Fairy's magic, a Skulltula"
             " wallet, a minigame bag or scale), the chests also hold a full set of copies, one per tier, in place of"
             " ordinary filler. Logic counts only copies toward upgrade tiers; native rewards are bonuses and never"

@@ -68,10 +68,20 @@ def places(monkeypatch):
 
 
 def build_save(
-    bools=None, ints=None, keys=(), *, bool_total=NATIVE_SAVED_BOOLS, extra=None, terminate=True, table_end=None
+    bools=None,
+    ints=None,
+    keys=(),
+    *,
+    bool_total=NATIVE_SAVED_BOOLS,
+    extra=None,
+    terminate=True,
+    table_end=None,
+    version=1,
+    save_type=SAVE_TYPE,
 ) -> bytes:
-    """A synthetic progress.sav: named Bools/Ints, unnamed Bools padding the section to ``bool_total`` (an unmodified
-    GameDataList's count), any ``extra`` sections, then the Bool64bitKey list."""
+    """A synthetic progress.sav: header ``version``, named Bools/Ints, unnamed Bools padding the section to
+    ``bool_total`` (an unmodified GameDataList's count), any ``extra`` sections, then the Bool64bitKey list keyed by
+    ``save_type`` (no Bool64bitKey section when None)."""
     sections = {
         save.BOOL: {save.key(name): int(bool(value)) for name, value in (bools or {}).items()},
         save.INT: {save.key(name): value & 0xFFFFFFFF for name, value in (ints or {}).items()},
@@ -85,11 +95,12 @@ def build_save(
     for section in sorted(sections):
         table += struct.pack("<II", 0, section)
         table += b"".join(struct.pack("<II", k, v) for k, v in sections[section].items())
-    end = save.HEADER_SIZE + len(table) + 16
-    table += struct.pack("<II", 0, save.BOOL64) + struct.pack("<II", SAVE_TYPE, end)
-    header = struct.pack("<III", save.MAGIC, 1, end if table_end is None else table_end).ljust(save.HEADER_SIZE, b"\0")
+    end = save.HEADER_SIZE + len(table) + (16 if save_type is not None else 0)
+    if save_type is not None:
+        table += struct.pack("<II", 0, save.BOOL64) + struct.pack("<II", save_type, end)
+    header = struct.pack("<III", save.MAGIC, version, end if table_end is None else table_end)
     data = b"".join(struct.pack("<Q", k) for k in keys) + (struct.pack("<Q", 0) if terminate else b"")
-    return header + table + data
+    return header.ljust(save.HEADER_SIZE, b"\0") + table + (data if save_type is not None else b"")
 
 
 def parse(bools=None, ints=None, keys=(), **options) -> save.Save:

@@ -61,6 +61,9 @@ def test_set_updates_a_name_entry_or_adds_a_hash_entry():
         ("Event/EventFlow/Flow.bfevfl.zs", 20_160, 20_160 + 272),
         ("Mals/USen.Product.110.sarc.zs", 1, 32 + 312),
         ("Pack/Actor/Obj_X.pack.zs", 0, 312),
+        ("Component/PouchContentParam/X.game__component__PouchContentParam.bgyml", 212, 224 + 5216),
+        ("RSDB/GameActorInfo.Product.111.rstbl.byml.zs", 574_824, 575_112),
+        ("RSDB/PouchActorInfo.Product.111.rstbl.byml.zs", 49_380, 49_672),
     ],
 )
 def test_required_size(path, size, entry):
@@ -70,6 +73,18 @@ def test_required_size(path, size, entry):
 def test_required_size_refuses_an_unchecked_type():
     with pytest.raises(RstbError, match="no size formula"):
         rstb.required_size("Logic/X.logic.module.ainb", 100)
+
+
+@pytest.mark.parametrize(("size", "components", "entry"), [(1856, 16, 1856 + 5144 + 768), (1, 0, 32 + 5144)])
+def test_an_actor_parameter_entry_counts_its_own_components(size, components, entry):
+    assert rstb.required_size("Actor/X.engine__actor__ActorParam.bgyml", size, components) == entry
+
+
+def test_component_counts_belong_only_to_actor_parameters():
+    with pytest.raises(RstbError, match="component count"):
+        rstb.required_size("Actor/X.engine__actor__ActorParam.bgyml", 100)
+    with pytest.raises(RstbError, match="only applies"):
+        rstb.required_size("Pack/Actor/X.pack.zs", 100, 3)
 
 
 def _header(magic=b"RESTBL", version=1, name_size=160, n_hash=0, n_name=0):

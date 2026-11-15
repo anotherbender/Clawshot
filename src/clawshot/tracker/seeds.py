@@ -9,8 +9,8 @@
   path of a ``spoiler.json`` itself. Such a folder has no save convention; ``<dir>/user`` is used only when it exists.
 
 Everything comes from the seed's own spoiler (``generate.spoiler`` plus ``patch.SeedOutput.spoiler``'s ``patch``) and
-the generator's own definitions (the world data, ``patch/gift_rules.toml``, ``patch.scrubs.SALES``); nothing is
-inferred from play.
+the generator's own definitions (the world data, ``patch/gift_rules.toml``, ``patch.scrubs.SALES``, the census's
+``data/locations.toml``); nothing is inferred from play.
 """
 
 import json
@@ -31,6 +31,22 @@ MAX_SPOILER_BYTES = 64 << 20
 # GameDataList Bools with SaveFileIndex 0 (10212 in every slot read)" (plans/03-game-data.md section 19). Each saved
 # Bool the gift patch adds (``patch.gifts.add_flags``) grows it by one.
 NATIVE_SAVED_BOOLS = 10212
+
+# Gold Skulltula sources (plans/rounds/r15-tokens-spec.md sections 2.1 and 3.4). The native token's death-reason-10
+# callback, which runs only once its drop is collected, saves two permanent ``Bool64bitKey`` records keyed by the
+# source enemy's Hash H: H and H xor 2 (XOR, not H+2: Lone Tree 2177746409373494991 has companion
+# 2177746409373494989). They are collection records, not token stock. The Bool64bitKey list holds only the keys that
+# are set (``clawshot.save``), so an uncollected source is both keys absent from a present list. That reading is
+# certified only for the layout the core packet was played and checked on (``clawshot.token_packet``;
+# plans/rounds/r15-scrub-tokens.md, Phase 1 PLAYED PASS): the accepted checkpoint's progress.sav header version
+# 0x2D80EB (spec section 1, S1) with Bool64bitKey type hash 0xA3DB7114 (``MetaData.SaveTypeHash``,
+# plans/rounds/r2-census.md item 5), holding build e0f3ccfa's saved Bools.
+SOURCE_COMPANION_XOR = 2
+SOURCE_SAVE_VERSION = 0x2D80EB
+SOURCE_SAVE_TYPE = 0xA3DB7114
+# World location types of a Skulltula source: ``generate.tokens.SHUFFLE`` once Token shuffle is on, its native
+# ``generate.tokens.SOURCE_TYPE`` otherwise (the tracker's own world index); literal, so the tracker imports no fill.
+TOKEN_TYPES = ("Token", "GS Token")
 
 # World dungeon name -> the ``DungeonInfo.<name>`` Struct holding its saved key/map/compass leaves, in game order.
 # Names: sloperina-FINDINGS.md section 1 ("Dungeon names ... same as the map name") and plans/03-game-data.md
@@ -54,6 +70,7 @@ DUNGEON_INFO = {
 NAMED_BOOL = "named_bool"  # any of ``Check.flags`` true
 PLACEMENT_HASH = "placement_hash"  # any of ``Check.hashes`` in the save's Bool64bitKey list
 NO_RECORD = "none"  # no audited record: always unknown
+SOURCE_PAIR = "source_pair"  # a ``Check.hashes`` source H and H xor 2 both in the save's Bool64bitKey list
 
 OTHER_AREA = "Other"
 _DUNGEON_ITEM = re.compile(r"^(Small Key|Boss Key|Map|Compass) \((.+)\)$")
@@ -82,7 +99,8 @@ class Check:
 
     ``location`` is the world key (the spoiler's ``placements`` key); ``label`` and ``where`` the spoiler's readable
     name and directions; ``item`` the placed logic item (a spoiler: only shown when asked, or once collected).
-    ``kind`` is chest, boss_heart, freestanding, scrub, gift, shop or other. ``method`` says how the save records it:
+    ``kind`` is chest, token, boss_heart, freestanding, scrub, gift, shop or other. ``method`` says how the save
+    records it:
 
     - ``named_bool``: chests read ``IsTreasureBoxOpen.<decimal actor Hash>`` (plans/03-game-data.md section 44: the
       raw Hash is "not its open-state accessor"); gifts read the check's flag from ``patch/gift_rules.toml`` (an
@@ -93,6 +111,11 @@ class Check:
     - ``placement_hash``: boss hearts and anchored floor Heart Pieces, the audited placement-Hash Bool64 families of
       section 44. Persistence of a replaced pickup is per-experiment there, so an unset Hash is reported unknown,
       never "not collected".
+    - ``source_pair``: Gold Skulltula sources (``hashes``: the source enemy's Hash, shared by every age/Alternative
+      copy, so a source is one check), from the spoiler's ``patch.tokens`` or else the census definitions. Collected
+      when H and H xor 2 are both set, whatever the reward: the token stock is a separate count. Both unset is "not
+      collected" only in the audited layout (:data:`SOURCE_SAVE_VERSION`); one without the other, or any other
+      layout, is unknown.
     - ``none``: no audited record (shops restock, section 17; swap-only gifts): always unknown, with ``reason``.
     """
 
@@ -192,6 +215,21 @@ def _catalog() -> dict:
     return names.load()
 
 
+@cache
+def _census_sources() -> dict[str, tuple[int, ...]]:
+    """World location -> its Gold Skulltula source Hash from the census definitions (``data/locations.toml``), keyed
+    as the world names it: ``oot_randomizer_name``, else the remake-only definition's own name. One Hash per source:
+    its age/Alternative copies share it."""
+    from clawshot.census.definitions import load
+    from clawshot.census.scan import GOLD_SKULLTULA
+
+    out: dict[str, set[int]] = {}
+    for definition in load():
+        if definition.kind == GOLD_SKULLTULA and isinstance(definition.id, int):
+            out.setdefault(definition.oot_randomizer_name or definition.name, set()).add(definition.id)
+    return {name: tuple(sorted(ids)) for name, ids in out.items()}
+
+
 def _gift_record(name: str, ids: tuple[str, ...]) -> tuple[tuple[str, ...], bool]:
     """(candidate flag names, whether the patch adds the flag) for a gift check; ((), False) without a record.
 
@@ -239,20 +277,60 @@ def _chest_hashes(spoiler: Mapping[str, Any]) -> dict[str, tuple[int, ...]]:
     return {name: tuple(sorted(hashes)) for name, hashes in out.items()}
 
 
+def _source_hash(raw: Any) -> int | None:
+    """A decimal source Hash whose two records can be saved: nonzero (the transferred Hash's default, which the
+    callback skips), below 2**64, and not 2 (its companion would be 0, the Bool64bitKey list's terminator)."""
+    if not isinstance(raw, str) or not (raw.isascii() and raw.isdigit()):
+        return None
+    value = int(raw)
+    return value if value < 1 << 64 and value not in (0, SOURCE_COMPANION_XOR) else None
+
+
+def _token_sources(spoiler: Mapping[str, Any]) -> dict[str, tuple[int, ...]]:
+    """Location -> its Gold Skulltula source Hashes from the spoiler's patch plan: ``patch.tokens`` holds one row per
+    shuffled Token location, native-kept or changed, whose ``id`` is the source enemy's Hash (every age/Alternative
+    copy shares it, so repeated rows of one location are one source). Spoilers before Token shuffle have none."""
+    patch = spoiler.get("patch")
+    if not isinstance(patch, Mapping) or "tokens" not in patch:
+        return {}
+    rows = patch["tokens"]
+    if not isinstance(rows, list):
+        raise SeedError("spoiler patch.tokens is not a list")
+    out: dict[str, set[int]] = {}
+    for row in rows:
+        if not isinstance(row, Mapping) or not isinstance(row.get("location"), str):
+            raise SeedError("spoiler patch.tokens has an entry without a location")
+        source = _source_hash(row.get("id"))
+        if source is None:
+            raise SeedError(f"spoiler patch.tokens entry {row['location']!r} has no valid decimal source Hash")
+        out.setdefault(row["location"], set()).add(source)
+    return {name: tuple(sorted(sources)) for name, sources in out.items()}
+
+
 def _classify(
     name: str,
     place: Place | None,
     ids: tuple[str, ...],
     chests: Mapping[str, tuple[int, ...]],
+    tokens: Mapping[str, tuple[int, ...]],
     scrubs: Mapping[str, str],
 ) -> tuple[str, str, tuple[str, ...], tuple[int, ...], str | None, bool]:
     """(kind, method, flags, hashes, reason, flag is added by the patch)."""
     location_type = place.type if place else None
+    if name in tokens:
+        if name in chests:
+            raise SeedError(f"the spoiler's patch plan lists {name!r} as both a chest and a Gold Skulltula source")
+        return "token", SOURCE_PAIR, (), tokens[name], None, False
     if name in chests or location_type == "Chest":
         hashes = chests.get(name) or _hash_ids(list(ids))
         if not hashes:
             return "chest", NO_RECORD, (), (), "the spoiler names no actor Hash for this chest", False
         return "chest", NAMED_BOOL, tuple(f"IsTreasureBoxOpen.{h}" for h in hashes), hashes, None, False
+    if location_type in TOKEN_TYPES:
+        sources = tuple(sorted({h for h in map(_source_hash, ids) if h is not None})) or _census_sources().get(name, ())
+        if not sources:
+            return "token", NO_RECORD, (), (), "neither the spoiler nor the census names this Skulltula's Hash", False
+        return "token", SOURCE_PAIR, (), sources, None, False
     if name in scrubs:
         return "scrub", NAMED_BOOL, (scrubs[name],), (), None, False
     flags, added = _gift_record(name, ids)
@@ -383,6 +461,7 @@ def load_seed(path: str | Path, *, index: Callable[[], Mapping[str, Place]] | No
 
     places = (index or location_index)()
     chests = _chest_hashes(spoiler)
+    tokens = _token_sources(spoiler)
     scrubs = _scrub_flags()
     catalog = _catalog()
     checks = []
@@ -399,7 +478,7 @@ def load_seed(path: str | Path, *, index: Callable[[], Mapping[str, Place]] | No
         place = places.get(name)
         if place is None:
             unplaced += 1
-        kind, method, flags, hashes, reason, is_added = _classify(name, place, ids, chests, scrubs)
+        kind, method, flags, hashes, reason, is_added = _classify(name, place, ids, chests, tokens, scrubs)
         if is_added:
             added.append(flags)
         label = description.get("name") if isinstance(description.get("name"), str) else name

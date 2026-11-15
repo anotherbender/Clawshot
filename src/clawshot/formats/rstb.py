@@ -29,14 +29,23 @@ OVERHEAD: dict[str, int] = {
     ".bfevfl": 272,  # event flows (914 of 914)
     ".sarc": 312,  # message archives (16 of 16)
     ".pack": 312,  # packs (8384 of 8384 that have an entry; Pack/ZsDic.pack.zs has none)
+    # Round 15: pouch components inside actor packs; a constant parsed size whatever fields they set (166 of 166).
+    ".game__component__PouchContentParam.bgyml": 5216,
 }
 ALIGNMENT = 32
+
+# Actor parameter files inside actor packs (Round 15): 5144 plus 48 per entry of the file's own ``Components`` map,
+# whether or not it has a ``$parent`` (8374 of 8374 unique ``*.engine__actor__ActorParam.bgyml`` members).
+ACTOR_PARAM = ".engine__actor__ActorParam.bgyml"
+ACTOR_PARAM_OVERHEAD = 5144
+ACTOR_PARAM_PER_COMPONENT = 48
 
 # Files with a formula of their own: resource path -> (alignment, overhead). GameDataList is one file: its entry
 # (1,463,176) is its size (1,462,888, a multiple of 8) + 288, which rounding to 32 would overshoot.
 OWN_FORMULA: dict[str, tuple[int, int]] = {
     "GameData/GameDataList.Product.110.byml": (8, 288),
-    # ActorInfo: 1,934,492 raw -> 1,937,560; Round 7 same-shape model/heap field substitutions only.
+    # ActorInfo: 1,934,492 raw -> 1,937,560; Round 7 same-shape model/heap field substitutions, and Round 15's
+    # inserted generated-pickup rows (structural growth with the same native formula; unplayed).
     "RSDB/ActorInfo.Product.111.rstbl.byml": (32, 3064),
     # GameActorInfo 574,824 -> 575,112 and PouchActorInfo 49,380 -> 49,672: rounded + 264, the placement files'
     # overhead (build e0f3ccfa, read 2026-11-12). [Inference] the same holds when custom_items adds rows.
@@ -138,18 +147,28 @@ def write(table: ResourceSizeTable) -> bytes:
     return bytes(out)
 
 
-def required_size(path: str, size: int) -> int:
+def required_size(path: str, size: int, components: int | None = None) -> int:
     """The entry a file at ``path`` (resource or romfs path) needs when its decompressed size is ``size``:
     ``size`` rounded up to 32 bytes plus the overhead of its type (:data:`OVERHEAD`), or a file's own formula
-    (:data:`OWN_FORMULA`).
+    (:data:`OWN_FORMULA`). An actor parameter file (:data:`ACTOR_PARAM`) also needs ``components``, the number of
+    entries in its own ``Components`` map; no other type takes it.
 
     Raises :class:`RstbError` for a type whose formula has not been checked against the game.
     """
     path = resource_path(path)
+    rounded = (size + ALIGNMENT - 1) // ALIGNMENT * ALIGNMENT
+    if path.endswith(ACTOR_PARAM):
+        if components is None or components < 0:
+            raise RstbError(f"{path}: an actor parameter's entry needs its own component count, not {components}")
+        return rounded + ACTOR_PARAM_OVERHEAD + ACTOR_PARAM_PER_COMPONENT * components
+    if components is not None:
+        raise RstbError(f"{path}: a component count only applies to actor parameter files")
     if path in OWN_FORMULA:
         alignment, overhead = OWN_FORMULA[path]
         return (size + alignment - 1) // alignment * alignment + overhead
     for suffix, overhead in OVERHEAD.items():
         if path.endswith(suffix):
-            return (size + ALIGNMENT - 1) // ALIGNMENT * ALIGNMENT + overhead
-    raise RstbError(f"no size formula for {path}: only {', '.join(OVERHEAD)} are checked against the game")
+            return rounded + overhead
+    raise RstbError(
+        f"no size formula for {path}: only {', '.join([*OVERHEAD, ACTOR_PARAM])} are checked against the game"
+    )

@@ -1598,7 +1598,7 @@ is expressible, but neither preserving the enemy Hash nor a matching file diff p
 persistence. No token location enters the fill yet; `--shuffle Token` explicitly refuses before generation
 or output, naming the missing callback/persistence evidence. No fake flag/no-op shuffle is shipped.
 
-`patch/tokens.py` provides explicit experiments with actual pickup actors, not inventory-only `Item_*`.
+Round 6's `patch/tokens.py` provided explicit experiments with actual pickup actors, not inventory-only `Item_*`; those unsafe experiment APIs were removed in Round 15 in favor of the separately held Phase 1 diagnostic (`plans/rounds/r15-scrub-tokens.md`).
 Ranch tree Hash `341792603838029977` is unset in all six ranch-backup slots; control/token, red-rupee
 and Hylian-Shield overlays change only its drop on both age copies, through the common writer and size
 table. **Kareem: check native control, uncollected-drop recovery, replacement pickup/count, saved enemy
@@ -1936,7 +1936,7 @@ blackboard field. Native GetType, SpecialDeal and fixed maximum 100 stay unchang
 may still force token-specific grant/count behavior. A preserved callback alone does not prove its engine
 implementation saves the enemy Hash when the pouch identity changes.
 
-`tokens.grant_experiment()` writes `ingame/native-token-boomerang/`. Adjacent
+The former `tokens.grant_experiment()` built `ingame/native-token-boomerang/` (removed in Round 15 after the failed result below). Adjacent
 `Test - native-token-boomerang.bat` copies `2026-11-07_llr-tower-before-pickup` into its own user.
 The ranch tree Hash 341792603838029977 is unset, Boomerang absent; manual slot 01 has nine tokens.
 **Kareem:** follow `native-token-checklist.md`: native-looking token, uncollected recovery, actual Boomerang

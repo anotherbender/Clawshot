@@ -27,6 +27,14 @@ lifetime total. `?` means the field or collection contract is unknown, not zero.
 by area; repeatable purchases and unaudited event gates cannot be treated as permanently collected.
 A partial/unreadable save keeps the previous good state with a warning until it can be read again.
 
+With Gold Skulltula tokens shuffled, each Skulltula is one check, however many age copies it has. It
+counts as collected once its reward has been picked up, whatever that reward is: the game saves two
+records for that Skulltula, and the tracker needs both. Killing it without collecting the drop does not
+count. The **Gold Skulltulas** number is the game's own token count, so it rises for a token found in a
+chest or at a Skulltula and stays the same for any other reward at a Skulltula. A Skulltula shows `?`
+when only one of its two records is set, or when the save is not the save layout those records were
+checked on.
+
 ## Hookshot Play
 
 Use Clawshot's **Play**, or the pack's Play launcher. These isolate saves under the seed's

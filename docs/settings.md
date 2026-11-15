@@ -47,16 +47,21 @@ in chests only; see [Progressive items](#progressive-items).
 | Kind | Scope and acceptance |
 |---|---|
 | `Chest` | 165 of 184 ordinary chests; changed chest grants work in game. Includes the sign-puzzle solution chest, not its failure chest. Unresolved/repeat chests stay unchanged. Treasure Chest Game reward swap is built but untested and held; its 11 game boxes stay unchanged. |
-| `Shop` | Ordinary shop shelves, native-display items only; slot swaps, restock and Castle Town purchases have in-game evidence. Refill goods stay in shops. Mask loans stay unchanged. |
+| `Shop` | Ordinary shop shelves, native-display items only; slot swaps, restock and Castle Town purchases have in-game evidence. Bought goods (refills, ammo, Bombchus, bottle contents, hearts and magic jars) go only to shop shelves in every seed; no setting moves one to a chest, gift, scrub, floor pickup or Skulltula. Mask loans stay unchanged. |
 | `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper and all seven frog checks. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the unaccepted checks below. |
 | `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. Implementation tested; not every sale has recorded in-game acceptance. |
 | `BossHeart` | Eight boss-heart checks, off by default. Limited to the five native floor pickups below. King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
 | `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
+| `Token` | The 97 live Gold Skulltulas, off by default; needs `Chest` (Token alone is refused). Each gives a token, a fixed item (Boomerang, Megaton Hammer) or equipment (shields, swords, boots, tunics), listed with native sources in `src/clawshot/data/token_rewards.toml`; nothing else. Excluded: progressive copies and small keys (chests only), boss keys, maps and compasses (own dungeon), songs, ocarinas, the Gerudo Pass, trade items and every bought good (shop shelves only); rupees, hearts, ammo, bottles, Bombchus, masks and spells wait for their own in-game packet. Tokens may also go to shuffled chests, never to gifts, scrubs, shops or floor pickups. Kareem's core packet passed: Boomerang and Hylian Shield from Skulltulas, recovered after leaving and after reloading; native and chest tokens counted; House 10 paid once. Other members have structural checks, not play. The three remake-only Skulltulas (HF GS Lone Tree, HF GS Wetland Grotto Crate, LLR GS Tower) stay out of the world with their native tokens until their route packet passes. |
 
-`--shuffle Token` is unavailable. Tokens, cows, dungeon completion rewards, pots, crates, loose
+Cows, dungeon completion rewards, pots, crates, loose
 rupees, recovery hearts, loose keys and silver-rupee puzzles stay unchanged. Pot and ground-rupee
 experiments are not seed options: grants were observed, but a thrown pot stranded and lost its
 reward. Completion and recovery are not solved by a destruction flag.
+
+The Round 15 forced token diagnostic is not a shuffle option or a beatable seed. It tests independent pickup grants,
+native collection records, chest tokens and the House 10 reward on an isolated historical checkpoint; its passed
+core packet is the evidence for the `Token` families above.
 
 The floor palette is **Heart Container, Piece of Heart, Deku Shield, Hylian Shield and red rupee**.
 Major items on the floor can crash. Heart Containers from chests have no recorded in-game acceptance.

@@ -1,6 +1,6 @@
 import pytest
 
-from clawshot.formats import rstb, zsdic
+from clawshot.formats import byml, rstb, sarc, zsdic
 
 
 @pytest.fixture(scope="module")
@@ -29,6 +29,8 @@ def test_dump_size_table_round_trips(table_bytes):
         "RSDB/ActorInfo.Product.111.rstbl.byml.zs",
         "RSDB/EventSetting.Product.111.rstbl.byml.zs",
         "RSDB/GameAnalyzedEventInfo.Product.111.rstbl.byml.zs",
+        "RSDB/GameActorInfo.Product.111.rstbl.byml.zs",
+        "RSDB/PouchActorInfo.Product.111.rstbl.byml.zs",
     ],
 )
 def test_dump_size_formula_fits_every_file(romfs, table_bytes, pattern):
@@ -43,4 +45,30 @@ def test_dump_size_formula_fits_every_file(romfs, table_bytes, pattern):
         if entry != needed:
             misfits.append((path, size, entry, needed))
     print(f"{pattern}: {len(paths) - len(misfits)} of {len(paths)} fit")
+    assert misfits == []
+
+
+@pytest.mark.dump
+def test_dump_pack_member_formulas_fit_every_member_of_their_type(romfs, table_bytes):
+    """Round 15's member formulas: every unique actor parameter and pouch component in every actor pack."""
+    dicts, data = table_bytes
+    table = rstb.read(data)
+    members: dict[str, bytes] = {}
+    for path in sorted(romfs.glob("Pack/Actor/*.pack.zs")):
+        relative = path.relative_to(romfs).as_posix()
+        for name, content in sarc.read(dicts.decompress(relative, path.read_bytes())).items():
+            if name.endswith((rstb.ACTOR_PARAM, ".game__component__PouchContentParam.bgyml")):
+                assert members.setdefault(name, content) == content, f"{name} differs between packs"
+    misfits, counts = [], {rstb.ACTOR_PARAM: 0, "PouchContentParam": 0}
+    for name, content in sorted(members.items()):
+        if name.endswith(rstb.ACTOR_PARAM):
+            counts[rstb.ACTOR_PARAM] += 1
+            needed = rstb.required_size(name, len(content), len(byml.read(content).get("Components", {})))
+        else:
+            counts["PouchContentParam"] += 1
+            needed = rstb.required_size(name, len(content))
+        if table.get(name) != needed:
+            misfits.append((name, len(content), table.get(name), needed))
+    print(f"{counts}: {len(members) - len(misfits)} of {len(members)} fit")
+    assert counts[rstb.ACTOR_PARAM] > 8000 and counts["PouchContentParam"] > 100
     assert misfits == []

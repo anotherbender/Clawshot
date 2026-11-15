@@ -305,7 +305,8 @@ def working_files(source: "NupRomfs | NxRomfs | StackedRomfs | FolderRomfs", spe
     """Resolve the one cache definition against the source's file index and the catalogues."""
     from fnmatch import fnmatchcase
 
-    from clawshot.patch import items, shops
+    from clawshot.generate import tokens as token_policy
+    from clawshot.patch import items, shops, tokens
 
     actors = set(items.load().actors.values())
     slots = shops.load()
@@ -313,6 +314,8 @@ def working_files(source: "NupRomfs | NxRomfs | StackedRomfs | FolderRomfs", spe
     actors.update(slot.vanilla_item for slot in slots)
     wanted = set(spec["files"])
     wanted.update(spec["actor_pack"].format(actor=actor) for actor in actors)
+    # Token shuffle reads the native enemy/token contracts, registries and each admitted reward's own pack.
+    wanted.update(tokens.native_inputs(actor for actor, _ in token_policy.REWARDS.values()))
     wanted.update(path for path in source.files if any(fnmatchcase(path, pattern) for pattern in spec["patterns"]))
     return wanted
 

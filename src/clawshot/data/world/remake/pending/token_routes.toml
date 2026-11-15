@@ -1,0 +1,50 @@
+# Round 15, Track D (cs15d): the three remake-only Gold Skulltulas.
+# Accepted clean-room specification: plans/rounds/r15-tokens-spec.md section 4 at 9e5008e,
+# cs15c, native build e0f3ccfa. Claude's 2026-11-14 ruling keeps these OUT of the loaded
+# world until the new-route packet passes. This nested pending folder is not autoloaded.
+# Branch preparation, not gameplay certification; production currently shuffles the live 97.
+# No imported N64 location is repurposed; census names/Hashes remain unchanged.
+
+[locations."HF GS Lone Tree"]
+new = true
+region = "Hyrule Field"
+type = "GS Token"
+vanilla = "Gold Skulltula Token"
+rule = "can_bonk and (is_adult or can_child_attack) and at_night and (is_adult or 'Time Flows')"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N11 (e0f3ccfa): Enemy_Skulltula_Gold Hash 2177746409373494991 in Banc/HyruleField/HyruleField_{Child,Adult}_Static.bcett.byml.zs, tree-roll binding near (71,167,264); r3-census.md:52-58 and r4-logic-child.md:363-374. Roll/bonk, kill and touch-retrieve the low drop. No Nocturnal field, but conflicting day/night guides leave the accepted conservative night restriction; child night requires Time Flows, as child_hyrule_castle.toml. No native daytime patch is supplied."
+
+[locations."LLR GS Tower"]
+new = true
+region = "Lon Lon Ranch"
+type = "GS Token"
+vanilla = "Gold Skulltula Token"
+rule = "((is_child and can_use(Boomerang)) or (is_adult and can_use(Hookshot))) and at_night and (is_adult or 'Time Flows')"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N11 (e0f3ccfa): Enemy_Skulltula_Gold Hash 2730878115209290675 in Banc/HyruleField/HyruleField_{Child,Adult}_Static.bcett.byml.zs, Nocturnal/night-appearance binding, vines near (-147,159,268); r3-census.md:58 and r4-logic-child.md:421-423. Child Boomerang or adult Hookshot kills/retrieves the high reward; child night needs Time Flows. Ranch access suffices: the separate tower chest's unresolved upper ledge is not this route."
+
+[regions."HF Wetland Grotto"]
+area = "HyruleField"
+scene = "HF Wetland Grotto"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N10 (e0f3ccfa): wetlands entrance near (40,145,342), cover Land_HrlField_HidingHoleCover_A_01 Hash 2786334400301738354, child Skullwalltula and adult alternative crates. A dedicated region avoids identifying either ambiguous imported generic grotto as this room."
+
+[exits."Hyrule Field"."HF Wetland Grotto"]
+new = true
+rule = "has_explosives"
+source = "Accepted r15-tokens-spec section 4: explosive opening at (40,145,342), r3-census.md:57 and r4-logic-child.md:372-374. Use the existing supported has_explosives capability, including remake/bombs.toml's Bomb Bag plus age-appropriate lift strength; no Echo Gem, note-reading, Hammer-only opening or assumed persistent open cover substitutes for access."
+
+[exits."HF Wetland Grotto"."Hyrule Field"]
+new = true
+rule = "True"
+source = "Native wetlands room/entrance in HyruleField, accepted r15-tokens-spec section 4 N9; return to the same surface region, as the existing Field grotto exits. No extra item gate on leaving."
+
+[events."HF Wetland Grotto"."HF Wetland Skullwalltula Defeated"]
+new = true
+rule = "is_child and can_child_attack"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N10 (e0f3ccfa): child Enemy_Skullwalltula Hash 8266046215447170481 Dead output in Logic/HyruleField_Child_Level_Prefab_29fc.logic.module.ainb sets HaveReadHrlField_Note12_Enemy. Persistent child kill, not note reading, Echo Gem ownership, adult presence or a token collection. Room access already requires usable explosives; retain r4-logic-child.md:372-374's child attack requirement."
+
+[locations."HF GS Wetland Grotto Crate"]
+new = true
+region = "HF Wetland Grotto"
+type = "GS Token"
+vanilla = "Gold Skulltula Token"
+rule = "is_adult and 'HF Wetland Skullwalltula Defeated' and can_break_crate"
+source = "cs15c, accepted r15-tokens-spec section 4 N9/N10 (e0f3ccfa): Enemy_Skulltula_Gold Hash 9047381233010434881 in Banc/HyruleField/HyruleField_Adult_Static.bcett.byml.zs near (57,126,343). Logic/HyruleField_Adult_Level_Prefab_c022.logic.module.ainb reads HaveReadHrlField_Note12_Enemy to create Obj_BrokenBox_A_06 Hash 4392858802949544986 instead of ordinary Obj_BrokenBox_A_01; its Dead output creates the source. Require the earlier child event plus adult room/crate access; adult combat/touch retrieval is the existing low-drop convention. This logic event does not patch crate alternatives, sync links, native flags or collection lifecycle."

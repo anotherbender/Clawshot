@@ -21,9 +21,10 @@ from clawshot.settings import CATALOG
 
 pytestmark = pytest.mark.dump
 
-# Token is explicitly disabled, not a supported generation route. Each supported kind
-# gets its own row with Chest (native fixed dungeon-key layouts are not shuffled otherwise).
-SHUFFLES = ("Chest", "Shop", "Gift", "Scrub", "BossHeart", "Freestanding")
+# Each supported kind gets its own row with Chest (native fixed dungeon-key layouts are not shuffled otherwise, and
+# Token without Chest is refused). Token reads the native Skulltula/token contracts, the actor registries and each
+# admitted reward's pack (clawshot.patch.tokens.native_inputs), which the working set must hold.
+SHUFFLES = ("Chest", "Shop", "Gift", "Scrub", "BossHeart", "Freestanding", "Token")
 
 
 def resource_modes():

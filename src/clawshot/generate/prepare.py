@@ -5,7 +5,8 @@ from collections.abc import Mapping
 from dataclasses import replace
 from typing import Any
 
-from clawshot.generate.fill import FillError, Settings
+from clawshot.generate import tokens
+from clawshot.generate.fill import SHOP_ONLY_PREFIX, FillError, Settings
 from clawshot.generate.progressive import prepare_spec, restrict_settings
 from clawshot.world.load import build_world
 from clawshot.world.model import World
@@ -31,10 +32,11 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
 
     With ``dungeon_items = "anywhere"`` the logic setting ``keysanity`` is set too, where the world has it.
     ``open_forest`` and the legacy ``skip_mido`` rule flag derive from the same forest mode the overlay patches.
+    With ``Token`` shuffled, Gold Skulltulas become Token checks held to their admitted reward families.
     Native setup also uses this compilation before its pool overrides are known. The UI checks return-kit
     construction against the spec; :func:`generate` checks it against the effective native pool before filling.
     """
-    spec = prepare_spec(spec)
+    spec = tokens.prepare_spec(prepare_spec(spec), settings)
     logic = dict(settings.logic)
     if "open_forest" in spec.get("settings", {}):
         if "open_forest" in logic and logic["open_forest"] != settings.forest:
@@ -64,8 +66,25 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
     if "Shop" in settings.shuffle:
         spec = with_shop_slots(spec, settings.shop_slots)
     spec = with_shop_prices(spec, settings.shuffle, settings.shop_prices, settings.cheap_deku_shield)
-    if "Shop" in settings.shuffle:
-        held = {name: ("Shop",) for name in spec.get("items", {}) if name.startswith("Buy ")}
-        settings = replace(settings, item_location_types={**settings.item_location_types, **held})
+    settings = _hold_shop_goods(spec, settings)
     world = build_world(world_spec(spec, settings), settings.logic)
-    return restrict_settings(world, settings), world
+    return restrict_settings(world, tokens.restrict_settings(world, settings)), world
+
+
+def _hold_shop_goods(spec: Mapping[str, Any], settings: Settings) -> Settings:
+    """Keep bought goods on shop shelves; explicit item/type restrictions cannot move them elsewhere."""
+    given = settings.item_location_types
+    if unsafe := sorted(
+        name for name, kinds in given.items() if name.startswith(SHOP_ONLY_PREFIX) and kinds != ("Shop",)
+    ):
+        raise FillError(f"item_location_types holds bought goods {unsafe} outside shops; they go only to shop shelves")
+    if unsafe := sorted(
+        kind
+        for kind, items in settings.location_type_items.items()
+        if kind != "Shop" and any(item.startswith(SHOP_ONLY_PREFIX) for item in items)
+    ):
+        raise FillError(f"location_type_items gives {unsafe} checks bought goods, which go only to shop shelves")
+    if "Shop" not in settings.shuffle:
+        return settings
+    held = {name: ("Shop",) for name in spec.get("items", {}) if name.startswith(SHOP_ONLY_PREFIX)}
+    return replace(settings, item_location_types={**given, **held})
