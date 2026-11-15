@@ -71,12 +71,16 @@
   the return guarantee on); settings add difficulty for players who want it. So `forest` defaults to `closed`, with
   `closed_deku` and `open` as options for advanced players; not all at once. Quality-of-life settings that remove
   grind without changing the route (the intro skip, the cheap Deku Shield) may stay on.
-- **D25 Bomb and Bombchu pickups from chests only where the Bomb Bag is already guaranteed** (Kareem, 2026-11-08,
-  Claude's recommendation). Ammo packs grant their missing container (round 6, section 24). In game, a shop bomb
-  bundle in a chest gave a Bomb Bag and 20 bombs in the menu, but the bombs cannot be used (Link raises one and
-  the action cancels; Kareem, 2026-11-08, round 7). Default: a `Bombs (N)`/`Bombchus (N)` item
+- **D25 Bomb and Bombchu pickups only where the Bomb Bag is already guaranteed** (Kareem, 2026-11-08;
+  extended to Skulltulas by Claude, 2026-11-14). A shop bomb bundle in a chest gave a Bomb Bag and 20 bombs,
+  but the bombs could not be used (Link raised one and the action cancelled; Kareem, round 7).
+  That chest observation does not guarantee a bag on an own-item Skulltula get. A `Bombs (N)`/`Bombchus (N)` item
   goes only to a location the logic cannot reach without the Bomb Bag, so a pickup never hands out an early bag.
   Counting such pickups as extra Bomb Bags is a later advanced option. Shop refills stay in shops.
+  Skulltula ammo must likewise have its existing container guaranteed before the source: Bomb Bag,
+  quiver, bullet bag, Nut Bag or Stick Bag as applicable. Refills grant no new container or weapon.
+  Native new-game setup already establishes an empty Nut Bag. The forced no-Bomb-Bag token diagnostic
+  yielded Bombchus 0/0 despite successful ownership/completion; it does not override the seed rule.
 - **D26 Hints: stones speak without the Mask of Truth by default; English hint text in every language archive**
   (Kareem, 2026-11-08, Claude's provisional picks). `hints = mask` (vanilla) is an option; Kareem's note for it: a
   stone's hint can be read only once the mask is held, so in that mode hints must stay useful from the point the

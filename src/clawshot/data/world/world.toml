@@ -98,6 +98,11 @@ age_return_door_families = { song_only = ["Bow", "Progressive Hookshot", "Progre
 downgrade_tier_families = ["Progressive Strength Upgrade", "Progressive Scale"]
 downgrade_tier_exemptions = ["Goron Bracelet"]
 
+# Native new-game setup always grants Item_NutBag_Small x1, then Item_DekuNut x0
+# (patch/start_items.py:19; Kareem's r13-item-grants.md first-containers/itembar play).
+# This is existing capacity, not ammo granting a new bag. Other ammo must prove its container before a Skulltula.
+token_starting_containers = ["nut"]
+
 # Each progressive item's tiers, lowest first. Tier n is an item of its own that raises the progressive item to at
 # least n (`Item.tier`: the highest fixed tier held, never a sum), so OoT Randomizer's rules ("Hookshot" =
 # Progressive_Hookshot, "Longshot" = (Progressive_Hookshot, 2)) read fixed and progressive items alike in a world built

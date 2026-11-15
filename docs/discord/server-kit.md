@@ -164,8 +164,10 @@ Digging still shows a heart prize but gives the shuffled item. First expert gall
 merchant experiments and some Skulltula House rewards stay unchanged until tested.
 The Door of Time's song-only and open modes passed a first check each.
 
-Tokens, cows, dungeon completion rewards, pots, crates and loose rupees are not shuffled. Small
-keys can leave their dungeon only through the opt-in **Small keys anywhere** choice (any shuffled
+Gold Skulltula shuffle is optional, off in both presets and requires chests: 97 admitted sources,
+with three new routes and additional reward families held for play. The core packet passed Boomerang/Shield
+delivery, recovery, chest tokens and House 10. Cows, dungeon completion rewards, pots, crates and loose
+rupees are not shuffled. Small keys can leave their dungeon only through the opt-in **Small keys anywhere** choice (any shuffled
 chest, named to the key's own dungeon; boss keys, maps and compasses always stay home); wider
 keysanity, entrance shuffle and Archipelago are not supported for play. All eight upgrade chains
 are always progressive; copies are chest-only. Native tier name/text and grant follow ownership,

@@ -54,6 +54,10 @@ in chests only; see [Progressive items](#progressive-items).
 | `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
 | `Token` | The 97 live Gold Skulltulas, off by default; needs `Chest` (Token alone is refused). Each gives a token, a fixed item (Boomerang, Megaton Hammer) or equipment (shields, swords, boots, tunics), listed with native sources in `src/clawshot/data/token_rewards.toml`; nothing else. Excluded: progressive copies and small keys (chests only), boss keys, maps and compasses (own dungeon), songs, ocarinas, the Gerudo Pass, trade items and every bought good (shop shelves only); rupees, hearts, ammo, bottles, Bombchus, masks and spells wait for their own in-game packet. Tokens may also go to shuffled chests, never to gifts, scrubs, shops or floor pickups. Kareem's core packet passed: Boomerang and Hylian Shield from Skulltulas, recovered after leaving and after reloading; native and chest tokens counted; House 10 paid once. Other members have structural checks, not play. The three remake-only Skulltulas (HF GS Lone Tree, HF GS Wetland Grotto Crate, LLR GS Tower) stay out of the world with their native tokens until their route packet passes. |
 
+Future admitted Skulltula ammo still requires its existing container before the source (D25).
+Refills never grant a bag or weapon; the native new-game Nut Bag is already present, empty.
+Bombchus remain excluded until a with-Bomb-Bag representative proves real ammo, use and reload.
+
 Cows, dungeon completion rewards, pots, crates, loose
 rupees, recovery hearts, loose keys and silver-rupee puzzles stay unchanged. Pot and ground-rupee
 experiments are not seed options: grants were observed, but a thrown pot stranded and lost its

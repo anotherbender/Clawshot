@@ -32,6 +32,20 @@ every seed, whatever the settings hold (Claude, 2026-11-14, Round 15 family tabl
 keeps its native display and restock; a purchase's grant (``NotPushToPouch`` bottle contents fill an owned bottle,
 never give a new one) has no proven equivalent at a chest, gift, scrub, floor pickup or Skulltula."""
 _BOMB_AMMO_PREFIXES = ("Bombs (", "Bombchus (")
+# Prefixes, independent container providers, shop refills, and farmable supply events.
+# Refills never become containers in the counterfactual (D25; Claude, 2026-11-14).
+_AMMO_CONTAINERS = {
+    "bomb": (_BOMB_AMMO_PREFIXES, ("Bomb Bag",), ("Buy Bombs (", "Buy Bombchu ("), ()),
+    "arrow": (("Arrows (",), ("Bow", "Quiver (40)", "Quiver (50)"), ("Buy Arrows (",), ()),
+    "seed": (
+        ("Deku Seeds (",),
+        ("Slingshot", "Bullet Bag (40)", "Bullet Bag (50)"),
+        ("Buy Deku Seeds (",),
+        (),
+    ),
+    "nut": (("Deku Nuts (",), ("Deku Nut Capacity",), ("Buy Deku Nut (",), ("Deku Nut Drop",)),
+    "stick": (("Deku Stick (",), ("Deku Stick Capacity",), ("Buy Deku Stick (",), ("Deku Stick Drop",)),
+}
 STAGE_ATTEMPTS = 15
 """Tries of a stage placed on its own before the fill fails (``Fill.fill_ownworld_restrictive``'s ``attempts``)."""
 
@@ -248,6 +262,8 @@ def allowed(world: World, settings: Settings, location: str, item: str) -> bool:
     if item in world.locations[location].excluded_items:
         return False
     if location in world.settings.get("tier_forbidden", {}).get(item, ()):
+        return False
+    if location in world.settings.get("token_container_forbidden", {}).get(item, ()):
         return False
     if world.locations[location].type == "Shop":
         if item not in world.settings.get("native_shop_items", ()):
@@ -591,6 +607,55 @@ def _assumable(world: World, settings: Settings, items: list[str]) -> list[str]:
     ]
 
 
+def _without_ammo_container(
+    world: World,
+    pool: list[str],
+    placements: Mapping[str, str],
+    prefixes: tuple[str, ...],
+    containers: tuple[str, ...],
+    refills: tuple[str, ...],
+    events: tuple[str, ...],
+) -> Search:
+    sources = {
+        name for name in world.items if _age_family(world, name) in containers or name.startswith((*prefixes, *refills))
+    } | set(events)
+    return Search(
+        replace(
+            world,
+            start_items=tuple(item for item in world.start_items if item not in sources),
+            events=[event for event in world.events if event.name not in sources],
+        ),
+        (item for item in [*pool, *placements.values()] if item not in sources),
+    )
+
+
+def _token_container_forbidden(
+    world: World, locations: list[str], pool: list[str], placements: Mapping[str, str]
+) -> dict[str, frozenset[str]]:
+    """Screen Skulltula ammo before palettes, type-held fill, swaps or filler can bypass its container.
+
+    Holding every other item, a source must still be unreachable without an independent container provider.
+    This is D25's counterfactual, not an assumption that an ammo get will create a bag or weapon.
+    Native new games already have an empty Nut Bag; that sourced world fact needs no placement gate.
+    """
+    destinations = [name for name in locations if world.locations[name].type == "Token"]
+    if not destinations:
+        return {}
+    starting = world.settings.get("token_starting_containers", ())
+    forbidden = {}
+    for family, contract in _AMMO_CONTAINERS.items():
+        if family in starting:
+            continue
+        ammo = dict.fromkeys(item for item in pool if item.startswith(contract[0]))
+        if not ammo:
+            continue
+        without = _without_ammo_container(world, pool, placements, *contract)
+        blocked = frozenset(name for name in destinations if without.can_access(world.locations[name]))
+        if blocked:
+            forbidden.update(dict.fromkeys(ammo, blocked))
+    return forbidden
+
+
 def _fill_bomb_ammo(
     world: World,
     settings: Settings,
@@ -608,16 +673,7 @@ def _fill_bomb_ammo(
     ammo = [item for item in pool if item.startswith(_BOMB_AMMO_PREFIXES)]
     if not ammo:
         return
-    sources = {
-        name
-        for name in world.items
-        if _age_family(world, name) == "Bomb Bag"
-        or name.startswith((*_BOMB_AMMO_PREFIXES, "Buy Bombs (", "Buy Bombchu ("))
-    }
-    without_bag = Search(
-        replace(world, start_items=tuple(item for item in world.start_items if item not in sources)),
-        (item for item in [*pool, *placements.values()] if item not in sources),
-    )
+    without_bag = _without_ammo_container(world, pool, placements, *_AMMO_CONTAINERS["bomb"])
     destinations = [name for name in locations if not without_bag.can_access(world.locations[name])]
     pool[:] = [item for item in pool if not item.startswith(_BOMB_AMMO_PREFIXES)]
     # Dungeon items already own their slots; place constrained ammo before unrestricted filler.
@@ -848,6 +904,9 @@ def fill(
     forbidden = tier_forbidden(world, pool, placements)
     if forbidden:
         world = replace(world, settings={**world.settings, "tier_forbidden": forbidden})
+    containers = _token_container_forbidden(world, shuffled, pool, placements)
+    if containers:
+        world = replace(world, settings={**world.settings, "token_container_forbidden": containers})
     locations = list(shuffled)
     held = settings.item_location_types
     shop_refills = sum(item.startswith("Buy ") and held.get(item) == ("Shop",) for item in pool)

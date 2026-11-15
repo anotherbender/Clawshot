@@ -4,6 +4,7 @@ Synthetic worlds exercise the real fill and beatability search; the whole world 
 the fill's own placement predicate. No game resources, no seed sweep: each forced shape below holds for any fill.
 """
 
+import random
 from collections import Counter
 from dataclasses import replace
 
@@ -12,7 +13,7 @@ import pytest
 from clawshot.__main__ import main
 from clawshot.app import schema, validate
 from clawshot.generate import FillError, Settings, generate, prepare
-from clawshot.generate.fill import SHOP_ONLY_PREFIX, allowed, shuffled_locations
+from clawshot.generate.fill import SHOP_ONLY_PREFIX, allowed, fill, shuffled_locations
 from clawshot.generate.tokens import (
     REWARDS,
     SHUFFLE,
@@ -20,7 +21,7 @@ from clawshot.generate.tokens import (
     TOKEN_DESTINATIONS,
     TOKEN_ITEM,
 )
-from clawshot.world.load import load_spec
+from clawshot.world.load import build_world, load_spec
 
 GS = SOURCE_TYPE
 SPILL = ("GS A", "GS B", "GS C", "GS D")
@@ -297,3 +298,76 @@ def test_cli_spelling_and_replay_match_the_app(capsys):
     assert Settings.from_string(text).shuffle == ("Chest", SHUFFLE) == validate(text=text).shuffle
     assert main(["--print-settings", "--settings", text]) == 0
     assert capsys.readouterr().out.strip() == text
+
+
+AMMO_CONTAINERS = (
+    ("Bombs (5)", "Bomb Bag"),
+    ("Bombchus (5)", "Bomb Bag"),
+    ("Arrows (5)", "Bow"),
+    ("Arrows (10)", "Quiver (40)"),
+    ("Deku Seeds (30)", "Slingshot"),
+    ("Deku Nuts (5)", "Deku Nut Capacity"),
+    ("Deku Stick (1)", "Deku Stick Capacity"),
+)
+
+
+def container_world(ammo, container, *, guaranteed=True, starting=()):
+    """A container, an unrelated bypass item, and two Skulltulas; no native bag is assumed."""
+    gate = f"'{container}'"
+    return build_world(
+        {
+            "start": "Start",
+            "goal": gate,
+            "settings": {"token_starting_containers": list(starting)},
+            "items": {container: {}, "Hammer": {}, ammo: {}, "Rupee": {"class": "normal"}},
+            "regions": [
+                {
+                    "name": "Start",
+                    "locations": {
+                        "Container Chest": {"rule": "True", "type": "Chest", "vanilla": container},
+                        "Hammer Chest": {"rule": "True", "type": "Chest", "vanilla": "Hammer"},
+                        "Bypass GS": {"type": SHUFFLE, "rule": f"{gate} or Hammer", "vanilla": "Rupee"},
+                        "Container GS": {
+                            "type": SHUFFLE,
+                            "rule": gate if guaranteed else f"{gate} or Hammer",
+                            "vanilla": ammo,
+                        },
+                    },
+                }
+            ],
+        }
+    )
+
+
+def container_settings(ammo, *, palette=True):
+    return Settings(
+        shuffle=("Chest", SHUFFLE),
+        location_type_items={SHUFFLE: (ammo, "Rupee")} if palette else {},
+        item_location_types={ammo: (SHUFFLE,)},
+    )
+
+
+@pytest.mark.parametrize(("ammo", "container"), AMMO_CONTAINERS)
+@pytest.mark.parametrize("palette", [True, False])
+def test_skulltula_ammo_requires_its_container_even_with_an_unrelated_bypass(ammo, container, palette):
+    world = container_world(ammo, container)
+    placements = fill(world, container_settings(ammo, palette=palette), random.Random(0))
+    assert placements["Container GS"] == ammo
+    assert placements["Bypass GS"] == "Rupee"
+    # The ammo placement changes no pool item into a container or weapon.
+    assert Counter(placements.values()) == Counter({ammo: 1, container: 1, "Hammer": 1, "Rupee": 1})
+
+
+@pytest.mark.parametrize(("ammo", "container"), AMMO_CONTAINERS)
+def test_skulltula_palette_refuses_ammo_when_every_source_can_bypass_its_container(ammo, container):
+    world = container_world(ammo, container, guaranteed=False)
+    with pytest.raises(FillError):
+        fill(world, container_settings(ammo), random.Random(0))
+
+
+def test_existing_empty_nut_bag_allows_a_refill_without_a_capacity_upgrade():
+    world = container_world("Deku Nuts (5)", "Deku Nut Capacity", guaranteed=False, starting=("nut",))
+    placements = fill(world, container_settings("Deku Nuts (5)"), random.Random(0))
+    assert (
+        sum(item == "Deku Nuts (5)" for name, item in placements.items() if world.locations[name].type == SHUFFLE) == 1
+    )

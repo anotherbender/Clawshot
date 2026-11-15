@@ -66,9 +66,9 @@ The [Tracker tab](docs/tracker.md) reads saved inventory and per-dungeon keys, w
 ## At a glance
 
 - **Shuffled now:** chests, shop shelves, NPC gifts and songs, one-time Deku Scrub sales.
-- **Optional:** boss Heart Containers, floor Heart Pieces, and small keys outside their own
-  dungeon (opt-in **Small keys anywhere**; boss keys, maps and compasses never leave).
-- **Not shuffled yet:** Gold Skulltula tokens, cows, dungeon rewards, pots, crates and loose rupees.
+- **Optional:** boss Heart Containers, floor Heart Pieces, Gold Skulltulas (requires chests),
+  and small keys outside their own dungeon (opt-in **Small keys anywhere**; boss keys, maps and compasses never leave).
+- **Not shuffled yet:** cows, dungeon rewards, pots, crates and loose rupees.
 
 Choose the kinds you want. The UI starts with Recommended; the generator's Defaults shuffle chests
 only. Some checks stay unchanged pending in-game tests; the evidence and limits are below.
@@ -86,6 +86,7 @@ that proves the model, not that every route has been verified in the game.
 | NPC gifts and songs | Gift swaps and Great Fairy once-only rewards work in game, as does the Kokiri shopkeeper's extended gift window. All seven frog checks have passed their in-game experiment. Not every gift or item combination has been played. |
 | One-time Business Scrubs | Four kinds of one-time Deku Scrub sale are enabled; repeat vendors stay unchanged. The implementation is tested, but the recorded results do not establish every shuffled sale in game. |
 | Boss hearts and floor Heart Pieces | Optional, off by default. A Hylian Shield worked at King Dodongo and the ranch tower. Only native floor pickups are allowed; other locations and pickup combinations are not all verified. |
+| Gold Skulltulas | Optional, off in both presets; requires Chest shuffle. 97 admitted sources, with three new routes held for play. Core Boomerang/Shield delivery, recovery, chest tokens and House 10 passed; only the explicitly admitted reward families are enabled. See [exact restrictions](docs/settings.md#what-enters-the-shuffle). |
 | Hints and convenience options | Gossip Stones speak hints without the Mask of Truth by default; this, fast start, the forest option that opens only the exit bridge (`--forest closed_deku`) and 10-rupee Kokiri prices have in-game evidence. |
 | Free time travel | Experimental, off by default. Early adult return, the Prelude scene and the corrected first adult arrival have passed in-game checks. |
 
@@ -104,8 +105,8 @@ unchanged until their tests pass; the 10-token swap alone has been observed, not
 The Door of Time's song-only and open modes each passed a first in-game check (the door and
 first sword pull); returning to child afterwards is untested.
 
-Gold Skulltula tokens, cows, dungeon completion rewards, pots, crates and loose rupees are not
-shuffled. Of the dungeon items, only small keys can leave their dungeon, and only when you opt in:
+Cows, dungeon completion rewards, pots, crates and loose rupees are not shuffled.
+Of the dungeon items, only small keys can leave their dungeon, and only when you opt in:
 **Small keys anywhere** puts them in any shuffled chest, including other dungeons and the overworld.
 Boss keys, maps and compasses always stay in their own dungeon, and defaults and both presets keep
 every dungeon item home. A key found outside its dungeon names that dungeon in its pickup messages
