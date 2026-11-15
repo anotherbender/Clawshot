@@ -104,6 +104,7 @@ _LOCATION_FIELDS = frozenset(
         "keep_vanilla",
         "region",
         "excluded_items",
+        "nonprogression_only",
     }
 )
 _REGION_FIELDS = frozenset({"area", "dungeon", "scene", "hint", "time_passes", "provides_time", "new"})
@@ -122,8 +123,9 @@ def apply_overrides(spec: dict[str, Any], files: Sequence[tuple[str, Mapping[str
     ``[locations."<name>"]``: any of ``rule`` (the remake's requirement; ``was`` must repeat the translated rule, so
     a change upstream is noticed), ``region`` (the region it moves to), ``type`` (the remake's kind of check, as an
     OoT Randomizer location type), ``vanilla`` (the remake's vanilla item), ``vanilla_fixed``, ``n64_only``,
-    ``area`` (the census area, where the check lies outside its region's Banc folder) and ``keep_vanilla`` (the
-    reason a check of a shuffled type keeps its vanilla item).
+    ``area`` (the census area, where the check lies outside its region's Banc folder), ``keep_vanilla`` (the
+    reason a check of a shuffled type keeps its vanilla item), and ``nonprogression_only`` (exclude every
+    progression-class item from the location in all placement paths).
 
     ``[exits."<region>"."<target>"]`` and ``[events."<region>"."<event>"]``: ``rule`` with ``was`` (the translated
     rule it replaces) or with ``new = true`` (an exit or event the translation lacks).
@@ -486,6 +488,13 @@ def build_world(spec: Mapping[str, Any], logic: Mapping[str, Any] | None = None)
                     isinstance(item, str) for item in excluded_items
                 ):
                     raise WorldError(f"{where}: excluded_items must be a list of item names")
+                nonprogression_only = info.get("nonprogression_only", False)
+                if not isinstance(nonprogression_only, bool):
+                    raise WorldError(f"{where}: nonprogression_only must be a boolean")
+                if nonprogression_only:
+                    excluded_items = sorted(
+                        set(excluded_items) | {name for name, item in items.items() if item.progression}
+                    )
                 location = Location(
                     name=location_name,
                     region=name,

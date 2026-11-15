@@ -218,11 +218,16 @@ def custom_step(
     stray = sorted(set(foreign) - set(by_item[custom_items.FOREIGN_ITEM]))
     if stray:
         raise PatchError(f"other players' items named for locations that do not hold one: {stray[:5]}")
-    own = [table.actors[item] for item in seed.placements.values() if item in table.actors] if possessive_text else []
+    own = []
     if possessive_text:
         from clawshot.progressive import CHAINS
 
-        own.extend(tier.actor for item in seed.placements.values() if item in CHAINS for tier in CHAINS[item])
+        for name in seed.shuffled:
+            item = seed.placements[name]
+            if item in table.actors:
+                own.append(table.actors[item])
+            if item in CHAINS:
+                own.extend(tier.actor for tier in CHAINS[item])
     return custom_items.changes(
         romfs, nothing_locations=by_item[custom_items.NOTHING_ITEM], foreign=foreign, own_actors=own
     )

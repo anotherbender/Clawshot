@@ -11,6 +11,7 @@ from dataclasses import asdict
 from importlib.metadata import version
 from pathlib import Path
 
+import clawshot
 from clawshot import save
 from clawshot.census.definitions import load as load_definitions
 from clawshot.census.gifts import scan_gifts
@@ -21,11 +22,20 @@ from clawshot.patch.events import REMOVE
 from clawshot.patch.events import load as load_events
 from clawshot.patch.plan import ChestChange, PatchError, Plan
 from clawshot.patch.write import check_output_folder, check_romfs, write
-from clawshot.token_packet import CHEST_HASH, CORE_SOURCES, HOUSE_FLAG
+from tools.token_packets.token_packet import CHEST_HASH, CORE_SOURCES, HOUSE_FLAG
 
 CHECKPOINT_SHA256 = "450eaf011b5654ce5f6e4a2bf7dc1d79feb68efaae5153203fb0339e11e4b8b7"
 HOUSE_CHECK = "Kak 10 Gold Skulltula Reward"
 HOUSE_ACTOR = "Item_Hammer"
+
+
+def implementation_sha256() -> dict[str, str]:
+    """The SHA256 of every Python file of the clawshot package and of this tooling, by path from its top-level
+    package's parent (``clawshot/patch/tokens.py``, ``tools/token_packets/token_packet.py``)."""
+    package, tooling = Path(clawshot.__file__).parent, Path(__file__).parent
+    files = [(path.relative_to(package.parent), path) for path in package.rglob("*.py")]
+    files += [(path.relative_to(tooling.parents[1]), path) for path in tooling.rglob("*.py")]
+    return {name.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for name, path in sorted(files)}
 
 
 def _source_records(romfs: Path, dictionaries: zsdic.Dictionaries, census) -> list[int]:
@@ -120,10 +130,7 @@ def build(romfs: Path, checkpoint: Path, out: Path, *, revision: str) -> dict:
         "accepted_facts_amendment": "9e5008e",
         "generator_version": version("clawshot"),
         "source_revision": revision,
-        "implementation_sha256": {
-            path.relative_to(Path(__file__).parent).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
-            for path in sorted(Path(__file__).parent.rglob("*.py"))
-        },
+        "implementation_sha256": implementation_sha256(),
         "seed": None,
         "settings": "accepted Phase 1 forced assignments; independent of production Token settings",
         "baseline_sha256": digest,

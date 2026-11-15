@@ -52,6 +52,10 @@ vanilla = "Bombchus (20)"
 keep_vanilla = "Round 8: native twenty-Bombchu reward; controlled swap awaits Kareem's result"
 source = "cs8d, build e0f3ccfa: GatheringTokenGold/Event200 grants Item_BombchuBundle_Large; PouchActorInfo BundleActorNum=20; saved GetReward40 Bool. plans/03-game-data.md section 35"
 
+[locations."Kak 100 Gold Skulltula Reward"]
+nonprogression_only = true
+source = "Claude, 2026-11-15, r15 review/maintainer #12 policy: the first 100-token reward stays junk by default. Three newly admitted native sources make 100 reachable, so reachability must not implicitly opt into progression here. Every fill/swap and externally supplied placement must exclude progression-class items, Token on or off; no opt-in this round."
+
 # Kareem confirmed all seven swaps (answers.md R8-FROGS, 2026-11-09).
 # Round 10 item 1 fixes the five variable song contributions at OoTR's Rupees (20).
 [locations."ZR Frogs Ocarina Game"]

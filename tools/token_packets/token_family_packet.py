@@ -3,12 +3,13 @@ played from an accepted checkpoint (plans/rounds/r15-scrub-tokens.md). Reward-fa
 route packets may also keep a source's native token. It compares one packet save with that checkpoint and says, for
 one phase of the packet, whether the saved state is what the manifest requires.
 
-    uv run python -m clawshot.token_family_packet --manifest <json> --baseline <sav> --save <sav> --phase <phase>
+    uv run python -m tools.token_packets.token_family_packet --manifest <json> --baseline <sav> --save <sav>
+        --phase <phase>
 
 Prints one JSON report (:func:`check_packet`); exit 0 pass, 1 fail, 2 unknown (a record a check needs is absent),
 3 contract error (bad manifest, unreadable file, a phase the manifest does not list, a baseline other than the accepted
 checkpoint or not in the manifest's ``baseline`` state, a save of another layout). The conventions are those of the
-core packet checker (:mod:`clawshot.token_packet`). Files are opened read-only; nothing is ever written.
+core packet checker (:mod:`tools.token_packets.token_packet`). Files are opened read-only; nothing is ever written.
 
 Manifest: a JSON object with these fields (:func:`parse_manifest`); other keys, at the top or in an assignment, are
 packet metadata and ignored:
@@ -58,7 +59,7 @@ from pathlib import Path
 from typing import Any
 
 from clawshot import save
-from clawshot.token_packet import (
+from tools.token_packets.token_packet import (
     BUILD,
     CONTRACT_ERROR,
     EXIT_CODES,
@@ -78,7 +79,7 @@ from clawshot.token_packet import (
     verdict,
 )
 
-TOOL = "clawshot.token_family_packet"
+TOOL = "tools.token_packets.token_family_packet"
 MANIFEST_FIELDS = ("build", "save_version", "save_type", "baseline_sha256", "source_hashes", "assignments", "phases")
 ASSIGNMENT_FIELDS = ("id", "name", "family", "actor")
 BASELINE = "baseline"

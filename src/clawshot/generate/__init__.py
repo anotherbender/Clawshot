@@ -9,6 +9,7 @@ only randomness is ``random.Random(seed)``, and every list the fill walks is in 
 
 import json
 import random
+from collections import Counter
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass, replace
 from importlib.metadata import version
@@ -19,10 +20,12 @@ from clawshot.generate import names as location_names
 from clawshot.generate.fill import (
     FillError,
     Settings,
+    allowed,
     check_beatable,
     fill,
     return_guarantee_conflict,
     shuffled_locations,
+    with_screens,
 )
 from clawshot.generate.itembar import age_locked_pickups
 from clawshot.generate.prepare import prepare, world_spec
@@ -114,28 +117,40 @@ def from_placements(
     other locations their vanilla items, as :func:`generate` would place them.
 
     ``placements`` must name exactly the shuffled locations, with items the world knows that the location may take
-    (``fill.allowed``: palettes, holds, exclusions, own-dungeon items). No beatability search: the placer proved the
-    seed across its whole multiworld, where this world's progression can sit in other games."""
-    from clawshot.generate.fill import allowed
-
+    (``fill.allowed``: palettes, holds, exclusions, own-dungeon items) under the screens :func:`generate` fills with
+    (``fill.with_screens``: fixed-tier order, D25 bomb packs, Skulltula ammo containers), set before any assignment
+    is checked. This world's own items may sit in other games' worlds, so the screens hold each item as many times as
+    the pool :func:`generate` would fill (refused as there when it cannot be built) or the supplied placements give:
+    a lower tier or a container placed remotely still counts as obtainable, never as guaranteed first. No beatability
+    search: the placer proved the seed across its whole multiworld, where this world's progression can sit in other
+    games."""
     settings, world = prepare(spec, settings)
     vanilla = dict(vanilla or {})
     shuffled = shuffled_locations(world, settings)
-    problems = [f"not a shuffled location: {name}" for name in sorted(set(placements) - set(shuffled))]
+    shuffled_set = set(shuffled)
+    fixed = {
+        name: item
+        for name, loc in world.locations.items()
+        if name not in shuffled_set and loc.n64_only is None and (item := vanilla.get(name, loc.vanilla)) is not None
+    }
+    pool = {**vanilla, **normalize_pool(world, settings, vanilla)}  # the pool generate would fill with
+    own = Counter(pool.get(name, world.locations[name].vanilla) for name in shuffled)
+    given = Counter(placements[name] for name in shuffled if placements.get(name) in world.items)
+    screened = with_screens(world, shuffled, list((own | given).elements()), fixed)
+    problems = [f"not a shuffled location: {name}" for name in sorted(set(placements) - shuffled_set)]
     problems += [f"no item given for {name}" for name in shuffled if name not in placements]
     problems += [
         f"{name}: unknown item {item!r}" if item not in world.items else f"{name}: may not hold {item!r}"
         for name, item in sorted(placements.items())
-        if name in shuffled and (item not in world.items or not allowed(world, settings, name, item))
+        if name in shuffled_set and (item not in world.items or not allowed(screened, settings, name, item))
     ]
     if problems:
         raise FillError("placements do not fit this world:\n  " + "\n  ".join(problems))
-    out = {}
-    for name, loc in world.locations.items():
-        if name in placements:
-            out[name] = placements[name]
-        elif loc.n64_only is None and (item := vanilla.get(name, loc.vanilla)) is not None:
-            out[name] = item
+    out = {
+        name: placements[name] if name in shuffled_set else fixed[name]
+        for name in world.locations
+        if name in shuffled_set or name in fixed
+    }
     return Seed(world, seed, settings, out, shuffled, spheres=[])
 
 

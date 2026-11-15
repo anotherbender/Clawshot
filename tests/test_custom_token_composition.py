@@ -329,3 +329,33 @@ def test_size_table_sizes_every_new_pack_and_member_and_keeps_native_entries(wri
     assert len(created_hashes) == len(created) and not created_hashes & native.hashes.keys()
     assert set(sizes.hashes) == set(native.hashes) | created_hashes and sizes.names == native.names
     assert (sizes.get(PARAM), sizes.get(MODEL)) == (LETTER_PARAM_ENTRY, LETTER_MODEL_ENTRY)
+
+
+def test_token_off_possessive_text_leaves_unshuffled_native_token_message_unchanged(combined):
+    # Both actors have native get-text keys; only Boomerang is in the shuffled assignment.
+    for actor in ("Item_Boomerang", "Item_Token_Gold"):
+        parameter = {
+            "Components": {
+                "ActorNameRef": f"?ActorSystem/ActorName/{actor}.engine__actor__ActorName.bgyml",
+            }
+        }
+        put(combined, pack_path(actor), sarc.write({actor_param(actor): byml.write(parameter)}))
+    messages = {
+        "Item_Boomerang_Name": ["Boomerang"],
+        "Item_Boomerang_GetMessage": ["You found the Boomerang!"],
+        "Item_Token_Gold_Name": ["Gold Skulltula Token"],
+        "Item_Token_Gold_GetMessage": ["You found the Gold Skulltula Token!"],
+    }
+    put(combined, ARCHIVE, sarc.write({text.POUCH_TEXT: msbt.write(msbt.Msbt(messages, 7))}))
+    seed = from_placements(
+        combined_spec(), 7, Settings(shuffle=("Chest",)), {CHEST_NAME: "Boomerang", AP_CHEST: "Boomerang"}
+    )
+    definitions = [
+        *DEFINITIONS,
+        Definition(AP_CHEST_ID, "chest", "Test", "Test Second Chest", "Obj_Rupee_Blue", AP_CHEST),
+    ]
+    links = link(seed.world, seed.shuffled, definitions, [*census(), chest(CHEST), chest(AP_CHEST_ID)])
+    changes = custom_step(combined, seed, links, item_actors.load(), {}, possessive_text=True).changes
+    after = msbt.read(sarc.read(changes[ARCHIVE](raw(combined, ARCHIVE)))[text.POUCH_TEXT]).messages
+    assert msbt.plain(after["Item_Boomerang_GetMessage"]) == "You found your Boomerang!"
+    assert after["Item_Token_Gold_GetMessage"] == messages["Item_Token_Gold_GetMessage"]

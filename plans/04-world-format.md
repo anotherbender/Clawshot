@@ -103,6 +103,7 @@ source = "PouchActorInfo Item_DinFire: ExpansionAvility MPMaxUP, MPMax 24"
 | `area` | the census area, where the remake places the check outside its region's Banc folder (`Location.area`) |
 | `keep_vanilla` | the check keeps its vanilla item though its type is shuffled (D17: the Treasure Chest Game room boxes) |
 | `excluded_items` | Item names this location cannot deliver. The fill checks these before reachability and during swaps/filler; unlike a logic setting, a settings-string override cannot remove them. |
+| `nonprogression_only` | When true, the compiler adds every progression-class item (including generated fixed tiers) to the location's exclusions. Normal/priority items remain eligible. All fill/swap and external-placement paths enforce it; it is data policy, not an overridable logic setting. |
 | `[regions."<name>"]` | a region the translation lacks, with `area`, `dungeon`, `scene`, `hint`, `time_passes`, `provides_time` |
 | `[exits."<region>"."<target>"]`, `[events."<region>"."<event>"]` | `rule` with `was` (a change; `"False"` closes it) or with `new = true` (an addition) |
 | `[key_counts]` | the remake's number of a dungeon's small keys, where it has fewer than N64: a rule asking for more asks for that many |
@@ -401,10 +402,13 @@ fill walks lists in world-file order, never a set (a test compares two interpret
 
 `generate.from_placements(spec, seed, settings, placements, vanilla=...)` and
 `patch.make_seed(..., placements=...)` accept exactly the prepared world's shuffled
-locations, with known items satisfying `fill.allowed`. Unshuffled sources retain
-their native rewards. These calls deliberately skip local beatability/return proofs:
-the external placer must prove its whole world or multiworld. They choose no hints,
-have no spheres and report a null opening route; they are not certified solo seeds.
+locations, with known items satisfying `fill.allowed` under the same precomputed tier/container screens as the
+fill. The screen pool includes each item as many times as either the normalized generator pool or supplied
+assignments provide; a remote lower tier/container is obtainable, never assumed guaranteed before its gate.
+An unbuildable progressive pool is refused. Data exclusions, including House100's nonprogression-only rule,
+cannot be widened by supplied assignments. Unshuffled sources retain their native rewards.
+These calls deliberately skip local beatability/return proofs: the external placer must prove its whole world
+or multiworld. They choose no hints, have no spheres and report a null opening route; they are not certified solo seeds.
 Ordinary CLI/app generation still fills and proves the seed.
 
 Native progressive preparation and chest-only copies, source-bound key/progressive
@@ -413,8 +417,8 @@ compilers, quest-step repairs and Darunia's native bonus guard still apply.
 `make_seed(foreign={location: custom_items.Foreign(player, item, own=False)})`
 supplies its window text. `own=True` says “your” but remains a placeholder: no native
 item is granted locally. A directly placed native progressive family instead grants
-the selected tier normally. `possessive_text=True` covers every possible native tier,
-not only a family's rising base model.
+the selected tier normally. `possessive_text=True` covers the shuffled placements and every possible native tier
+of their progressive families, not unshuffled native rewards.
 
 `receive_event=True` adds the opt-in native receive event; it does not implement a
 network connection, external client, slot format or progressive-selection protocol.

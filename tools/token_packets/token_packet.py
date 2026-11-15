@@ -2,7 +2,7 @@
 (section 9, amendment 1) played as section 6's core packet. It compares one packet save with the accepted checkpoint
 the packet starts from and says, for one step of the packet, whether the saved state is what that step requires.
 
-    uv run python -m clawshot.token_packet --manifest <json> --baseline <sav> --save <sav> --phase <phase>
+    uv run python -m tools.token_packets.token_packet --manifest <json> --baseline <sav> --save <sav> --phase <phase>
 
 Prints one JSON report (:func:`check_packet`); exit 0 pass, 1 fail, 2 unknown (a record a check needs is absent),
 3 contract error (bad manifest, unreadable file, a baseline other than the accepted checkpoint or not in the packet's
@@ -69,7 +69,7 @@ from typing import Any
 from clawshot import save
 from clawshot.census.scan import GOLD_SKULLTULA, Location
 
-TOOL = "clawshot.token_packet"
+TOOL = "tools.token_packets.token_packet"
 BUILD = "e0f3ccfa"
 CORE_SOURCES = {"tree": 341792603838029977, "tower": 2730878115209290675, "control": 2177746409373494991}
 CHEST_HASH = 14818888396401495482

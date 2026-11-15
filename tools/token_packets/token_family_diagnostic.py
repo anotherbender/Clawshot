@@ -15,15 +15,16 @@ from dataclasses import asdict, dataclass
 from importlib.metadata import version
 from pathlib import Path, PurePosixPath
 
-from clawshot import save, token_route_diagnostic
+from clawshot import save
 from clawshot.census.scan import GAME_DATA_LIST, read_romfs_byml, scan
 from clawshot.formats import sarc, zsdic
 from clawshot.patch import actor_packs, tokens
 from clawshot.patch.plan import PatchError, Plan
 from clawshot.patch.write import check_output_folder, check_romfs, write
-from clawshot.token_diagnostic import CHECKPOINT_SHA256
-from clawshot.token_family_packet import check_packet, parse_manifest
-from clawshot.token_packet import census_sources
+from tools.token_packets import token_route_diagnostic
+from tools.token_packets.token_diagnostic import CHECKPOINT_SHA256, implementation_sha256
+from tools.token_packets.token_family_packet import check_packet, parse_manifest
+from tools.token_packets.token_packet import census_sources
 
 AGE = token_route_diagnostic.AGE  # the native child flag the route packet checks
 AFTER_FOREST_SHA256 = token_route_diagnostic.CHECKPOINT_SHA256  # the approved after-Forest slot04
@@ -490,10 +491,7 @@ def build(romfs: Path, checkpoint: Path, out: Path, *, revision: str, packet: in
         **extra,
         "generator_version": version("clawshot"),
         "source_revision": revision,
-        "implementation_sha256": {
-            path.relative_to(Path(__file__).parent).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
-            for path in sorted(Path(__file__).parent.rglob("*.py"))
-        },
+        "implementation_sha256": implementation_sha256(),
         "seed": None,
         "settings": "approved forced family representatives, not production family admission",
         "unplayed": True,

@@ -1,6 +1,6 @@
-"""The Gold Skulltula packet checker (``clawshot.token_family_packet``) on synthetic saves built here and read by the
-real parser: a four-family packet and a native-token route packet played phase by phase, then one departure at a time
-from them."""
+"""The Gold Skulltula packet checker (``tools.token_packets.token_family_packet``) on synthetic saves built here and
+read by the real parser: a four-family packet and a native-token route packet played phase by phase, then one
+departure at a time from them."""
 
 import copy
 import hashlib
@@ -12,9 +12,9 @@ from dataclasses import dataclass, field
 import pytest
 
 from clawshot import save
-from clawshot import token_family_packet as fp
 from clawshot.save import BOOL, BOOL64, ENUM, INT, murmur3_32
 from clawshot.tracker.state import BOTTLE_SLOTS
+from tools.token_packets import token_family_packet as fp
 
 VERSION = 0x2D80EB
 SAVE_TYPE = 0xA3DB7114

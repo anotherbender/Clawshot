@@ -545,3 +545,134 @@ producer-output echoes/file-existence assertions from the new composition test r
 tautological wiring coverage; fixed-value row/grant, native preservation, collision/sizing and placement
 assertions remain. Final frozen-head gates below supersede this scoped checkpoint.
 
+### Frozen rebased verification — source head669b682 on e5fe7e2
+
+All source/tests/config were frozen by SHA256 before the overnight sequence; each stage rechecked that
+snapshot. No source/test mutation or automatic retry occurred. Game remained closed; no game was launched.
+Three workers throughout. `gate2.lock` covered synthetic and was released; the ordinary `gate.lock`
+covered fixture/replay/composition/full dump, then the final native Token-off comparison.
+
+| Check on669b682 | Observed result |
+|---|---|
+| Full `ruff format --check` / `ruff check` | Both exit0 |
+| Full `uv run pytest`, no dump environment | **2802 passed,205 skipped**,788.73s |
+| Full `uv run pytest -m dump`, real ROMFS/NUP/fresh layered fixture | **202 passed,2805 deselected,0 skipped**,7084.66s |
+| Actual Chest+Token seed7, second process with hash seed417 | **119 output files byte-identical**, no changed hash |
+| Actual combined Nothing/AP/Token seed through `make_seed` and `write_seed` | **118 resources,9 new packs,100 Token source rows**; valid rows/allocations and unchanged inputs |
+
+The actual composition replaces only two ordinary Red20 junk chests: Dodongo's Cavern End of Bridge
+with Nothing, Fire Temple Highest Goron with an Archipelago item. It retains a beatable seed and all100
+Token assignments. ActorInfo/GameActorInfo each grow8363→8372, PouchActorInfo395→404: exactly9 added
+rows in each, sorted/unique, every native row retained. **378 pack-member entries checked** with native
+copy/donor-growth/measured sizing as appropriate; **108 original transformed inputs remained byte-identical**.
+The permanent native combined test also passed as one of the11 `test_tokens_dump.py` checks.
+
+Evidence under `work/r15-token-impl/`: `phase2-rebased-e5-source-snapshot.json`,
+`phase2-rebased-e5-{synthetic,dump}-results.json`, matching gate logs,
+`phase2-rebased-e5-determinism-result.json` and
+`phase2-rebased-e5-combined-custom-token-seed-result.json`. Final native off/Gift comparison is recorded
+separately below; older4734 data-only results are not substituted for it.
+
+### Native parity sphere ruling — accepted by Claude
+
+The first actual native off seed7 compared **99 game files byte-identical and identical shuffled placements**.
+Only `spheres` differed: the three new sources plus native House30's unchanged Giant Wallet moving
+**sphere8→7**. The old “exactly three entries added, no other sphere movement” comparator stopped and
+printed all values; source/game logic was not altered. Remaining cases continue without regenerating seed7.
+
+**Claude ruling: ACCEPT.** Earlier native House thresholds are the expected consequence of three more real
+native tokens. The comparator now requires identical game files and placements, no spoiler-field change
+outside spheres, exactly the three added native token entries, and permits unchanged-item sphere moves
+only for this explicit native House list:
+`Kak 10 Gold Skulltula Reward`, `Kak 20 Gold Skulltula Reward`, `Kak 30 Gold Skulltula Reward`,
+`Kak 40 Gold Skulltula Reward`, `Kak 50 Gold Skulltula Reward`, `Kak 100 Gold Skulltula Reward`.
+Every other existing check/item movement, removed check or other spoiler-field difference still fails.
+Actual output is never filtered/rewritten. Per-case allowed moves and any unexpected changes are listed;
+the old raw report remains separate from the accepted-criterion report.
+
+**Superseding ruling from Claude:** the allowlist is replaced by a monotonic criterion, since native-token
+reachability propagates transitively. Every existing unchanged item may stay in the same or an **earlier**
+sphere; any later move fails. All other file/placement/field/addition/removal conditions remain unchanged.
+This explicitly accepts keys-anywhere seed7's native Bowling Bombchus move8→7 after House40 moves7→6.
+All three saved ordinary cases passed; eight deliberately broken counterexamples were rejected, including
+later House and non-House moves, changed items/files/placements/fields, removals and unexpected additions.
+
+
+### Independent review fixes — Claude's required cutover
+
+Claude relayed the review of669b682 and required every finding in this change before one final gate run.
+The blocker was a **native Gift seed7 placing Stone of Agony at House100**, versus main's Rupees50.
+The former implicit97-token reachability limit was not a sufficient junk-only policy once all100 sources
+became reachable. Claude reaffirmed: **House100 is always junk-only, Token on or off; no opt-in this round;
+issue12 stays open**.
+
+- The House100 location now carries an explicit data-backed non-progression restriction enforced by
+  the shared placement predicate. Progression fill, filler, swaps, final validation and external placements
+  use that restriction; external progression at House100 is refused rather than silently replaced.
+  Regression coverage includes every progression-class item, both Token settings and an actual Gift fill.
+- Possessive text derives its own-item set only from shuffled placements. Unshuffled native tokens no
+  longer change all16 message archives in Token-off AP seeds; the regression exercises that combination.
+- External `from_placements` applies the same container and tier screens, with fail-closed checking rather
+  than a deferred ammo exception. The current production palette remains unchanged; this admits no ammo.
+- Settings help/docs explicitly exclude Double Defense and Scrub Business Seed. The no-Chest refusal names
+  Token shuffle; custom-item and Token refusal tests retain semantic error matches.
+- Packet/diagnostic modules moved to `tools/token_packets/`, outside the release package, with callers and
+  tests migrated and no old import aliases. A rebuilt wheel contains no `clawshot/token_*.py` modules.
+  The moved families2 checker ran against the unchanged staged baseline: **87 pass,0 fail,0 unknown**.
+- Actual local browser verification showed the updated Token exclusion help and Token still Vanilla in
+  Recommended. The review-only browser tab was closed; no game was launched or gameplay profile edited.
+
+Final source/tests/config are frozen in
+`work/r15-token-impl/phase2-final-review-source-snapshot.json`. The final sequence uses distinct
+`phase2-final-review-*` evidence, preserving the earlier669b682 results rather than relabeling them.
+No staged mod/save bytes were rebuilt for these review fixes.
+
+### Final post-review verification — READY
+
+One final sequence completed after all review fixes, with source/tests/config frozen and three workers.
+Synthetic used `gate2.lock`; dump/fixture/smoke and the subsequent native comparison used `gate.lock`.
+Every owned lock was released. No game was launched, no source/test mutation or unchanged retry occurred.
+
+| Final check | Observed result |
+|---|---|
+| `uv run ruff format --check` |402 files already formatted, exit0 |
+| `uv run ruff check` |All checks passed, exit0 |
+| `uv run pytest`, no dump environment |**2821 passed,207 skipped**,889.43s |
+| `uv run pytest -m dump`, ROMFS/NUP/validated fixture |**204 passed,2824 deselected,0 skipped**,7094.80s |
+| Actual Chest+Token seed7 replay, hash seed417 |**119 files byte-identical**, no changed hash |
+| Combined Nothing/AP/Token native generation/write |**118 resources,9 new packs,100 Token source rows**,378 pack members checked,108 source files unchanged |
+
+The reused layered fixture was byte-validated against all1266 current native working-set inputs before use.
+The combined seed retained all native registry rows, with exactly9 added rows in each actor/pouch registry.
+House100's real Gift tests and Token-off possessive composition regression passed in the relevant gates.
+
+Final actual native Token-off comparison against pinned **e5fe7e2** reused only the previously generated
+main outputs after checking every saved game-file hash; all candidate outputs were freshly generated.
+
+| Seed/settings | Main/candidate game files | Changed game files | Changed placements | Result |
+|---|---:|---:|---:|---|
+|7, own-dungeon |99/99 |0 |0 |PASS monotonic sphere criterion |
+|11, own-dungeon |99/99 |0 |0 |PASS monotonic sphere criterion |
+|7, keys-anywhere |102/102 |0 |0 |PASS monotonic sphere criterion |
+|7, Chest+Gift, Token off |139/138 |101 |119 |Differences reported; House100 junk-only confirmed |
+
+The ordinary cases differ only in spheres: exactly the three native Token checks added, no checks removed,
+and every existing item remains in its original or an earlier sphere. Actual moves are House30 Giant Wallet
+8→7 in seed7/own-dungeon; House40 Bombchus20 7→6 and native Bowling Bombchus10 8→7 in keys-anywhere.
+Seed11 has no existing-check movement.
+
+The corrected **Gift seed7 puts Rupees20 at House100**, classified non-progression; main has Rupees50
+and the rejected669b682 output had progression-class Stone of Agony. House10/50 now receive Rupees20;
+House20 receives Rupees200 and House30 a Heart Piece. Gift output is deliberately **not** called byte-identical.
+Changed spoiler fields: `age_locked_pickups`, `hints`, `item_names`, `opening_route`, `patch`,
+`placements`, `progressive_grants`, `spheres`. No generated output was normalized or edited for parity.
+
+Final evidence under `work/r15-token-impl/`:
+`phase2-final-review-{synthetic,dump}-results.json`, `phase2-final-review-gate-*.log`,
+`phase2-final-review-fixture-proof.json`, `phase2-final-review-determinism-result.json`,
+`phase2-final-review-combined-custom-token-seed-result.json`,
+`phase2-final-review-comparison-summary.json`, and
+`off-native-parity-e5fe7e2-final-review/accepted-report.json`.
+
+Families2 remains the same staged packet/checklist and baseline; **no new played PASS is claimed**.
+Its excluded families, including Bombchus, are still excluded until the staged in-game checks pass.

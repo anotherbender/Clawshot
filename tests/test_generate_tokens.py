@@ -363,7 +363,7 @@ def test_skulltula_ammo_requires_its_container_even_with_an_unrelated_bypass(amm
 @pytest.mark.parametrize(("ammo", "container"), AMMO_CONTAINERS)
 def test_skulltula_palette_refuses_ammo_when_every_source_can_bypass_its_container(ammo, container):
     world = container_world(ammo, container, guaranteed=False)
-    with pytest.raises(FillError):
+    with pytest.raises(FillError, match=SHUFFLE):
         fill(world, container_settings(ammo), random.Random(0))
 
 

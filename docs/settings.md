@@ -52,11 +52,15 @@ in chests only; see [Progressive items](#progressive-items).
 | `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. Implementation tested; not every sale has recorded in-game acceptance. |
 | `BossHeart` | Eight boss-heart checks, off by default. Limited to the five native floor pickups below. King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
 | `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
-| `Token` | All 100 native Gold Skulltulas, off by default; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, ordinary rupees1/5/20/50, Heart Pieces/Containers and fixed Nut/Stick capacity. Each member must pass its native structural check; see `src/clawshot/data/token_rewards.toml`. Core and packet1 representatives passed, not every member/boundary. Bombchus, ordinary ammo, gold rupees, magic recovery/spells/arrows, Lens and Echo Gem remain excluded pending packets2/3. Progressive copies/keys stay chest-only; other dungeon items stay in their dungeon; songs, ocarinas, trade items and shop goods keep their holds. Tokens may spill only into shuffled chests. The Field tree (daytime roll/attack/retrieval), night ranch tower (child Boomerang/adult Hookshot), and wetlands adult crate after the earlier child wall kill passed. Final revisits were not played; Claude accepted saved state plus earlier packets. |
+| `Token` | All 100 native Gold Skulltulas, off by default; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, ordinary rupees1/5/20/50, Heart Pieces/Containers and fixed Nut/Stick capacity. Each member must pass its native structural check; see `src/clawshot/data/token_rewards.toml`. Core and packet1 representatives passed, not every member/boundary. Bombchus, ordinary ammo, gold rupees, magic recovery/spells/arrows, Lens, Echo Gem, Double Defense and Scrub Business Seed remain excluded pending packets2/3. Progressive copies/keys stay chest-only; other dungeon items stay in their dungeon; songs, ocarinas, trade items and shop goods keep their holds. Tokens may spill only into shuffled chests. The Field tree (daytime roll/attack/retrieval), night ranch tower (child Boomerang/adult Hookshot), and wetlands adult crate after the earlier child wall kill passed. Final revisits were not played; Claude accepted saved state plus earlier packets. |
 
 Future admitted Skulltula ammo still requires its existing container before the source (D25).
 Refills never grant a bag or weapon; the native new-game Nut Bag is already present, empty.
 Bombchus remain excluded until a with-Bomb-Bag representative proves real ammo, use and reload.
+
+The 100-token House reward accepts only non-progression items in every seed, including Gift shuffle with
+Token off. This is an explicit placement rule, not a consequence of which Skulltulas are reachable.
+There is no progression-at-100 opt-in this round; #12 remains open.
 
 Cows, dungeon completion rewards, pots, crates, loose
 rupees, recovery hearts, loose keys and silver-rupee puzzles stay unchanged. Pot and ground-rupee
@@ -66,6 +70,10 @@ reward. Completion and recovery are not solved by a destruction flag.
 The Round 15 forced token diagnostic is not a shuffle option or a beatable seed. It tests independent pickup grants,
 native collection records, chest tokens and the House 10 reward on an isolated historical checkpoint; its passed
 core packet is the evidence for the `Token` families above.
+
+Maintainer packet/checker tools live in `tools/token_packets/`, outside the release package.
+From the repository root, run `uv run python -m tools.token_packets.token_family_packet`
+with `--manifest`, `--baseline`, `--save` and `--phase` to check families2 read-only.
 
 The floor palette is **Heart Container, Piece of Heart, Deku Shield, Hylian Shield and red rupee**.
 Major items on the floor can crash. Heart Containers from chests have no recorded in-game acceptance.

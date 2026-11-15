@@ -257,13 +257,13 @@ def _in_dungeon_area(world: World, location: str, dungeon: str) -> bool:
 
 
 def allowed(world: World, settings: Settings, location: str, item: str) -> bool:
-    """Whether ``item`` may go to ``location`` at all, reachable or not. Inside :func:`fill`, the world also carries
-    the seed's tier screen (``tier_forbidden``, :func:`tier_forbidden`)."""
+    """Whether ``item`` may go to ``location`` at all, reachable or not. A world from :func:`with_screens` (every
+    :func:`fill`, every external assignment) also carries the seed's tier and ammo-container screens."""
     if item in world.locations[location].excluded_items:
         return False
     if location in world.settings.get("tier_forbidden", {}).get(item, ()):
         return False
-    if location in world.settings.get("token_container_forbidden", {}).get(item, ()):
+    if location in world.settings.get("container_forbidden", {}).get(item, ()):
         return False
     if world.locations[location].type == "Shop":
         if item not in world.settings.get("native_shop_items", ()):
@@ -629,25 +629,26 @@ def _without_ammo_container(
     )
 
 
-def _token_container_forbidden(
+def _container_forbidden(
     world: World, locations: list[str], pool: list[str], placements: Mapping[str, str]
 ) -> dict[str, frozenset[str]]:
-    """Screen Skulltula ammo before palettes, type-held fill, swaps or filler can bypass its container.
+    """Screen ammo before palettes, type-held fill, swaps, filler or an external assignment can bypass a container.
 
-    Holding every other item, a source must still be unreachable without an independent container provider.
-    This is D25's counterfactual, not an assumption that an ammo get will create a bag or weapon.
-    Native new games already have an empty Nut Bag; that sourced world fact needs no placement gate.
+    Holding every other item, a destination must still be unreachable without an independent container provider.
+    D25: bomb and Bombchu packs go only where the Bomb Bag is guaranteed, at every location. At Skulltulas every other
+    ammo family needs its container too. This is D25's counterfactual, not an assumption that an ammo get will create
+    a bag or weapon. Native new games already have an empty Nut Bag (``token_starting_containers``); that sourced world
+    fact needs no Skulltula gate.
     """
-    destinations = [name for name in locations if world.locations[name].type == "Token"]
-    if not destinations:
-        return {}
+    skulltulas = [name for name in locations if world.locations[name].type == "Token"]
     starting = world.settings.get("token_starting_containers", ())
     forbidden = {}
     for family, contract in _AMMO_CONTAINERS.items():
-        if family in starting:
-            continue
+        destinations = locations if family == "bomb" else skulltulas
+        if family != "bomb" and family in starting:  # D25 has no starting-container exception
+            destinations = []
         ammo = dict.fromkeys(item for item in pool if item.startswith(contract[0]))
-        if not ammo:
+        if not destinations or not ammo:
             continue
         without = _without_ammo_container(world, pool, placements, *contract)
         blocked = frozenset(name for name in destinations if without.can_access(world.locations[name]))
@@ -668,13 +669,14 @@ def _fill_bomb_ammo(
 
     The audited item and Shop bundle actors share SmallBagActor = Item_BombBag_Small
     (plans/03-game-data.md section 24). Buy refills remain in shops; never count any pack
-    or logical bag alias in the counterfactual inventory.
+    or logical bag alias in the counterfactual inventory. The seed's container screen
+    (:func:`with_screens`) already holds every location reachable without a bag, the same for every pack.
     """
     ammo = [item for item in pool if item.startswith(_BOMB_AMMO_PREFIXES)]
     if not ammo:
         return
-    without_bag = _without_ammo_container(world, pool, placements, *_AMMO_CONTAINERS["bomb"])
-    destinations = [name for name in locations if not without_bag.can_access(world.locations[name])]
+    without_bag = world.settings.get("container_forbidden", {}).get(ammo[0], frozenset())
+    destinations = [name for name in locations if name not in without_bag]
     pool[:] = [item for item in pool if not item.startswith(_BOMB_AMMO_PREFIXES)]
     # Dungeon items already own their slots; place constrained ammo before unrestricted filler.
     # Assumed fill still requires actual reachability and respects dungeon/display restrictions.
@@ -736,6 +738,24 @@ def tier_forbidden(world: World, items: list[str], fixed: Mapping[str, str]) -> 
             for high in tiers[index + 1 :]:
                 forbidden.setdefault(high, set()).update(reachable)
     return {item: frozenset(names) for item, names in forbidden.items()}
+
+
+def with_screens(world: World, shuffled: list[str], pool: list[str], fixed: Mapping[str, str]) -> World:
+    """``world`` carrying the seed's placement screens, which :func:`allowed` reads: each higher fixed tier's forbidden
+    locations (:func:`tier_forbidden`) and ammo whose container is not guaranteed (:func:`_container_forbidden`: D25
+    bomb packs anywhere, every ammo family at Skulltulas).
+
+    ``pool`` holds every item the ``shuffled`` locations may give, ``fixed`` the other locations' placements.
+    :func:`fill` screens its pool before any stage; ``generate.from_placements`` screens before it checks a supplied
+    assignment, so neither can place past a screen."""
+    # Strength and scales: a higher fixed tier goes only where every lower tier the seed holds is mandatory.
+    forbidden = tier_forbidden(world, pool, fixed)
+    if forbidden:
+        world = replace(world, settings={**world.settings, "tier_forbidden": forbidden})
+    containers = _container_forbidden(world, shuffled, pool, fixed)
+    if containers:
+        world = replace(world, settings={**world.settings, "container_forbidden": containers})
+    return world
 
 
 def tier_order_violations(world: World, placements: Mapping[str, str]) -> list[tuple[str, str, str]]:
@@ -900,13 +920,7 @@ def fill(
     }
     pool = [vanilla_item(name) for name in shuffled]
     rng.shuffle(pool)
-    # Strength and scales: a higher fixed tier goes only where every lower tier the seed holds is mandatory.
-    forbidden = tier_forbidden(world, pool, placements)
-    if forbidden:
-        world = replace(world, settings={**world.settings, "tier_forbidden": forbidden})
-    containers = _token_container_forbidden(world, shuffled, pool, placements)
-    if containers:
-        world = replace(world, settings={**world.settings, "token_container_forbidden": containers})
+    world = with_screens(world, shuffled, pool, placements)
     locations = list(shuffled)
     held = settings.item_location_types
     shop_refills = sum(item.startswith("Buy ") and held.get(item) == ("Shop",) for item in pool)

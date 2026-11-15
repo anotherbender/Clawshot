@@ -1,5 +1,5 @@
-"""The core packet checker (``clawshot.token_packet``) on synthetic saves built here and read by the real parser:
-the packet played step by step, then one departure at a time from it."""
+"""The core packet checker (``tools.token_packets.token_packet``) on synthetic saves built here and read by the real
+parser: the packet played step by step, then one departure at a time from it."""
 
 import hashlib
 import json
@@ -9,10 +9,10 @@ from dataclasses import dataclass, field
 import pytest
 
 from clawshot import save
-from clawshot import token_packet as tp
 from clawshot.census.scan import GAME_DATA_LIST, read_romfs_byml, scan
 from clawshot.formats import zsdic
 from clawshot.save import BOOL, BOOL64, INT, murmur3_32
+from tools.token_packets import token_packet as tp
 
 VERSION = 0x2D80EB
 SAVE_TYPE = 0xA1B2C3D4

@@ -1,11 +1,16 @@
 """Seeds from placements chosen elsewhere (another placer's fill, such as an Archipelago multiworld's). Synthetic
-worlds from test_generate, and the repository's own logic data for the spoiler's opening route."""
+worlds from test_generate and test_world_tiers, and the repository's own logic data for the spoiler's opening route."""
+
+import re
+from types import MappingProxyType
 
 import pytest
-from test_generate import dungeon_world
+from test_generate import chest, dungeon_world
+from test_world_tiers import BYPASS, strength_spec
 
-from clawshot.generate import FillError, Settings, from_placements, generate, prepare, spoiler
+from clawshot.generate import FillError, Settings, from_placements, generate, prepare, spoiler, tokens
 from clawshot.generate.fill import shuffled_locations
+from clawshot.generate.tokens import SOURCE_TYPE
 from clawshot.world import build_world
 from clawshot.world.load import load_spec
 
@@ -60,6 +65,10 @@ def test_a_seed_from_given_placements_has_no_opening_route_instead_of_failing_th
     settings = Settings(shuffle=("Chest",))
     world = build_world(spec)
     placements = {name: world.locations[name].vanilla for name in shuffled_locations(world, settings)}
+    # D25: a native bomb pack goes only where the Bomb Bag is guaranteed, which not every vanilla chest is.
+    placements = {
+        name: "Rupees (5)" if item.startswith(("Bombs (", "Bombchus (")) else item for name, item in placements.items()
+    }
     out = from_placements(spec, 1, settings, placements)
     assert all(out.placements[name] == item for name, item in placements.items())
     assert spoiler(out)["opening_route"] is None
@@ -85,3 +94,117 @@ def test_external_copies_remain_chest_only_and_native_quest_rewards_stay_at_thei
     chest_placements = dict.fromkeys(shuffled_locations(chest_world, chest_settings), "Rupees (5)")
     chest_only = from_placements(spec, 1, chest_settings, chest_placements)
     assert chest_only.placements["GC Darunias Joy"] == "Goron Bracelet"
+
+
+def test_a_higher_tier_supplied_before_its_lower_tier_is_refused():
+    """The fill's tier screen (``fill.with_screens``) is set before a supplied assignment is checked."""
+    spec = strength_spec()
+    settings = Settings(shuffle=("Chest",))
+    with pytest.raises(FillError, match="Open A: may not hold 'Golden Gauntlets'"):
+        from_placements(spec, 1, settings, BYPASS)
+    safe = {**BYPASS, "Open A": "Silver Gauntlets", "Boulder Chest": "Golden Gauntlets"}
+    assert from_placements(spec, 1, settings, safe).placements["Boulder Chest"] == "Golden Gauntlets"
+
+
+def test_a_lower_tier_in_another_world_still_has_to_come_first():
+    """This world's own Silver Gauntlets may arrive from another game at any time, so the Golden ones must still wait
+    behind them; behind them they are accepted without a local route to either."""
+    spec = strength_spec()
+    settings = Settings(shuffle=("Chest",))
+    remote = {**BYPASS, "Boulder Chest": "Rupees (5)"}  # the Silver Gauntlets are placed in another game's world
+    with pytest.raises(FillError, match="Open A: may not hold 'Golden Gauntlets'"):
+        from_placements(spec, 1, settings, remote)
+    behind = {**remote, "Open A": "Rupees (5)", "Boulder Chest": "Golden Gauntlets"}
+    out = from_placements(spec, 1, settings, behind)
+    assert out.placements["Boulder Chest"] == "Golden Gauntlets"
+    assert "Silver Gauntlets" not in out.placements.values()
+
+
+def bomb_spec() -> dict:
+    """A Bomb Bag, an unrelated Hammer bypass and a chest only the bag opens."""
+    return {
+        "start": "Start",
+        "goal": "Bomb_Bag",
+        "items": {"Bomb Bag": {}, "Hammer": {}, "Bombs (5)": {"class": "normal"}, "Rupee": {"class": "normal"}},
+        "regions": [
+            {
+                "name": "Start",
+                "locations": {
+                    "Bag": chest("Bomb Bag"),
+                    "Hammer": chest("Hammer"),
+                    "Bypass": chest("Rupee", "Bomb_Bag or Hammer"),
+                    "Bag Required": chest("Bombs (5)", "Bomb_Bag"),
+                },
+            }
+        ],
+    }
+
+
+def test_a_supplied_bomb_pack_needs_a_guaranteed_bag_even_when_the_bag_is_remote():
+    """D25 at every supplied location, with the fill's own counterfactual: a pack never counts as a bag, and a bag
+    in another game's world never makes a bag-free source safe. No local beatability is asked for."""
+    spec = bomb_spec()
+    settings = Settings()
+    bypass = {"Bag": "Bomb Bag", "Hammer": "Hammer", "Bypass": "Bombs (5)", "Bag Required": "Rupee"}
+    with pytest.raises(FillError, match=r"Bypass: may not hold 'Bombs \(5\)'"):
+        from_placements(spec, 1, settings, bypass)
+    behind = {**bypass, "Bypass": "Rupee", "Bag Required": "Bombs (5)"}
+    assert from_placements(spec, 1, settings, behind).placements["Bag Required"] == "Bombs (5)"
+    remote = {**behind, "Bag": "Rupee"}  # the Bomb Bag is placed in another game's world
+    out = from_placements(spec, 1, settings, remote)
+    assert out.placements["Bag Required"] == "Bombs (5)" and "Bomb Bag" not in out.placements.values()
+    with pytest.raises(FillError, match=r"Bypass: may not hold 'Bombs \(5\)'"):
+        from_placements(spec, 1, settings, {**remote, "Bypass": "Bombs (5)", "Bag Required": "Rupee"})
+
+
+def test_a_bomb_pack_supplied_at_a_chest_open_from_the_start_is_refused():
+    spec = load_spec()
+    settings = Settings()
+    _, world = prepare(spec, settings)
+    placements = dict.fromkeys(shuffled_locations(world, settings), "Rupees (5)")
+    placements["KF Midos Top Left Chest"] = "Bombs (5)"
+    with pytest.raises(FillError, match=r"KF Midos Top Left Chest: may not hold 'Bombs \(5\)'"):
+        from_placements(spec, 1, settings, placements)
+
+
+def skulltula_spec(ammo: str, container: str) -> dict:
+    """A container, an unrelated Hammer bypass and two Gold Skulltulas, one only the container opens."""
+    gate = f"'{container}'"
+    return {
+        "start": "Start",
+        "goal": gate,
+        "items": {container: {}, "Hammer": {}, ammo: {}, "Rupees (5)": {"class": "normal"}},
+        "regions": [
+            {
+                "name": "Start",
+                "locations": {
+                    "Container Chest": chest(container),
+                    "Hammer Chest": chest("Hammer"),
+                    "Bypass GS": {"rule": f"{gate} or Hammer", "type": SOURCE_TYPE, "vanilla": "Rupees (5)"},
+                    "Container GS": {"rule": gate, "type": SOURCE_TYPE, "vanilla": ammo},
+                },
+            }
+        ],
+    }
+
+
+@pytest.mark.parametrize(
+    ("ammo", "container", "actor"),
+    [("Arrows (10)", "Quiver (40)", "Obj_ArrowBundle_Large"), ("Bombs (5)", "Bomb Bag", "Item_BombBundle_Small")],
+)
+def test_supplied_skulltula_ammo_needs_its_container_even_once_admitted(monkeypatch, ammo, container, actor):
+    """Production admits no ammo family at Skulltulas, so the palette refuses it outright. Admitting one (patched
+    here) still leaves the container screen: the Hammer bypass is refused, a remote container is not a guarantee."""
+    spec = skulltula_spec(ammo, container)
+    settings = Settings(shuffle=("Chest", tokens.SHUFFLE))
+    behind = {"Container Chest": container, "Hammer Chest": "Hammer", "Bypass GS": "Rupees (5)", "Container GS": ammo}
+    with pytest.raises(FillError, match=re.escape(f"Container GS: may not hold '{ammo}'")):
+        from_placements(spec, 1, settings, behind)
+    monkeypatch.setattr(tokens, "REWARDS", MappingProxyType({**tokens.REWARDS, ammo: (actor, "refill")}))
+    assert from_placements(spec, 1, settings, behind).placements["Container GS"] == ammo
+    remote_container = {**behind, "Container Chest": "Rupees (5)"}  # placed in another game's world
+    assert from_placements(spec, 1, settings, remote_container).placements["Container GS"] == ammo
+    for container_placement in (behind, remote_container):
+        bypass = {**container_placement, "Bypass GS": ammo, "Container GS": "Rupees (5)"}
+        with pytest.raises(FillError, match=re.escape(f"Bypass GS: may not hold '{ammo}'")):
+            from_placements(spec, 1, settings, bypass)

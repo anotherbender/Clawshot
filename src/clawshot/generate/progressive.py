@@ -113,9 +113,10 @@ def normalize_pool(world: World, settings: Settings, vanilla: Mapping[str, str] 
         return {}
     destinations = world.progressive_destinations
     if not set(destinations) & set(settings.shuffle):
+        context = "Token shuffle requires shuffled Chest checks: " if "Token" in settings.shuffle else ""
         raise FillError(
-            f"progressive items ({', '.join(chains)}) go only to {list(destinations)} checks, so the seed must "
-            f"shuffle them; shuffle is {list(settings.shuffle)}"
+            f"{context}progressive items ({', '.join(chains)}) go only to {list(destinations)} checks, "
+            f"so the seed must shuffle them; shuffle is {list(settings.shuffle)}"
         )
     shuffled = shuffled_locations(world, settings)
     overrides = {}

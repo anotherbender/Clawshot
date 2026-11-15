@@ -37,7 +37,7 @@ NATIVE_SAVED_BOOLS = 10212
 # source enemy's Hash H: H and H xor 2 (XOR, not H+2: Lone Tree 2177746409373494991 has companion
 # 2177746409373494989). They are collection records, not token stock. The Bool64bitKey list holds only the keys that
 # are set (``clawshot.save``), so an uncollected source is both keys absent from a present list. That reading is
-# certified only for the layout the core packet was played and checked on (``clawshot.token_packet``;
+# certified only for the layout the core packet was played and checked on (``tools.token_packets.token_packet``;
 # plans/rounds/r15-scrub-tokens.md, Phase 1 PLAYED PASS): the accepted checkpoint's progress.sav header version
 # 0x2D80EB (spec section 1, S1) with Bool64bitKey type hash 0xA3DB7114 (``MetaData.SaveTypeHash``,
 # plans/rounds/r2-census.md item 5), holding build e0f3ccfa's saved Bools.

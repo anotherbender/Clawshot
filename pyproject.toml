@@ -34,6 +34,7 @@ select = ["E", "F", "W", "I", "B", "UP", "SIM"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]  # the repository's tools/ (never in the clawshot wheel) for their tests
 markers = [
     "dump: needs the player's romfs in OOT_ROMFS; skipped when it is unset",
 ]

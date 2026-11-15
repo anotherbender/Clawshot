@@ -17,8 +17,9 @@ from clawshot.formats import zsdic
 from clawshot.patch import tokens
 from clawshot.patch.plan import PatchError, Plan
 from clawshot.patch.write import check_output_folder, check_romfs, write
-from clawshot.token_family_packet import check_packet, parse_manifest
-from clawshot.token_packet import census_sources
+from tools.token_packets.token_diagnostic import implementation_sha256
+from tools.token_packets.token_family_packet import check_packet, parse_manifest
+from tools.token_packets.token_packet import census_sources
 
 CHECKPOINT_SHA256 = "e36c32a6156c07f9f4b1d8c3f5ea12a101984e16e51b05744712df36b5ce6bd3"
 LONE = 2177746409373494991
@@ -121,10 +122,7 @@ def build(romfs: Path, checkpoint: Path, out: Path, *, revision: str) -> dict:
         "phases": phases,
         "generator_version": version("clawshot"),
         "source_revision": revision,
-        "implementation_sha256": {
-            path.relative_to(Path(__file__).parent).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
-            for path in sorted(Path(__file__).parent.rglob("*.py"))
-        },
+        "implementation_sha256": implementation_sha256(),
         "seed": None,
         "settings": "approved forced routes; native flag/age/appearance/crate logic untouched",
         "unplayed": True,
