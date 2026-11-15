@@ -129,8 +129,7 @@ def build(romfs: Path, checkpoint: Path, out: Path, *, revision: str) -> dict:
         "settings": "approved forced routes; native flag/age/appearance/crate logic untouched",
         "unplayed": True,
         "debug_policy": (
-            "Map Teleport, clock, movement/access Noclip only; "
-            "no inventory, flag or age cheats; route actions native"
+            "Map Teleport, clock, movement/access Noclip only; no inventory, flag or age cheats; route actions native"
         ),
     }
     preflight = check_packet(parse_manifest(manifest), original, original, "baseline")
