@@ -1382,3 +1382,32 @@ no Clawshot code. The implementer never opens ootrr. Credit "ootrr (REALAZK)".
    second time leaves an invisible text box. Reproduce, find the cause, fix, and stage an in-game check.
 2. After C's specification is accepted: Gold Skulltula tokens as a shuffle option, built only from that
    specification and our own sources (D never opens `E:/OOTRemake/work/refs/ootrr-azk` or ootrr on GitHub).
+
+### After round 15
+
+Done 2026-11-15; not released yet (main `f84b5ae`). All four tracks merged:
+- A: castle's #5, #6, #4 and #20, merged as one linear series under his name (main `e5fe7e2`).
+- B: the compact OBS tracker view and free time travel in the app.
+- C: the clean-room token specification.
+- D: the #26 scrub guard (`d66d35f`), then Gold Skulltula token shuffle (`3e2dd50`, final families `f84b5ae`).
+
+Token shuffle:
+- Off by default; presets are unchanged.
+- All 100 Skulltulas are locations, including HF Lone Tree, HF Wetland Grotto Crate and LLR Tower.
+- 40 items in 19 families can sit at a Skulltula as a real pickup, each admitted after a played packet on Longshot
+  rc.3.
+- Bombchus and ammo follow D25 and the container rules.
+- The 100-token reward is junk-only, with Token on or off.
+- Gates on `f84b5ae`: synthetic 2855, dump 203, a 1500-seed sweep with no fill failure. Token-off output is
+  byte-identical to `3e2dd50`.
+
+Seeds differ from 0.2.1 (the #26 guard and the three native Skulltula checks), so the next release needs new
+community seeds.
+
+Open:
+- #32: the time of day sticks with the Door of Time open, from a tester on 0.2.1 and 0.2.0.
+- #31: the `.nup` reader size cap.
+- #6's in-game check of the Nothing and other-player get windows.
+- Gift-held items (bottles, Double Defense, Stone of Agony, Rupees (200)) never reach Skulltulas.
+- Tokens fill about 56% of Skulltula slots; this is structural.
+- Longshot moved to rc.4 on 2026-11-15; seed 25 boots on it, but nothing has been played on rc.4 yet.
