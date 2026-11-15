@@ -362,3 +362,152 @@ Packet2 producer retains explicit packet1 support without rebuilding it. It chec
 Magic notation correction to the earlier design: native MPMax24 corresponds to **saved raw MPMax240**, per existing played meter data; the producer labels that prediction. Magic Jar's MPRecover120 is **not** asserted to fill every empty meter. Before its pickup, briefly use the Lens only, then turn it off/save with **120 < raw MP < 240**; expect that bounded deficit to refill to240, capacity unchanged. Actual Din's Fire cast is proved after reload, with variable current MP not guessed. All effect/current-MP evidence remains separate from source completion.
 
 Native child Kakariko static has no AgonyStoneReactArea. Echo Gem reaction is therefore tested in the **child wooded grotto**, verified reaction area **17897764476642920225** at `(-149.06,128.84,320.78)`, without killing/collecting unrelated Gold **12007978132755687032**. Open with an ordinary bomb, preserving the independently tested Bombchu stock4. `FAMILIES-2-CHECKLIST.md` records the complete bounded sequence and required load names; no new played result is claimed.
+
+### Packet2 staged READY and boot checked
+
+Built from source **96dd41d** into `work/r15-token-impl/ingame/mods/token-families-2-next/token-families-2-next/`, with `Test - token-families-2-next.bat`, `FAMILIES-2-CHECKLIST.md`, original after-Forest baseline and isolated user. **13 resources, six pickup packs**; baseline checker **87 pass /0 fail /0 unknown**. Launcher dry run exited0 on rc.3; copied progress/caption/account/options equal the original approved backup. Script verified the backup unchanged and **108 existing staged files/profiles preserved**.
+
+Independent inverse/readback passed: three Bancs (Field child/adult, Kakariko child), intended source selectors only, all original registry/placement content preserved, native token graph bytes retained, no GDL/Tag/AIglobal/native-token/enemy emission. Both age copies of tree/tower/Field-tree link to the same source; no duplicate source identity.
+
+Posted READY to `cs-r15`. Claude then reported **packet2 boot PASS on rc.3: crash0,13 RomFS files,1 mod**, with a save watcher armed on `user-token-families-2-next` for morning. This is **boot evidence only**; all six packet2 families remain excluded pending their actual grants/use/reload.
+
+### Production tracker/UI smoke and overnight gate start
+
+Fresh-process tracker loaded the actual generated Chest+Token seed and the retained families1 final save: **100 shuffled source rows,16 collected,0 unknown**, while native token stock is **9**, proving source completion is independent of token inventory. Seed identity correctly reports **unverifiable** (neither side adds seed-specific flags); this is a reader/completion smoke, not a claim the historical save belongs to that randomized seed.
+
+Actual fresh isolated UI (in-memory preferences, Play disabled) displayed all100-source admission, the expanded played families and explicit unplayed exclusions. Browser screenshot inspected; tab/server closed and the temporary entry removed. Initial two-second helper wait preceded schema initialization; printed state showed normal loaded controls and no page errors, then the observed control was exercised. No game, seed or user preferences were started/modified through the UI.
+
+First full overnight gate attempt acquired/released **gate2.lock** correctly and stopped at format: exactly one wrapped `debug_policy` string in `token_route_diagnostic.py`. Printed diff identified the cause. Ran Ruff format on that file only, committed the formatting correction as Claude requested, preserved the original frozen snapshot, and started a new format-fix snapshot for the complete three-worker synthetic gates. Existing staged packets remain byte-identical to their recorded source.
+
+### Phase2 READY handoff — review/staged play; rebased gates pending
+
+**Source:** `96dd41d` production admission plus `f7dde54` formatting correction. Full pre-castle
+gate on that source: **385 files formatted, lint clean, 2740 passed /203 skipped in947.86s**,
+`CLAWSHOT_WORKERS=3`; `gate2.lock` acquired with `owner.txt` and released, exit0.
+These are not results for the future rebased head.
+
+**Order, Claude:** castle's series merges first after its dump passes. This branch then rebases onto
+that main and runs full synthetic and dump on the rebased head. The previously queued cs15d dump
+job was cancelled while waiting; ordinary `gate.lock` remained cs15a-owned. **No fixture/dump work
+starts until Claude explicitly says main moved.** Staged packet bytes/profiles are not rebased or rebuilt.
+
+#### Token option
+
+`Token` is an explicit, default-off shuffle kind; Defaults/Recommended presets are unchanged.
+It requires `Chest` under the existing always-progressive contract. On, all **100 distinct native
+sources** enter the pool once, supplying exactly100 individual tokens; the114 age/Alternative
+placements do not duplicate checks/items. Tokens may occupy only shuffled Chest/Token checks.
+Token checks take only the22 structurally verified members in `data/token_rewards.toml`; unsupported
+explicit palettes/holds are refused before output, not silently widened.
+
+Native source identity and collected-reason completion remain independent of the assigned grant.
+No global native token/enemy replacement, source flag fabrication, token-on-kill compensation or
+House threshold change is introduced. House rewards remain an independent Gift option; the100 reward
+stays junk and the separate progression opt-in is not offered. D25's guaranteed-container screen runs
+before the Token palette/type-held/filler stages; it grants no bag/weapon and does not admit unplayed ammo.
+
+#### Admitted families and their actual representative proof
+
+Admission is by native family, **not a claim every listed member/boundary was played**. Each member
+must still pass the writer's own native row/components. The catalogue contains exactly these22 members:
+
+| Native family | Admitted members | Packet that proves the representative |
+|---|---|---|
+| `token` | Gold Skulltula Token | Core: native Field-tree token9→10, chest token10→11, House10 paid once; route packet also proves the native wetlands token19→20 |
+| `fixed_major` | Boomerang, Megaton Hammer | Core: Boomerang at ranch tree, left/recovered through Save and Continue, then usable |
+| `equipment` | Hylian/Deku/Mirror Shield; Kokiri/Biggoron Sword; Iron/Hover Boots; Goron/Zora Tunic | Core: ranch-tower Hylian Shield retrieved/equipped; route: owned shield abandoned as child, Hookshot-retrieved as adult |
+| `bottle` | Bottle, Bottle with Milk | Families1: new Milk slot, drank to Empty, original bottle unchanged after use/save |
+| `rupee` | Rupee1, Rupees5/20/50 | Families1: Red20, saved rupees68→88 and source committed; full-wallet clamp not separately played |
+| `heart_piece` | Piece of Heart | Families1: first piece stock1, maximum life unchanged, abandoned drop recovered; fourth-piece conversion unplayed |
+| `heart_container` | Heart Container | Families1: maximum life16→20, piece stock unchanged |
+| `fixed_capacity` | Deku Nut Capacity, Deku Stick Capacity | Families1: native Nut30 capacity/refill and source completion; Stick20 retains its own structural fields |
+
+The route packet admits **HF GS Lone Tree, LLR GS Tower, HF GS Wetland Grotto Crate**.
+Lone Tree retains roll/attack/retrieval but no night gate: daytime was observed. Tower retains night,
+child clock and age-appropriate retrieval; wetlands retains the actual child-kill/adult-crate history.
+Final revisits were not played; Claude explicitly accepted the saved state plus earlier packets.
+
+#### Exclusions and staged morning packet
+
+Bombchus remain excluded: families1 committed their source/IsGet but its forced no-bag baseline gave0/0.
+Only a legitimate with-bag **0→5, use/reload4/20** passes the held representative. Ordinary ammo awaits
+packet3 and its existing containers; legacy nut/stick quantity labels are not assertions of native amounts.
+Gold200, Magic Jar, spells/magic arrows, Lens, Echo Gem, Double Defense and Scrub Business Seed remain
+excluded until their distinct grant/use/persistence representatives pass. Ocarinas need unresolved native
+binding/display proof and a later played packet. No boot/staging result admits a family.
+
+All `Buy ...` goods remain Shop-only, with no owned-bottle-refill adapter. Progressive copies/small keys
+remain chest-only, including keys-anywhere; boss keys/maps/compasses retain own-dungeon policy.
+Songs, trade items, Gerudo captain hand-over and out-of-pool items keep their existing holds.
+
+Families2 is staged from the original approved after-Forest slot04, with no save/age/inventory edits:
+Bombchus5, Din's Fire, Lens, Magic Jar, Echo Gem, Gold200. Entry:
+`work/r15-token-impl/ingame/Test - token-families-2-next.bat`; instructions:
+`FAMILIES-2-CHECKLIST.md`; isolated watcher profile `user-token-families-2-next`.
+13 resources/six pickup packs, inverse/readback and87/87 baseline checker passed.
+**Claude boot PASS, rc.3: crash0,13 RomFS files,1 mod. Gameplay remains pending.**
+
+#### Tracker and exact settings-string behavior
+
+Shuffled Token rows complete from their own stable source **H / H xor2** collection records,
+not token stock or enemy death. Age copies share one row. Missing/wrong-layout records remain unknown.
+The displayed `tokens` value remains native `Item_Token_Gold` stock, so a non-token source can complete
+without increasing stock and a chest token can increase stock without completing another Skulltula.
+Exercised real reader smoke:100 shuffled rows,16 collected,0 unknown, stock9; seed identity explicitly
+unverifiable for that historical save, not falsely matched to the generated seed.
+
+No settings version/boolean was added: Token lives in the existing sorted `shuffle` list.
+Bare `CS1` remains this version's defaults, Token off. The exact request string printed by
+`uv run python -m clawshot --shuffle Chest Token --print-settings` is
+`CS1.eNqrVirOKE1Ly0lVsopWcs5ILS5R0lEKyc9OzVOKrQUAlLkJyA`,
+whose delta is `{"shuffle":["Chest","Token"]}`. Existing off strings do not gain Token-specific fields.
+Generation writes the **effective** canonical string, including derived world/progressive/Gift holds and,
+when Token is on, its admitted palette and Chest/Token destination hold. Replay preserves/intersects
+explicit restrictions; it cannot widen admission. Explicit CLI options override their corresponding
+string fields, not unrelated custom hold tables. Reproduction requires the same generator/world version;
+request-only and effective strings need not be textually identical.
+
+#### Token-off parity ruling — Claude, superseding strict seed-byte parity
+
+**Do not build a legacy Token-off logic view.** All three admitted real sources remain native token checks
+with Token off, like the original97. No legacy-view code/data edit was applied.
+The next release already changes outputs through #26's guard; full seed-byte parity with old main is
+not the goal. For ordinary off cases, compare **game files and shuffled placements**; the spoiler may
+differ only by those three native token checks in the spheres. Also check Gift shuffle independently:
+House logic now sees100 tokens, so changed Gift placements can be legitimate and must be reported,
+not hidden by dropping checks or filtering actual output.
+
+The first dump-free seed7/default preflight against pinned main4734b0a printed identical settings and
+shuffled placements. Its only spoiler difference was precisely Lone Tree in sphere1, Tower in sphere2,
+wetlands crate in sphere6; no old check moved/disappeared and both had21 spheres. The initially over-strict
+whole-spoiler comparison correctly stopped/printed the mismatch. Revised dump-free cases are seed7,
+seed11, seed7/keys-anywhere, plus a separately labelled data-only Gift logic probe. Native game-file
+comparison and real native-eligible Gift setup remain held until the moved-main signal; no dump result
+is inferred from these logic-only files.
+
+Revised dump-free ordinary cases **PASS against4734b0a**: seed7/default,
+seed11/default and seed7/keys-anywhere each retained byte-identical effective settings and identical
+shuffled placements. In every case the **only** spoiler change was the three named native token entries
+added to the spheres: no existing entry moved or disappeared and no other top-level field changed.
+The actual search collected97 native source tokens on main and100 on this branch. Evidence:
+`work/r15-token-impl/off-logic-parity-4734-f7dde54-ruling/report.json`, with full differing values and hashes.
+No game files were generated/read for this comparison.
+
+The data-only Gift helper initially omitted production-derived song/item holds and anchors, so its printed
+baseline fill failed at Shadow small keys. Adding the existing policy then exposed an unmapped imported
+`Recovery Heart` while deriving a chest actor from raw N64 vanilla data. Corrected the helper to read the
+project's shipped **native actor names in location definitions**, not invent a Recovery Heart mapping or
+read ROMFS. Neither failure changed product code or relaxed the requested source/House scope.
+This probe explicitly does not claim native census/wrapper eligibility; the real Gift pipeline still
+requires the authorized native comparison after main moves.
+
+The corrected **data-only Gift seed7 completed** on both sources,225 shuffled checks, with native
+token collection **97→100** and identical effective settings. Placements are **not identical:98 changed**;
+House20 changes Red20→Heart Piece, House30 Red20→Recovery Heart, and House100 Blue5→Arrows30
+(still junk). Changed spoiler fields are placements, spheres, hints, opening_route, progressive_grants and
+age_locked_pickups. These outputs are retained, not normalized away. This is consistent with the now
+reachable100-token gate; isolated causal attribution and native wrapper eligibility are not claimed.
+The probe includes the actual data-held House40 policy unchanged; it shuffles House10/20/30/50/100.
+Evidence: `work/r15-token-impl/off-logic-parity-4734-f7dde54-gift-native-definitions/report.json`
+and both process logs. Real native Gift setup/comparison remains part of the held rebased verification.
+
