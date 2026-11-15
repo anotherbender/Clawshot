@@ -2,7 +2,6 @@
 worlds from test_generate and test_world_tiers, and the repository's own logic data for the spoiler's opening route."""
 
 import re
-from types import MappingProxyType
 
 import pytest
 from test_generate import chest, dungeon_world
@@ -167,12 +166,14 @@ def test_a_bomb_pack_supplied_at_a_chest_open_from_the_start_is_refused():
         from_placements(spec, 1, settings, placements)
 
 
-def skulltula_spec(ammo: str, container: str) -> dict:
-    """A container, an unrelated Hammer bypass and two Gold Skulltulas, one only the container opens."""
+def skulltula_spec(ammo: str, container: str, starting: tuple[str, ...] = ()) -> dict:
+    """A container, an unrelated Hammer bypass and two Gold Skulltulas, one only the container opens; the native
+    containers a new game ``starting`` with (``token_starting_containers``), none unless given."""
     gate = f"'{container}'"
     return {
         "start": "Start",
         "goal": gate,
+        "settings": {"token_starting_containers": list(starting)},
         "items": {container: {}, "Hammer": {}, ammo: {}, "Rupees (5)": {"class": "normal"}},
         "regions": [
             {
@@ -189,22 +190,44 @@ def skulltula_spec(ammo: str, container: str) -> dict:
 
 
 @pytest.mark.parametrize(
-    ("ammo", "container", "actor"),
-    [("Arrows (10)", "Quiver (40)", "Obj_ArrowBundle_Large"), ("Bombs (5)", "Bomb Bag", "Item_BombBundle_Small")],
+    ("ammo", "container"),
+    [
+        ("Arrows (5)", "Bow"),
+        ("Arrows (10)", "Quiver (40)"),
+        ("Bombs (5)", "Bomb Bag"),
+        ("Bombchus (5)", "Bomb Bag"),
+        ("Deku Nuts (5)", "Deku Nut Capacity"),
+        ("Deku Stick (1)", "Deku Stick Capacity"),
+    ],
 )
-def test_supplied_skulltula_ammo_needs_its_container_even_once_admitted(monkeypatch, ammo, container, actor):
-    """Production admits no ammo family at Skulltulas, so the palette refuses it outright. Admitting one (patched
-    here) still leaves the container screen: the Hammer bypass is refused, a remote container is not a guarantee."""
+def test_supplied_skulltula_ammo_needs_its_container_here_or_in_another_world(ammo, container):
+    """Every admitted ammo pickup, Bombchus included, under the container screen (D25 for bomb packs): a Skulltula
+    only its container opens takes it, the container placed here or in another game's world; the Hammer bypass is
+    refused either way, since a remote container is not a guarantee."""
     spec = skulltula_spec(ammo, container)
     settings = Settings(shuffle=("Chest", tokens.SHUFFLE))
     behind = {"Container Chest": container, "Hammer Chest": "Hammer", "Bypass GS": "Rupees (5)", "Container GS": ammo}
-    with pytest.raises(FillError, match=re.escape(f"Container GS: may not hold '{ammo}'")):
-        from_placements(spec, 1, settings, behind)
-    monkeypatch.setattr(tokens, "REWARDS", MappingProxyType({**tokens.REWARDS, ammo: (actor, "refill")}))
     assert from_placements(spec, 1, settings, behind).placements["Container GS"] == ammo
     remote_container = {**behind, "Container Chest": "Rupees (5)"}  # placed in another game's world
     assert from_placements(spec, 1, settings, remote_container).placements["Container GS"] == ammo
     for container_placement in (behind, remote_container):
         bypass = {**container_placement, "Bypass GS": ammo, "Container GS": "Rupees (5)"}
+        with pytest.raises(FillError, match=re.escape(f"Bypass GS: may not hold '{ammo}'")):
+            from_placements(spec, 1, settings, bypass)
+
+
+@pytest.mark.parametrize(
+    ("ammo", "container", "accepted"),
+    [("Deku Nuts (5)", "Deku Nut Capacity", True), ("Deku Stick (1)", "Deku Stick Capacity", False)],
+)
+def test_a_new_game_s_empty_nut_bag_lets_supplied_nuts_skip_the_capacity_gate(ammo, container, accepted):
+    """The native new game's empty Nut Bag is an existing container: nuts may go where the Hammer bypasses the capacity
+    upgrade. Sticks have no such bag and still need theirs."""
+    spec = skulltula_spec(ammo, container, starting=("nut",))
+    settings = Settings(shuffle=("Chest", tokens.SHUFFLE))
+    bypass = {"Container Chest": container, "Hammer Chest": "Hammer", "Bypass GS": ammo, "Container GS": "Rupees (5)"}
+    if accepted:
+        assert from_placements(spec, 1, settings, bypass).placements["Bypass GS"] == ammo
+    else:
         with pytest.raises(FillError, match=re.escape(f"Bypass GS: may not hold '{ammo}'")):
             from_placements(spec, 1, settings, bypass)

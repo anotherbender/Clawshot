@@ -1,6 +1,6 @@
 """The Gold Skulltula packet checker (``tools.token_packets.token_family_packet``) on synthetic saves built here and
 read by the real parser: a four-family packet and a native-token route packet played phase by phase, then one
-departure at a time from them."""
+departure at a time from them, and the phases ``token_family_diagnostic`` generates for families-3."""
 
 import copy
 import hashlib
@@ -14,6 +14,7 @@ import pytest
 from clawshot import save
 from clawshot.save import BOOL, BOOL64, ENUM, INT, murmur3_32
 from clawshot.tracker.state import BOTTLE_SLOTS
+from tools.token_packets import token_family_diagnostic as fd
 from tools.token_packets import token_family_packet as fp
 
 VERSION = 0x2D80EB
@@ -535,6 +536,47 @@ def test_route_fields_record_the_childs_wall_kill_and_the_age():
     del unrecorded.bools[NOTE12]
     report = route(unrecorded, "wetland-collected")
     assert (report["verdict"], by_id(report)[f"field.bool.{NOTE12}"]["actual"]) == ("unknown", None)
+
+
+def families_3_phases() -> dict:
+    """The generator's families-3 phases from a checkpoint holding the values it requires (zero or false where it
+    requires none), with the native bundle counts and Ice Arrow magic it reads from the dump."""
+    carried = {key: fd.REQUIRED_3.get(key, 0 if key[0] == "int" else False) for key in fd.CARRIED_3}
+    observed = {key: fd.REQUIRED_3[key] for key in fd.OBSERVED_3}
+    facts = {donor: {"BundleActorNum": count} for donor, (*_, count) in fd.AMMO_3.items()} | {fd.ICE: {"MPMax": 24}}
+    return fd._phases_3(carried, observed, facts)
+
+
+def phase_state(phase: dict) -> State:
+    """A save holding exactly a generated phase: its fields and completed sources, the token stock unchanged."""
+    state = State(ints={stock(TOKEN): ROUTE_TOKENS}, keys={DONE, DONE ^ 2, UNRELATED})
+    sections = {"int": state.ints, "bool": state.bools, "enum": state.enums}
+    for row in phase["fields"]:
+        sections[row["kind"]][row["name"]] = row["value"]
+    for source in phase["completed"]:
+        state.collect(int(source))
+    return state
+
+
+def test_families_3_seed_used_without_buying_keeps_the_collected_stock():
+    """Using the Scrub Business Seed without buying consumes nothing (native; Kareem, rc.3): the generated seed-used
+    phase accepts the stock its own Skulltula raised and refuses one lost to the use."""
+    phases = families_3_phases()
+    baseline = phase_state(phases["baseline"]).encode()
+    sources = [source for source, *_ in fd.ASSIGNMENTS_3]
+    raw = manifest_dict(
+        baseline,
+        source_hashes=[*sources, *OTHERS[: len(SOURCES) - len(sources)]],
+        assignments=[{"id": str(s), "name": n, "family": f, "actor": a} for s, n, a, f in fd.ASSIGNMENTS_3],
+        phases=phases,
+    )
+    manifest, seed = fp.parse_manifest(raw), stock(fd.SEED)
+    kept = phase_state(phases["seed-used"])
+    assert kept.ints[seed] == phase_state(phases["seed-collected"]).ints[seed] == fd.REQUIRED_3[fd._stock(fd.SEED)] + 1
+    assert run(kept, "seed-used", manifest, baseline)["verdict"] == "pass"
+    kept.ints[seed] -= 1
+    check = by_id(run(kept, "seed-used", manifest, baseline))[f"field.int.{seed}"]
+    assert (check["status"], check["actual"]) == ("fail", kept.ints[seed])
 
 
 def test_cli_reports_json_and_exit_codes_without_touching_its_inputs(tmp_path, capsys):

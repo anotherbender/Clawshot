@@ -371,13 +371,21 @@ resources under `<dir>/romfs/` plus `<dir>/spoiler.json`:
       bypass the child's Saria/bracelet dependency and strand adult at Mido. Small keys bootstrap first, boss keys
       last. The independent first-pull oracle checks the finished placements, not just this construction. Then the
       own-dungeon items of the kit's dungeons (the Forest Temple's map and compass).
-   3. Location types of `Settings.location_type_items` (D27's native floor pick-ups: BossHeart), each filled from
-      the first pool items it may take, as OoT Randomizer fills shops first.
+   3. Non-Skulltula location types of `Settings.location_type_items` (D27's native floor pickups:
+      BossHeart/Freestanding), each filled from the first pool items it may take, as OoT Randomizer fills shops first.
    4. Type-held items (`item_location_types`: songs, shop refills, gift items), most constrained first, as one
       stage retried on its own up to 15 times (OoT Randomizer's `fill_ownworld_restrictive` for songs and shops).
+      Holds that include Token remain in the shared progression pool or its later filler match instead.
    5. D25's bomb and Bombchu packs, only where the Bomb Bag is needed.
-   6. Progression, native-display items first (with Shop, so the second shield finds a way past Mido).
-   7. Priority items (restriction only), then the rest anywhere; with Shop, all filler uses restriction checks,
+   6. Shared progression, native-display items first (with Shop, so the second shield finds a way past Mido).
+      Skulltula rewards and spilled tokens participate in this same assumed fill, with the same `allowed` predicate
+      and stage-local swaps; no earlier Token palette commits progression while borrowing later openers.
+   7. Remaining Skulltulas: a seeded deterministic bipartite match from the non-progression pool. Each item copy
+      has edges only to locations accepted by `allowed`, including existing container screens. Match mandatory
+      Token-only copies first, then optional copies in shuffled-pool order. Augmenting paths preserve capacity
+      when flexible rupees compete with scarce ammo slots; excess optional ammo stays in the pool for other checks.
+      No cohort is committed by a per-item existential fit, and no filler item becomes a container or progression.
+   8. Priority items (restriction only), then the rest anywhere; with Shop, all filler uses restriction checks,
       native-display items last.
    In every stage but the return kit's forward placement and the filler, an item with no reachable location left
    takes one its stage filled earlier, if that location is reachable without the item there, which is placed again

@@ -40,8 +40,30 @@ TOKEN_ITEM = "Gold Skulltula Token"
 TOKEN_DESTINATIONS = ("Chest", SHUFFLE)
 """The check kinds a token item may go to: no exact-one native grant is proven for gifts, scrubs, shops or floors."""
 ADMITTED_FAMILIES = frozenset(
-    {"token", "fixed_major", "equipment", "bottle", "rupee", "heart_piece", "heart_container", "fixed_capacity"}
+    {
+        "token",
+        "fixed_major",
+        "equipment",
+        "bottle",
+        "rupee",
+        "gold_rupee",
+        "heart_piece",
+        "heart_container",
+        "fixed_capacity",
+        "refill",
+        "bombchu",
+        "magic_recovery",
+        "spell",
+        "magic_arrow",
+        "lens",
+        "agony_stone",
+        "double_defense",
+        "scrub_seed",
+        "ocarina",
+    }
 )
+"""All 19 native grant families of ``clawshot.patch.tokens.FAMILIES``: after the rc.3 packet2, packet3 and S1
+Time-Ocarina plays (Claude, 2026-11-15), each is admitted by the played evidence in ``token_rewards.toml``."""
 DATA = Path(__file__).resolve().parents[1] / "data" / "token_rewards.toml"
 
 

@@ -1,11 +1,11 @@
 """The fill: OoT Randomizer's assumed fill (``Fill.py``, ``distribute_items_restrictive``, MIT), for one world.
 
 Stages: own-dungeon items of the dungeons the return kit does not draw from, the return kit, the kit's own
-dungeons' items, native pick-up palettes, type-held items (songs, shop refills, gift items, progressive copies;
-retried on their own), bag-gated bomb ammo, progression, then filler. A stage puts an item only where it can be
-reached holding the items a later stage places by reachability, never junk; an item with nowhere left swaps into a
-location its stage filled (Archipelago). Priority filler respects its restriction; the rest can go anywhere,
-including unreachable junk locations in otherwise-beatable slices. ``plans/04-world-format.md`` has the reasons.
+dungeons' items, native pick-up palettes except Skulltulas, type-held items (songs, shop refills, gift items,
+progressive copies; retried on their own), bag-gated bomb ammo, shared progression, capacity-matched Skulltula
+filler, then other filler. Skulltula-compatible progression and spilled tokens stay in the shared assumed fill,
+where swaps can repair their dependencies. A stage assumes only later reachable items, never junk.
+``plans/04-world-format.md`` has the reasons.
 """
 
 import base64
@@ -860,7 +860,7 @@ def _fill_palettes(
     pool: list[str],
     shop_refills: int,
 ) -> int:
-    """Fill each location type of ``settings.location_type_items`` from its items before anything else can need it,
+    """Fill the non-Skulltula ``location_type_items`` palettes before anything else can need them,
     as OoT Randomizer fills its shop locations first (``distribute_items_restrictive``, 526b4c8d).
 
     The items are those that may go nowhere else (a shield held to Freestanding), then the first of the shuffled pool
@@ -868,6 +868,8 @@ def _fill_palettes(
     sent the junk through the reachability stages with the progression, where it took the early chests
     (Chest+Freestanding seed 7: no reachable location for the Boomerang)."""
     for location_type in sorted(settings.location_type_items):
+        if location_type == "Token":
+            continue
         destinations = [name for name in locations if world.locations[name].type == location_type]
         if not destinations:
             continue
@@ -896,6 +898,65 @@ def _fill_palettes(
         )
         locations[:] = [name for name in locations if name not in placements]
     return shop_refills
+
+
+def _fill_token_filler(
+    world: World,
+    settings: Settings,
+    rng: random.Random,
+    placements: dict[str, str],
+    locations: list[str],
+    pool: list[str],
+) -> None:
+    """Match remaining Skulltulas to filler copies after progression, using the unchanged placement predicate.
+
+    Items with nowhere else to go are mandatory. Optional ammo bundles compete for their actual shared capacity;
+    an augmenting path can move an earlier flexible rupee to make room, or skip an excess bundle for other filler.
+    The shuffled pool and seeded destination order make the matching deterministic without fixing a cohort first.
+    """
+    destinations = [name for name in locations if world.locations[name].type == "Token"]
+    if not destinations:
+        return
+    elsewhere = [name for name in locations if world.locations[name].type != "Token"]
+    rng.shuffle(destinations)
+    compatible = {
+        item: [name for name in destinations if allowed(world, settings, name, item)] for item in dict.fromkeys(pool)
+    }
+    only = {item: not any(allowed(world, settings, name, item) for name in elsewhere) for item in compatible}
+    assigned: dict[str, int] = {}
+
+    def match(index: int, seen: set[str]) -> bool:
+        for name in compatible[pool[index]]:
+            if name in seen:
+                continue
+            seen.add(name)
+            previous = assigned.get(name)
+            if previous is None or match(previous, seen):
+                assigned[name] = index
+                return True
+        return False
+
+    for index, item in enumerate(pool):
+        if only[item] and not match(index, set()):
+            raise FillError(
+                f"Token: no compatible capacity for mandatory {item!r}; candidates: {compatible[item]}",
+                stage="Token",
+                item=item,
+                allowed=tuple(compatible[item]),
+            )
+    for index, item in enumerate(pool):
+        if len(assigned) == len(destinations):
+            break
+        if not only[item]:
+            match(index, set())
+    if len(assigned) != len(destinations):
+        empty = [name for name in destinations if name not in assigned]
+        raise FillError(f"Token: no compatible filler for {empty}", stage="Token", allowed=tuple(empty))
+    used = set(assigned.values())
+    for name in destinations:
+        placements[name] = pool[assigned[name]]
+    pool[:] = [item for index, item in enumerate(pool) if index not in used]
+    locations[:] = [name for name in locations if name not in placements]
 
 
 def fill(
@@ -935,19 +996,27 @@ def fill(
     shop_refills = _fill_dungeon_items(world, settings, rng, placements, locations, pool, shop_refills)
     shop_refills = _fill_palettes(world, settings, rng, placements, locations, pool, shop_refills)
     unrestricted = pool
+    # Skulltula-compatible holds belong to shared progression or its late filler match, not an earlier frozen batch.
+    token_held = {item for item, kinds in held.items() if "Token" in kinds} if "Token" in settings.shuffle else set()
     # Type-held ammo still needs the stronger D25 bag gate in its dedicated stage.
-    type_held = [item for item in unrestricted if item in held and not item.startswith(_BOMB_AMMO_PREFIXES)]
-    unrestricted = [item for item in unrestricted if item not in held or item.startswith(_BOMB_AMMO_PREFIXES)]
+    type_held = [
+        item
+        for item in unrestricted
+        if item in held and item not in token_held and not item.startswith(_BOMB_AMMO_PREFIXES)
+    ]
+    unrestricted = [item for item in unrestricted if item not in type_held]
     shop_refills = _fill_type_held(
         world, settings, rng, placements, locations, type_held, _assumable(world, settings, unrestricted), shop_refills
     )
     _fill_bomb_ammo(world, settings, rng, placements, locations, unrestricted)
     progression = [item for item in unrestricted if world.items[item].progression]
-    priority = [item for item in unrestricted if not world.items[item].progression and world.items[item].priority]
-    rest = [item for item in unrestricted if not world.items[item].progression and item not in priority]
     shop_refills = _fill_restrictive(
         world, settings, rng, placements, locations, progression, [], shop_refills, "progression", True
     )
+    filler = [item for item in unrestricted if not world.items[item].progression]
+    _fill_token_filler(world, settings, rng, placements, locations, filler)
+    priority = [item for item in filler if world.items[item].priority]
+    rest = [item for item in filler if not world.items[item].priority]
     if any(world.locations[name].type == "Shop" for name in shuffled):
         native = world.settings.get("native_shop_items", ())
         priority = [*priority, *rest]

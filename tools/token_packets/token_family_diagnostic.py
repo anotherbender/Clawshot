@@ -558,7 +558,7 @@ def _phases_3(carried: dict, observed: dict, facts: Mapping) -> dict:
         ("defense-collected", GATE, {_stock(DEFENSE): 1, _got(DEFENSE): True}),
         ("damage-after", None, {_stock(BOMB): bombs - 2}),
         ("seed-collected", WATCHTOWER, {_stock(SEED): carried[_stock(SEED)] + 1}),
-        ("seed-used", None, {_stock(SEED): carried[_stock(SEED)]}),
+        ("seed-used", None, {}),  # native use without a purchase does not consume the seed (Kareem, rc.3)
         ("reload", None, {}),
         ("adult-ready", None, {("bool", AGE): False}),
         ("ice-abandoned", None, {}),
@@ -604,7 +604,7 @@ def _plan_3(baseline: save.Save, romfs: Path, dictionaries: zsdic.Dictionaries) 
                 "No guessed engine defense flag or assumed exact multiplier; reject zero/mismatched hits."
             ),
             "seed-collected": "Actual native Scrub Business Seed stock2->3; own world donor, not Magic Bean.",
-            "seed-used": "Assign/use once: see native effect and stock3->2; observe age usability, do not assume it.",
+            "seed-used": "Assign/use without buying: see the native effect; stock stays3, not2 (Kareem, rc.3).",
             "reload": "Save and Continue; every completed source and grant persists.",
             "adult-ready": "Native pedestal return to adult with the checkpoint's real Bow, no age/inventory cheat.",
             "ice-abandoned": "Kill night rooftop source, abandon pickup, leave/reload; source pair stays unset.",

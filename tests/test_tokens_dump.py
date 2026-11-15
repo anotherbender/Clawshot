@@ -235,15 +235,16 @@ def grant_fields(row):
 
 
 def test_every_admitted_member_has_its_native_shape_and_a_checked_pickup(romfs, census, original, tmp_path):
-    """Every token_rewards.toml member: its dump row has the declared family's shape, a member of a family admitted
-    after the core packet grants as its chest actor does, and its generated pickup (one source each) passes every
-    written-output check. Structure only: members beyond each family's played representative are unplayed."""
+    """Every token_rewards.toml member: its dump row has the declared family's shape, the members together covering
+    every native grant family; a member of a family admitted after the core packet grants as its chest actor does;
+    and its generated pickup (one source each) passes every written-output check, granting a bundle exactly where its
+    row names a BundleActor. Structure only: members beyond each family's played representative are unplayed."""
     table = items.load()
     rows = {row["__RowId"]: row for row in byml.read(original(tokens.POUCH_ACTOR_INFO))}
     shapes = {actor: tokens.grant_family(rows[actor]) for actor in PRODUCTION}
     print(f"native shapes {shapes}")
     assert shapes == PRODUCTION
-    assert set(PRODUCTION.values()) <= token_policy.ADMITTED_FAMILIES
+    assert set(PRODUCTION.values()) == token_policy.ADMITTED_FAMILIES == set(tokens.FAMILIES)
     for item, (actor, family) in token_policy.REWARDS.items():
         if family in CORE_REWARDS.values():
             continue  # the core packet's families, played with their own actors
@@ -253,62 +254,18 @@ def test_every_admitted_member_has_its_native_shape_and_a_checked_pickup(romfs, 
     members = sorted(actor for actor in PRODUCTION if actor != "Item_Token_Gold")
     sources = sorted(location.id for location in census)
     placements = {**dict(zip(sources, members, strict=False)), sources[-1]: "Item_Token_Gold"}
-    delivery, _ = check_written_delivery(romfs, census, original, tmp_path / "out", placements, PRODUCTION)
+    delivery, grants = check_written_delivery(romfs, census, original, tmp_path / "out", placements, PRODUCTION)
     assert sorted(delivery.pickups) == members
     assert len(delivery.new_files) == len(members)
-
-
-# Every member of Claude's approved Round 15 family table that is neither bought goods nor policy-excluded, outside
-# the admitted families: logic item -> (donor actor, family). The donor is the native world pickup where one grants
-# the same, as for production's Obj_Shield_Hylian. Diagnostic only: no member is admitted to production seeds before
-# its family's representative plays.
-DIAGNOSTIC = {
-    "Rupees (200)": ("Obj_Rupee_Gold", "gold_rupee"),
-    "Arrows (5)": ("Obj_ArrowBundle_Medium", "refill"),
-    "Arrows (10)": ("Obj_ArrowBundle_Large", "refill"),
-    "Bombs (5)": ("Item_BombBundle_Small", "refill"),
-    "Deku Nuts (5)": ("TBox_DekuNutBundle", "refill"),
-    "Deku Stick (1)": ("Item_DekuStickBundle_Small", "refill"),
-    "Bombchus (5)": ("Item_BombchuBundle_Small", "bombchu"),
-    "Magic Jar": ("Obj_MagicJar_Large", "magic_recovery"),
-    "Dins Fire": ("Item_DinFire", "spell"),
-    "Farores Wind": ("Item_FaroreWind", "spell"),
-    "Nayrus Love": ("Item_NayruLove", "spell"),
-    "Ice Arrows": ("Item_Arrow_Ice", "magic_arrow"),
-    "Light Arrows": ("Item_Arrow_Light", "magic_arrow"),
-    "Lens of Truth": ("Item_GlassTruth", "lens"),
-    "Stone of Agony": ("Item_AgonyStone", "agony_stone"),
-    "Double Defense": ("Item_FairyBless_DefenseDouble", "double_defense"),
-    "Scrub Business Seed": ("Obj_ScrubBusinessSeed", "scrub_seed"),
-    "Ocarina of Time": ("Obj_Ocarina_Time", "ocarina"),
-}
-
-
-def test_every_diagnostic_member_has_its_native_shape_and_a_checked_pickup(romfs, census, original, tmp_path):
-    """Each diagnostic member's dump row has its family's shape, its chest actor grants the same, and its generated
-    pickup (one source each) passes every written-output check. Structure only, not gameplay evidence."""
-    table = items.load()
-    rows = {row["__RowId"]: row for row in byml.read(original(tokens.POUCH_ACTOR_INFO))}
-    rewards = {actor: family for actor, family in DIAGNOSTIC.values()}
-    unadmitted = set(tokens.FAMILIES) - token_policy.ADMITTED_FAMILIES
-    assert {tokens.grant_family(rows[actor]) for actor in rewards} == unadmitted
-    assert not set(rewards.values()) & token_policy.ADMITTED_FAMILIES
-    for item, (actor, family) in DIAGNOSTIC.items():
-        chest = table.actor(item)
-        assert tokens.grant_family(rows[actor]) == tokens.grant_family(rows[chest]) == family, (item, actor, chest)
-        assert grant_fields(rows[actor]) == grant_fields(rows[chest]), item
-    sources = sorted(location.id for location in census)
-    placements = dict(zip(sources, sorted(rewards), strict=False))
-    delivery, grants = check_written_delivery(romfs, census, original, tmp_path / "out", placements, rewards)
-    assert sorted(delivery.pickups) == sorted(rewards) and len(delivery.new_files) == len(rewards)
+    print(f"grants {grants}")
     bundles = {actor for actor, (_, grant) in grants.items() if grant is None}
-    print(f"diagnostic grants {grants}")
-    assert bundles == {actor for actor in rewards if rows[actor].get("BundleActor")}
+    assert bundles == {actor for actor in members if rows[actor].get("BundleActor")}
 
 
 def test_fairy_ocarina_is_excluded_for_want_of_its_own_animation(romfs):
     """The documented ocarina boundary: the Item_ ocarinas (Common performer; Fairy Ocarina has no world pickup) have
-    no AnimationRef to give a pickup, so they compose nothing; Ocarina of Time goes through Obj_Ocarina_Time."""
+    no AnimationRef to give a pickup, so they compose nothing; Ocarina of Time goes through Obj_Ocarina_Time. The
+    family is admitted by that member alone: Fairy Ocarina has the same native shape and stays out."""
     native = tokens.Romfs(romfs)
     token = tokens.check_token(native)
     registries = {path: {row["__RowId"]: row for row in byml.read(native.read(path))} for path in tokens.REGISTRIES}
@@ -316,7 +273,8 @@ def test_fairy_ocarina_is_excluded_for_want_of_its_own_animation(romfs):
     for item in ("Item_Ocarina_Fairy", "Item_Ocarina_Time"):
         with pytest.raises(PatchError, match=f"{item}: no AnimationRef to give the pickup"):
             tokens.compose(item, token, native.pack(item), generic, registries)
-    assert tokens.compose("Obj_Ocarina_Time", token, native.pack("Obj_Ocarina_Time"), generic, registries).rows
+    assert tokens.grant_family(registries[tokens.POUCH_ACTOR_INFO]["Item_Ocarina_Fairy"]) == "ocarina"
+    assert "Obj_Ocarina_Fairy" not in registries[tokens.ACTOR_INFO]  # no world pickup to donate
 
 
 def test_every_source_copy_accepts_a_generated_pickup(romfs, census, original):

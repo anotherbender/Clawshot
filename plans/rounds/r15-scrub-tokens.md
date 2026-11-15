@@ -93,7 +93,7 @@ Claude accepted #26 played PASS and ordered final queued gates, then a `Fixes #2
 
 **Token staging path (resolved):** cs15d proposed independent `work/r15-token-impl/ingame`; Claude approved it in the current conversation and superseded section 6's path for this implementer. `work/r15-tokens` remains forbidden. No prohibited path was opened.
 
-## Tokens — Phase 1 played PASS; Phase 2 in progress
+## Tokens — played packets passed; production integration verified
 
 Scrub commit `654d1c3` was posted READY after all four gates. Claude reported it merged/pushed as main `d66d35f`, #26 closed, with 98 scoped tests and format/lint clean on the merged tree. Per his explicit instruction this branch was reset to `d66d35f`; both Phase 1 workers confirmed no edits beforehand and the worktree was clean. Updated AGENTS rule 8 was read. These merge checks are Claude's evidence, not rerun by this agent.
 
@@ -771,3 +771,229 @@ its external checklist and future proof text alone were corrected to Kareem's wa
 follow-up branch admits only the successful packet2/3 families and, if its separate part passes, Ocarina of Time;
 Fairy stays excluded. Bombchus and all admitted ammo retain D25/container screens. Run exactly one final full
 gate sequence after those combined policy/test/docs edits; do not claim these scoped checks as that sequence.
+
+### Final packet3 acceptance and production cutover — Claude/Kareem, rc.3
+
+Claude boot-checked **both** parts: crash0,16 and7 RomFS files, one mod each, watchers on both profiles.
+He then relayed **PLAYED PASS for both parts** and explicitly authorized admitting every packet2/3 family
+plus Ocarina of Time, with the named exclusions and existing D25/container rules retained.
+Reported results are accepted ground truth; no agent confirmation replay or acceptance-checker rerun.
+
+| Packet3 representative | Actual reported result |
+|---|---|
+|Ranch tree Arrows5 |20→25, exact+5 |
+|Ranch tower Bombs5 |10→15, exact+5 |
+|Ranch window Nuts5 label |16→19, exact native+3; Kareem first threw **four**, not the scripted three |
+|Field lone tree Stick1 label |7→10, exact native+3 |
+|Double Defense |Owned, damage reduction seen by Kareem, MaxLife28 unchanged; no unreported numeric damage ratio claimed |
+|Scrub Business Seed |2→3, exact+1; use **without buying does not consume it**, confirmed by Kareem |
+|Ice Arrows |Owned, MPMax0→240, arrows25→24 after one actual ice shot |
+|Separate S1 Ocarina of Time |New Time instrument played Sun's Song; `time-collected`, `song-played`, `reload` checker each passed69/69 |
+
+The18 family snapshots establish every reported grant delta; the four ranch/Field source pairs were set
+and nothing else touched. **The historical strict family phases do not all pass**: player ammo use differed
+from the script. Do not re-pin those thresholds or call it an all-phase strict pass. The Seed prediction was
+separately wrong: future no-purchase `seed-used` keeps stock3; already staged mod/manifest/save bytes remain
+unchanged. Seed purchase consumption/full-stock behavior is not inferred. Ranch tree appeared by day;
+**its existing rule already has no night restriction, so no world-logic change is needed.**
+
+Cutover contract (Claude): explicit **40 members in19 native grant families**, preserving every former
+member and adding packet2/3 members plus **Time only**. Each member still passes its own native row,
+grant identity, component/graph, source-completion and writer allocation checks. A family's representative
+is played; that does not label every sibling member or full-capacity boundary individually played.
+
+**Excluded at Skulltulas:** Fairy Ocarina, songs, progressive copies/fixed tiers, keys/maps/compasses,
+all `Buy*`/shop stock, trade items and Gerudo Pass (Gerudo Membership Card), plus out-of-pool items.
+Fairy still lacks a native world/AnimationRef donor; Time uses the existing `Obj_Ocarina_Time`, no adapter.
+Bombs/Bombchus retain D25 at every destination; other Skulltula ammo retains its independent-container
+screen, including the sourced empty starting Nut Bag exception. No refill grants a bag or weapon.
+Fill stages, swaps, filler and external placements use the same predicate/screens. Token defaults/presets,
+token count/destination rules, native Token-off behavior and the House100 junk-only policy are unchanged.
+
+Next verification is one frozen final sequence after all source/tests/docs/help changes: format, lint,
+synthetic, dump and native Token-off comparison against exact3e2dd50. Existing3e2dd50 seed artifacts may
+be reused only after source-snapshot and recorded game-file hash verification; no baseline seeds regenerated.
+
+Pre-gate baseline provenance passed: the detached3e2dd50 checkout matches all **437** frozen
+source/test/tool/config files from its earlier generation. All recorded game-file hashes match the retained
+3e2dd50 candidate artifacts: seeds7/11 own-dungeon99 files each, seed7 keys-anywhere102, Gift seed7
+138. Each retains its complete output-folder hash map, not only placements. The new comparison requires
+**exact full-folder and spoiler identity in all four cases**; unlike the earlier comparison to e5fe7e2,
+there is no native-source/sphere exception because3e2dd50 already contains all100 sources and House100 policy.
+Evidence: `work/r15-token-impl/final-family-baseline-proof.json`; no baseline generation repeated.
+
+Actual isolated browser verification showed the complete updated Token help, including every requested
+exclusion, D25/container wording, native non-consuming Seed use and Token still Vanilla in Recommended.
+All text fits the help surface. The browser tab/server were closed; no real preferences or game launch.
+Production output changes for Token-on recipes through the expanded palette; defaults and Token-off
+recipes are intentionally unchanged. Release-version publication remains the maintainer's existing policy.
+
+Integrated pre-gate checks: **171 synthetic passed** across production admission, external placements,
+packet conservation and custom-item composition; the full Token native module **10 passed**, including all
+40 catalogue members (39 generated pickups), canonical grants, bundles, row/size preservation and production
+seed composition. Scoped Ruff format and full lint passed. The initial targeted run correctly refused bag-free
+nuts/sticks but failed my added incidental `"Token"` message match (their error named `type-held`); removed
+only that wording assertion, retained all six refusal cases and their successful gated counterparts, then made
+one aimed rerun. No runtime policy changed to silence it. Redundant direct catalogue-copy assertions and the
+obsolete separate diagnostic batch were removed; actual placement/exclusion and native writer proofs remain.
+
+The no-purchase Seed regression accepts stock3 and rejects lost stock2 using synthetic saves; it does not
+replay Kareem's snapshots or alter historical manifests. Existing default/off and new-game Nut Bag exceptions
+remain covered. The first frozen sequence then found the fill regression below; it did **not** establish READY.
+
+### Expanded-palette fill correction — Claude-approved, 2026-11-15
+
+The first frozen admission batch passed format, lint and **2853 synthetic tests /206 skips**, then failed
+the native gate: **199 passed,4 failed**. Both NUP and layered inputs failed seed7 in
+`mixed-small-keys-anywhere` (late Boomerang, no reachable empty check) and `forest-closed`
+(Token Arrows10, no allowed check). The remaining Token-off comparison was held, not reported passed.
+Evidence remains under `work/r15-token-impl/final-families-*`; no unchanged rerun.
+
+Before editing fill code, cs15d printed stage inputs, outputs, capacities, assumptions and empty frontiers
+to `fill-diagnosis/*-trace.json` and posted the cause. Claude accepted it and approved the shape below:
+
+- Forest-closed attempt10 committed **Arrows5 plus Arrows10 to one live Bow-guaranteed Skulltula**
+  (Forest Temple GS Basement). Each passed `any(fits)` individually; the cohort violated shared capacity.
+  Reordering or swapping two arrows cannot manufacture a second slot.
+- Mixed attempt10 committed Kokiri Sword at KF GS Bean Patch under later progression assumptions.
+  Its Token cohort placed54 native tokens and spilled46 into a separate earlier type-held batch.
+  The final progression stage had only two starting chests and could not swap either earlier batch's
+  placements. After Hylian Shield/Fairy Ocarina took those chests, Boomerang had no reachable empty check.
+
+Implementation: skip Token in the early palette stage; holds including Token stay out of the frozen
+type-held batch. Progression-class rewards, **including every native token copy**, join the ordinary
+assumed fill, not a separate Token stage or unchecked filler. After progression, remaining Skulltulas use
+an actual seeded bipartite matching from non-progression item copies to `allowed` locations: mandatory
+only-here copies first, optional copies in shuffled-pool order, augmenting paths for competing capacity,
+and flexible existing filler rather than excess ammo. No generated substitute item or fabricated fallback.
+The same D25/container/tier/House100/exclusion predicate is used; attempts remain10 overall and15 per
+type-held stage. Token-off takes no Token matching RNG and retains the former non-Token stage order.
+
+Permanent, code-built synthetic regressions in `tests/test_generate_tokens.py` reproduce both seed7
+shapes. Before the fix they failed respectively on Arrows10 with0 allowed and Boomerang with0 reachable
+empty checks (`fill-diagnosis/synthetic-before.log`). After the aimed correction the complete module
+passed **82 tests** (`synthetic-after.log`). The ammo refusal tests retain their behavioral checks; removed
+one old incidental error-stage wording assertion rather than re-pinning it.
+
+Actual correction smoke used both exact captured native setup inputs, seed7, with their native vanilla
+overrides, ordinary generator retries and beatability search: both succeeded with **411 shuffled checks,
+100 Skulltulas**. The closed-forest result had52 native-token Skulltulas, the keys-anywhere result56,
+with multiple non-token families in each (`correction-smoke.log`). No game launched or save changed.
+
+Claude additionally requires300 dump-free seeds per Defaults, Recommended, keys-anywhere, Gift and Shop
+recipe, family counts posted **before** the next frozen batch, and exact Token-off identity against3e2dd50
+for all four retained cases, Gift included. To make Gift/Shop real rather than a settings-only echo, each
+recipe's runtime setup was captured once, before generation/writing. Sweep workers read only those
+logic/vanilla inputs and repository code/data; an audit hook forbids game-resource reads. Gift recipes
+must actually shuffle NPC/Cutscene/Song checks, Shop recipes actual Shop checks, every seed all100 GS.
+The completed sweep is recorded below; the corrected frozen gate results are recorded after that run.
+
+The sweep's first command reached the tool's3600-second deadline, **not a fill failure**. Its flushed
+checkpoint retained786 successful unique cases: Defaults300, Recommended300, keys-anywhere186,
+no exhausted-seed failure. The parent and its owned workers had stopped; cs15d released only that owned
+lock, retained the original source snapshot and checkpoint, and continued the714 unrecorded cases with
+no deadline. Completed cases are not regenerated, source/attempt limits unchanged. This is one continued
+sweep, not a second sample or a product retry-limit change.
+
+### Dump-free sweep PASS, posted before corrected freeze
+
+**1500/1500 generated seeds passed:**300 per recipe, seeds0–299; zero exhausted-fill failures.
+Every seed included100 actual shuffled Skulltulas. Gift/Recommended had36 NPC,8 Cutscene and12 Song
+checks active; Shop/Recommended had64 Shop checks active. Existing10/15 attempt limits unchanged;
+first-attempt passes were257/242/200/248/240 (Defaults/Recommended/keys-anywhere/Gift/Shop), with
+maximum attempts4/5/6/3/6. Thus zero exhausted seeds does **not** mean zero internal retries.
+Source snapshot unchanged across both checkpoint legs; game-resource reads forbidden in the workers.
+
+Counts below are Skulltula grants across300 seeds per column, totaling30000 per recipe:
+
+| Family | Defaults | Recommended | Keys anywhere | Gift | Shop |
+|---|---:|---:|---:|---:|---:|
+|Token |16851 |17039 |16665 |16840 |16983 |
+|Rupee |6882 |5597 |7333 |6468 |6888 |
+|Equipment |1374 |1059 |1224 |1162 |1316 |
+|Heart piece |980 |2329 |888 |2389 |1012 |
+|Heart container |0 |918 |0 |0 |0 |
+|Fixed major |238 |191 |222 |185 |233 |
+|Bombchu |488 |362 |375 |415 |417 |
+|Refill |925 |666 |887 |731 |868 |
+|Magic recovery |174 |117 |200 |103 |166 |
+|Magic arrow |165 |127 |163 |131 |172 |
+|Lens |184 |150 |194 |151 |190 |
+|Ocarina |0 |160 |0 |183 |0 |
+|Spell |0 |140 |0 |129 |0 |
+|Scrub Seed |1739 |1145 |1849 |1113 |1755 |
+
+Agony Stone, bottle, Double Defense, fixed capacity and gold rupee each appeared **zero** times in all
+five sampled recipes; do not label these families as observed draws. Overall65622 of150000 GS grants
+were non-token, so the matching did not degenerate into an all-native-token shuffle.
+Evidence: `fill-diagnosis/sweep-results.json`, every individual result in `sweep-seeds.jsonl`, unchanged
+`sweep-source-snapshot.json`, captured-input hashes and the Bermuda receipt `sweep-posted.json`.
+cs15d posted the complete numbers/zero-family limits before starting the corrected frozen sequence.
+
+### Maintainer-accepted follow-ups — no frozen source change
+
+Claude accepted both read-only distribution explanations and explicitly deferred policy/sampler changes
+from this merge. The active corrected gates continue on the exact1500-seed source.
+
+**(a) Played-family destination holds.** In Gift and Recommended, the pool contains Bottle×3,
+Bottle with Milk×1, Double Defense×1, Stone of Agony×1 and Rupees200×1, but `gifts.held_items`
+holds all seven copies to Boss/Cutscene/NPC because their actors lack vanilla-chest or `chest_verified`
+proof. This is the legacy chest-safety-derived hold, not a Token reachability/matching failure. Defaults,
+keys-anywhere and Shop do not shuffle their gift/story sources, so these items are absent from those pools.
+The other nominal gold-rupee chest (DMT Storms Grotto) is explicitly N64-only, absent in the remake.
+Recommended's fixed Nut/Stick capacity pair is separately held Scrub-only by `scrubs.seed_setup`;
+Gift has no such pool pair because Scrub is off and both Theater capacity gifts stay unsupported/vanilla.
+Those two upgrades are not progressive copies; the eight actual progressive chains remain chest-only.
+
+Next change, per Claude: let auto-held items also take Token destinations wherever their native family is
+played, while retaining chest safety and every named exclusion. The packet-proved catalogue alone currently
+does **not** override the inherited holds. This merge adds a one-sentence shipped-preset caveat to README
+and the settings reference; no `src/` help/data/code is altered during the freeze. The existing runtime help
+lists native catalogue capability, not a guarantee that every listed item enters each recipe.
+
+**(b) Structural native-token share.** Gold tokens are progression: all100 copies are placed in the
+shared assumed fill, before the non-progression-only late matching. They can occupy only Chest/Token,
+the same165+100 base in every sampled recipe; adding Gift/Shop sources does not add token destinations.
+Earlier dungeon-item, chest-only progressive/return-kit and bag-gated ammo stages reserve chest space
+before that fill. The near56% share is therefore a staged/restricted distribution, not the late filler
+matcher preferring tokens. Whole-pool38%/25% is not this sampler's uniform target. Documented; **no action
+or sampler change now**, per Claude. No uniform-distribution claim is made.
+
+### Corrected frozen final gates PASS
+
+One corrected frozen sequence, after the posted1500-seed sweep, held/released cs15d's `gate.lock`;
+workers3, no game processes observed, no game launched. Every source/test/tool/config hash remained
+unchanged throughout. The existing layered fixture was reused only after every working-set input read
+back byte-identically to the read-only native dump; retained3e2dd50 baseline outputs were not regenerated.
+
+| Gate | Observed result |
+|---|---|
+| `uv run ruff format --check` |402 files already formatted |
+| `uv run ruff check` |All checks passed |
+| `uv run pytest` without dump environment |2855 passed,206 skipped |
+| `OOT_ROMFS` + `OOT_NUP` + `OOT_DUMP` `uv run pytest -m dump` |203 passed,2858 deselected |
+| Token-off full-folder/spoiler comparison to3e2dd50 |All four cases byte-identical, no changed files or spoiler fields |
+
+The Token-off cases are seed7/11 own-dungeon (101 total files each), seed7 keys-anywhere (104),
+and Gift seed7 (140). Their native game-file counts are99/99/102/138. Both formerly failing native
+resource modes now pass from NUP and layered inputs as part of the203-test gate.
+
+Actual CLI smoke generated a Chest+Token seed and a Gift+Token seed. An independent process with
+`PYTHONHASHSEED=417` replayed the Token seed with **all132 output files byte-identical**.
+The custom-item composition smoke wrote Nothing/AP grants alongside all100 Token sources:
+131 written resources,17 new packs,742 pack members checked, native registry rows preserved and113
+original files unchanged. No full random seed was played in this batch; the accepted rc.3 family/route
+packets remain the in-game grant evidence, with their stated member/boundary limits.
+
+Evidence: `work/r15-token-impl/final-families-corrected-gate-results.json`, stage logs,
+`*-fixture-proof.json`, `*-determinism.json`, `*-combined.log`, `*-off-comparison.json`
+and the complete `*-source-snapshot.json`.
+
+**Committed-head documentation exception (Claude):** README/settings-reference caveats and this round
+record were updated during/after the run; no frozen executable/data/test/tool changes are allowed.
+Before READY, commit all changes, then re-run the documentation consumers and both Ruff checks on that
+exact head. The grep/find review found `tests/test_ui_release.py`; also include `tests/test_pack.py`
+(documentation-path error reference) and `tests/test_ui_bootstrap.py` (bootstrap documentation grep hit)
+conservatively. Generated `play-note.md` fixture tests do not read repository documentation.
+The post-commit receipt and committed-tree/snapshot proof are retained outside the repository beside the
+gate evidence and reported on the thread; no post-check source or documentation edit is part of this head.

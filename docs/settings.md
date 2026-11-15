@@ -52,11 +52,21 @@ in chests only; see [Progressive items](#progressive-items).
 | `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. Implementation tested; not every sale has recorded in-game acceptance. |
 | `BossHeart` | Eight boss-heart checks, off by default. Limited to the five native floor pickups below. King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
 | `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
-| `Token` | All 100 native Gold Skulltulas, off by default; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, ordinary rupees1/5/20/50, Heart Pieces/Containers and fixed Nut/Stick capacity. Each member must pass its native structural check; see `src/clawshot/data/token_rewards.toml`. Core and packet1 representatives passed, not every member/boundary. Bombchus, ordinary ammo, gold rupees, magic recovery/spells/arrows, Lens, Echo Gem, Double Defense and Scrub Business Seed remain excluded pending packets2/3. Progressive copies/keys stay chest-only; other dungeon items stay in their dungeon; songs, ocarinas, trade items and shop goods keep their holds. Tokens may spill only into shuffled chests. The Field tree (daytime roll/attack/retrieval), night ranch tower (child Boomerang/adult Hookshot), and wetlands adult crate after the earlier child wall kill passed. Final revisits were not played; Claude accepted saved state plus earlier packets. |
+| `Token` | All 100 native Gold Skulltulas, off in both presets; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, all rupee colours, Heart Pieces/Containers, fixed Nut/Stick capacity, ordinary arrow/bomb/nut/stick bundles, Bombchus, magic jars/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed and Ocarina of Time. Core, packets1–3 and the separate first-Time-ocarina part passed on rc.3; each catalogue member still needs its own native structural check, not every member/boundary was played. See `src/clawshot/data/token_rewards.toml`. Tokens spill only into shuffled chests; non-token grants add no token. The Field tree works by day, the ranch tower needs night/retrieval, and wetlands needs the child wall kill before the adult crate. |
 
-Future admitted Skulltula ammo still requires its existing container before the source (D25).
-Refills never grant a bag or weapon; the native new-game Nut Bag is already present, empty.
-Bombchus remain excluded until a with-Bomb-Bag representative proves real ammo, use and reload.
+**Current preset limitation:** with Token added, existing holds keep bottles, Double Defense, the Echo Gem and gold rupees on gift/story checks rather than Skulltulas; fixed Nut/Stick upgrades remain Scrub-only.
+
+Skulltula ammo requires its existing container before the source; refills never grant a bag or weapon.
+**D25:** Bombs and Bombchus require an independent Bomb Bag at every shuffled destination, not only Skulltulas.
+Arrow and stick bundles retain their container screens; the native new game already has an empty Nut Bag.
+The legacy labels **Deku Nuts (5)** and **Deku Stick (1)** each deliver the native bundle of **3**.
+Scrub Business Seed is not an ammo bundle or N64 Magic Bean: the played pickup added one seed; using it
+without buying anything **does not consume it**, which is native behavior.
+
+**Excluded at Skulltulas:** Fairy Ocarina; songs; progressive copies and their fixed tiers; keys, maps and
+compasses; every `Buy*`/shop-stock item (including refills and bottle contents); trade items; and Gerudo Pass
+(Gerudo Membership Card). Their existing destination/pool holds remain unchanged. Fire Arrows and other
+out-of-pool items are not silently added.
 
 The 100-token House reward accepts only non-progression items in every seed, including Gift shuffle with
 Token off. This is an explicit placement rule, not a consequence of which Skulltulas are reachable.
@@ -67,17 +77,18 @@ rupees, recovery hearts, loose keys and silver-rupee puzzles stay unchanged. Pot
 experiments are not seed options: grants were observed, but a thrown pot stranded and lost its
 reward. Completion and recovery are not solved by a destruction flag.
 
-The Round 15 forced token diagnostic is not a shuffle option or a beatable seed. It tests independent pickup grants,
-native collection records, chest tokens and the House 10 reward on an isolated historical checkpoint; its passed
-core packet is the evidence for the `Token` families above.
+The Round 15 forced diagnostics are not shuffle options or beatable seeds. Their core, reward-family,
+route and first-Time-ocarina parts provide the played evidence for this explicit catalogue; they do not
+establish every item, full-capacity case or route combination.
 
 Maintainer packet/checker tools live in `tools/token_packets/`, outside the release package.
 From the repository root, run `uv run python -m tools.token_packets.token_family_packet`
 with `--manifest`, `--baseline`, `--save` and `--phase` to check a staged family or route packet read-only.
 
 **Fairy Ocarina stays excluded at Skulltulas:** its native actor has no AnimationRef and there is no native
-world-pickup donor. Ocarina of Time has a suitable native world donor, but its first-grant/song/reload
-diagnostic is separate and remains unplayed; neither ocarina is admitted to Token seeds by staging a packet.
+world-pickup donor. **Ocarina of Time is admitted** using its native `Obj_Ocarina_Time` donor: a fresh S1
+pickup, Sun's Song on the new instrument and saved ownership after reload all passed. No animation/common
+adapter or Fairy Ocarina admission is implied.
 
 The floor palette is **Heart Container, Piece of Heart, Deku Shield, Hylian Shield and red rupee**.
 Major items on the floor can crash. Heart Containers from chests have no recorded in-game acceptance.

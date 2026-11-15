@@ -1,25 +1,27 @@
 # Round 15 (issue #30): what a shuffled Gold Skulltula (a ``Token`` check) may give. Clawshot data; no game
 # resources. Read by clawshot.generate.tokens (fill admission) and clawshot.patch.tokens (writer).
 #
-# Claude, 2026-11-14, after Kareem's PLAYED core, families-1 and route packets: admission is by native grant family,
-# and each admitted member must pass the writer's structural check of its own dump row
-# (clawshot.patch.tokens.grant_family over RSDB/PouchActorInfo, build e0f3ccfa) before any output.
-# A family not listed here is not admitted. Claude's approved Round 15 family table (2026-11-14):
+# Admission is by native grant family, and each admitted member must pass the writer's structural check of its own
+# dump row (clawshot.patch.tokens.grant_family over RSDB/PouchActorInfo, build e0f3ccfa) before any output; a
+# family not listed here is not admitted. Admitted so far, each by played evidence (see [families]): Kareem's rc.3
+# core, families-1 and route packets; then Claude, 2026-11-15, accepting packet2 (families-2), packet3
+# (families-3) and packet3's short S1 Time-Ocarina second part, all PLAYED PASS on rc.3 (packet2's watcher newest
+# used-reload 83/83; S1's reload 69/69), and ordering every packet2+3 family and Ocarina of Time admitted. Still
+# excluded, as policy rather than pending packets:
 # - bought goods (every ``Buy ...`` item: refills, ammo, Bombchus, bottle contents, Buy Heart, Buy Magic Jar) go
 #   only to shop shelves in every seed, enforced by the fill (clawshot.generate.fill.SHOP_ONLY_PREFIX); no adapter
 #   to a world pickup this round, so a ``NotPushToPouch`` shop bottle content never becomes a new bottle;
 # - progressive copies and small keys stay chest-only; boss keys, maps and compasses stay in their own dungeon;
-#   songs, the Gerudo captain's card and trade items keep their existing holds; items outside every pool stay out;
-# - ocarinas are excluded unless a later small packet proves them;
-# - families-1 admits new bottles, ordinary rupees, Heart Pieces/Containers and fixed nut/stick capacity;
-# - Bombchus remain excluded: the no-bag diagnostic completed but gave 0/0, pending the with-bag +5 packet;
-# - gold rupees, ordinary ammo, magic recovery/spells/arrows, Lens and Echo Gem await packets2/3;
-#   masks and other out-of-pool items remain excluded.
+# - songs, the Gerudo captain's card and trade items keep their existing holds; items outside every pool stay out;
+# - Fairy Ocarina never joins its family's admitted Ocarina of Time member: it has no native world donor to
+#   deliver a Token check's grant (the Item_ ocarinas also lack their own AnimationRef);
+# - masks and other out-of-pool items remain excluded.
 #
 # [families]: family -> the played evidence that admits it.
 # [rewards."<logic item>"]: actor = the native actor whose grant the Token check delivers (a native world
-# pickup, Obj_*, where one exists; never a chest wrapper TBox_* or shop display Shop_*), family, source = that
-# actor's PouchActorInfo grant fields as read from the dump.
+# pickup, Obj_*, where one exists; an Item_ bundle row where that row is itself the native grant; and once the
+# chest-content row TBox_DekuNutBundle, the only native bundle behind the ``Deku Nuts (5)`` label; never a shop
+# display Shop_*), family, source = that actor's PouchActorInfo grant fields as read from the dump.
 
 [families]
 token = "Kareem, rc.3 core packet PASS: HF GS Lone Tree native token (count 9 -> 10, its own source pair set) and a token in KF Storms Grotto Chest (count 10 -> 11, only that chest's flag); House 10 paid once from chest + source tokens"
@@ -30,6 +32,17 @@ rupee = "Kareem, rc.3 families-1: Obj_Rupee_Red from Field lone tree, rupees 68 
 heart_piece = "Kareem, rc.3 families-1: first Heart Piece, stock1 with MaxLife unchanged, source committed; abandoned drop recovered"
 heart_container = "Kareem, rc.3 families-1: whole container raises MaxLife16 -> 20 with Piece stock unchanged, source committed"
 fixed_capacity = "Kareem, rc.3 families-1: Item_NutBag_Medium establishes native30 capacity/refill and source completion; fixed StickBag member retains its own native20 fields"
+gold_rupee = "Kareem, rc.3 packet2 PLAYED PASS: Obj_Rupee_Gold retrieved at Kak GS Watchtower, rupees 148 -> 348 inside wallet capacity500, watchtower pair set, token18; all six packet2 pairs persisted through used-reload (watcher 83/83)"
+refill = "Kareem, rc.3 packet3 PLAYED PASS: the four native small bundles at their Skulltulas, Arrows 20 -> 25 (cap30), Bombs 10 -> 15 (cap20), Deku Nuts 16 -> 19 (cap20, native bundle of 3) and Deku Sticks 7 -> 10 (cap10, native bundle of 3); no bag, quiver or other container granted"
+bombchu = "Kareem, rc.3 packet2 PLAYED PASS: Item_BombchuBundle_Small rolled at LLR GS Tree, Bombchus unowned -> 5/20 with the owned Bomb Bag and cap20 unchanged, one used -> 4/20 and still 4/20 after used-reload"
+magic_recovery = "Kareem, rc.3 packet2 PLAYED PASS: Obj_MagicJar_Large at HF GS Lone Tree refilled the gauge from a small deficit (more than half, less than full) to full with MPMax unchanged"
+spell = "Kareem, rc.3 packet2 PLAYED PASS: Item_DinFire Boomerang-retrieved at LLR GS Tower, owned with saved magic capacity240, cast as a fire dome after reload; Farores Wind and Nayrus Love are structural siblings, not separately played"
+magic_arrow = "Kareem, rc.3 packet3 PLAYED PASS: Item_Arrow_Ice Hookshot-retrieved at Kak GS Above Impas House, owned with MPMax 0 -> 240 and one real ice shot fired (arrows 25 -> 24), Bow and quiver unchanged; Light Arrows is the structural sibling, not separately played"
+lens = "Kareem, rc.3 packet2 PLAYED PASS: Item_GlassTruth at LLR GS House Window, canonical Armor_GlassTruth owned, toggled to a visible view change with gauge drain and still usable after reload"
+agony_stone = "Kareem, rc.3 packet2 PLAYED PASS: Item_AgonyStone (the Echo Gem) at Kak GS Near Gate Guard, owned, and the equipped Gem reacted at the Kakariko watchtower Skulltula, the accepted Gem-effect proof"
+double_defense = "Kareem, rc.3 packet3 PLAYED PASS: Item_FairyBless_DefenseDouble at Kak GS Near Gate Guard, owned with reduced bomb-blast damage on a comparable blast and MaxLife28 unchanged"
+scrub_seed = "Kareem, rc.3 packet3 PLAYED PASS: Obj_ScrubBusinessSeed at Kak GS Watchtower, stock 2 -> 3 of cap30 and usable; using it without buying does not consume it, which is native behaviour, not a bug"
+ocarina = "Kareem, rc.3 packet3 S1 part PLAYED PASS: Obj_Ocarina_Time at LLR GS Tree, Time stock 0 -> 1, Sun's Song played on the newly granted instrument and still owned after Save and Continue (watcher reload 69/69); Fairy Ocarina stays excluded"
 
 [rewards."Gold Skulltula Token"]
 actor = "Item_Token_Gold"
@@ -140,3 +153,93 @@ source = "PouchActorInfo Item_NutBag_Medium: KeyItem/KeyItem, Large/None, Expans
 actor = "Item_StickBag_Medium"
 family = "fixed_capacity"
 source = "PouchActorInfo Item_StickBag_Medium: KeyItem/KeyItem, Large/None, ExpansionMaxNumActor Item_DekuStick, AfterExpansionMaxNum20, MaxNumGameData DekuStick, native stock-max refill"
+
+[rewards."Rupees (200)"]
+actor = "Obj_Rupee_Gold"
+family = "gold_rupee"
+source = "PouchActorInfo Obj_Rupee_Gold: Rupee/KeyItem tab, GetType Medium, SpecialDeal None, BundleActor Obj_Rupee_Green x200; the Medium get that separates the gold rupee from the Small rupee family; the played control of its family"
+
+[rewards."Arrows (5)"]
+actor = "Obj_ArrowBundle_Medium"
+family = "refill"
+source = "PouchActorInfo Obj_ArrowBundle_Medium: Arrow/Equipment tab, GetType Small, SpecialDeal None, BundleActor Item_Arrow_Normal x5; the native world pickup of the chest twin TBox_ArrowBundle_Medium; played 20 -> 25"
+
+[rewards."Arrows (10)"]
+actor = "Obj_ArrowBundle_Large"
+family = "refill"
+source = "PouchActorInfo Obj_ArrowBundle_Large: Arrow/Equipment tab, GetType Small, SpecialDeal None, BundleActor Item_Arrow_Normal x10; the native world pickup of the chest twin TBox_ArrowBundle_Large"
+
+[rewards."Bombs (5)"]
+actor = "Item_BombBundle_Small"
+family = "refill"
+source = "PouchActorInfo Item_BombBundle_Small: Material/Item tab, GetType Small, SpecialDeal None, BundleActor Item_Bomb x5, ActionGuideType Bomb; the Item_ bundle row is itself the native grant (no separate Obj_ pickup); played 10 -> 15"
+
+[rewards."Deku Nuts (5)"]
+actor = "TBox_DekuNutBundle"
+family = "refill"
+source = "PouchActorInfo TBox_DekuNutBundle: Material/Item tab, GetType Small, SpecialDeal None, BundleActor Item_DekuNut x3, IsAutoSaveAfterGet; the chest-content row is the only native nut bundle, a native 3 behind the logical 5 label; played 16 -> 19"
+
+[rewards."Deku Stick (1)"]
+actor = "Item_DekuStickBundle_Small"
+family = "refill"
+source = "PouchActorInfo Item_DekuStickBundle_Small: Material/Item tab, GetType Small, SpecialDeal None, BundleActor Item_DekuStick x3, ActionGuideType DekuStick; a native 3 behind the logical 1 label; played 7 -> 10"
+
+[rewards."Bombchus (5)"]
+actor = "Item_BombchuBundle_Small"
+family = "bombchu"
+source = "PouchActorInfo Item_BombchuBundle_Small: Material/Item tab, GetType Large, SpecialDeal None, BundleActor Item_Bombchu x5, ActionGuideType Bombchu; a Large get, not the Small refill shape, so it never grants or needs a bag; played unowned -> 5/20"
+
+[rewards."Magic Jar"]
+actor = "Obj_MagicJar_Large"
+family = "magic_recovery"
+source = "PouchActorInfo Obj_MagicJar_Large: CureItem/Item tab, GetType Small, SpecialDeal NotPushToPouch, IsUsable, MPRecover 120, BundleActorNum 1; the native world pickup of the chest twin Tbox_MagicJar_Large; restores magic without entering the pouch"
+
+[rewards."Dins Fire"]
+actor = "Item_DinFire"
+family = "spell"
+source = "PouchActorInfo Item_DinFire: Material/Item tab, GetType Heart, SpecialDeal None, BundleActorNum 1, AssignableItem DinFire, ExpansionAvility MPMaxUP, MPMax 24 (saved raw 240); the played representative of its family"
+
+[rewards."Farores Wind"]
+actor = "Item_FaroreWind"
+family = "spell"
+source = "PouchActorInfo Item_FaroreWind: Material/Item tab, GetType Heart, SpecialDeal None, BundleActorNum 1, AssignableItem FaroreWind, ExpansionAvility MPMaxUP, MPMax 24; structural sibling of the played Dins Fire, same grant shape"
+
+[rewards."Nayrus Love"]
+actor = "Item_NayruLove"
+family = "spell"
+source = "PouchActorInfo Item_NayruLove: Material/Item tab, GetType Heart, SpecialDeal None, BundleActorNum 1, AssignableItem NayruLove, ExpansionAvility MPMaxUP, MPMax 24; structural sibling of the played Dins Fire, same grant shape"
+
+[rewards."Ice Arrows"]
+actor = "Item_Arrow_Ice"
+family = "magic_arrow"
+source = "PouchActorInfo Item_Arrow_Ice: Bow/Item tab, GetType Large, SpecialDeal None, BundleActorNum 1, AssignableItem IceArrow, ExpansionAvility MPMaxUP, MPMax 24 (saved raw 240), WeaponType Bow, ShootableActor NormalArrow; the played representative of its family"
+
+[rewards."Light Arrows"]
+actor = "Item_Arrow_Light"
+family = "magic_arrow"
+source = "PouchActorInfo Item_Arrow_Light: Bow/Item tab, GetType Large, SpecialDeal None, BundleActorNum 1, AssignableItem LightArrow, ExpansionAvility MPMaxUP, MPMax 24, WeaponType Bow, ShootableActor NormalArrow; structural sibling of the played Ice Arrows, same grant shape"
+
+[rewards."Lens of Truth"]
+actor = "Item_GlassTruth"
+family = "lens"
+source = "PouchActorInfo Item_GlassTruth: HeadArmor/Equipment tab, GetType Large, SpecialDeal GlassTruth, BundleActorNum 1, ExpansionAvility MPMaxUP, MPMax 24, AdultEquipment Armor_Adult_GlassTruth, ChildEquipment Armor_Child_GlassTruth"
+
+[rewards."Stone of Agony"]
+actor = "Item_AgonyStone"
+family = "agony_stone"
+source = "PouchActorInfo Item_AgonyStone: KeyItem/Equipment tab, GetType Large, SpecialDeal AgonyStone, BundleActorNum 1, AdultEquipment Armor_Adult_AgonyStone, ChildEquipment Armor_Child_AgonyStone; the remake's Echo Gem"
+
+[rewards."Double Defense"]
+actor = "Item_FairyBless_DefenseDouble"
+family = "double_defense"
+source = "PouchActorInfo Item_FairyBless_DefenseDouble: KeyItem/KeyItem tab, GetType Heart, SpecialDeal FairyBlessDefenseDouble, BundleActorNum 1, IsAutoSaveAfterGet; the Great Fairy's defense bless, distinct from Heart Containers (played MaxLife unchanged)"
+
+[rewards."Scrub Business Seed"]
+actor = "Obj_ScrubBusinessSeed"
+family = "scrub_seed"
+source = "PouchActorInfo Obj_ScrubBusinessSeed: Material/Item tab, GetType Small, SpecialDeal None, PouchStockable, FixedMaxNum 30, BundleActorNum 1, IsAutoSaveAfterGet; the scrub's own world actor (chest twin Item_ScrubBusinessSeed); capped stock, not a bundle"
+
+[rewards."Ocarina of Time"]
+actor = "Obj_Ocarina_Time"
+family = "ocarina"
+source = "PouchActorInfo Obj_Ocarina_Time: KeyItem/KeyItem tab, GetType Large, SpecialDeal Ocarina, BundleActorNum 1, IsAutoSaveAfterGet; the native world pickup that carries its own AnimationRef, which the Item_ ocarinas lack, so only it composes at a Skulltula; Fairy Ocarina has no such donor and stays out"
