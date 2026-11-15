@@ -1,6 +1,7 @@
 # Round 15 — castle PRs (cs15a)
 
-Current linear-series base `d66d35f` (includes #26), pending cs15b's merge.
+Current linear-series base `4734b0a`: cs15b's tracker/time-travel and docs merged.
+Claude authorized the rebase, ordered full gates and fresh three-recipe comparison.
 Earlier comparisons used `1db6e63` / docs-only `eff7dab`; version remains 0.2.1.
 Agent/model `cs15a`, `openai-codex/gpt-6.1-sol`.
 Read required plans, README/CONTRIBUTING, decisions, native §46–48, and all four
@@ -202,7 +203,57 @@ Six separate adaptation commits; no castle commit amended:
   | 1506 Chest/Shop/Gift | 153 | `28d9a7767b6eb19363c5a253b54f0b97fce67fc5b8e89b41d5ad8d60343d62e3` |
   | 1507 Defaults + `dungeon_items="anywhere"` | 102 | `bbe445d44e1e78c7d87520824df12e5aa6b901a229ccf6c91706070c2570dc0a` |
 
-- Full gates remain stopped: no lock, runner or watcher has been created.
+- At that review handoff full gates remained stopped: no new lock, runner or watcher.
+
+## Authorized merged-main verification (`4734b0a`)
+
+- Rebased with `--update-refs`; only conflicts were in our tracker adaptation:
+  union the test's NX fixture import with main's `tree` import, and retain main's
+  dungeon/OBS documentation alongside separate-update cache invalidation.
+  No new adaptation was needed in castle's commits; all four boundary refs updated.
+- Rebased boundaries: #5 `05e39a8`, #6 `18110c4`, #4 `038ab4d`;
+  top code head `da7846c`, `src` tree `023a01cc296d502fc8d799a7cec7153ec8f7c14b`.
+- Ordered owned gates use `--frozen --extra ui`. #6 ran in `series6-final`;
+  top uses this worktree and the expanded r15 fixture for dump tests.
+  Both completed synthetic runs passed full format and lint checks as well.
+
+  | Stage | Code head | Result | Workers at suite start |
+  |---|---|---|---:|
+  | #6 synthetic | `18110c4` | 2437 passed, 189 skipped (1123.95 s) | 3 |
+  | Top synthetic | `da7846c` | 2474 passed, 189 skipped (1100.13 s) | 3 |
+  | Top dump | `da7846c` | 187 passed, 2476 deselected (6877.64 s), no skips | 3 |
+
+- Dump attempt found a real Longshot process at stage start and did not run pytest.
+  Its owned lock was released; no retry or watcher was queued. Posted BLOCKED,
+  not READY, at 20:18; runtime closure was needed before the gate.
+  Completed logs: `gates-authorized-4734-pr6-synthetic.log`,
+  `gates-authorized-4734-top-synthetic.log`; refusal log:
+  `gates-authorized-4734-top-dump.log`, all under `work/r15-castle/`.
+  Claude confirmed closure since 20:27 and authorized resumption. Started at 20:32
+  in a detached `top-dump-final` worktree at exact `da7846c`; verified owner.txt's
+  full head and dump label. The suite kept workers 3 through completion.
+  No Longshot or Hookshot process was present at either startup or completion;
+  no claim is made about unmonitored intermediate instants. The owned lock
+  was released. Complete dump log: `gates-authorized-4734-da7846c-dump.log`.
+  All requested gates and the fresh three-recipe comparison are now complete.
+  The final round-record-only commit does not change the verified source or tests.
+
+- Verified the live lock's populated owner file: cs15a, branch
+  `r15/castle-series-6`, full `18110c4` head and run label. Publication is an
+  atomic rename of an already-populated claim directory, not an empty lock.
+  Every stage rechecks processes. Main-comparison startup found Longshot PID
+  210292, so selected workers 1; workers 3 only where the fresh check finds no game.
+- Rebased production web surface: native NX check showed its blocking modal,
+  then Verified Version1.1.1 / nx / e0f3ccfa; screenshot inspected.
+  Main's experimental free-time-travel switch is present; no browser errors.
+  Library roots were isolated to an empty scratch path, preferences in memory,
+  and Play disabled. Browser/server closed and throwaway script removed.
+- Fresh main `4734b0a` versus rebased code head `da7846c`: all three recipes above
+  have **zero differences**, with the same file counts and manifest hashes shown
+  in the preceding table. Every relative path/resource/spoiler/play-note compared.
+  Oracle and candidate were both generated anew; workers 1 after their process checks.
+  Evidence: `work/r15-castle/review-main-4734b0a-manifest.json` and
+  `work/r15-castle/review-series-da7846c-manifest.json`. No prior oracle substituted.
 
 ## In-game boundary
 
