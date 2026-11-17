@@ -13,6 +13,10 @@ files = [
     "Event/EventFlow/EventFlowFileEntry.Product.110.byml.zs",
     "System/Resource/ResourceSizeTable.Product.111.Nin_Ounce_NVN2.rsizetable.zs",
     "Logic/Market_Common_f252.logic.module.ainb", # Round10 Door of Time open mode (cs10b)
+    "Logic/HyruleField_Child_Prefab_0ce5.logic.module.ainb", # R16: late escape area
+    "Logic/HyruleField_Child_Prefab_9e35.logic.module.ainb", # R16: escape storm
+    "Logic/HyruleField_Child_Prefab_91f9.logic.module.ainb", # R16: late moat pickup
+    "Logic/HyruleField_Child_Prefab_32f7.logic.module.ainb", # R16: moat sensors/air wall
     "Sequence/SetPouchAndStatusForGameStart.module.ainb", # R13: new-game-only item-bar initialization
 ]
 patterns = [
