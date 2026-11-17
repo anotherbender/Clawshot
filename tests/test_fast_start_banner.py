@@ -41,22 +41,57 @@ def test_kaepora_skip_keeps_the_field_map_available_without_its_panorama():
 
 
 @pytest.mark.dump
-def test_native_saria_banner_visit_state_is_preserved(romfs):
+def test_every_skipped_location_banner_preserves_its_native_visit(romfs):
+    """Derive lost banner effects from native event routing, including timeline companions."""
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)
-    flow = "Event/EventFlow/Dm_Kokiri_0045.bfevfl.zs"
-    fc = evfl.read(dictionaries.decompress(flow, (romfs / flow).read_bytes())).flowchart
-    banner = next(event for event in fc.events if event.name == "Event7")
-    assert fc.actors[banner.actor].actions[banner.action] == "EventTriggerOpenLocationUI"
-    location = "Work/Location/KokiriForest.game__location__Location.gyml"
-    assert banner.params == {"LocationName": location}
-    path = "RSDB/Location.Product.111.rstbl.byml.zs"
-    locations = byml.read(dictionaries.decompress(path, (romfs / path).read_bytes()))
-    assert next(row for row in locations if row["__RowId"] == location)["IsShowLocationUIFirstTimeInDemo"]
-    path = gamedata.GAME_DATA_LIST
-    data = dictionaries.decompress(path, (romfs / path).read_bytes())
-    original = byml.read(data)
-    _, before = gamedata._find(original, VISIT)
-    assert before["DefaultValue"] is False
-    assert before["ResetTypeValue"] == 8 and before["SaveFileIndex"] == 0
-    patched = byml.read(gamedata.patch_initial_values(data, gamedata.select(gamedata.load(), ["saria"])))
-    assert gamedata._find(patched, VISIT)[1]["DefaultValue"] is True
+    path = "RSDB/EventSetting.Product.111.rstbl.byml.zs"
+    routes = {row["__RowId"]: row for row in byml.read(dictionaries.decompress(path, (romfs / path).read_bytes()))}
+    documents = {}
+    for setting in [*gamedata.load().values(), *gamedata.load_always()]:
+        pending = {
+            name.removeprefix("HavePlayedEvent.")
+            for name, value in setting.game_data.items()
+            if name.startswith("HavePlayedEvent.") and value is True
+        }
+        seen = set()
+        required = {}
+        while pending:
+            name = pending.pop()
+            if name in seen:
+                continue
+            seen.add(name)
+            route = routes[name]
+            references = [
+                route[field] for field in ("FlowchartFileName", "TimelineFileName") if route.get(field)
+            ] + route.get("SubTimelineNames", [])
+            for reference in references:
+                path = reference.removeprefix("Work/").rsplit(".", 1)[0] + ".bfevfl.zs"
+                if path not in documents:
+                    documents[path] = evfl.read(dictionaries.decompress(path, (romfs / path).read_bytes()))
+                document = documents[path]
+                actions = []
+                if document.flowchart is not None:
+                    fc = document.flowchart
+                    actions.extend(
+                        (fc.actors[event.actor].actions[event.action], event.params or {})
+                        for event in fc.events
+                        if isinstance(event, evfl.ActionEvent)
+                    )
+                if document.timeline is not None:
+                    timeline = document.timeline
+                    actions.extend(
+                        (timeline.actors[clip.actor].actions[clip.action], clip.params or {}) for clip in timeline.clips
+                    )
+                for operation, params in actions:
+                    if operation == "EventTransition" and isinstance(params.get("EventName"), str):
+                        pending.add(params["EventName"])
+                    assert operation != "EventTriggerOpenCurrentSmallLocationUI", (
+                        setting.name,
+                        path,
+                        "Resolve the current small location before suppressing its banner",
+                    )
+                    if operation == "EventTriggerOpenLocationUI":
+                        area = params["LocationName"].removeprefix("Work/Location/").split(".", 1)[0]
+                        required[f"IsVisitLocation.{area}"] = path
+        for visit, source in required.items():
+            assert setting.game_data.get(visit) is True, (setting.name, source, visit)

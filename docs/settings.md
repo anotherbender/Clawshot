@@ -264,8 +264,9 @@ This changes **new games only**, not existing saves. Kareem verified the repaire
 music and the story/escape checks on Longshot on 2026-11-13
 ([section 46](../plans/03-game-data.md#46-round-14-child-story-and-field-music)).
 The skip now also preserves `IsVisitLocation.HyruleField`, normally supplied by the panorama's
-location UI and required for the Field map. This new-game minimap/full-map correction still awaits
-in-game verification; existing saved visit state is not migrated.
+location UI and required for the Field map. Like the Saria skip's Kokiri Forest visit flag, this
+also reveals the area's pause map before the first visit. This new-game minimap/full-map correction
+still awaits in-game verification; existing saved visit state is not migrated.
 
 Every new seed enables the D-pad HUD shortcuts from the start, independently of fast-start
 choices (including `--skip` with no selections): **Navi, Ocarina, Boots and Masks**.
