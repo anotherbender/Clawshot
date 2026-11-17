@@ -1,13 +1,13 @@
 """Synthetic door contracts and world/CS1 boundaries; no game trees or decoded data fixtures."""
 
 from copy import deepcopy
-from dataclasses import replace
 
 import pytest
 
 from clawshot.__main__ import main
 from clawshot.formats import evfl
 from clawshot.generate import FillError, Settings, prepare
+from clawshot.generate.fill import return_guarantee_conflict
 from clawshot.patch import door, gifts
 from clawshot.patch.plan import PatchError
 from clawshot.world import ADULT, CHILD, load_spec
@@ -180,6 +180,17 @@ def test_world_door_modes_match_inventory_and_story_requirements(mode, items, ex
     assert Settings.from_string(settings.to_string()) == settings
 
 
+@pytest.mark.parametrize("mode", ["open", "song_only"])
+def test_early_modes_can_construct_the_default_adult_return_guarantee(mode):
+    settings, world = prepare(load_spec(), Settings(shuffle=GIFTS, door_of_time=mode))
+    conflict = return_guarantee_conflict(world, settings)
+    assert conflict is None, {
+        "mode": mode,
+        "first_pull_minimum": world.settings["age_return_fill_inventory"],
+        "conflict": conflict,
+    }
+
+
 @pytest.mark.parametrize("mode", door.MODES)
 def test_adult_fairy_ocarina_cannot_play_saria_in_any_door_mode(mode):
     _, world = prepare(load_spec(), Settings(shuffle=GIFTS, door_of_time=mode))
@@ -194,10 +205,6 @@ def test_cli_explicit_door_mode_overrides_an_effective_settings_string(capsys):
     assert main(["--settings", effective.to_string(), "--door-of-time", "song_only", "--print-settings"]) == 0
     settings = Settings.from_string(capsys.readouterr().out.strip())
     assert settings.door_of_time == "song_only"
-    resolved, world = prepare(load_spec(), settings)
-    assert world.settings["age_return_fill_inventory"] == {"Ocarina": 1, "Song of Time": 1}
-    back, _ = prepare(load_spec(), replace(resolved, door_of_time="closed", logic={}))
-    assert back.logic["age_return_fill_inventory"]["Ocarina"] == 2
     with pytest.raises(FillError, match="must agree"):
         prepare(load_spec(), Settings(door_of_time="closed", logic={"door_of_time": "open"}))
 
