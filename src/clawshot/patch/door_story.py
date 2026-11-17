@@ -26,7 +26,7 @@ cleared natively when adult Link walks from the Market to the Field; ``Market_Ad
 clears it as well, right after its native ``Sequence_IsChildhood`` write, so a real return to child never
 keeps the hold. At the send-off, an independent guard also clears a set ``HyruleField_ChangeENV``, waits one
 frame and rebuilds the conditional environment palette, as the skipped owl does. The Forest exit sets this
-first-arrival environment only while the Field panorama is unplayed. No other history, quest or inventory is written.
+first-arrival environment only before both the Field panorama and the real send-off. No other history is written.
 """
 
 from collections.abc import Callable
@@ -158,7 +158,14 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
         renamed.update(f"{_PREFIX}{name}" for name in ("CountSendoff", "CountEscape", "SendoffRecount"))
         renamed.update(
             f"{_CLOCK}{name}"
-            for name in ("Arrival", "Arrived", "Environment", "ClearedEnvironment", "WaitEnvironment", "RebuildEnvironment")
+            for name in (
+                "Arrival",
+                "Arrived",
+                "Environment",
+                "ClearedEnvironment",
+                "WaitEnvironment",
+                "RebuildEnvironment",
+            )
         )
     if done := [event.name for event in fc.events if event.name in renamed]:
         raise PatchError(f"Door of Time: {flow} is already patched: {done}")
@@ -283,7 +290,7 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
 
 
 def _first_field(data: bytes) -> bytes:
-    """Do not re-enable the first-arrival palette after the native panorama has already played."""
+    """Never re-enable first-arrival light after the owl panorama or the real send-off, even on a late first exit."""
     document = evfl.read(data)
     fc = document.flowchart
     if fc is None or fc.name != "Goto_HyruleCastle":
@@ -308,11 +315,16 @@ def _first_field(data: bytes) -> bytes:
         raise PatchError(f"Door of Time: changed native first Field arrival: {writer!r}, {travel!r}")
     actor = _native_actor(fc, _GAME_DATA_ACTOR)
     query = _slot(fc.actors[actor].queries, _READ_HISTORY)
-    fc.events[at] = evfl.SwitchEvent(
-        writer.name, actor, query, [(0, onward), (1, len(fc.events))], {"EventName": _PANORAMA}
-    )
+    first = len(fc.events)
+    fc.events[at] = evfl.SwitchEvent(writer.name, actor, query, [(0, onward), (1, first + 1)], {"EventName": _PANORAMA})
     writer.name = f"{_CLOCK}FirstFieldENV"
     fc.events.append(writer)
+    # The Lost Woods shortcuts can reach the send-off before this bridge's first departure.
+    fc.events.append(
+        evfl.SwitchEvent(
+            f"{_CLOCK}FirstFieldSendoff", actor, query, [(0, onward), (1, first)], {"EventName": _SENDOFF_EVENT}
+        )
+    )
     result = evfl.write(document)
     if evfl.read(result) != document:
         raise PatchError(f"Door of Time: {_CASTLE_FLOW} does not read back as the edited flow")
