@@ -302,12 +302,14 @@ native repair follows the Fire/Water counter and adds no Forest condition. All D
 counter until the real Impa send-off, recount there, and ignore calls after escape. This also covers
 closed mode when shuffled songs allow stones before Zelda. The native courtyard Step01 reset remains;
 early-mode post-pull callbacks do not roll the completed Door quest back.
-Kareem passed the open-mode send-off gate and the early-pull escape/moat order repair on Longshot rc.7.
-The additional clock-state fixes below await their four in-game controls.
+Kareem passed the open-mode send-off gate, early-pull escape/moat order repair and immediate
+child-return clock clear on Longshot rc.7. The first-arrival lighting repair below awaits v5 play checks.
 
 **For new seeds; no save-repair pass.** Both early modes read the
 arrival flag and the real send-off history. Kaepora fast start now preserves the skipped owl's
-arrival effect; the actual send-off restores it if a different route missed the owl.
+arrival effect; the actual send-off restores it if a different route missed the owl. Independently,
+that send-off clears a leftover first-arrival environment, waits one frame and rebuilds its palette.
+The Forest exit does not re-enable that environment once the Field panorama or real send-off has played.
 Returning to child through the Temple clears the pending first-adult clock hold without changing
 the native first-adult scenes or the adult Market exit.
 An adult who warps out before walking Market → Hyrule Field keeps the native first-night hold; walk that exit or return to child through the Temple to clear it.
@@ -328,8 +330,8 @@ remain at child gifts. Validation names the fixed checks and offers a closed doo
 shuffle. This is a construction limitation, not proof that no physical route exists;
 in particular, the logic for the unshuffled Time-song gift already requires all three stones.
 Free time travel replaces that return proof, so with it on all three door modes are accepted
-with Chest only. Early open-mode return and the preserved moat rewards passed on rc.7; the new
-immediate-child-return clock fix remains unplayed.
+with Chest only. Early open-mode return, preserved moat rewards and the immediate-child-return
+clock clear passed on rc.7.
 
 An open-bridge, early-door seed can validly require adult Link before Gohma. Its play note
 explains when no child-only opening guide exists instead of rejecting the beatable seed.

@@ -10,8 +10,6 @@ before the courtyard (whose native Step01 always stays) still reach Step03 and t
 keep every lower DoorOfTime write forward-only.
 """
 
-from copy import deepcopy
-from dataclasses import replace
 from itertools import product
 
 import pytest
@@ -61,6 +59,23 @@ TIME_SONG = "IsGet.Item_Melody_TimeSong"
 ARRIVED = "HyruleField_ArriveEntrance"  # the Field owl arrival the native clock reads; natural routes met the owl
 ARRIVE = {"GameDataName": ARRIVED, "Index": -1, "Value": True}  # the send-off's fallback write when it is unset
 CLOCK_READY = "Clawshot.Door.ClockReady"  # the early door stage's unsaved BoolExp: the arrival and the send-off
+FIRST_FIELD = "HyruleField_ChangeENV"  # saved Bool: the Forest exit's first-Field light, cleared by the owl arrival
+PANORAMA_SCENE = "Dm_HrlField_0000"  # the owl arrival's Field panorama
+PANORAMA = f"HavePlayedEvent.{PANORAMA_SCENE}"
+OWL_ARRIVAL = "Goto_HyruleCastle_Kaepora_00"
+FOREST_EXIT = "KokiriForest_ArriveLostWood"
+MEET_ZELDA = "Goto_HyruleCastle_MeetZelda"
+WAIT = "EventWait"
+REBUILD = "Event_RebuildConditionEnvTimePalette"
+BANC_CHANGE = "EventReserveBancChange"
+ONE_FRAME = {"IsWaitEnd": True, "Frames": 1}
+TO_FIELD = {
+    "IsWaitEnd": True,
+    "FadePattern": 1,
+    "NextBanc": "HyruleField_Child",
+    "NextStartPos": "HyruleField_FrontOfLostWoodBridge",
+    "BootEventName": "Dm_SY_BancChangeArrive_HyruleField",
+}
 START = {
     "Step_Get_StoneOfForest": "Complete",
     "Step_Get_StoneOfFire": "Ready",
@@ -72,6 +87,8 @@ START = {
     OPENING: False,
     TIME_SONG: True,
     ARRIVED: True,
+    PANORAMA: True,  # the owl arrival plays its panorama right after setting the arrival
+    FIRST_FIELD: False,  # and clears the first-Field light
 }
 STONES = (("Ready", "Ready"), ("Complete", "Ready"), ("Ready", "Complete"), ("Complete", "Complete"))  # Fire, Water
 # Every lower DoorOfTime writer the early modes guard: (flow, writer, step written, native next or None).
@@ -120,6 +137,14 @@ CAMERA = {"KeepManualModeFrame": 120.0, "IsKeepWithRelativePos": False}
 WEATHER = {"IsImmTrans": False, "ChangeSpeed": 0}
 DOOR_NOTICE = {"ChallengeName": "DoorOfTime", "IsFirstStep": False}
 REWARD = ("call", "Dm_SY_GetInEvent", "GetInEvent_Test", {"ActorName": "Item_Test"})
+# The Forest exit's first-Field light, and the owl arrival's native return to the ordinary light: the light cleared,
+# a frame's wait, then the conditional palette rebuilt (a parameterless action, as the runner records it).
+LIT = ("GameDataActor", SET_BOOL, {"GameDataName": FIRST_FIELD, "Index": -1, "Value": True})
+UNLIT = [
+    ("GameDataActor", SET_BOOL, {"GameDataName": FIRST_FIELD, "Index": -1, "Value": False}),
+    ("EventSystemActor", WAIT, ONE_FRAME),
+    ("EventWorldManagerController", REBUILD, {}),
+]
 
 
 def write(name, step, next_name, params=WRITE):
@@ -253,26 +278,46 @@ def door_flow():
 
 
 def castle_flow():
-    """The courtyard meeting: Zelda's quest completes, the forced DoorOfTime Step01, then wait/fade/notice/camera."""
+    """The castle story's flows: Kaepora's Field owl arrival (the arrival, the panorama and the owl, then the
+    first-Field light cleared, a frame's wait and the palette rebuilt before the next scene), the Forest exit
+    (Saria's farewell, the first-Field light, then the Field travel) and the courtyard meeting (Zelda's quest
+    completes, the forced DoorOfTime Step01, then wait/fade/notice/camera)."""
     return chart(
         "Goto_HyruleCastle",
         [
             ("ChallengeSystemActor", [STEP, NOTICE], []),
             ("GameDataActor", [SET_BOOL], [READ_BOOL, BOOL_EXP]),
-            ("EventSystemActor", ["EventWait"], []),
+            ("EventSystemActor", [WAIT, TRANSITION], []),
             ("UISystemActor", ["EventEventFadeIn"], []),
             ("EventCamera", [KEEP_CAMERA], []),
+            ("EventWorldManagerController", [REBUILD], []),
+            ("GameSystemActor", [BANC_CHANGE], []),
         ],
         [
-            ("Event203", "act", "EventSystemActor", "EventWait", {"IsWaitEnd": True, "Frames": 30}, "Event30"),
+            data("Event153", SET_BOOL, ARRIVED, True, "Event3"),
+            scene("Event3", PANORAMA_SCENE, "Event59"),
+            scene("Event59", "Dm_HrlField_0005", "Event217"),
+            data("Event217", SET_BOOL, FIRST_FIELD, False, "Event220"),
+            ("Event220", "act", "EventSystemActor", WAIT, dict(ONE_FRAME), "Event221"),
+            ("Event221", "act", "EventWorldManagerController", REBUILD, None, "Event12"),
+            scene("Event12", "Dm_HrlField_0010", None),
+            scene("Event44", "Dm_Kokiri_0155", "Event218"),
+            data("Event218", SET_BOOL, FIRST_FIELD, True, "Event42"),
+            ("Event42", "act", "GameSystemActor", BANC_CHANGE, dict(TO_FIELD), None),
+            ("Event203", "act", "EventSystemActor", WAIT, {"IsWaitEnd": True, "Frames": 30}, "Event30"),
             write("Event30", "Complete", "Event32", {**QUIET, "ChallengeName": "Goto_HyruleCastle"}),
             write("Event32", "Step01", "Event202", FIRST),
-            ("Event202", "act", "EventSystemActor", "EventWait", {"IsWaitEnd": True, "Frames": 90}, "Event128"),
+            ("Event202", "act", "EventSystemActor", WAIT, {"IsWaitEnd": True, "Frames": 90}, "Event128"),
             ("Event128", "act", "UISystemActor", "EventEventFadeIn", {"Length": 1, "IsWaitEnd": True}, "Event183"),
             ("Event183", "act", "ChallengeSystemActor", NOTICE, {**DOOR_NOTICE, "IsFirstStep": True}, "Event204"),
             ("Event204", "act", "EventCamera", KEEP_CAMERA, CAMERA, None),
         ],
-        [("Goto_HyruleCastle_MeetZelda", "Event203", [])],
+        [
+            (OWL_ARRIVAL, "Event153", []),
+            (FOREST_EXIT, "Event44", []),
+            (MEET_ZELDA, "Event203", []),
+            ("TestStartsAtTheFirstFieldWrite", "Event218", []),  # an entry may name the write itself
+        ],
     )
 
 
@@ -302,7 +347,7 @@ def zelda_flow():
 FLOWS = {DOOR: door_flow, CASTLE: castle_flow, SARIA: saria_flow, ZELDA: zelda_flow}
 
 
-def run(fc, start, state, *, orders=ORDERS, forward=(), order=False, scenes=False, entry=None):
+def run(fc, start, state, *, orders=ORDERS, forward=(), order=False, light=False, scenes=False, entry=None):
     """Follow ``fc`` from event ``start``; return its effects and update ``state`` (``Step_<quest>``, data).
 
     Case 0 is a true query, as native gates use it; the requested melody is always the one played. Sub flow calls
@@ -312,8 +357,10 @@ def run(fc, start, state, *, orders=ORDERS, forward=(), order=False, scenes=Fals
 
     A reference engine models the story's promises on a flow without them: it never moves the ``forward`` quests
     back; with ``order`` the stone count entry runs only after the send-off and before the escape, and the
-    send-off's Step02 (native Event7) is followed by the Field arrival when it is still unset, then by that count,
-    before its native continuation."""
+    send-off's Step02 (native Event7) is followed by the Field arrival when it is still unset, then by the owl's
+    return to the ordinary light when the first-Field light is still set, then by that count, before its native
+    continuation; with ``light`` a played owl panorama or a played send-off keeps the first-Field light from being
+    set."""
     effects = []
     budget = [2000]
 
@@ -339,6 +386,8 @@ def run(fc, start, state, *, orders=ORDERS, forward=(), order=False, scenes=Fals
         if action == STEP and params["ChallengeName"] in forward:
             steps = orders[params["ChallengeName"]]
             return steps.index(state[f"Step_{params['ChallengeName']}"]) > steps.index(params["StepName"])
+        if light and action == SET_BOOL and params == LIT[2]:
+            return state[PANORAMA] or state[SENDOFF]
         return False
 
     def count():
@@ -382,6 +431,9 @@ def run(fc, start, state, *, orders=ORDERS, forward=(), order=False, scenes=Fals
                     if not state[ARRIVED]:
                         state[ARRIVED] = True
                         effects.append(("GameDataActor", SET_BOOL, ARRIVE))
+                    if state[FIRST_FIELD]:
+                        state[FIRST_FIELD] = False
+                        effects.extend(UNLIT)
                     effects.append(RECOUNT)
                     count()
                 at = event.next
@@ -406,9 +458,10 @@ def outcome(fc, start, state, **options):
 
 def reference(mode, path=DOOR):
     """What the door story promises for a ``mode`` seed on the flow without it: the order repair on the door flow
-    in every mode, and forward-only lower writes in the early modes (never the courtyard's)."""
+    in every mode, and forward-only lower writes in the early modes (never the courtyard's); on the castle flow, in
+    every mode, no first-Field light after a played owl panorama or a played send-off."""
     forward = ("DoorOfTime",) if mode in EARLY and path in STORY else ()
-    return {"forward": forward, "order": path == DOOR}
+    return {"forward": forward, "order": path == DOOR, "light": path == CASTLE}
 
 
 STORY_ONLY = {"forward": ("DoorOfTime",), "order": True}  # the early door story alone, on the door flow
@@ -420,6 +473,26 @@ def index(fc, name):
 
 def named(fc, name):
     return fc.events[index(fc, name)]
+
+
+def reach(fc, start):
+    """Every event index ``start`` can run, through branches, forks and calls of this flowchart's own entries."""
+    seen, todo = set(), [start]
+    while todo:
+        at = todo.pop()
+        if at == evfl.NONE or at in seen:
+            continue
+        seen.add(at)
+        event = fc.events[at]
+        if isinstance(event, evfl.SwitchEvent | evfl.SubFlowSwitchEvent):
+            todo += [target for _, target in event.cases]
+        elif isinstance(event, evfl.ForkEvent):
+            todo += [*event.forks, event.join]
+        elif not isinstance(event, evfl.ReturnEvent):
+            todo.append(event.next)
+        if isinstance(event, evfl.SubFlowEvent | evfl.SubFlowSwitchEvent) and event.flowchart in ("", fc.name):
+            todo.append(fc.entry_point(event.entry_point).main_event)
+    return seen
 
 
 def flows_for(sources, mode):
@@ -487,53 +560,6 @@ def door_opens(flows, state, mode, orders=ORDERS):
         return state[ARRIVED] and state[door.SENDOFF]
     effects, _ = outcome(flows[DOOR], "DoorOfTime_OpenDoor", state, orders=orders)
     return "Dm_TimeTemple_0010" in scenes_of(effects)
-
-
-def expected_story(old, path, early=True):
-    """``old`` with exactly the contracted edits. Early modes: each lower writer becomes a strict IsAfter query at
-    its own index and its write moves to the end, native next kept. The door flow in every mode: the counter
-    entry first asks for the played send-off, then for an unplayed escape, before native Event38 (a missing case
-    ends it); the send-off's Step02 asks for the Field arrival, sets it only when unset, then continues through
-    its own registered count to native Event62."""
-    fc = deepcopy(old)
-    actor = next(i for i, candidate in enumerate(fc.actors) if candidate.name == "GameDataActor")
-    queries = fc.actors[actor].queries
-    moved = {}
-    for _, name, step, _ in guards_of(path) if early else ():
-        at = index(fc, name)
-        write = fc.events[at]
-        moved[name] = len(fc.events)
-        fc.events.append(replace(write, name=f"ClawshotDoor{name}Write"))
-        cases = [(1, moved[name])] if write.next == evfl.NONE else [(0, write.next), (1, moved[name])]
-        expression = {"GameDataName": f"DoorOfTime_IsAfter_{step}_Exp"}
-        fc.events[at] = evfl.SwitchEvent(name, actor, queries.index(BOOL_EXP), cases, expression)
-    if path == DOOR:
-        sendoff, escape, recount, arrival, arrived = range(len(fc.events), len(fc.events) + 5)
-        counter = fc.entry_point(COUNT)
-        played = queries.index(HAVE_PLAYED)
-        fc.events += [
-            evfl.SwitchEvent("ClawshotDoorCountSendoff", actor, played, [(0, escape)], {"EventName": SENDOFF_SCENE}),
-            evfl.SwitchEvent(
-                "ClawshotDoorCountEscape", actor, played, [(1, counter.main_event)], {"EventName": ESCAPE_EVENT}
-            ),
-            evfl.SubFlowEvent("ClawshotDoorSendoffRecount", "", COUNT, index(fc, "Event62"), None),
-            evfl.SwitchEvent(
-                "ClawshotClockArrival",
-                actor,
-                queries.index(READ_BOOL),
-                [(0, recount), (1, arrived)],
-                {"GameDataName": ARRIVED, "Index": -1},
-            ),
-            evfl.ActionEvent("ClawshotClockArrived", actor, fc.actors[actor].actions.index(SET_BOOL), recount, ARRIVE),
-        ]
-        counter.main_event = sendoff
-        fc.entry_point("DoorOfTime_SendOff").sub_flow_events.append(recount)
-        if early:
-            named(fc, "Event7").cases = [(0, arrival), (1, moved["Event7"])]
-            fc.events[moved["Event7"]].next = arrival
-        else:
-            named(fc, "Event7").next = arrival
-    return fc
 
 
 def check_boundary(old, new, writer, step, tail, boundary, orders=ORDERS):
@@ -618,7 +644,6 @@ def assert_composes(source, path, others, early=True):
     after = evfl.read(story(chain(source))).flowchart
     before = evfl.read(chain(story(source))).flowchart
     assert canonical(after) == canonical(before)
-    assert canonical(after) == canonical(expected_story(alone, path, early))
     return alone, after, before
 
 
@@ -627,30 +652,20 @@ def check_composed(path, alone, composed, orders, early=True):
     starts = [index(alone, name) for _, name, _, _ in guards_of(path)] if early else []
     if path == DOOR:
         starts += [COUNT, "DoorOfTime_SendOff", *(() if early else (index(alone, "Event7"),))]
-    options = {"forward": ("DoorOfTime",) if early else (), "order": path == DOOR}
+    if path == CASTLE:  # Saria's farewell scene right before the Forest exit's light, and the light write itself
+        starts += [index(alone, "Event44"), index(alone, "Event218")]
+    forward = ("DoorOfTime",) if early and path in STORY else ()
+    options = {"forward": forward, "order": path == DOOR, "light": path == CASTLE}
     fires = ("Ready", "KakarikoVillageNpc", "Complete")
-    histories = product((False, True), repeat=3)  # send-off, escape, Field arrival
-    for start, current, fire, (sendoff, escaped, arrived) in product(starts, STEPS, fires, histories):
+    # Send-off, escape, Field arrival and first-Field light; the castle reads the owl panorama, the send-off and the
+    # light.
+    flags = (PANORAMA, SENDOFF, FIRST_FIELD) if path == CASTLE else (SENDOFF, ESCAPED, ARRIVED, FIRST_FIELD)
+    for start, current, fire, values in product(starts, STEPS, fires, product((False, True), repeat=len(flags))):
         stones = {"Step_Get_StoneOfFire": fire, "Step_Get_StoneOfWater": "Complete"}
-        state = {**START, **stones, "Step_DoorOfTime": current, SENDOFF: sendoff, ESCAPED: escaped, ARRIVED: arrived}
+        state = {**START, **stones, "Step_DoorOfTime": current, **dict(zip(flags, values, strict=True))}
         expected = outcome(alone, start, state, orders=orders, **options)
         for flow in composed:
             assert outcome(flow, start, state, orders=orders) == expected, (start, state)
-
-
-def flow_name(path):
-    return path.rsplit("/", 1)[-1].removesuffix(".bfevfl.zs")
-
-
-CHANGES = [pytest.param(path, True, id=f"early-{flow_name(path)}") for path in STORY]
-CHANGES.append(pytest.param(DOOR, False, id="every-mode-DoorOfTime"))
-
-
-@pytest.mark.parametrize("path,early", CHANGES)
-def test_only_the_contracted_events_change_and_every_reference_survives(path, early):
-    out = door_story.changes(early=early)[path](evfl.write(FLOWS[path]()))
-    assert evfl.write(evfl.read(out)) == out
-    assert evfl.read(out).flowchart == expected_story(FLOWS[path]().flowchart, path, early)
 
 
 @pytest.mark.parametrize("path,writer,step,tail", GUARDS)
@@ -664,10 +679,11 @@ def test_a_writer_advances_to_its_step_but_never_moves_the_quest_back(path, writ
 @pytest.mark.parametrize("path", PATHS)
 def test_every_entry_plays_as_promised_on_the_reference_engine(mode, path):
     """In every mode the stone count waits for the send-off and ends with the escape, and the send-off counts
-    again; the early modes never move DoorOfTime back; everything else, the courtyard included, is native."""
+    again; the early modes never move DoorOfTime back; a played owl panorama or send-off keeps the Forest exit from
+    setting the first-Field light; everything else, the courtyard included, is native."""
     flows, base = synthetic(mode)
     new, old = flows[path], base[path]
-    if path == CASTLE or (mode == "closed" and path != DOOR):
+    if mode == "closed" and path in (SARIA, ZELDA):
         assert new == old
     for entry, current in product(old.entry_points, STEPS):
         for (fire, water), (sendoff, escaped) in product(STONES, product((False, True), repeat=2)):
@@ -698,9 +714,17 @@ def test_skipped_writes_keep_the_reward_camera_and_notice_tails(current):
 BEFORE_ZELDA = ("NotReady", "Ready", "Step2_1", "Srep2_1_1", "Step2_2", "Step03")
 
 
+def courtyard(fc):
+    """The courtyard meeting as it can play: its entry and every event it can run, keyed by name."""
+    events, entries, _ = canonical(fc)
+    ran = reach(fc, fc.entry_point(MEET_ZELDA).main_event)
+    return entries[MEET_ZELDA], {fc.events[i].name: events[fc.events[i].name] for i in sorted(ran)}
+
+
 def check_courtyard(flows, base, orders=ORDERS):
-    """The shipped courtyard is the native one, and its forced Step01 brings back the exact step Impa waits for."""
-    assert flows[CASTLE] == base[CASTLE]
+    """The shipped courtyard plays the native events, and its forced Step01 brings back the exact step Impa waits
+    for."""
+    assert courtyard(flows[CASTLE]) == courtyard(base[CASTLE])
     for current in BEFORE_ZELDA:
         state = {**START, "Step_DoorOfTime": current, SENDOFF: False}
         effects, final = outcome(flows[CASTLE], "Goto_HyruleCastle_MeetZelda", state, orders=orders)
@@ -1013,7 +1037,8 @@ def test_another_flowchart_and_a_second_application_are_refused():
         changes = door_story.changes(early=early)
         with pytest.raises(PatchError, match="DoorOfTime"):
             changes[DOOR](evfl.write(castle_flow()))
-        for path in sorted(FLOWS.keys() & changes.keys()):  # the era flow's own refusals: test_clock_transitions
+        # The era and castle flows' own refusals: test_clock_transitions and test_clock_environment.
+        for path in sorted(changes.keys() & set(STORY)):
             transform = changes[path]
             once = transform(evfl.write(FLOWS[path]()))
             with pytest.raises(PatchError, match="ClawshotDoor"):
@@ -1050,7 +1075,7 @@ def native(romfs):
 @pytest.fixture(scope="module")
 def patched(native):
     flows, _, _ = native
-    edits = [*((path, True) for path in STORY), (DOOR, False)]
+    edits = [*((path, True) for path in STORY), (DOOR, False), (CASTLE, False)]
     return {(path, early): door_story.changes(early=early)[path](flows[path]) for path, early in edits}
 
 
@@ -1095,15 +1120,6 @@ def test_dump_every_native_door_writer_is_guarded_or_kept_native(romfs):
                 found.append((path, event.name, params["StepName"]))
     expected = [(path, writer, step) for path, writer, step, _ in GUARDS] + list(NATIVE)
     assert sorted(found) == sorted(expected)
-
-
-@pytest.mark.dump
-@pytest.mark.parametrize("path,early", CHANGES)
-def test_dump_only_the_contracted_events_change(native, patched, path, early):
-    flows, _, _ = native
-    out = patched[path, early]
-    assert evfl.write(evfl.read(out)) == out
-    assert evfl.read(out).flowchart == expected_story(evfl.read(flows[path]).flowchart, path, early)
 
 
 @pytest.mark.dump
@@ -1163,12 +1179,13 @@ def test_dump_darunia_fire_guard_composes_in_either_order(native, early):
 
 @pytest.mark.dump
 def test_dump_composes_with_a_gift_seed_transforms_in_either_order(romfs, native):
-    """Every transform a gift-shuffle seed ships for these flows but the door story's own (Darunia's guards today)."""
+    """Every transform a gift-shuffle seed ships for these flows but the door story's own (Darunia's guards, the
+    castle's gifts)."""
     flows, _, orders = native
     settings = Settings(shuffle=("Chest", "Shop", gifts.SHUFFLE, "Scrub", "BossHeart"), songs="song")
     spec, settings, gift_step = gifts.seed_setup(romfs, load_spec(), settings)
     output = make_seed(romfs, 11, settings, spec, extra_steps=[gift_step])
-    for path, early in [*((path, True) for path in STORY), (DOOR, False)]:
+    for path, early in [*((path, True) for path in STORY), (DOOR, False), (CASTLE, False)]:
         others = [
             changes[path]
             for changes in output.extra_changes

@@ -38,6 +38,7 @@ from test_door_story import (
     index,
     named,
     outcome,
+    reach,
     reference,
     scene,
     synthetic,
@@ -231,26 +232,7 @@ def check_other_entries(flows, base, mode, orders=ORDERS):
 def clock_entries(fc):
     """The entries that can run a clock event, through their branches and calls of this flowchart's entries."""
     clock = {i for i, event in enumerate(fc.events) if event.name.startswith("ClawshotClock")}
-
-    def reaches(start):
-        seen, todo = set(), [start]
-        while todo:
-            at = todo.pop()
-            if at == evfl.NONE or at in seen:
-                continue
-            seen.add(at)
-            event = fc.events[at]
-            if isinstance(event, evfl.SwitchEvent | evfl.SubFlowSwitchEvent):
-                todo += [target for _, target in event.cases]
-            elif isinstance(event, evfl.ForkEvent):
-                todo += [*event.forks, event.join]
-            elif not isinstance(event, evfl.ReturnEvent):
-                todo.append(event.next)
-            if isinstance(event, evfl.SubFlowEvent | evfl.SubFlowSwitchEvent) and event.flowchart in ("", fc.name):
-                todo.append(fc.entry_point(event.entry_point).main_event)
-        return bool(seen & clock)
-
-    return [entry.name for entry in fc.entry_points if reaches(entry.main_event)]
+    return [entry.name for entry in fc.entry_points if reach(fc, entry.main_event) & clock]
 
 
 @pytest.mark.parametrize("mode", MODES)
@@ -413,7 +395,8 @@ def test_dump_only_the_send_off_and_the_child_return_add_clock_writes(romfs, nat
     ]
     for mode in MODES:
         changes = door.changes({}, mode=mode)
-        assert not {path for path, *_ in native_writers} & changes.keys()  # the native writers ship unchanged
         shipped = {path: changes[path](data) if path in changes else data for path, data in flows.items()}
+        for path, name, *_ in native_writers:  # each native writer ships as it is, wherever its flow changes
+            assert named(evfl.read(shipped[path]).flowchart, name) == named(evfl.read(flows[path]).flowchart, name)
         writers = sorted(row for path, data in shipped.items() for row in _bool_writers(path, data))
         assert writers == sorted(native_writers + added), mode

@@ -7,6 +7,7 @@ from copy import deepcopy
 from dataclasses import replace
 
 import pytest
+from test_clock_environment import REPAIR, unlight_castle
 from test_door import run_open_flow
 from test_door_stage import ARRIVED, CHALLENGE, CLOCK_READY, STEPS, Layout, Stage, evaluate, indexed, node_query
 
@@ -24,6 +25,7 @@ DOOR_FLOW = "Event/EventFlow/DoorOfTime.bfevfl.zs"
 SARIA_FLOW = "Event/EventFlow/Dm_SY_Ocarina_SariaSong.bfevfl.zs"
 ZELDA_FLOW = "Event/EventFlow/Npc_Hylia_Zelda_Child.bfevfl.zs"
 ERA_FLOW = "Event/EventFlow/Market_Adult_Field_AdultToChild.bfevfl.zs"
+CASTLE_FLOW = "Event/EventFlow/Goto_HyruleCastle.bfevfl.zs"
 GAME_DATA = "GameData/GameDataList.Product.110.byml.zs"
 SIZE_TABLE = "System/Resource/ResourceSizeTable.Product.111.Nin_Ounce_NVN2.rsizetable.zs"
 CHILD_MARKET = "Banc/Market/Market_Child_Static.bcett.byml.zs"
@@ -34,14 +36,13 @@ STAGE_MODULES = (
     "Logic/HyruleField_Child_Prefab_91f9.logic.module.ainb",
     "Logic/HyruleField_Child_Prefab_9e35.logic.module.ainb",
 )
-# Per mode, the only size-table entries that rise. Closed ships just the shared DoorOfTime ordering repair and the
-# two clock transitions (in the send-off and in the Temple's era change).
+# Per mode, the only size-table entries that rise. Closed ships just the shared DoorOfTime ordering repair, the
+# clock transitions (in the send-off and in the Temple's era change) and the castle's first-Field light guard.
 GROWN = {
-    "closed": (DOOR_FLOW, ERA_FLOW),
-    "song_only": (DOOR_FLOW, SARIA_FLOW, ZELDA_FLOW, ERA_FLOW, GAME_DATA),
-    "open": (DOOR_FLOW, SARIA_FLOW, ZELDA_FLOW, ERA_FLOW, GAME_DATA),
+    "closed": (DOOR_FLOW, ERA_FLOW, CASTLE_FLOW),
+    "song_only": (DOOR_FLOW, SARIA_FLOW, ZELDA_FLOW, ERA_FLOW, CASTLE_FLOW, GAME_DATA),
+    "open": (DOOR_FLOW, SARIA_FLOW, ZELDA_FLOW, ERA_FLOW, CASTLE_FLOW, GAME_DATA),
 }
-# Goto_HyruleCastle (the courtyard's forced Step01 reset) stays native, so no mode writes it.
 WRITTEN = {
     "closed": (*GROWN["closed"], SIZE_TABLE),
     "song_only": (*GROWN["song_only"], *STAGE_MODULES, SIZE_TABLE),
@@ -77,6 +78,8 @@ CLOCK = {
     DOOR_FLOW: ("ClawshotClockArrival", "ClawshotClockArrived", ARRIVED, True, RECOUNT[0]),
     ERA_FLOW: ("ClawshotClockChildReturn", "ClawshotClockReturnedChild", FIRST_ADULT, False, "Event0"),
 }
+LIGHT = "HyruleField_ChangeENV"  # the first-Field light; the send-off's repair (``REPAIR``) clears a set one
+REBUILD = "Event_RebuildConditionEnvTimePalette"  # the repair's last action, registered on the native actor
 
 COMMON_GATE_SHA256 = "5b4152c4e56bf51b7f2400fbdd6a39e4b506f3104cee49a24f6f49e72eb4d6a4"
 POOL = 0x24  # u32: the string pool's file offset; the pool runs to the end of the module
@@ -133,16 +136,26 @@ def retarget(event, old, new):
         event.cases = [(value, new if target == old else target) for value, target in event.cases]
 
 
+def only(found):
+    assert len(found) == 1, found
+    return found[0]
+
+
 def unpatch_story(native, patched, path, *, mode):
     """``patched`` with exactly ``mode``'s intended edits undone, each checked first; all else must equal ``native``.
 
     Every mode repairs the DoorOfTime order: the stone-counter entry starts with send-off played, then escape
     unplayed, checks; the send-off calls that entry between Event7 and Event62. Every mode's clock transitions
     (``CLOCK``): a GameDataActor Bool query whose callers are the native predecessor's; the flag already at its
-    value continues, otherwise the write runs first. Early modes: a guard is a GameDataActor query at its writer's
-    index: strictly past the step continues to the native next, otherwise the moved native write runs. Song-only also
-    enters through the learned-song and clock-gate checks and skips the stone-quest gate Event60. The clock
-    transition and shared repair are undone first, so the Event7 guard then shows its native tail."""
+    value continues, otherwise the write runs first. The send-off's arrival repair then asks for the first-Field
+    light (``REPAIR``): a set light is cleared, a frame waited and the palette rebuilt (the rebuild action
+    registered on the native world manager), unset continues to the recount. The castle's light guard alone is
+    undone by ``unlight_castle``. Early modes: a guard is a GameDataActor query at its writer's index: strictly past
+    the step continues to the native next, otherwise the moved native write runs. Song-only also enters through the
+    learned-song and clock-gate checks and skips the stone-quest gate Event60. The light repair, clock transition
+    and shared repair are undone first, so the Event7 guard then shows its native tail."""
+    if path == CASTLE_FLOW:
+        return evfl.EventFlowFile(patched.name, unlight_castle(patched.flowchart), patched.timeline)
     fc = deepcopy(patched.flowchart)
     names = [event.name for event in fc.events]
     count = len(native.flowchart.events)
@@ -171,6 +184,29 @@ def unpatch_story(native, patched, path, *, mode):
     def callers(index):
         return [i for i, event in enumerate(fc.events) if index in targets(event)]
 
+    if path == DOOR_FLOW:  # the light repair, so the arrival repair continues straight to the recount again
+        light, clear, wait, rebuild = (names.index(name) for name in REPAIR)
+        resume = names.index(RECOUNT[0])
+        params = {"GameDataName": LIGHT, "Index": -1}
+        ask(REPAIR[0], "EventQueryIsGameDataBool", params, [(0, clear), (1, resume)])
+        action = fc.actors[actor].actions.index("EventTriggerSetGameDataBool")
+        assert fc.events[clear] == evfl.ActionEvent(REPAIR[1], actor, action, wait, {**params, "Value": False}), path
+        system, world = (
+            only([i for i, candidate in enumerate(fc.actors) if candidate.name == name])
+            for name in ("EventSystemActor", "EventWorldManagerController")
+        )
+        waits, rebuilds = fc.actors[system].actions.index("EventWait"), fc.actors[world].actions
+        one_frame = {"IsWaitEnd": True, "Frames": 1}
+        assert fc.events[wait] == evfl.ActionEvent(REPAIR[2], system, waits, rebuild, one_frame), path
+        assert fc.events[rebuild] == evfl.ActionEvent(REPAIR[3], world, rebuilds.index(REBUILD), resume, None), path
+        assert [callers(i) for i in (clear, wait, rebuild)] == [[light], [clear], [wait]], path
+        assert sorted(names[i] for i in callers(light)) == sorted(CLOCK[DOOR_FLOW][:2]), path
+        for i in callers(light):
+            retarget(fc.events[i], light, resume)
+        fc.events[light].cases = []  # detached; dropped with every addition
+        for i in (clear, wait, rebuild):
+            fc.events[i].next = evfl.NONE
+        added |= set(REPAIR)
     if path in CLOCK:
         query, setter, flag, value, then = CLOCK[path]
         check, sets, resume = names.index(query), names.index(setter), names.index(then)
@@ -226,6 +262,12 @@ def unpatch_story(native, patched, path, *, mode):
         predecessor.next = names.index("Event60")
     assert sorted(names[count:]) == sorted(added), path
     del fc.events[count:]
+    if path == DOOR_FLOW:  # the rebuild action the light repair registered, now read by no event
+        unused = len(rebuilds) - 1
+        assert rebuilds[unused] == REBUILD, path
+        uses = [event for event in fc.events if isinstance(event, evfl.ActionEvent) and event.actor == world]
+        assert all(event.action != unused for event in uses), path
+        rebuilds.pop()
     return evfl.EventFlowFile(patched.name, fc, patched.timeline)
 
 
@@ -312,11 +354,12 @@ def test_each_mode_writes_exactly_its_resources(romfs, overlay, mode):
 
 @pytest.mark.parametrize("mode", MODES)
 def test_story_flows_change_only_the_intended_events(romfs, overlay, mode):
-    """Every mode: the DoorOfTime ordering repair and the two clock transitions. Early modes add the nine
-    forward-only writers and, song-only, the door entry. Nothing else in any written flow."""
+    """Every mode: the DoorOfTime ordering repair, the clock transitions and the send-off's light repair, and the
+    castle's light guard. Early modes add the nine forward-only writers and, song-only, the door entry. Nothing else
+    in any written flow."""
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)
     root, _ = overlay(mode)
-    for path in (*GUARDED, ERA_FLOW):
+    for path in (*GUARDED, ERA_FLOW, CASTLE_FLOW):
         if path not in WRITTEN[mode]:
             continue
         native = evfl.read(dictionaries.decompress(path, (romfs / path).read_bytes()))

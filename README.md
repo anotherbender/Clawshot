@@ -106,8 +106,8 @@ First expert gallery rewards, merchant experiments and some Skulltula House rewa
 unchanged until their tests pass; the 10-token swap alone has been observed, not every threshold.
 The Door of Time's earlier song-only and open modes passed a first door/sword-pull check.
 Both wait for Field-arrival clock state and Zelda/Impa's real send-off. The open-mode gate and
-later escape/moat order repair passed on Longshot rc.7; the new clock-state corrections await
-their four in-game controls. For new seeds; no save-repair or older-seed compatibility guarantee.
+later escape/moat order repair and immediate child-return clock clear passed on Longshot rc.7.
+The first-arrival lighting repair awaits v5 play checks. For new seeds; no save-repair or older-seed compatibility guarantee.
 
 Cows, dungeon completion rewards, pots, crates and loose rupees are not shuffled.
 Of the dungeon items, only small keys can leave their dungeon, and only when you opt in:

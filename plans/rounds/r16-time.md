@@ -324,3 +324,120 @@ Its read-only pre-play smoke returned corridor A/B/S=false/false/false and Jabu 
 is in the four-part checklist. No runtime boot or gameplay was performed: Kareem/Claude still need
 the runtime `mods:` load lines plus the four actual in-game observations. The source remains the
 tested b2f1c15; this final round-file update is evidence only.
+
+## v4 played closure and approved ENV follow-up
+
+Claude relayed Kareem's **P4 played PASS on the b2f1c15 overlay**: teleport to the Temple, first-pull
+scenes, immediate sword return, then child Field time advanced (the B clear worked). Barinade,
+escape and both moat grants worked; Sun's Song persisted without snap-back. The item slot displayed
+vanilla “Ocarina” text and no model, but actually granted Megaton Hammer; the song slot displayed
+Hookshot text and no model, and granted Hookshot. This accepts progression/grants, not presentation.
+The agent did not repeat or launch this gameplay.
+
+P3 differed: A/S became true at the real send-off and B cleared through the native adult Market
+exit, but shadows/time still looked fixed, including after area re-entry and Continue. The corridor
+source has `HyruleField_ChangeENV=true`; the natural-owl control and P4's Jabu source have it false.
+Fresh native tracing found Event218 sets it before first Forest→Field travel; only the owl's
+Event217 clears it, waits one frame (Event220), then calls
+`Event_RebuildConditionEnvTimePalette` (Event221). Adult Field inherits the child palette condition;
+both First palette variants force the same main light. This proves fixed lighting, not a sampled
+numeric clock stop. The separate0x57be70 quest-condition mask is not a clock cache: the clock reads
+A/B/S live on its update paths. Private evidence: `work/r16-clock-timing/`.
+
+**Claude approved two shared, forward-only repairs before implementation**:
+
+1. Independently of the missing-A guard, the real send-off clears a set ENV, waits one frame,
+   rebuilds the conditional palette, then continues its existing stone recount. ENV=false adds no
+   write, wait or rebuild; no history/quest/inventory is forged.
+2. Replace Event218 at its original index with the native panorama-history query. If
+   `HavePlayedEvent.Dm_HrlField_0000` is true, continue directly to native Event42; otherwise execute
+   the unchanged true writer and travel. This covers the selected skip and pre-played history
+   without coupling the repair to a setting. Natural first exit still sets true and the owl clears it.
+
+Both behavior regressions were **RED before production edits:2 failed in0.35s**, printing missing
+send-off clear and the unwanted later true write. After the two repairs, the same cases gave
+**2 passed in0.44s**. Native transforms for all three modes read/write back. The real adult→child
+flow is byte-identical (compressed and decompressed) to the played P4 overlay; the adult pedestal
+placement is also identical, and the native adult Market→Field B clearer remains unmodified.
+Evidence: `env-v5-red-proof.json`, `env-v5-green-proof.json`,
+`env-v5-native-smoke-and-P4-identity.json` under `work/r16-time/`.
+
+Claude authorized a shortened v5 P4 only on that path identity. Read-only validation of snapshots16/17
+found child, first pull done, B=false, escape/moat unplayed and Hammer/Hookshot absent. Their slots02/04
+are Water Step13, not Step11: the initial blanket Step11 report was corrected from the printed values.
+Selected snapshot16 slot00, whose Water Step11 matches the original pre-Barinade control; all other
+required predicates hold. Source hash and all candidate states are in `v5-p4-source-candidates.json`.
+v5 will use a fresh copy, preserving all history/age/quest/clock state.
+P3 remains the authentic corridor with ENV=true so the real send-off repair must perform the clear.
+No old staged/played overlay or original save is overwritten.
+
+### Moat presentation attribution
+
+The normal gift patch alone, with Hammer and Hookshot substitutions but no order repair, produces
+**byte-identical decompressed `Dm_MelodyGet_Time`** to the played P4 overlay (SHA256
+`9ea2f45e451c2be0a309922100865cc9cd2d093b06d793e074feb041c137a756`).
+Relative to native, only Event70's direct pouch actor and Event4's grant actor change; all280 events
+remain. Event70 retains `IsGetEvent=false`; Event4 uses `GetPouchContentByActorName`, not an item-actor
+creation wrapper. Native scene messages/props are untouched. No Door mode's order repair transforms
+this resource. Thus this is pre-existing gift presentation, not introduced by the early-order repair.
+**[INFERENCE]** The same visual limitation applies on a natural non-early moat route with those same
+shuffled items; no separate natural-route gameplay result is claimed. Private proof:
+`v5-moat-natural-path-proof.json` and `v5-moat-native-presentation.txt`.
+
+### Exact closed-mode output delta
+
+Two serial real-app generations on final production head `ab9600f` reused seed332751819 and the preserved
+v4 closed+Kaepora controls, with free travel off/on. Both passed: settings, placements, spheres and
+**raw spoiler.json bytes are identical**. No source changed during either run.
+
+Both profiles add only `romfs/Event/EventFlow/Goto_HyruleCastle.bfevfl.zs`, change only
+`romfs/Event/EventFlow/DoorOfTime.bfevfl.zs` and
+`romfs/System/Resource/ResourceSizeTable.Product.111.Nin_Ounce_NVN2.rsizetable.zs`, and remove nothing.
+GameDataList and every other output byte remain unchanged. The size table differs only at these
+two existing native allocations (same values in both profiles):
+
+| Resource | Previous allocation | New allocation | New decompressed size |
+|---|---:|---:|---:|
+| DoorOfTime.bfevfl | 91696 | 92592 | 92304 |
+| Goto_HyruleCastle.bfevfl | 98768 | 99216 | 98936 |
+
+The closed native item/stone gate, courtyard reset, first-adult scenes and B-clear path are not
+changed by the ENV repair. Exact commands, full file/key hashes, raw-spoiler comparison and allocation
+diff: `work/r16-time/clock-env-v5-final-closed-output/proof.json`. These are real app-generation results,
+not an in-game ENV acceptance result or a guarantee for arbitrary older seed saves.
+
+### Late first-forest-exit guard
+
+The subsequent native requester trace exposed a late-first-exit edge: the Forest bridge's request
+area is retired only by `Dm_Kokiri_0150` history, not Castle progress or the send-off. Its requester is
+child Kokiri Forest actor hash3999375045224027646, bound to
+`KokiriForest_Child_Level_All_02_ddcd`; the sensor's delete input comes only from that history query.
+Lost Woods shortcuts already have child-route logic evidence above. A first bridge departure
+after the send-off can therefore re-enable ENV when the panorama was never played; actual gameplay
+of this ordering remains **[INFERENCE]**. Under Claude's authorization to use a better traced guard,
+the final condition skips Event218 when **the panorama OR the real send-off has played**. It uses
+two native history queries and writes neither history. Natural first departure before both stays
+unchanged. The extra edge was RED first (**1 failed in0.44s**), then **1 passed in0.41s**.
+Private proof: `env-v5-late-forest-requester.json`, `env-v5-late-exit-red-proof.json`,
+`env-v5-late-exit-green-proof.json`.
+
+### Regression closure before freeze
+
+Behavior tests cover all three modes, A/ENV combinations, past-Step02 send-off, no unrelated entry
+writes, natural/Kaepora/missed-owl routes, late first departure, repeated calls and native owl/
+courtyard preservation. Existing shared emulators carry ENV state. Native inverse tests strip the
+intended edits and require every unrelated byte to equal the original.
+
+The old `expected_story` graph constructor and its two structural-copy tests were removed rather
+than re-pinned: duplicating the implementation is not a behavior oracle. Commuting gift/Darunia
+composition, independent state/effect checks and native exact inverses remain. One targeted lint
+preflight found the now-unused `deepcopy` import; only that printed cause was removed before the
+cause-targeted check. No full gate had started at that point.
+
+Final focused real-dump/shared-emulator closure: **362 passed,1 warning in136.90s**, using one worker
+and the real romfs/NUP/extended fixture. It exercised `test_clock_environment`, `test_door_story`,
+`test_clock_transitions`, `test_door_dump`, and both Darunia consumer modules. The warning is the
+existing non-Collection `itertools.product` parametrization in the native open-door test, reported
+without suppression. Exact command, harness hashes and log: `work/r16-time/env-v5-focused/`.
+Targeted format/lint checks passed. Production remains the real-app-proven `ab9600f`; the next
+commit contains the test/documentation closure and is the source freeze for the ONE complete gate.
