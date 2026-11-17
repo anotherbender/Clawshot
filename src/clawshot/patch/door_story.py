@@ -24,7 +24,9 @@ without that owl leave the arrival unset, so after the send-off scene (Event10) 
 asked and, only when unset, set before the recount. The first-adult hold is set by Dm_TimeTemple_0055 and
 cleared natively when adult Link walks from the Market to the Field; ``Market_Adult_Field_AdultToChild``
 clears it as well, right after its native ``Sequence_IsChildhood`` write, so a real return to child never
-keeps the hold. Both reuse the native query/setter shape; no other history, quest or inventory is written.
+keeps the hold. At the send-off, an independent guard also clears a set ``HyruleField_ChangeENV``, waits one
+frame and rebuilds the conditional environment palette, as the skipped owl does. The Forest exit sets this
+first-arrival environment only while the Field panorama is unplayed. No other history, quest or inventory is written.
 """
 
 from collections.abc import Callable
@@ -37,6 +39,11 @@ ESCAPE_READY = "Clawshot.Door.EscapeReady"  # the door stage's unsaved BoolExp: 
 
 _ARRIVED = "HyruleField_ArriveEntrance"  # saved Bool, the Field owl arrival the native clock reads
 _FIRST_ADULT = "HrlField_HasEnteredFirstTime_Adult"  # saved Bool, the first adult arrival's clock hold
+_FIRST_ENV = "HyruleField_ChangeENV"  # saved Bool: first-arrival fixed lighting, cleared by the owl
+_PANORAMA = "Dm_HrlField_0000"
+_CASTLE_FLOW = "Event/EventFlow/Goto_HyruleCastle.bfevfl.zs"
+_WAIT = "EventWait"
+_REBUILD_ENV = "Event_RebuildConditionEnvTimePalette"
 _CLOCK = "ClawshotClock"
 _CHALLENGE = "DoorOfTime"
 _PREFIX = "ClawshotDoor"
@@ -104,11 +111,11 @@ def _native_writers(fc: evfl.Flowchart) -> list[str]:
     ]
 
 
-def _game_data_actor(fc: evfl.Flowchart) -> int:
-    found = [i for i, actor in enumerate(fc.actors) if actor.name == _GAME_DATA_ACTOR]
+def _native_actor(fc: evfl.Flowchart, name: str) -> int:
+    found = [i for i, actor in enumerate(fc.actors) if actor.name == name]
     if len(found) != 1 or fc.actors[found[0]].secondary_name or fc.actors[found[0]].entry_point != evfl.NONE:
         unexpected = [fc.actors[i] for i in found]
-        raise PatchError(f"Door of Time: {fc.name} lacks its one native {_GAME_DATA_ACTOR}: {unexpected!r}")
+        raise PatchError(f"Door of Time: {fc.name} lacks its one native {name}: {unexpected!r}")
     return found[0]
 
 
@@ -149,7 +156,10 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
     renamed = {f"{_PREFIX}{name}Write" for name, *_ in guards}
     if path == _DOOR_FLOW:
         renamed.update(f"{_PREFIX}{name}" for name in ("CountSendoff", "CountEscape", "SendoffRecount"))
-        renamed.update(f"{_CLOCK}{name}" for name in ("Arrival", "Arrived"))
+        renamed.update(
+            f"{_CLOCK}{name}"
+            for name in ("Arrival", "Arrived", "Environment", "ClearedEnvironment", "WaitEnvironment", "RebuildEnvironment")
+        )
     if done := [event.name for event in fc.events if event.name in renamed]:
         raise PatchError(f"Door of Time: {flow} is already patched: {done}")
     index = {event.name: i for i, event in enumerate(fc.events)}
@@ -192,7 +202,7 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
             raise PatchError(f"Door of Time: changed native {flow}/{name}: {raise_bridge!r}, next {next_name!r}")
     if unknown := sorted(set(_native_writers(fc)) - {name for name, _, _, _ in pinned}):
         raise PatchError(f"Door of Time: {flow} has unknown native DoorOfTime writes {unknown}")
-    actor = _game_data_actor(fc)
+    actor = _native_actor(fc, _GAME_DATA_ACTOR)
     query = _slot(fc.actors[actor].queries, _READ_EXPRESSION)
     for name, step, _, _ in guards:
         at = index[name]
@@ -210,8 +220,13 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
         history_query = _slot(fc.actors[actor].queries, _READ_HISTORY)
         read_bool = _slot(fc.actors[actor].queries, _READ_BOOL)
         set_bool = _slot(fc.actors[actor].actions, _SET_BOOL)
+        system = _native_actor(fc, "EventSystemActor")
+        world = _native_actor(fc, "EventWorldManagerController")
+        wait = _slot(fc.actors[system].actions, _WAIT)
+        rebuild = _slot(fc.actors[world].actions, _REBUILD_ENV)
         first = len(fc.events)
         recount, arrival = first + 2, first + 3
+        environment = first + 5
         arrived = {"GameDataName": _ARRIVED, "Index": -1}
         fc.events.extend(
             [
@@ -231,8 +246,27 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
                 ),
                 evfl.SubFlowEvent(f"{_PREFIX}SendoffRecount", "", _COUNTER, index["Event62"], None),
                 # The send-off scene has played: an owl-less route still lacks the arrival the clock reads.
-                evfl.SwitchEvent(f"{_CLOCK}Arrival", actor, read_bool, [(0, recount), (1, first + 4)], arrived),
-                evfl.ActionEvent(f"{_CLOCK}Arrived", actor, set_bool, recount, {**arrived, "Value": True}),
+                evfl.SwitchEvent(f"{_CLOCK}Arrival", actor, read_bool, [(0, environment), (1, first + 4)], arrived),
+                evfl.ActionEvent(f"{_CLOCK}Arrived", actor, set_bool, environment, {**arrived, "Value": True}),
+                # Independent of A: old owl-skipped saves can already have A but still force first-arrival light.
+                evfl.SwitchEvent(
+                    f"{_CLOCK}Environment",
+                    actor,
+                    read_bool,
+                    [(0, environment + 1), (1, recount)],
+                    {"GameDataName": _FIRST_ENV, "Index": -1},
+                ),
+                evfl.ActionEvent(
+                    f"{_CLOCK}ClearedEnvironment",
+                    actor,
+                    set_bool,
+                    environment + 2,
+                    {"GameDataName": _FIRST_ENV, "Index": -1, "Value": False},
+                ),
+                evfl.ActionEvent(
+                    f"{_CLOCK}WaitEnvironment", system, wait, environment + 3, {"IsWaitEnd": True, "Frames": 1}
+                ),
+                evfl.ActionEvent(f"{_CLOCK}RebuildEnvironment", world, rebuild, recount, None),
             ]
         )
         counter.main_event = first
@@ -245,6 +279,43 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
     result = evfl.write(document)
     if evfl.read(result) != document:
         raise PatchError(f"Door of Time: {path} does not read back as the edited flow")
+    return result
+
+
+def _first_field(data: bytes) -> bytes:
+    """Do not re-enable the first-arrival palette after the native panorama has already played."""
+    document = evfl.read(data)
+    fc = document.flowchart
+    if fc is None or fc.name != "Goto_HyruleCastle":
+        raise PatchError(f"Door of Time: {_CASTLE_FLOW} holds no Goto_HyruleCastle flowchart")
+    if done := [event.name for event in fc.events if event.name.startswith(_CLOCK)]:
+        raise PatchError(f"Door of Time: Goto_HyruleCastle is already patched: {done}")
+    index = {event.name: i for i, event in enumerate(fc.events)}
+    if missing := [name for name in ("Event218", "Event42") if name not in index]:
+        raise PatchError(f"Door of Time: Goto_HyruleCastle lacks native events {missing}")
+    at, onward = index["Event218"], index["Event42"]
+    writer, travel = fc.events[at], fc.events[onward]
+    if (
+        not isinstance(writer, evfl.ActionEvent)
+        or _op(fc, writer) != f"{_GAME_DATA_ACTOR}.{_SET_BOOL}"
+        or writer.params != {"GameDataName": _FIRST_ENV, "Index": -1, "Value": True}
+        or writer.next != onward
+        or not isinstance(travel, evfl.ActionEvent)
+        or _op(fc, travel) != "GameSystemActor.EventReserveBancChange"
+        or (travel.params or {}).get("NextBanc") != "HyruleField_Child"
+        or (travel.params or {}).get("NextStartPos") != "HyruleField_FrontOfLostWoodBridge"
+    ):
+        raise PatchError(f"Door of Time: changed native first Field arrival: {writer!r}, {travel!r}")
+    actor = _native_actor(fc, _GAME_DATA_ACTOR)
+    query = _slot(fc.actors[actor].queries, _READ_HISTORY)
+    fc.events[at] = evfl.SwitchEvent(
+        writer.name, actor, query, [(0, onward), (1, len(fc.events))], {"EventName": _PANORAMA}
+    )
+    writer.name = f"{_CLOCK}FirstFieldENV"
+    fc.events.append(writer)
+    result = evfl.write(document)
+    if evfl.read(result) != document:
+        raise PatchError(f"Door of Time: {_CASTLE_FLOW} does not read back as the edited flow")
     return result
 
 
@@ -275,7 +346,7 @@ def _child_return(data: bytes) -> bytes:
         or {name: (travel.params or {}).get(name) for name in _TO_CHILD} != _TO_CHILD
     ):
         raise PatchError(f"Door of Time: changed native {_ERA} age change: {swap!r}, {age!r}, {travel!r}")
-    actor = _game_data_actor(fc)
+    actor = _native_actor(fc, _GAME_DATA_ACTOR)
     read_bool = _slot(fc.actors[actor].queries, _READ_BOOL)
     set_bool = _slot(fc.actors[actor].actions, _SET_BOOL)
     hold, clear = len(fc.events), len(fc.events) + 1
@@ -304,4 +375,8 @@ def changes(*, early: bool = True) -> FileChanges:
 
     The courtyard reset is native. Event62 and its tail stay compatible with Darunia in either edit order."""
     paths = _GUARDS if early else (_DOOR_FLOW,)
-    return {**{path: _transform(path, early=early) for path in paths}, _ERA_FLOW: _child_return}
+    return {
+        **{path: _transform(path, early=early) for path in paths},
+        _ERA_FLOW: _child_return,
+        _CASTLE_FLOW: _first_field,
+    }
