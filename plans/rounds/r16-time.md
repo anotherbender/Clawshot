@@ -285,3 +285,8 @@ before writes and printed that path. After correcting only the pin to the discov
 shipped. All stages checked inherited workers and process pressure; OBS was active, so the app/staging
 runs used one worker. The only pre-freeze formatter pass left all11 owned Python files unchanged.
 Boot, runtime `mods:` load lines, live clock progression and actual save persistence remain **unplayed**.
+
+The first frozen gate at e78b214 passed full format checking, then stopped at lint:
+`SIM102`, `tests/test_clock_transitions.py:381`, nested writer-filter conditions. Neither synthetic
+nor dump pytest started. cs16b printed the diagnostic and combined only those conditions, with no
+production-code, staged-output or acceptance-scope change; the cause-targeted refreeze follows.

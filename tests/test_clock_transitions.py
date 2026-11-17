@@ -378,9 +378,12 @@ def _bool_writers(path, data):
     rows = []
     for event in fc.events if fc is not None else ():
         params = getattr(event, "params", None) or {}
-        if isinstance(event, evfl.ActionEvent) and fc.actors[event.actor].actions[event.action] == SET_BOOL:
-            if params.get("GameDataName") in (ARRIVED, FIRST_ADULT):
-                rows.append((path, event.name, params["GameDataName"], params["Value"]))
+        if (
+            isinstance(event, evfl.ActionEvent)
+            and fc.actors[event.actor].actions[event.action] == SET_BOOL
+            and params.get("GameDataName") in (ARRIVED, FIRST_ADULT)
+        ):
+            rows.append((path, event.name, params["GameDataName"], params["Value"]))
     return rows
 
 
