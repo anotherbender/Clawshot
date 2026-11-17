@@ -127,5 +127,19 @@ The closed-mode child-only trace is `E:\OOTRemake\work\r16-time\closed-pre-court
 
 Historical-save scan:262 eligible native/test backup families,1,059 freshly decoded slots, no authentic Fire+Water-complete/send-off-unplayed match. No extra pre-Zelda-two-stones v3 profile is staged; that order has native-flow/logic data proof only. Existing played/randomizer/foreign seed families were excluded; no save was written by the scan. Evidence:`historical-both-before-zelda-proof.json`.
 
-Closed comparison uses preserved successful `f93cd4b` app generations with the same seed/settings, for both free-return values. Only `Event/EventFlow/DoorOfTime.bfevfl.zs` (shared history-gated counter, post-send-off recount and entry registration) and `System/Resource/ResourceSizeTable.Product.111.Nin_Ounce_NVN2.rsizetable.zs` (only that flow's allocation) may differ. Placements and spoiler bytes must match; exact comparisons are in `review-v3-closed/proof.json`.
+Closed comparison **passes** against preserved successful `f93cd4b` app generations with the same seed/settings, for both free-return values: placements, spheres and spoiler bytes are identical; no files added/removed. Exactly `Event/EventFlow/DoorOfTime.bfevfl.zs` (shared history-gated counter, post-send-off recount and entry registration) and `System/Resource/ResourceSizeTable.Product.111.Nin_Ounce_NVN2.rsizetable.zs` (only that flow's allocation) change. Exact comparisons: `review-v3-closed/proof.json`.
+
+### Final test-only closure and verification provenance
+
+Runtime source is frozen at `81bf50f`. The four v3 overlays were built from that head, all launcher dry runs passed, and actual isolated user saves were read back without writes; `acceptance-v3-proof.json` records their hashes. Nothing in the test-only closure changes source or requires rebuilding those successful overlays.
+
+The **single full gate** at `81bf50f` passed repository format/lint and synthetic tests (`3073 passed,364 skipped`). The full real-dump run returned `357 passed,4 failed`: all failures were the old Darunia shared emulator rejecting the newly reached native `EventQueryHavePlayedEvent` in `ClawshotDoorCountSendoff`. Every other dump test, including all-mode stone ordering, courtyard reset, bridge and native-byte oracles, passed. Logs/results:`E:\OOTRemake\work\r16-time\review-v3-gates`.
+
+The test-only fix records actual completed-transition history, reads native Fire/Water completion and integer writes, and checks that an already-won Fire stone is counted at send-off (Step2_1/count1), rather than bypassing the recount or retaining its obsolete Step02 expectation. The native default count2 is present in both reference and patched initial states, preserving the vanilla-order state comparison.
+
+**Claude explicitly accepted this closure and proof scope:** final-head repository-wide `ruff format --check`, `ruff check` and the **full synthetic suite**, plus a real-dump targeted rerun of all three shared-emulator consumer modules (`test_story_steps_darunia.py`, `test_story_steps_fire.py`, `test_story_steps_darunia_dump.py`). Targeted results and exact harness hashes:`review-v3-harness-closure/proof.json`; final-head checks:`review-v3-final-head/proof.json`. Handoff must show `git diff 81bf50f..HEAD` contains only tests and docs.
+
+**No second full dump:** the357 passing dump tests exercised identical production source; only the two emulator/contract test files and this evidence document change afterward. The targeted real-dump run closes their affected contracts, and the full synthetic rerun covers other consumers. This is not a claim that the original full dump had no failures, nor a gameplay PASS. v3 startup/load proof and player observations remain pending.
+
+Targeted real-dump closure **passes:97 tests**, all three consumer modules, with matching narrow format/lint checks. The unchanged harness file hashes are recorded in that proof and checked again for final-head verification; no v3 overlay rebuild is needed because production source is still the frozen `81bf50f`.
 

@@ -148,20 +148,29 @@ class UnregisteredCall(AssertionError):
 def play(stone, movie, *, step, source=False, song=True, owned=(), pouch=None, entries=(), extra=()):
     """Play a song to Darunia and follow both flows' state-changing events.
 
-    ``owned`` contains canonical saved IsGet suffixes, not acquisition-actor names. The engine's own
-    HavePlayedEvent bookkeeping is not modeled; only the flows' writes count. A step write is applied as
+    ``owned`` contains canonical saved IsGet suffixes, not acquisition-actor names. Completed transitions
+    record HavePlayedEvent, so the Door's send-off recount reads the history of the scene just played.
+    Water starts uncleared and the stone count at its native default 2. A step write is applied as
     written, without assuming engine protection from IsIgnoreCompletedChallenge=False. ``entries``
     runs successive source/door/talk/song callbacks in the same saved state."""
     flows = {"Get_StoneOfFire": stone.flowchart, "Dm_Goron_0030": movie.flowchart}
     flows.update({document.flowchart.name: document.flowchart for document in extra})
     if pouch is not None:
         flows["GetPouchContent"] = pouch.flowchart
-    state = {STEP: step, darunia.SOURCE: source, **{f"IsGet.{item}": True for item in owned}}
+    state = {
+        STEP: step,
+        "Step_Get_StoneOfWater": "Ready",
+        "DoorOfTime_GetStoneCount": 2,
+        darunia.SOURCE: source,
+        **{f"IsGet.{item}": True for item in owned},
+    }
     result = {"rewards": [], "writes": [], "notices": 0, "trace": []}
     budget = [5000]
 
     def query(fc, event, params):
         name = fc.actors[event.actor].queries[event.query]
+        if name == "EventQueryHavePlayedEvent":
+            return 0 if state.get(f"HavePlayedEvent.{params['EventName']}", False) else 1
         if name == "EventQueryIsRecommendedMelody":
             return 0 if song else 1
         if name == "EventQueryMelodyTypeForNormal":
@@ -171,6 +180,9 @@ def play(stone, movie, *, step, source=False, song=True, owned=(), pouch=None, e
             return 0  # accept the meadow lesson; its performance/presentation helpers are not modeled
         if name == darunia.READ_EXPRESSION:
             expression = params["GameDataName"]
+            if expression in ("Get_StoneOfFire_IsCompleted_Exp", "Get_StoneOfWater_IsCompleted_Exp"):
+                challenge = expression.removesuffix("_IsCompleted_Exp")
+                return 0 if state[f"Step_{challenge}"] == "Complete" else 1
             assert expression.startswith("Get_StoneOfFire_IsAfter_") and expression.endswith("_Exp"), event
             cutoff = expression.removeprefix("Get_StoneOfFire_IsAfter_").removesuffix("_Exp")
             return 0 if STEPS.index(state[STEP]) > STEPS.index(cutoff) else 1
@@ -221,7 +233,7 @@ def play(stone, movie, *, step, source=False, song=True, owned=(), pouch=None, e
                 index = event.next
             elif isinstance(event, evfl.ActionEvent):
                 action = fc.actors[event.actor].actions[event.action]
-                if action == darunia.SET_BOOL:
+                if action in (darunia.SET_BOOL, "EventTriggerSetGameDataInt"):
                     state[params["GameDataName"]] = params["Value"]
                 elif action == "EventExecuteProgressChallengeStep":
                     challenge = params["ChallengeName"]
@@ -238,6 +250,7 @@ def play(stone, movie, *, step, source=False, song=True, owned=(), pouch=None, e
                         run(flows[scene], start, start.main_event, arguments=params)
                     else:
                         result["trace"].append(f"timeline {scene}")
+                    state[f"HavePlayedEvent.{scene}"] = True
                 index = event.next
             else:
                 raise AssertionError(f"unmodeled event {event}")

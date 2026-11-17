@@ -160,7 +160,10 @@ def test_native_source_boundaries_and_natural_order(produced, flow, entry, targe
     assert after[STEP] == (target if STEPS.index(step) <= index else step)
     assert result["writes"] == ([(step, target)] if STEPS.index(step) <= index else [])
     if flow == "DoorOfTime":
-        assert after["Step_DoorOfTime"] == "Step02"  # Zelda/Impa's own continuation still runs
+        assert after["HavePlayedEvent.Dm_HrlField_0020"] is True
+        # The real send-off recounts before the Fire guard. An already-won Fire stone must still count.
+        assert after["Step_DoorOfTime"] == ("Step2_1" if step == "Complete" else "Step02")
+        assert after["DoorOfTime_GetStoneCount"] == (1 if step == "Complete" else 2)
     if STEPS.index(step) <= index:
         old_stone, old_movie, old_pouch = documents(native)
         expected, old = play(
