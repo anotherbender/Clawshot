@@ -1,25 +1,21 @@
-"""Door of Time story writes only move the quest forward, so an early first pull keeps its Complete.
+"""Preserve late Door of Time progress without breaking the native courtyard reset.
 
 Native facts (whole-dump audit, round 16): eleven ``EventExecuteProgressChallengeStep`` actions write the
-``DoorOfTime`` quest. ``SageRoom_MeetRauru``'s Event93 writes ``Complete`` and stays native. The other ten
-each become a ``GameDataActor`` ``EventQueryIsGameDataBoolExp`` on the native strict
-``DoorOfTime_IsAfter_<step>_Exp`` at the writer's own index. True (already past the step) continues straight
-to the write's native next; false (before or at the step) runs the original write, appended as
-``ClawshotDoor<event>Write`` with that same next. Callers, entry points and sub flow registrations keep their
-indices, and the continuations (rewards, camera, progress notices, other quests' writes) stay native. No saved
-flag, default or actor is added. An end continuation has no true case, the native shape of every switch.
+``DoorOfTime`` quest. Rauru's Event93 writes ``Complete`` and stays native. Goto_HyruleCastle Event32 also
+stays native: its forced Step01 reset is required by Impa's exact-Step01 lesson after pre-courtyard stone
+or Saria callbacks. In early modes the other nine writes become queries on native strict
+``DoorOfTime_IsAfter_<step>_Exp``: already past the target, continue to the native next; otherwise run
+the original appended write. Native rewards, notices and other quests' writes retain their behavior.
 
-``DoorOfTime``: send-off Event7 (Step02, then Fire's Event62), stone count Event147 and Event148 (Step2_1 and
-Step2_2, then Event5) and Event37 (Step03, then Event77), escape Event12 (Step04, then Event140), the Song of
-Time aftermath Event14 (Step05, then notice Event171) and the door opening Event57 (Step06, end).
-``Goto_HyruleCastle`` Event32 (Step01, then Event202), ``Dm_SY_Ocarina_SariaSong`` Event172 and
-``Npc_Hylia_Zelda_Child`` Event42 (native spelling ``Srep2_1_1``, end).
+``DoorOfTime``: send-off Event7 (Step02, then Fire's Event62), stone count Event147/Event148 (Step2_1/Step2_2,
+then Event5) and Event37 (Step03, then Event77), escape Event12 (Step04, then Event140), Time-song aftermath
+Event14 (Step05, then Event171) and opening Event57 (Step06, end). ``Dm_SY_Ocarina_SariaSong`` Event172 and
+``Npc_Hylia_Zelda_Child`` Event42 write native ``Srep2_1_1``.
 
-The stone count's Event77 raises the field drawbridge (``IsHyruleFieldBridgeClose`` true, then Event4's count);
-only the escape's Event78 lowers it. Once Step03 is forward-only, a stone count after the escape would raise it
-for good, so Event77 becomes the same kind of query on ``ESCAPE_READY``: true runs the moved raise, false goes
-straight to Event4. That unsaved BoolExp belongs to the door stage (DoorOfTime past Step2_2, all three stone
-quests complete, the send-off played, ``HyruleField_DoorOfTime_Escape`` unplayed); this module only reads it.
+In every door mode, stone counting waits for the real send-off and stops after the once-only escape.
+This prevents premature Step03/bridge raising, including the native closed-mode escape sensor. The
+send-off recounts before Event62, preserving Darunia's independently guarded Fire continuation. The
+counter's original branches, bridge write and count values stay native; no saved history is forged.
 """
 
 from collections.abc import Callable
@@ -34,6 +30,11 @@ _CHALLENGE = "DoorOfTime"
 _PREFIX = "ClawshotDoor"
 _GAME_DATA_ACTOR = "GameDataActor"
 _READ_EXPRESSION = "EventQueryIsGameDataBoolExp"
+_READ_HISTORY = "EventQueryHavePlayedEvent"
+_ESCAPE_EVENT = "HyruleField_DoorOfTime_Escape"
+_SENDOFF_EVENT = "Dm_HrlField_0020"
+_COUNTER = "DoorOfTime_CheckStoneNum"
+_SENDOFF = "DoorOfTime_SendOff"
 _CHALLENGE_ACTOR = "ChallengeSystemActor"
 _STEP_ACTION = "EventExecuteProgressChallengeStep"
 _WRITE = {
@@ -54,9 +55,6 @@ _GUARDS = {
         ("Event12", "Step04", "Event140", _WRITE),
         ("Event14", "Step05", "Event171", _WRITE),
         ("Event57", "Step06", None, _WRITE),
-    ),
-    "Event/EventFlow/Goto_HyruleCastle.bfevfl.zs": (
-        ("Event32", "Step01", "Event202", {**_QUIET, "IsIgnoreCompletedChallenge": True}),
     ),
     "Event/EventFlow/Dm_SY_Ocarina_SariaSong.bfevfl.zs": (("Event172", "Srep2_1_1", None, _QUIET),),
     "Event/EventFlow/Npc_Hylia_Zelda_Child.bfevfl.zs": (("Event42", "Srep2_1_1", None, _QUIET),),
@@ -106,22 +104,37 @@ def _next_name(fc: evfl.Flowchart, event: evfl.Event) -> str | None:
     return fc.events[event.next].name if isinstance(event, evfl.ActionEvent) and event.next != evfl.NONE else None
 
 
-def _forward(path: str, data: bytes) -> bytes:
-    """Guard the lower DoorOfTime writes and bridge raise of ``path``; keep references and native continuations."""
+def _forward(path: str, data: bytes, *, early: bool) -> bytes:
+    """Repair counted-stone ordering in every mode; guard late quest writes only in early modes."""
     document = evfl.read(data)
     fc = document.flowchart
     flow = path.rsplit("/", 1)[-1].removesuffix(".bfevfl.zs")
     if fc is None or fc.name != flow:
         raise PatchError(f"Door of Time: {path} holds no {flow} flowchart")
-    guards = _GUARDS[path]
+    guards = _GUARDS[path] if early else ()
     bridge = (_BRIDGE[path],) if path in _BRIDGE else ()
-    pinned = (*guards, _COMPLETE[path]) if path in _COMPLETE else guards
-    renamed = {f"{_PREFIX}{name}Write" for name, *_ in (*guards, *bridge)}
+    pinned = (*_GUARDS[path], _COMPLETE[path]) if path in _COMPLETE else _GUARDS[path]
+    renamed = {f"{_PREFIX}{name}Write" for name, *_ in guards}
+    if path == _DOOR_FLOW:
+        renamed.update(f"{_PREFIX}{name}" for name in ("CountSendoff", "CountEscape", "SendoffRecount"))
     if done := [event.name for event in fc.events if event.name in renamed]:
         raise PatchError(f"Door of Time: {flow} is already patched: {done}")
     index = {event.name: i for i, event in enumerate(fc.events)}
     if missing := [name for name, *_ in (*pinned, *bridge) if name not in index]:
         raise PatchError(f"Door of Time: {flow} lacks native events {missing}")
+    sendoff_write = None
+    if path == _DOOR_FLOW:
+        entries = {entry.name: entry for entry in fc.entry_points}
+        if missing := [name for name in (_COUNTER, _SENDOFF) if name not in entries]:
+            raise PatchError(f"Door of Time: {flow} lacks native entries {missing}")
+        counter, sendoff = entries[_COUNTER], entries[_SENDOFF]
+        if (
+            fc.events[counter.main_event].name != "Event38"
+            or fc.events[sendoff.main_event].name != "Event65"
+            or sendoff.sub_flow_events
+        ):
+            raise PatchError(f"Door of Time: changed counter/send-off entries: {counter!r}, {sendoff!r}")
+        sendoff_write = fc.events[index["Event7"]]
     for name, step, tail, params in pinned:
         write = fc.events[index[name]]
         next_name = _next_name(fc, write)
@@ -158,29 +171,51 @@ def _forward(path: str, data: bytes) -> bytes:
         fc.events[at] = evfl.SwitchEvent(name, actor, query, cases, expression)
         write.name = f"{_PREFIX}{name}Write"
         fc.events.append(write)
-    for name, _, _ in bridge:
-        at = index[name]
-        raise_bridge = fc.events[at]
-        # True (the escape may play now) runs the moved raise; false continues at its native next.
-        cases = [(0, len(fc.events)), (1, raise_bridge.next)]
-        fc.events[at] = evfl.SwitchEvent(name, actor, query, cases, {"GameDataName": ESCAPE_READY})
-        raise_bridge.name = f"{_PREFIX}{name}Write"
-        fc.events.append(raise_bridge)
+    if path == _DOOR_FLOW:
+        history_query = _slot(fc.actors[actor].queries, _READ_HISTORY)
+        first = len(fc.events)
+        fc.events.extend(
+            [
+                evfl.SwitchEvent(
+                    f"{_PREFIX}CountSendoff",
+                    actor,
+                    history_query,
+                    [(0, first + 1)],
+                    {"EventName": _SENDOFF_EVENT},
+                ),
+                evfl.SwitchEvent(
+                    f"{_PREFIX}CountEscape",
+                    actor,
+                    history_query,
+                    [(1, counter.main_event)],
+                    {"EventName": _ESCAPE_EVENT},
+                ),
+                evfl.SubFlowEvent(f"{_PREFIX}SendoffRecount", "", _COUNTER, index["Event62"], None),
+            ]
+        )
+        counter.main_event = first
+        sendoff.sub_flow_events.append(first + 2)
+        # Hook before Event62: its native end and Darunia's guard remain untouched in either edit order.
+        sendoff_write.next = first + 2
+        if early:
+            guard = fc.events[index["Event7"]]
+            guard.cases = [(case, first + 2 if case == 0 else target) for case, target in guard.cases]
     result = evfl.write(document)
     if evfl.read(result) != document:
         raise PatchError(f"Door of Time: {path} does not read back as the edited flow")
     return result
 
 
-def _transform(path: str) -> Callable[[bytes], bytes]:
+def _transform(path: str, *, early: bool) -> Callable[[bytes], bytes]:
     def transform(data: bytes) -> bytes:
-        return _forward(path, data)
+        return _forward(path, data, early=early)
 
     return transform
 
 
-def changes() -> FileChanges:
-    """Forward-only DoorOfTime writes and the escape-bound bridge raise, for both early door modes.
+def changes(*, early: bool = True) -> FileChanges:
+    """Shared stone-order repair, plus late-write guards when the Door may open early.
 
-    Composes with Darunia's Event62 guard in either order. The door stage must add the ``ESCAPE_READY`` row."""
-    return {path: _transform(path) for path in _GUARDS}
+    The courtyard reset is native. Event62 and its tail stay compatible with Darunia in either edit order."""
+    paths = _GUARDS if early else (_DOOR_FLOW,)
+    return {path: _transform(path, early=early) for path in paths}

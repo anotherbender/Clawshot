@@ -1,15 +1,15 @@
 """Early Door of Time story stage: Zelda's escape and the moat Ocarina play in any quest order.
 
 Both early door modes let the first pull write ``Complete`` (song_only's opening already writes ``Step06``)
-before the three-stone escape. Four native Hyrule Field modules key the escape and the moat on the exact
+before the native counted-stone escape. Four native Hyrule Field modules key the escape and the moat on the exact
 quest step (``HoldChallengeCurrentStepCheckOrder`` on DoorOfTime, ``IsEqual`` Step03 or Step04), so any later
 step would strand both scenes and their checks. Each such query becomes the native
 ``HoldGameDataGetBoolExpSimple`` on one of three unsaved BoolExp rows (reset 0, save -1); no saved flag,
 default or save layout changes:
 
-- ``ESCAPE_READY`` (owned by ``door_story``): DoorOfTime past Step2_2, the three stone quests Complete, the
+- ``ESCAPE_READY`` (owned by ``door_story``): DoorOfTime past Step2_2, Fire and Water quests Complete, the
   send-off played, the escape unplayed. Read by 0ce5 node3 (the escape area) and 9e35 node3 (its storm).
-- ``MOAT_READY``: DoorOfTime past Step03, the same stones and send-off, the escape played, ``Dm_MelodyGet_Time``
+- ``MOAT_READY``: DoorOfTime past Step03, the same counted quests and send-off, the escape played, ``Dm_MelodyGet_Time``
   unplayed. Read by 91f9 node0 (the moat Ocarina actor) and 32f7 node5, which was the escape history and now
   drives the moat air wall (node13) and the moat event's AND (node6). Scene histories, never Ocarina or song
   ownership: either gift may be shuffled.
@@ -48,7 +48,7 @@ COLLECTED = "HavePlayedEvent.Dm_MelodyGet_Time"
 
 _SENDOFF = "HavePlayedEvent.Dm_HrlField_0020"
 _AFTER = {step: f"DoorOfTime_IsAfter_{step}_Exp" for step in ("Step2_2", "Step03", "Step04")}  # strictly past
-_STONES = {stone: f"Get_StoneOf{stone}_IsCompleted_Exp" for stone in ("Forest", "Fire", "Water")}
+_STONES = {stone: f"Get_StoneOf{stone}_IsCompleted_Exp" for stone in ("Fire", "Water")}
 _STEP = "Step_DoorOfTime"
 _STEPS = (
     "NotReady",

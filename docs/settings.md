@@ -296,8 +296,12 @@ Door mode and reverse travel are independent. The default return guarantee prove
 unlock return from the minimum mandatory first-pull inventory and adult checks; optional child
 errands are not assumed. Early-door settings can be refused with unshuffled child-only prerequisites.
 There is no automatic free-travel override. Both early modes keep the escape and both moat rewards
-available after an early sword pull: finish all three stone quests, return as child, then approach the
-Market from Hyrule Field and collect the moat pickup. Late scenes do not roll the completed Door quest back.
+available after an early sword pull: finish the required stone route, return as child, then approach the
+Market from Hyrule Field and collect the moat pickup. Logic still assumes all three stone quests; the
+native repair follows the Fire/Water counter and adds no Forest condition. All Door modes defer that
+counter until the real Impa send-off, recount there, and ignore calls after escape. This also covers
+closed mode when shuffled songs allow stones before Zelda. The native courtyard Step01 reset remains;
+early-mode post-pull callbacks do not roll the completed Door quest back.
 These new gates/order repairs are built, **not yet checked in game**; earlier Door/first-pull checks
 (R10-DOOR-SONG/OPEN) do not certify them.
 
@@ -318,7 +322,7 @@ With the return guarantee enabled, this generator cannot build Chest-only seeds 
 `song_only` or `open`: its return-kit bound needs movable ocarinas and Saria's Song, but those
 remain at child gifts. Validation names the fixed checks and offers a closed door or Gift
 shuffle. This is a construction limitation, not proof that no physical route exists;
-in particular, an unshuffled Time-song gift already requires all three stones.
+in particular, the logic for the unshuffled Time-song gift already requires all three stones.
 Free time travel replaces that return proof, so with it on all three door modes are accepted
 with Chest only; returning to child after an early door has not been checked in game.
 

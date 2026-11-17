@@ -20,8 +20,8 @@ Decoded issue settings: both seeds use `door_of_time=open`, native/default rever
 ### Product provenance
 
 - **Kareem, relayed by Claude, 2026-11-16:** in `open`, the **Door itself**, not a pedestal presence gate, stays shut until the real send-off; then opens without songs or stones. Back-room/Time Travel logic must match.
-- **Claude's explicit choice, confirmed 2026-11-17:** protect **both** early modes. `song_only` also requires the send-off, while keeping the learned Song of Time and either child ocarina. Only `closed` remains byte-identical; this supersedes the initial song-only identity requirement.
-- **Claude, 2026-11-17:** pre-existing escape/moat loss after an early pull is in scope. Permit late quest states with the real three-stone/send-off/unplayed-event conditions, and make Door quest writes forward-only.
+- **Claude's explicit choice, confirmed 2026-11-17:** protect **both** early modes. `song_only` also requires the send-off, while keeping the learned Song of Time and either child ocarina. The initial closed-output identity requirement was subsequently superseded by the approved shared ordering repair below; closed placements and spoilers must remain identical to `f93cd4b`.
+- **Claude, 2026-11-17:** pre-existing escape/moat loss after an early pull is in scope. Permit late quest states with native Fire/Water completion, real send-off and unplayed-event conditions, and make the nine late Door writes forward-only; retain the courtyard reset.
 - **Claude, latest linear-stack instruction:** after cs16a finishes its current gates and posts its af6-based rebased head, rebase this track onto that head. Run all four gates at the stack top; main moves once. Closed output identity compares against **cs16a's head**, not af6/dd3, because A's Slingshot logic can legitimately change placements.
 - **Not a save repair.** This prevents new freezes; it does not repair already-frozen saves. Never swap a played pre-send-off adult save to the new output on a save-compatibility assumption. No send-off/history/default is forged.
 
@@ -50,7 +50,7 @@ Read-only supported NUP inventory: **914 event files (653 flowcharts,261 timelin
 | `HidingHole_Level_Hole_23_Prefab_5d28` node18 | `IsAfter_Step05` gates the shared Forest/Fire Time-block interaction, not a grotto reward. Complete satisfies it; block disappearance/once flags stay native. |
 | `Dm_SY_Ocarina_SariaSong` Event72 | `IsAfter_Step06`; unchanged, satisfied by Complete. |
 | `Market_Child_Prefab_b715` node2 | Door completed expression; native first-pull Event93 still sets Complete, and late callbacks cannot undo it. |
-| `HyruleField_Child_Prefab_0ce5` node3 / `_9e35` node3 | Exact Step03 escape sensor/weather: extend through guarded late-stage readiness, including Step06/Complete, all three stone quests, send-off and unplayed escape. |
+| `HyruleField_Child_Prefab_0ce5` node3 / `_9e35` node3 | Exact Step03 escape sensor/weather: extend through guarded late-stage readiness, including Step06/Complete, native Fire/Water completion, send-off and unplayed escape. |
 | `HyruleField_Child_Prefab_91f9` node0 | Exact Step04 moat ocarina: extend through guarded late-stage readiness, requiring escaped and unplayed Time-melody source, not ownership of shuffled rewards. |
 | `HyruleField_Child_Prefab_32f7` nodes4/5 | Moat areas/airwall/area-out event must also remain usable until the late pickup; prevent premature airwalls and delete after the actual source is collected. |
 | Running Man `_592d` node3 and NPC/talk/presence selectors | Native exact Step04 / after-Step03 presentation windows remain unchanged; their complete-state behavior predates the fix. |
@@ -60,7 +60,7 @@ Native15-key binary audit (LE32 literals, MOVZ/MOVN+MOVK, all3 segments, with kn
 
 The pre-existing loss is real in data: first pull reaches native Event93 Complete, but the escape sensor requires exact03 and moat actor exact04. The R10 “Step04 or later escape” inference is superseded by R14's exact-step audit. `Recovery` only restores life/MP/UI; it does not recover a skipped story step. Do not rely on undocumented `IsIgnoreCompletedChallenge` behavior.
 
-Every native lower Door writer is guarded at its own event index, preserving its continuation: `DoorOfTime` Event7/147/148/37/12/14/57, `Goto_HyruleCastle` Event32, `Dm_SY_Ocarina_SariaSong` Event172, and `Npc_Hylia_Zelda_Child` Event42. Native strict `IsAfter_<target>` skips only backward writes; equality retains native behavior. First-pull Event93 Complete stays untouched. Event77 bridge-close is additionally conditional on escape readiness, so later stone callbacks cannot re-raise the bridge after the once-only escape.
+Nine lower Door writers are guarded at their own event index, preserving continuation: `DoorOfTime` Event7/147/148/37/12/14/57, `Dm_SY_Ocarina_SariaSong` Event172, and `Npc_Hylia_Zelda_Child` Event42. Native strict `IsAfter_<target>` skips only backward writes; equality retains native behavior. `Goto_HyruleCastle` Event32 remains entirely native: its forced Step01 reset is necessary before Impa. First-pull Event93 Complete stays untouched. In all modes the stone counter waits for actual send-off, reruns after that send-off, and stops after escape; no early or repeated bridge raise.
 
 The altar suppression is **new** versus `dd3b453` open. It skips only the native opening transition `Dm_TimeTemple_0010`, opened write and Step06 write; Step05 belongs to the later moat song aftermath and is not suppressed. The noon setter is escape Event34, retained unchanged, not the opening scene. Earlier research suggestions to the contrary were corrected before implementation.
 
@@ -96,16 +96,16 @@ Closed spoilers are also exact. Early-mode effective settings/strings change wit
 
 ## In-game acceptance
 
-Claude reports Longshot `v3.0.0-rc.5`, source `013b1d3a`, installed in place in the pinned `builds/v3.0.0-rc.4` folder on2026-11-16; launcher paths stay unchanged. His2026-11-17 02:09 thread report boot-checked all four v2 overlays: crash0, every mod found (11–13 RomFS files each). This is Claude's startup evidence, not this agent's game launch or Kareem's gameplay acceptance.
+Claude reports Longshot `v3.0.0-rc.5`, source `013b1d3a`, installed in place in the pinned `builds/v3.0.0-rc.4` folder on2026-11-16; launcher paths stay unchanged. His2026-11-17 02:09 thread report boot-checked all four **superseded v2** overlays: crash0, every mod found (11–13 RomFS files each). This does not certify the rebuilt v3 overlays, which require fresh startup and gameplay checks by Claude/Kareem.
 
 Final controls are staged under `E:/OOTRemake/work/r16-time/ingame/`; exact directions and Claude-only boot commands are in `TIME-CHECKLIST.md`. All four approved-template launchers passed `CLAWSHOT_DRY_RUN=1`; read-only reporter exercised all four actual user copies; every source checksum and native story/age/location remained unchanged. No game launch by this agent. The pre-Zelda source is the authentic castle corridor immediately before the courtyard; the order source is authentic Jabu Water Step11, Forest/Fire Complete, before the third stone and first pull.
 
 | Launcher suffix | Progress words changed | Mod resources | Control |
 |---|---:|---:|---|
-| `time-gate-open-v2` | 1 | 13 | Pre-Zelda; only Sun's Song staged, Fairy Ocarina native, no Time Ocarina/song. |
-| `time-gate-songonly-v2` | 2 | 11 | Same pre-Zelda source; Sun's Song and learned Time song staged. |
-| `time-order-open-v2` | 0 | 13 | Exact pre-third-stone progress copy; both moat rewards remain vanilla progression. |
-| `time-order-songonly-v2` | 3 | 13 | Time song/Time Ocarina stock staged; moat item becomes Hammer and song becomes Hookshot, both absent initially. |
+| `time-gate-open-v3` | 1 | See `acceptance-v3-proof.json` | Pre-Zelda; only Sun's Song staged, Fairy Ocarina native, no Time Ocarina/song. |
+| `time-gate-songonly-v3` | 2 | See proof | Same pre-Zelda source; Sun's Song and learned Time song staged. |
+| `time-order-open-v3` | 0 | See proof | Exact pre-third-stone progress copy; both moat rewards remain vanilla progression. |
+| `time-order-songonly-v3` | 3 | See proof | Time song/Time Ocarina stock staged; moat item becomes Hammer and song becomes Hookshot, both absent initially. |
 
 All test overlays enable free return **only for a quick child return**; production default stays off. Checklist covers both pre-/post-send-off modes, native Impa reward, clock/Sun's Song, first pull before Barinade's stone, later escape and both moat grants, Door remaining open/no second stone scene, save/reload/no repeats/no moat airwall. One gate control estimated5–10min; both10–20min; each late-order control15–25min; all four40–70min, unmeasured in game. Claude boot-checks, Kareem supplies runtime `mods:` load lines plus observations. Do not teleport to DreamWorld/BarinadeStage as a substitute for the real boss.
 
@@ -116,3 +116,16 @@ The baseline runner's `extra` step was a private send-off consumer audit, **not 
 The fourth acceptance profile initially failed in its private harness: `flow_files(R,FLOW_VERSIONS)` passed the resource-path string instead of the parsed mapping (`AttributeError: 'str' object has no attribute 'get'`). The first three successful profiles were not overwritten or rerun; explicit resume verified them and completed only the remaining native gift overlay/launcher after parsing `Versions`. Final four-profile proof passed. This was not seed generation or an accepted-settings failure.
 
 The first stack-control harness passed a version-labelled `Clawshot-0.2.1:CS1...` string directly to CLI `--settings`, which requires bare `CS1`; rc2 printed the exact parser error and no generation ran. Prefix handling was corrected in the private harness. This is distinct from the subsequent two real-app integration failures recorded above. Every failed output remains private; no unchanged failure was retried.
+
+## Review follow-up on46b8d72
+
+Claude requested the native courtyard Step01 reset, exact native byte/file/string and unrelated-path oracles, explicit kit/label contracts, rebuilt v3 profiles, then one gate run. The native counter reads Fire/Water, not Forest; the added Forest predicate is removed. Proposed by cs16b from that native trace, in response to the review.
+
+**Claude approved completing the ordering repair in every reachable Door mode, including closed with shuffled songs.** Native Fire/Water completion callbacks are the only original counter callers; both before Zelda can raise the bridge, and the courtyard reset/send-off leaves Step02 without another clear callback. The physical bridge obstruction remains **[INFERENCE]** from native actor Presence, not an in-game observation. The repair suppresses counter effects before the real send-off, calls the native counter afterward, and ignores later calls after actual escape. No completion, inventory, or history is forged.
+
+The closed-mode child-only trace is `E:\OOTRemake\work\r16-time\closed-pre-courtyard-logic-proof.json`: `Met Child Zelda`, Time Travel and Zelda's Letter are held at zero; all six warp songs and Farore's Wind are excluded. A shuffled Lullaby is eligible in `KF Kokiri Sword Chest`; King Dodongo is reachable through Lost Woods → GC Woods Warp → Goron City → Death Mountain, and Barinade through Lost Woods → Zora River → Zora's Domain → Fountain. This is prepared-native rule reachability with placeable-pool inventory, **not a generated placement or in-game proof**.
+
+Historical-save scan:262 eligible native/test backup families,1,059 freshly decoded slots, no authentic Fire+Water-complete/send-off-unplayed match. No extra pre-Zelda-two-stones v3 profile is staged; that order has native-flow/logic data proof only. Existing played/randomizer/foreign seed families were excluded; no save was written by the scan. Evidence:`historical-both-before-zelda-proof.json`.
+
+Closed comparison uses preserved successful `f93cd4b` app generations with the same seed/settings, for both free-return values. Only `Event/EventFlow/DoorOfTime.bfevfl.zs` (shared history-gated counter, post-send-off recount and entry registration) and `System/Resource/ResourceSizeTable.Product.111.Nin_Ounce_NVN2.rsizetable.zs` (only that flow's allocation) may differ. Placements and spoiler bytes must match; exact comparisons are in `review-v3-closed/proof.json`.
+

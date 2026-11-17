@@ -325,12 +325,18 @@ Both early modes require `Met Child Zelda` (the completed Impa field send-off, w
 unlocks clock progression): song-only additionally requires either child ocarina + learned Time song;
 open requires no items. Kareem chose the open-Door physical gate on2026-11-16; Claude explicitly
 extended the protection to song-only on2026-11-17 (`rounds/r16-time.md`).
-`patch.door` supplies matching physical/altar gates; closed emits nothing. Open reuses the ungated
+`patch.door` supplies matching physical/altar gates; closed receives only the shared ordering repair. Open reuses the ungated
 attention module for first/repeat pulls; its common gate reads actual send-off and skips the native
 opening scene. Song-only retains its learned-song/melody/scene/once and Step06 path after send-off.
-Both early modes extend escape/moat actor predicates through late Door states with all three native
-stone-quest completions and source-history guards. `patch.door_story` makes every lower Door write
-forward-only while preserving native rewards, continuations and the first-pull Complete write.
+All modes defer the native Fire/Water stone counter until the real Impa send-off, recount there,
+and ignore later counter calls after the escape history is played. This covers stones before Zelda,
+including closed mode with shuffled songs, without inventing completion or history.
+Both early modes additionally extend escape/moat actor predicates through late Door states with the
+native counter's Fire/Water completions and source-history guards, not an added Forest prerequisite.
+Nine late Door writes are forward-only. The courtyard's native forced Step01 reset remains untouched
+so stone-before-Zelda orders still reach Impa's exact-Step01 lesson; it cannot undo an actual early pull,
+which needs the send-off. Bridge raising waits for send-off and cannot repeat after escape.
+Closed's item gate remains native; its shared ordering repair changes DoorOfTime and the resource table.
 No stone quest completion, inventory grant, saved history/default or first-adult scene is forged.
 This is prevention for new seeds, not a repair for already-frozen saves; the rc.5 player check is pending.
 

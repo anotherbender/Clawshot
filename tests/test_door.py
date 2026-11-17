@@ -201,10 +201,28 @@ def test_adult_fairy_ocarina_cannot_play_saria_in_any_door_mode(mode):
 
 
 def test_cli_explicit_door_mode_overrides_an_effective_settings_string(capsys):
+    """The CLI's explicit mode replaces the effective string's mode, and the prepared world compiles the return kit
+    of the selected mode: a kit compiled for the previous mode is never kept."""
     effective, _ = prepare(load_spec(), Settings(shuffle=GIFTS, door_of_time="open"))
     assert main(["--settings", effective.to_string(), "--door-of-time", "song_only", "--print-settings"]) == 0
     settings = Settings.from_string(capsys.readouterr().out.strip())
     assert settings.door_of_time == "song_only"
+    resolved, world = prepare(load_spec(), settings)
+    # song_only's compulsory first-pull kit: a child ocarina, the learned Time song and Impa's send-off story.
+    song_kit = {"Ocarina": 1, "Song of Time": 1, "Met Child Zelda": 1}
+    assert world.settings["age_return_fill_inventory"] == resolved.logic["age_return_fill_inventory"] == song_kit
+    # Switch the effective song_only string back to closed through the same path; its stale kit must not survive.
+    assert main(["--settings", resolved.to_string(), "--door-of-time", "closed", "--print-settings"]) == 0
+    switched = Settings.from_string(capsys.readouterr().out.strip())
+    assert switched.door_of_time == "closed"
+    back, back_world = prepare(load_spec(), switched)
+    fresh, fresh_world = prepare(load_spec(), Settings(shuffle=GIFTS, door_of_time="closed"))
+    for name in ("age_return_fill_inventory", "age_return_fill_families"):
+        assert back_world.settings[name] == back.logic[name] == fresh_world.settings[name] == fresh.logic[name]
+        assert back.logic[name] != resolved.logic[name], name
+    closed_kit = back_world.settings["age_return_fill_inventory"]
+    # Closed's door needs the adult-capable Time ocarina, the Time song and the courtyard/Impa story.
+    assert (closed_kit["Ocarina"], closed_kit["Song of Time"], closed_kit["Met Child Zelda"]) == (2, 1, 1)
     with pytest.raises(FillError, match="must agree"):
         prepare(load_spec(), Settings(door_of_time="closed", logic={"door_of_time": "open"}))
 

@@ -363,7 +363,8 @@ button:disabled {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0 14px;
 }
-.field.full {
+.field.full,
+.field[data-setting="door_of_time"] {
   grid-column: 1 / -1;
 }
 .field.menu-row {
@@ -376,7 +377,8 @@ button:disabled {
 .field.menu-row .value-cell select {
   font-size: 13px;
 }
-.field.full.menu-row {
+.field.full.menu-row,
+.field[data-setting="door_of_time"] {
   grid-template-columns: 33% minmax(0, 1fr);
 }
 .field .help {

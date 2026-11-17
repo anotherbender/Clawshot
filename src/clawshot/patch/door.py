@@ -1,8 +1,8 @@
 """Door of Time: native closed; both early modes wait for Impa's field send-off.
 
 No stone quest, inventory grant, saved default/history or first-adult scene is forged.
-Early modes keep the escape/moat sources available after first pull; lower Door writes
-cannot undo Complete. Decisions and native audit: plans/rounds/r16-time.md.
+Early modes keep the escape/moat sources available after first pull; late callbacks cannot
+undo Complete. The pre-send-off courtyard reset stays native. Audit: plans/rounds/r16-time.md.
 """
 
 import argparse
@@ -37,6 +37,7 @@ REACTION = "Market_Child_TimeTempleDoor_OcarinaReacts"
 TIME_SONG = "IsGet.Item_Melody_TimeSong"
 SENDOFF = "HavePlayedEvent.Dm_HrlField_0020"
 _STORY_CHANGES = door_story.changes()
+_ORDER_CHANGES = door_story.changes(early=False)
 
 
 def _altar_reaction(data: bytes, values: list[list[byml.U64]]) -> bytes:
@@ -189,7 +190,7 @@ def changes(_placements: Mapping[str, str], *, mode: str = "closed") -> FileChan
     if mode not in MODES:
         raise PatchError(f"unknown door_of_time mode {mode!r}")
     if mode == "closed":
-        return {}
+        return dict(_ORDER_CHANGES)
     if mode == "song_only":
         return {**_STORY_CHANGES, FLOW: _song_story, GAME_DATA_LIST: song_reaction}
     return {**_STORY_CHANGES, PLACEMENT: open_pedestal, GAME_DATA_LIST: open_reaction}

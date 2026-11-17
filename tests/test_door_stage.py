@@ -1,7 +1,7 @@
 """Early door story stage: Zelda's escape and the moat Ocarina keep working in any quest order.
 
 Both early modes let the first pull write Complete (song_only's opening already writes Step06) before the
-three-stone escape. The behavior tests read the door's public ``build``/``changes`` output, or the native
+stone-count escape. The behavior tests read the door's public ``build``/``changes`` output, or the native
 module while the build does not supply it yet, and evaluate every consumer input the stage re-sources
 against an independent model of the quest order. Node reads are pinned native layout facts of build
 e0f3ccfa (node table, query list, String input and Bool output tables), not a general AINB parser.
@@ -155,11 +155,13 @@ def outcome(escape: bool, moat: bool, gone: bool) -> dict[str, object]:
 
 
 def expected(story: Story) -> dict[str, object]:
-    """Independent model: the escape waits for the counted stones (Step03 or any later step), all three stone
-    quests and the send-off, and plays once; the moat follows the escape (Step04 or later), once; its sensor
-    areas leave only after the collection, at Step05 or later."""
+    """Independent model: the escape waits for the counted stones (Step03 or any later step), the Fire and Water
+    stone quests the native count reads (Forest never: natively it precedes Zelda) and the send-off, and plays
+    once; the moat follows the escape (Step04 or later), once; its sensor areas leave only after the collection,
+    at Step05 or later."""
     at = STEPS.index(story.step)
-    prepared = all(story.stones) and story.sendoff
+    _, fire, water = story.stones
+    prepared = fire and water and story.sendoff
     escape = prepared and at >= STEPS.index("Step03") and not story.escaped
     moat = prepared and at >= STEPS.index("Step04") and story.escaped and not story.collected
     return outcome(escape, moat, at >= STEPS.index("Step05") and story.collected)
@@ -296,7 +298,31 @@ CASES = {
     ),
     "Step06 reload after the collection": (Story("Step06", escaped=True, collected=True), outcome(False, False, True)),
     "stones not yet counted at Step2_2": (Story("Step2_2"), outcome(False, False, False)),
-    "Forest stone missing": (Story("Complete", stones=(False, True, True)), outcome(False, False, False)),
+    "Forest stone missing: the native count reads only Fire and Water": (
+        Story("Step03", stones=(False, True, True)),
+        outcome(True, False, False),
+    ),
+    "Forest stone missing when the first pull wrote Complete": (
+        Story("Complete", stones=(False, True, True)),
+        outcome(True, False, False),
+    ),
+    "Forest stone missing, moat Ocarina pending": (
+        Story("Step04", stones=(False, True, True), escaped=True),
+        outcome(False, True, False),
+    ),
+    "Forest stone missing after the collection": (
+        Story("Complete", stones=(False, True, True), escaped=True, collected=True),
+        outcome(False, False, True),
+    ),
+    "Forest stone missing and stones not yet counted": (
+        Story("Step2_2", stones=(False, True, True)),
+        outcome(False, False, False),
+    ),
+    "Forest stone missing and send-off missing": (
+        Story("Step03", stones=(False, True, True), sendoff=False),
+        outcome(False, False, False),
+    ),
+    "only Forest complete": (Story("Complete", stones=(True, False, False)), outcome(False, False, False)),
     "Fire stone missing": (Story("Complete", stones=(True, False, True)), outcome(False, False, False)),
     "Water stone missing": (Story("Complete", stones=(True, True, False)), outcome(False, False, False)),
     "Fire stone missing after the escape": (
@@ -451,6 +477,20 @@ def test_expressions_follow_the_independent_model():
         if actual != {**model, MOAT_AREAS_DONE: want["areas_gone"][0]}:
             wrong.append((story, actual))
     assert not wrong, wrong[:3]
+
+
+@pytest.mark.parametrize("case", CASES)
+def test_expressions_give_each_named_story_its_scenes(case):
+    """The named orders without the dump: Fire and Water with the send-off ready the escape, Forest or not."""
+    from clawshot.patch import door_stage
+
+    tree = synthetic_game_data()
+    door_stage.add_expressions(tree)
+    rows = indexed(tree)
+    story, want = CASES[case]
+    actual = {name: evaluate(rows, key(name), story.state()) for name in ADDED}
+    scenes = (want["escape_area"], want["moat_ocarina"], want["areas_gone"][0])
+    assert actual == dict(zip(ADDED, scenes, strict=True)), story
 
 
 def test_expressions_add_only_three_unsaved_rows():

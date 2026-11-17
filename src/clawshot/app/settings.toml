@@ -147,8 +147,8 @@ closed_deku = "Open bridge only"
 open = "Open forest and Mido"
 [door_of_time.labels]
 closed = "Closed (vanilla)"
-song_only = "Time song after Zelda"
-open = "Open after meeting Zelda"
+song_only = "Impa send-off + Time song + ocarina"
+open = "Open after Impa's send-off"
 [fast_start.labels]
 intro = "Skip the opening movie"
 saria = "Skip Saria's opening scene"
