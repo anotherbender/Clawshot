@@ -93,3 +93,12 @@ ages; an underlying numeric clock stop is not proven. The A-cache hypothesis was
 P4's immutable Jabu source has ENV=false and was unchanged by inspection. No clock implementation,
 source save, game folder or runtime was changed; no game was started. Clock implementation and
 the full gate remain held for Claude's direction.
+
+## Rebase after the final time freeze
+
+Claude subsequently approved and completed the separate time-track ENV follow-up. Minimap was
+cleanly rebased onto final `r16/time` head `ef0d9321b3d0d8734850204f760e8f59ccb8995f`, after its
+single frozen gate passed at2256115 (the later time commit is evidence only). Both minimap commits
+replayed without conflict. **No minimap gate, tests, formatter or game run followed the rebase**;
+the six-test focused result above is pre-rebase evidence, not certification of this combined head.
+The one-line visit correction and native-derived skip coverage remain the minimap scope.
