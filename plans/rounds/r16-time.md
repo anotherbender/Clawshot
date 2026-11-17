@@ -27,6 +27,8 @@ Decoded issue settings: both seeds use `door_of_time=open`, native/default rever
 
 The send-off flag is not clock-only: `ZoraRiver_Child_Prefab_07cf` node5 reads it; nodes6/8/9 combine it with Saria's lesson history to create the river owl/contact/request area, removed after `Dm_ZoraRiver_0005`. Native hash materializations also exist at `0x41ea7c/0x41eacc` and `0x345c968/0x345c9b8`. The physical/altar gate avoids all early history writes and cannot skip Impa's shuffled song source.
 
+Direct Prelude teleport is not a back-room bypass: native `Dm_SY_Ocarina` Event20 selects child `Market_Child` / `LightPrelude`; StartPos Hash `4578708010518158057` in `Market_Child_Dynamic` lands in the front hall, before the stone altar and Door. Read-only placement inspection compared that anchor with the actual Door and sword; no warp permission assumption or new warp restriction was needed.
+
 ### Release seed and mode evidence
 
 Private app regeneration reproduced both issue hashes exactly: 0.2.1 seed332751819 `D70084C06D92`; 0.2.0 seed1582717117 `42523F62EDFE`. For 0.2.1, spoiler search reaches Time Travel in sphere0 but Met Child Zelda/Time Flows only in sphere1: a pre-Zelda first pull was permitted. The attachment's loaded mod files all belong to the reproduced output. Main's pre-fix placements differ from the release after earlier fill changes; never compare release/main save compatibility by seed number.
@@ -70,6 +72,7 @@ The altar suppression is **new** versus `dd3b453` open. It skips only the native
 - Actual post-pull native-stage RED: both early modes at Complete/all stones/send-off/unplayed escape had no escape/storm and all four moat areas deleted (**2 failed**). Same public-path cases after integration: **2 passed**.
 - Post-af6 targeted synthetic: **150 passed,93 deselected in11.33s**, including forward-only boundaries, repeated callbacks and readiness truth tables.
 - Independent full native decoder/writer oracle passed in7.62s: all four story modules equal exactly the specified graph deltas, same lengths/native allocations; three typed unsaved predicates only; actual integrated `door.write` outputs in both modes; closed no stage output. Private `story-native-gate-proof.json`.
+- Current working-set coverage: existing layered fixture contains all1271 required files, none missing; no fixture addition. The prepared private `run_stack_acceptance.py` serializes13 app/CLI control generations plus all four gates, checks game processes at each stage, records both source heads and refuses changed closed bytes against A's head. It has not executed those generations/gates yet.
 - No full gates or comparison generations have started while cs16a owns the next slot. They await the requested linear-stack rebase. No game behavior is claimed verified.
 
 ## In-game acceptance
