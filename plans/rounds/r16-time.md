@@ -441,3 +441,33 @@ existing non-Collection `itertools.product` parametrization in the native open-d
 without suppression. Exact command, harness hashes and log: `work/r16-time/env-v5-focused/`.
 Targeted format/lint checks passed. Production remains the real-app-proven `ab9600f`; the next
 commit contains the test/documentation closure and is the source freeze for the ONE complete gate.
+
+### ONE complete frozen v5 gate PASS
+
+The complete gate ran once at frozen head `2256115f01dd2859a0b4afbc1ebb30a02166a9c8`.
+No game process was present at either pytest stage start, so the approved12-process xdist path
+was used (not the4-process/one-worker fallback):
+
+| Command | CLAWSHOT_WORKERS | Result | Runner seconds |
+|---|---:|---|---:|
+| `uv run ruff format --check` | 3 | 416 files already formatted | 0.12 |
+| `uv run ruff check` | 3 | All checks passed | 0.11 |
+| `uv run --with pytest-xdist pytest -n 12` | 12 | 3217 passed,371 skipped | 296.19 |
+| `uv run --with pytest-xdist pytest -m dump -n 12` | 4 | 368 passed | 1451.86 |
+
+Synthetic cleared `OOT_ROMFS`, `OOT_NUP` and `OOT_DUMP`. Dump used the real romfs/NUP and
+`E:/OOTRemake/work/rounds/r16/time-layered-dump`. Every stage recorded **zero source-snapshot changes**;
+the runner released its owned gate lock. Both suites reported36 existing product-iterator
+parametrization deprecations; none was suppressed. Exact argv, environment, per-stage process checks,
+source hashes, logs and results: `work/r16-time/clock-env-v5-approved-gate/proof.json`.
+No second full gate or post-freeze source/test edit was made.
+
+This final evidence update is documentation only; production and tests remain those exercised
+above. The v5 stager then builds both controlled overlays from this evidence commit's exact HEAD,
+verifies that HEAD and source snapshot before/after, and writes
+`work/r16-time/acceptance-v5-proof.json` plus `ingame/TIME-CHECKLIST-V5-metadata.json`.
+It preserves the corridor's ENV=true premise and uses the validated snapshot16 slot00 for shortened
+P4, with no inventory or story edits to that played copy. The P4 stager requires its actual new era
+flow and adult pedestal placement bytes to equal the played v4 overlay; the native B clearer stays
+unmodified. The selected checklist is `ingame/TIME-CHECKLIST-V5.md`, P3/P4 only.
+Launcher dry-run/read-back proof is separate from boot/play: this agent never launches the game.
