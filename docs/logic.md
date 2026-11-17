@@ -41,6 +41,13 @@ meanings in a port. Do not turn a held check into a randomized check just becaus
 The current acceptance boundary is in [settings](settings.md), with observations in
 `plans/playtest/answers.md` and completed results in `plans/00-roadmap.md`.
 
+**Water Temple precaution (0.2.2):** entry requires access to the real Ice Cavern end chest as well
+as Hookshot and Iron Boots, independent of where Boots or Serenade are shuffled. Claude chose this
+safety constraint on 2026-11-17; Kareem was informed. Kareem's played rc.7 check (unmodded fresh game,
+Debug-made adult with Hookshot and Iron Boots, teleported to adult Lake Hylia) found that the submerged
+Hookshot does **not latch** onto the entrance target. This is consistent with the Ice gate, not proof
+of its exact quest/flag predicate; the setup was made with Debug, not normal progression.
+
 ## Rule language
 
 Rules are parsed expressions, **not Python to execute**. The compiler validates and folds settings

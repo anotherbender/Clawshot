@@ -608,8 +608,14 @@ test (with its documented up-front-key caveat) and 200 default generated seeds a
 
 - Goron City's adult token is on the ceiling: Hookshot, not adult age alone. The frozen Domain token likewise
   needs collection reach, not just Bow or Magic Meter.
-- Water Temple entrance uses Iron Boots/Hookshot; the N64 Scale/Longshot alternative has no remake proof.
-  The documented Fire Arrows route needs the lake restored by Morpha; low-water scarecrow collection is unverified.
+- Water Temple logic requires Iron Boots/Hookshot and access to the real Ice Cavern end chest,
+  independent of its reward or Serenade ownership. Claude chose this 0.2.2 safety precaution on
+  2026-11-17; Kareem was informed. Played follow-up: Kareem, rc.7, unmodded fresh game; Debug adult
+  plus Hookshot/Iron Boots, teleported to adult Lake Hylia, submerged at the entrance: Hookshot
+  does not latch onto the target. This Debug-made state is consistent with the Ice gate, not proof
+  of its exact predicate. The latchability condition remains unlocalized (`rounds/r16-water-gate.md`).
+  The N64 Scale/Longshot alternative has no remake proof. The documented Fire Arrows route needs
+  the lake restored by Morpha; low-water scarecrow collection is unverified.
 - After Water Temple, the Domain thaws and its lake shortcut works as adult. Blue Fire on King Zora does not
   unseal the shop during Water Temple. Reopening after the whole-area thaw is provisional, not a traced flag.
 - Zora Fountain's hidden cave uses Silver Gauntlets and Lenses; the extra bombable rocks were original-only.
