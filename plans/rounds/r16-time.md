@@ -1,10 +1,10 @@
 # Round 16 Track B — time of day (#32)
 
-Agent: cs16b (`openai-codex/gpt-6.1-sol`), branch `r16/time`. Original base `dd3b453`; rebased onto `.nup`-only `af6a7b4`. Latest merge plan: stack on cs16a's posted af6-based head before full gates and use that head for closed-output comparisons.
+Agent: cs16b (`openai-codex/gpt-6.1-sol`), branch `r16/time`. Original base `dd3b453`; rebased first onto `.nup`-only `af6a7b4`, then cleanly onto cs16a's posted `f93cd4b1b77dd676e724a1b2d4070c47b412594f`. Closed-output comparisons use that A head; all four full gates run at the combined stack top.
 
 ## Scope and safety
 
-Investigate native clock/Sun's Song and early Door state; failing regressions first; protect both early modes without losing the escape/moat checks; prove closed output identity and measure early-mode changes; stage Longshot v3.0.0-rc.4 acceptance. No version bump or game launch.
+Investigate native clock/Sun's Song and early Door state; failing regressions first; protect both early modes without losing the escape/moat checks; prove closed output identity and measure early-mode changes; stage Longshot v3.0.0-rc.5 acceptance. No version bump or game launch by this agent.
 
 Issue #32 was read through `gh issue view 32` (no comment). The report distinguishes worldwide stuck night after the first sword pull on 0.2.1 from Gerudo Fortress stuck day on 0.2.0. These are observations, not yet one proven cause. The attachment downloaded successfully using plain `curl -L --fail` (2,738,232 bytes); all log material, research, generated mods and any staged saves remain exclusively under `E:/OOTRemake/work/r16-time/`. No private log paths/usernames are reproduced here.
 
@@ -73,11 +73,11 @@ The altar suppression is **new** versus `dd3b453` open. It skips only the native
 - Post-af6 targeted synthetic: **150 passed,93 deselected in11.33s**, including forward-only boundaries, repeated callbacks and readiness truth tables.
 - Independent full native decoder/writer oracle passed in7.62s: all four story modules equal exactly the specified graph deltas, same lengths/native allocations; three typed unsaved predicates only; actual integrated `door.write` outputs in both modes; closed no stage output. Private `story-native-gate-proof.json`.
 - Current working-set coverage: existing layered fixture contains all1271 required files, none missing; no fixture addition. The prepared private `run_stack_acceptance.py` serializes13 app/CLI control generations plus all four gates, checks game processes at each stage, records both source heads and refuses changed closed bytes against A's head. It has not executed those generations/gates yet.
-- No full gates or comparison generations have started while cs16a owns the next slot. They await the requested linear-stack rebase. No game behavior is claimed verified.
+- Clean rebase onto cs16a's posted `f93cd4b` completed. No full gates or comparison generations have started while cs16a finishes its rebased format/lint/synthetic slot. No gameplay behavior is claimed verified.
 
 ## In-game acceptance
 
-Only Longshot `v3.0.0-rc.4` is installed. Claude boot-checks, Kareem plays; the agent never launches a game.
+Claude reports Longshot `v3.0.0-rc.5`, source `013b1d3a`, installed in place in the pinned `builds/v3.0.0-rc.4` folder on2026-11-16; launcher paths stay unchanged. His2026-11-17 02:09 thread report boot-checked all four v2 overlays: crash0, every mod found (11–13 RomFS files each). This is Claude's startup evidence, not this agent's game launch or Kareem's gameplay acceptance.
 
 Final controls are staged under `E:/OOTRemake/work/r16-time/ingame/`; exact directions and Claude-only boot commands are in `TIME-CHECKLIST.md`. All four approved-template launchers passed `CLAWSHOT_DRY_RUN=1`; read-only reporter exercised all four actual user copies; every source checksum and native story/age/location remained unchanged. No game launch. The pre-Zelda source is the authentic castle corridor immediately before the courtyard; the order source is authentic Jabu Water Step11, Forest/Fire Complete, before the third stone and first pull.
 
