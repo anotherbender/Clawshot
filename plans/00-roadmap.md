@@ -1411,3 +1411,47 @@ Open:
 - Gift-held items (bottles, Double Defense, Stone of Agony, Rupees (200)) never reach Skulltulas.
 - Tokens fill about 56% of Skulltula slots; this is structural.
 - Longshot moved to rc.4 on 2026-11-15; seed 25 boots on it, but nothing has been played on rc.4 yet.
+
+## Round 16 (softlocks without a save warp; time of day with the Door of Time open; `.nup` cap)
+
+Kareem handed over the PC overnight on 2026-11-16, after playing a self-generated seed from main on Longshot rc.4.
+Bermuda thread `cs-r16`; tracks on `openai-codex/gpt-6.1-sol`; Claude reviews, merges and bumps the version. Full
+suites serialize under `work/rounds/r16/gate.lock`. `CLAWSHOT_WORKERS=4` while the game is closed (Kareem's offer
+for overnight runs), 1 while `longshot.exe` or `hookshot.exe` runs. Nobody opens his seed's spoiler.
+
+Facts from his run (2026-11-16):
+- The remake has no save warp. It autosaves on every room change, and Load offers the autosave and the manual
+  saves. A room the player can enter but not leave is a real softlock: he loaded an older save.
+- In the Deku Tree Slingshot Room (2F, the Deku Scrub room), he had no Slingshot, Boomerang or Bow, and was locked
+  in. Our override already gates the way out (`child_deku_tree.toml`, eye switch `Obj_EyeSwitch_A_02`), but not the
+  way in. So the fill counted both chests as reachable with only a shield, and put the dungeon's map and compass
+  there.
+- OoT Randomizer's logic assumes a save warp exists. Any one-way move it allows may trap a remake player.
+
+### Track A: softlocks (`r16/softlocks`)
+
+1. Fix the Slingshot Room. The way in requires the way out; the vanilla Slingshot-in-its-own-chest case is a
+   self-lock the fill must not produce. Add a failing test first.
+2. Audit the whole world for the same trap. Build a checker that, for many seeds and presets (Defaults,
+   Recommended, keys anywhere, Gift, Shop, Token, open Door and open Forest), walks the playthrough sphere by
+   sphere. At each step it lists every reachable region from which the start can't be reached again with the items
+   held. Warp songs and Farore's Wind count only when held, and only where the remake allows them (inside
+   dungeons and buildings?). Report each finding with evidence from data and the guide: a real trap gets an entry
+   rule like item 1; a missing return edge in our world gets a new exit with evidence. The checker becomes a test
+   that holds for the sweep.
+3. Settings and generation must refuse rather than produce a seed with a reachable trap.
+
+### Track B: time of day stuck with the Door of Time open (#32)
+
+A tester on 0.2.1 and 0.2.0 (Linux, Longshot rc.3; log attached to the issue) reports that after pulling the
+Master Sword with the Door of Time open, it stayed night across the whole world. Sun's Song set it back to night.
+On a 0.2.0 seed, the day was stuck instead. Kareem's current seed has the Door open.
+- Find the cause in data: what the day cycle reads, and what the open-Door patch writes or skips.
+- Fix it. Prove the fix offline: if it's a patch-only change, placements stay identical for the same seed and
+  settings.
+- Stage a short in-game check on Longshot.
+
+### Track C: `.nup` reader size cap (#31)
+
+Cap each file's declared size and hash it block by block, as the `.nx` reader does since `4617fb5`. Add tests,
+including a crafted oversized entry that is refused before allocation.
