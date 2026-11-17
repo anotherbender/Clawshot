@@ -266,7 +266,7 @@ Both add `romfs/Event/EventFlow/Market_Adult_Field_AdultToChild.bfevfl.zs`; both
 No files are removed. The GameData delta was decoded from those existing outputs only, with **no extra
 generation or test run** (Claude's request): the sole value change in the complete typed tree is
 `Data/Bool[Hash=0x804aec99]` (`HyruleField_ArriveEntrance`), `DefaultValue=false→true`.
-Hash2152393881, reset8, save index0 and every other key/row/header stay identical, including S/B.
+Hash2152393881, reset8, save index0 and every other decoded key/row/root-metadata value stay identical, including S/B.
 Decompressed sizes stay1,463,136B without free travel and1,463,228B with it. Both profiles select Kaepora;
 the all-mode runtime flow repairs use existing A/B keys, and the new unsaved ClockReady row is early-mode
 only. No extra skip-off generation was run. Evidence: `work/r16-time/closed-gamedata-entry-diff.json`
@@ -290,3 +290,37 @@ The first frozen gate at e78b214 passed full format checking, then stopped at li
 `SIM102`, `tests/test_clock_transitions.py:381`, nested writer-filter conditions. Neither synthetic
 nor dump pytest started. cs16b printed the diagnostic and combined only those conditions, with no
 production-code, staged-output or acceptance-scope change; the cause-targeted refreeze follows.
+
+### Final frozen gate PASS — b2f1c15
+
+Claude's main af6a7b4 probes reproduced the known serial results, authorizing xdist for this gate only:
+synthetic `-n12` with `CLAWSHOT_WORKERS=12`; dump `-n12` with workers4. Each pytest stage checked for
+Longshot/Hookshot, with the approved `-n4`/workers1 fallback if either was running. Neither game process
+was present at either stage start, so both ran with12 pytest workers.
+
+The ONE full synthetic/full dump gate at `b2f1c15324ea2a8446ac2b970e6b2db80406a5c2` passed:
+
+| Command | CLAWSHOT_WORKERS | Result | Process time |
+|---|---:|---|---:|
+| `uv run ruff format --check` | 3 | 415 files already formatted | 0.09s |
+| `uv run ruff check` | 3 | All checks passed | 0.09s |
+| `uv run --with pytest-xdist pytest -n 12` | 12 | 3181 passed, 366 skipped | 276.59s |
+| `uv run --with pytest-xdist pytest -m dump -n 12` | 4 | 363 passed | 1573.42s |
+
+Dump environment: `OOT_ROMFS=E:/Games/Hookshot/romfs`,
+`OOT_NUP=E:/Games/Hookshot/The Legend of Zelda Ocarina of Time [0400486024DEC000][v131072].nup`,
+`OOT_DUMP=E:/OOTRemake/work/rounds/r16/time-layered-dump`. Synthetic cleared all three variables.
+Total runner wall time1872.75s (31m13s). Every stage's source-snapshot comparison was empty;
+the runner released its owned `gate.lock`. Exact argv, cwd, environment, process checks, source hashes,
+exit codes and timings: `work/r16-time/clock-v4-approved-gate/proof.json`; full logs alongside.
+
+Both suites reported36 `PytestRemovedIn10Warning` deprecations: three `itertools.product` parameter
+iterators repeated across12 workers, in `test_door`, `test_door_dump` and `test_door_stage`.
+These are reported, not suppressed; no post-freeze test/code edit or repeat suite was made.
+
+The private saved-state capture helper now accepts all four v4 profiles and prints A/B/S.
+Its read-only pre-play smoke returned corridor A/B/S=false/false/false and Jabu true/false/true;
+`v4-capture-helper-smoke.json` records that proof, explicitly not live-clock proof. Post-play command
+is in the four-part checklist. No runtime boot or gameplay was performed: Kareem/Claude still need
+the runtime `mods:` load lines plus the four actual in-game observations. The source remains the
+tested b2f1c15; this final round-file update is evidence only.
