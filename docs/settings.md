@@ -263,6 +263,9 @@ music-suppression window. The previous preset could leave Hyrule Field silent du
 This changes **new games only**, not existing saves. Kareem verified the repaired field
 music and the story/escape checks on Longshot on 2026-11-13
 ([section 46](../plans/03-game-data.md#46-round-14-child-story-and-field-music)).
+The skip now also preserves `IsVisitLocation.HyruleField`, normally supplied by the panorama's
+location UI and required for the Field map. This new-game minimap/full-map correction still awaits
+in-game verification; existing saved visit state is not migrated.
 
 Every new seed enables the D-pad HUD shortcuts from the start, independently of fast-start
 choices (including `--skip` with no selections): **Navi, Ocarina, Boots and Masks**.

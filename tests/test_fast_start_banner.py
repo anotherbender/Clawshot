@@ -1,6 +1,7 @@
-"""Skipping Saria must retain the visit state normally written by the area banner."""
+"""Skipped location banners must retain the visit state that makes the area's map available."""
 
 import pytest
+from test_fast_start_kaepora import FIELD_PANORAMA, game_data_list, initial_value
 
 from clawshot.formats import byml, evfl, zsdic
 from clawshot.patch import gamedata
@@ -26,6 +27,17 @@ def test_saria_skip_marks_only_its_missing_area_banner_visited(skips):
     flags = {row["Hash"]: row["DefaultValue"] for row in result["Data"]["Bool"]}
     assert flags[key(VISIT)] is ("saria" in skips)
     assert flags[key("IsVisitLocation.HyruleField")] is False
+
+
+def test_kaepora_skip_keeps_the_field_map_available_without_its_panorama():
+    """The skipped Dm_HrlField_0000 opens Hyrule Field's location UI; walking in does not replace that effect."""
+    settings = gamedata.load()
+    visit = "IsVisitLocation.HyruleField"
+    data = game_data_list([visit, *settings["kaepora"].game_data])
+    written = gamedata.patch_initial_values(data, gamedata.select(settings, ["kaepora"]))
+    values = {name: initial_value(written, name) for name in (FIELD_PANORAMA, visit)}
+    assert values[FIELD_PANORAMA] is True  # the panorama will not run and open the map
+    assert values[visit] is True, values
 
 
 @pytest.mark.dump

@@ -78,6 +78,7 @@ source = "Logic HyruleField_Child_Prefab_de5f (request when Dm_HrlField_0010 not
 "HavePlayedEvent.Dm_LostWood_0010" = true
 "UI_IsFinishChallengeMenuOpenEvent" = true
 "HyruleField_ArriveEntrance" = true
+"IsVisitLocation.HyruleField" = true
 "Step_Goto_HyruleCastle" = "Step02"
 
 # --- Applied to every seed, not a choice ([always.*], gamedata.load_always) -------------------------------------------
