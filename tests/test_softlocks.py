@@ -173,14 +173,13 @@ def test_any_physical_anchor_for_the_current_age_is_sufficient():
     assert reachable_traps(Search(world)) == []
 
 
+# Gift is an overlay-setup alias, not a world location type. Its actual presets
+# are exercised through native gift preparation in test_softlocks_dump.py.
 PRESETS = {
     "Defaults": Settings(),
-    "Recommended": Settings(shuffle=("Chest", "Shop", "Gift", "Scrub", "BossHeart")),
     "keys anywhere": Settings(dungeon_items="anywhere"),
-    "Gift": Settings(shuffle=("Chest", "Gift")),
     "Shop": Settings(shuffle=("Chest", "Shop")),
     "Token on": Settings(shuffle=("Chest", "Token")),
-    "open Door": Settings(shuffle=("Chest", "Shop", "Gift", "Scrub", "BossHeart"), door_of_time="open"),
     "open Forest": Settings(forest="open"),
     "free time travel": Settings(logic={"free_time_travel": True}),
 }
