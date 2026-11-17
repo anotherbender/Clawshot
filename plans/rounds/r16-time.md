@@ -72,8 +72,25 @@ The altar suppression is **new** versus `dd3b453` open. It skips only the native
 - Actual post-pull native-stage RED: both early modes at Complete/all stones/send-off/unplayed escape had no escape/storm and all four moat areas deleted (**2 failed**). Same public-path cases after integration: **2 passed**.
 - Post-af6 targeted synthetic: **150 passed,93 deselected in11.33s**, including forward-only boundaries, repeated callbacks and readiness truth tables.
 - Independent full native decoder/writer oracle passed in7.62s: all four story modules equal exactly the specified graph deltas, same lengths/native allocations; three typed unsaved predicates only; actual integrated `door.write` outputs in both modes; closed no stage output. Private `story-native-gate-proof.json`.
-- Current working-set coverage: existing layered fixture contains all1271 required files, none missing; no fixture addition. The prepared private `run_stack_acceptance.py` serializes13 app/CLI control generations plus all four gates, checks game processes at each stage, records both source heads and refuses changed closed bytes against A's head. It has not executed those generations/gates yet.
-- Clean rebase onto cs16a's posted `f93cd4b` completed. No full gates or comparison generations have started while cs16a finishes its rebased format/lint/synthetic slot. No gameplay behavior is claimed verified.
+- Working-set integration correction: the initial1271-file coverage only covered the old manifest, not the four new story inputs. `pack/resources.toml` now includes all four. Private fixture `E:/OOTRemake/work/rounds/r16/time-layered-dump` preserves1275 supplied physical files unchanged, adds only the four pinned native AINBs, and covers all1275 effective inputs with none missing (`extended-fixture-proof.json`). No source/game write.
+- Clean rebase onto cs16a's posted `f93cd4b` completed. On code head `02238bd`, all13 serial real-app/CLI generations passed against the private extended fixture; every run checked game processes and used workers4. Full gates follow at the combined stack top; no gameplay behavior is claimed verified.
+- Real-app default-return regression: first generation refused because the early-mode kit omitted the newly compulsory send-off. Both new feasibility regressions failed with their printed minimums; after carrying only `Met Child Zelda` into both data profiles,2 passed. No optional inventory or guarantee relaxation; native generations subsequently passed. The obsolete exact-minimum copy assertion was removed, not re-pinned.
+- After that repair the real app exposed a separate missing temporary-ROMFS input (`HyruleField_Child_Prefab_0ce5`); adding all four story modules to the manifest fixed this actual staging failure. The existing cache-only native mode oracle exercises both early modes; no wiring-only test was added.
+
+### Generated-output controls
+
+Seed332751819; identical per-row settings and source for A `f93cd4b` versus B `02238bd`. Exact per-file/key digests and route facts: private `stack-f93cd4b-v4/`.
+
+| Door | Free return | Placements equal | Spheres equal | All output bytes equal | B hash |
+|---|---|---|---|---|---|
+| open | off | yes | no | no | `EA34AF469E46` |
+| open | on | yes | no | no | `9B55C96C991F` |
+| song_only | off | yes | yes | no | `15A14C913355` |
+| song_only | on | yes | yes | no | `CF10861E7D6D` |
+| closed | off | yes | yes | yes | `C2D8B0E7E2E4` |
+| closed | on | yes | yes | yes | `9F309CC92795` |
+
+Closed spoilers are also exact. Early-mode effective settings/strings change with the compulsory-story minimum; open spheres and their replay-derived metadata change too. The actual open-mode app/CLI outputs are byte-identical. Corrected open search records send-off, Time Flows and Time Travel together at sphere1, not Time Travel at sphere0 before send-off. These controls do not authorize swapping an arbitrary played seed/save.
 
 ## In-game acceptance
 
@@ -95,3 +112,5 @@ All test overlays enable free return **only for a quick child return**; producti
 The baseline runner's `extra` step was a private send-off consumer audit, **not seed generation**. It failed at `audit_sendoff_readers.py:49` with `BymlError: unsupported BYML value type 0xa1` while decoding an unrelated value. After byte prefiltering target references before parsing, the rerun succeeded (3.8s); all baseline seed generations succeeded. Later broad Door audit prefiltering also required document-endian/word-aligned hash candidates to exclude an unaligned opposite-endian match inside an Effect binary payload. No production format support or accepted settings were weakened.
 
 The fourth acceptance profile initially failed in its private harness: `flow_files(R,FLOW_VERSIONS)` passed the resource-path string instead of the parsed mapping (`AttributeError: 'str' object has no attribute 'get'`). The first three successful profiles were not overwritten or rerun; explicit resume verified them and completed only the remaining native gift overlay/launcher after parsing `Versions`. Final four-profile proof passed. This was not seed generation or an accepted-settings failure.
+
+The first stack-control harness passed a version-labelled `Clawshot-0.2.1:CS1...` string directly to CLI `--settings`, which requires bare `CS1`; rc2 printed the exact parser error and no generation ran. Prefix handling was corrected in the private harness. This is distinct from the subsequent two real-app integration failures recorded above. Every failed output remains private; no unchanged failure was retried.

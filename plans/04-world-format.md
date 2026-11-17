@@ -332,10 +332,11 @@ Both early modes extend escape/moat actor predicates through late Door states wi
 stone-quest completions and source-history guards. `patch.door_story` makes every lower Door write
 forward-only while preserving native rewards, continuations and the first-pull Complete write.
 No stone quest completion, inventory grant, saved history/default or first-adult scene is forged.
-This is prevention for new seeds, not a repair for already-frozen saves; the rc.4 player check is pending.
+This is prevention for new seeds, not a repair for already-frozen saves; the rc.5 player check is pending.
 
-The data-defined return kit's lower-bound inventory and staged families vary with door mode:
-earlier pulls cannot assume optional child Saria/strength/Time-ocarina finds. The independent
+The data-defined return kit's lower-bound inventory and staged families vary with door mode.
+Both early-mode minima retain compulsory `Met Child Zelda`, matching the real send-off gate;
+earlier pulls still cannot assume optional child Saria/strength/Time-ocarina finds. The independent
 first-pull oracle remains mandatory and may refuse combinations with unshuffled child-only
 prerequisites. No automatic free-travel or guarantee override. Native Fairy Ocarina is child-only
 (section 37), so the sourced `age_ocarina.toml` helpers require Ocarina2 for adult song use;
