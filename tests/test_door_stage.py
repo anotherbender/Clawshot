@@ -1,10 +1,12 @@
-"""Early door story stage: Zelda's escape and the moat Ocarina keep working in any quest order.
+"""Early door story stage: Zelda's escape and the moat Ocarina keep working in any quest order; the clock gate.
 
 Both early modes let the first pull write Complete (song_only's opening already writes Step06) before the
 stone-count escape. The behavior tests read the door's public ``build``/``changes`` output, or the native
 module while the build does not supply it yet, and evaluate every consumer input the stage re-sources
 against an independent model of the quest order. Node reads are pinned native layout facts of build
-e0f3ccfa (node table, query list, String input and Bool output tables), not a general AINB parser.
+e0f3ccfa (node table, query list, String input and Bool output tables), not a general AINB parser. Both early
+doors' clock gate (``CLOCK_READY``) is checked against the native clock's two story inputs, the Field owl arrival
+and the send-off.
 """
 
 import hashlib
@@ -39,13 +41,16 @@ STEPS = (
 )
 CHALLENGE = "Work/Challenge/DoorOfTime.game__challenge__Challenge.gyml"
 SENDOFF = "HavePlayedEvent.Dm_HrlField_0020"
+ARRIVED = "HyruleField_ArriveEntrance"  # the Field owl arrival (A): with the send-off (S), the native clock runs
 ESCAPED = "HavePlayedEvent.HyruleField_DoorOfTime_Escape"
 COLLECTED = "HavePlayedEvent.Dm_MelodyGet_Time"
 STONES = ("Step_Get_StoneOfForest", "Step_Get_StoneOfFire", "Step_Get_StoneOfWater")
 ESCAPE_READY = door_story.ESCAPE_READY
 MOAT_READY = "Clawshot.Door.MoatReady"
 MOAT_AREAS_DONE = "Clawshot.Door.MoatAreasDone"
-ADDED = (ESCAPE_READY, MOAT_READY, MOAT_AREAS_DONE)
+CLOCK_READY = "Clawshot.Door.ClockReady"
+SCENE_GATES = (ESCAPE_READY, MOAT_READY, MOAT_AREAS_DONE)
+ADDED = (*SCENE_GATES, CLOCK_READY)
 BOOL_EXP = "HoldGameDataGetBoolExpSimple"
 
 POOL, NODES, NODE_SIZE = 0x24, 0x74, 0x3C  # string pool offset field; 60-byte node headers from 0x74
@@ -122,25 +127,34 @@ def node_query(module: bytes, layout: Layout, node: int) -> tuple[str, dict[str,
 
 @dataclass(frozen=True)
 class Story:
-    """Primitive saved state: the Door of Time step, the three stone quests and three scene histories."""
+    """Primitive saved state: the Door of Time step, the three stone quests, three scene histories and the Field
+    owl arrival."""
 
     step: str
     stones: tuple[bool, bool, bool] = (True, True, True)
     sendoff: bool = True
     escaped: bool = False
     collected: bool = False
+    arrived: bool = True
 
     def state(self) -> dict[str, str | bool]:
         stones = {name: "Complete" if done else "Ready" for name, done in zip(STONES, self.stones, strict=True)}
         histories = {SENDOFF: self.sendoff, ESCAPED: self.escaped, COLLECTED: self.collected}
-        return {"Step_DoorOfTime": self.step, **stones, **histories}
+        return {"Step_DoorOfTime": self.step, **stones, **histories, ARRIVED: self.arrived}
 
 
 def stories():
-    for step, stones, sendoff, escaped, collected in itertools.product(
-        STEPS, itertools.product((False, True), repeat=3), (False, True), (False, True), (False, True)
+    for step, stones, sendoff, escaped, collected, arrived in itertools.product(
+        STEPS, itertools.product((False, True), repeat=3), *((False, True),) * 4
     ):
-        yield Story(step, stones, sendoff, escaped, collected)
+        yield Story(step, stones, sendoff, escaped, collected, arrived)
+
+
+def clock_runs(story: Story) -> bool:
+    """Independent model of the native Field clock's story inputs (build e0f3ccfa, ordinary update): it cycles
+    with the owl arrival and the send-off; the stones, the Door step and later scenes play no part. The first-adult
+    hold and the live Meet_DekuTree override are outside both gates."""
+    return story.arrived and story.sendoff
 
 
 def outcome(escape: bool, moat: bool, gone: bool) -> dict[str, object]:
@@ -354,6 +368,16 @@ def test_every_story_state_matches_the_independent_model(stage):
 
 
 @pytest.mark.dump
+def test_written_clock_gate_needs_the_field_arrival_and_the_sendoff(stage):
+    """Each early mode's written GameData: in every story state, Forest stone complete or not, the owl arrival and
+    the send-off alone decide both doors' gate."""
+    wrong = [
+        story for story in stories() if evaluate(stage.rows, key(CLOCK_READY), story.state()) is not clock_runs(story)
+    ]
+    assert not wrong, f"{stage.mode}: {len(wrong)} wrong states, first {wrong[:3]}"
+
+
+@pytest.mark.dump
 def test_moat_gate_and_kept_area_dependencies(stage, romfs):
     """The air wall and the event AND read the moat gate, the areas their own predicate; every other pinned
     source keeps its native node and output, and each module keeps its length."""
@@ -453,7 +477,7 @@ def synthetic_game_data() -> dict:
     ]
     return {
         "Data": {
-            "Bool": [saved(SENDOFF), saved("Unrelated.Saved", True), saved(ESCAPED), saved(COLLECTED)],
+            "Bool": [saved(SENDOFF), saved("Unrelated.Saved", True), saved(ESCAPED), saved(COLLECTED), saved(ARRIVED)],
             "BoolExp": [after[3], *after[:3], *done],
             "Enum": [enum("Step_DoorOfTime", STEPS), *(enum(name, stone_steps) for name in STONES)],
             "Int": [saved("Unrelated.Int", 3, int)],
@@ -474,7 +498,7 @@ def test_expressions_follow_the_independent_model():
         want = expected(story)
         actual = {name: evaluate(rows, key(name), story.state()) for name in ADDED}
         model = {ESCAPE_READY: want["escape_area"], MOAT_READY: want["moat_ocarina"]}
-        if actual != {**model, MOAT_AREAS_DONE: want["areas_gone"][0]}:
+        if actual != {**model, MOAT_AREAS_DONE: want["areas_gone"][0], CLOCK_READY: clock_runs(story)}:
             wrong.append((story, actual))
     assert not wrong, wrong[:3]
 
@@ -488,12 +512,46 @@ def test_expressions_give_each_named_story_its_scenes(case):
     door_stage.add_expressions(tree)
     rows = indexed(tree)
     story, want = CASES[case]
-    actual = {name: evaluate(rows, key(name), story.state()) for name in ADDED}
+    actual = {name: evaluate(rows, key(name), story.state()) for name in SCENE_GATES}
     scenes = (want["escape_area"], want["moat_ocarina"], want["areas_gone"][0])
-    assert actual == dict(zip(ADDED, scenes, strict=True)), story
+    assert actual == dict(zip(SCENE_GATES, scenes, strict=True)), story
 
 
-def test_expressions_add_only_three_unsaved_rows():
+@pytest.mark.parametrize("arrived,sendoff", itertools.product((False, True), repeat=2))
+def test_clock_gate_truth_table_with_the_forest_stone_incomplete(arrived, sendoff):
+    """Both early doors' gate, the Kokiri Emerald quest not complete: only the owl arrival and the send-off
+    together open it, at every Door step, with or without the other stones and the later scenes."""
+    from clawshot.patch import door_stage
+
+    tree = synthetic_game_data()
+    door_stage.add_expressions(tree)
+    rows = indexed(tree)
+    states = [
+        Story(step, (False, fire, water), sendoff, escaped, collected, arrived)
+        for step, fire, water, escaped, collected in itertools.product(STEPS, *((False, True),) * 4)
+    ]
+    assert {evaluate(rows, key(CLOCK_READY), story.state()) for story in states} == {arrived and sendoff}
+
+
+@pytest.mark.parametrize("initial", [False, True])
+def test_expressions_keep_a_fast_start_field_arrival(initial):
+    """Fast start's initial values compose first: the Kaepora skip's restored owl arrival (true from New Game) is
+    accepted and kept, so after it the gate waits only for the real send-off; the native false waits for both."""
+    from clawshot.patch import door_stage
+
+    tree = synthetic_game_data()
+    _edit("Bool", ARRIVED, "DefaultValue", initial)(tree)
+    before = deepcopy(tree)
+    door_stage.add_expressions(tree)
+    rows = indexed(tree)
+    new_game = {name: rows["Bool"][key(name)]["DefaultValue"] for name in (ARRIVED, SENDOFF)}
+    assert evaluate(rows, key(CLOCK_READY), new_game) is False
+    assert evaluate(rows, key(CLOCK_READY), {**new_game, SENDOFF: True}) is initial
+    del tree["Data"]["BoolExp"][len(before["Data"]["BoolExp"]) :]
+    assert byml.same(tree, before)
+
+
+def test_expressions_add_only_unsaved_rows():
     from clawshot.patch import door_stage
 
     tree = synthetic_game_data()
@@ -535,8 +593,13 @@ STALE_GAME_DATA = {
         [[byml.U64(12), byml.U64(key("Step_DoorOfTime"))], [byml.U64(2), byml.U64(key("Step05"))]],
     ),
     "send-off no longer saved": _edit("Bool", SENDOFF, "SaveFileIndex", byml.I32(-1)),
+    "send-off initial value changed": _edit("Bool", SENDOFF, "DefaultValue", True),
     "escape history default changed": _edit("Bool", ESCAPED, "DefaultValue", True),
     "Door steps reordered": _edit("Enum", "Step_DoorOfTime", "RawValues", [*STEPS[:7], "Step04", "Step03", *STEPS[9:]]),
+    "Field arrival missing": _drop(ARRIVED),
+    "Field arrival no longer saved": _edit("Bool", ARRIVED, "SaveFileIndex", byml.I32(-1)),
+    "Field arrival no longer reset on New Game": _edit("Bool", ARRIVED, "ResetTypeValue", byml.I32(0)),
+    "Field arrival initial value not a Bool": _edit("Bool", ARRIVED, "DefaultValue", byml.I32(1)),
 }
 
 

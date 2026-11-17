@@ -139,7 +139,7 @@ pull prerequisites and adult checks, without assuming optional child errands. Fr
 both logic and native patches; do not copy the search assumption without that patch contract.
 Sources: `plans/04-world-format.md`, Ages; `src/clawshot/world/search.py`;
 `src/clawshot/data/world/remake/sheik.toml`; `plans/playtest/answers.md`, R9-FREE-TRAVEL and
-R10-FIRST-PULL-FIXED. Non-default Door of Time modes passed first in-game checks; returning to child afterwards is untested. See [settings](settings.md).
+R10-FIRST-PULL-FIXED. Open-mode early return and preserved escape/moat rewards passed on rc.7; the new clock-state fixes remain unplayed. See [settings](settings.md).
 
 **No save warp (Round 16).** The remake autosaves room changes; an older manual save is not a logic escape.
 The Slingshot Room's entry now requires its existing usable Slingshot/Boomerang/Bow exit condition as well
@@ -167,20 +167,23 @@ Sources: `src/clawshot/data/world/remake/gifts.toml`; D39 in `plans/decisions.md
 
 The persistent `Met Child Zelda` event models the **whole courtyard/Impa lesson and accepted
 send-off through DoorOfTime Step02**, not first courtyard contact. Both moat rewards, Saria's
-song source and the **closed** Door of Time require it; shuffled items do not advance native
-quests. Its route is Malon's fixed Egg / Chicken, Talon, the courtyard and Impa. `Time Flows`
-derives from it. Song-only/open doors bypass it, but the moat and Saria do not. The Market
-Bombchu Shop entrance also requires Dodongo's completion, matching its eight already-gated
-shelves, as well as available night. Sources: `remake/child_hyrule_castle.toml`,
+song source and **every** Door mode require it; shuffled items do not advance native quests.
+Its route is Malon's fixed Egg / Chicken, Talon, the courtyard and Impa. `Field Owl Arrival`
+models the saved arrival effect, not literal owl history: native owl play or the real send-off's
+missing-arrival restoration supplies it. `Time Flows` and both early Door rules require both events.
+The temporary first-adult clock hold is clearable at the native adult Market exit or a genuine
+Temple return to child; it is not a persistent search prerequisite. The Market Bombchu Shop also
+requires Dodongo's completion and available night. Sources: `remake/child_hyrule_castle.toml`,
 `remake/child_hyrule_field.toml`, `remake/child_sacred_forest_meadow.toml`,
 `remake/child_market.toml`, `remake/child_temple_of_time.toml`;
-[native trace](../plans/03-game-data.md#46-round-14-child-story-and-field-music).
+[native trace](../plans/03-game-data.md#46-round-14-child-story-and-field-music) and
+[clock audit](../plans/rounds/r16-time.md#rc7-played-results-and-clock-follow-up-2026-11-17).
 Kareem verified Saria before Darunia and the Step03 escape/reload controls on Longshot on
 2026-11-13; Bombchu Shop's entrance correction remains native-data evidence.
 
 The independent adult-return proof retains compulsory child story events using the same
-count-cap test as items; optional history is excluded. The closed-door construction bound
-includes `Met Child Zelda`, while early-door bounds do not assume that optional visit.
+count-cap test as items; optional history is excluded. Both early-door construction bounds include
+`Met Child Zelda` and `Field Owl Arrival`; the closed kit retains its native inventory/story minimum.
 
 The fill uses seeded assumed fill, placement restrictions and safe swaps, then an independent
 collection search on the completed placement. Item pool preparation uses actual remake identities,

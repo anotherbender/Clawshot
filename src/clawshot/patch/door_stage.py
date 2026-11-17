@@ -1,4 +1,4 @@
-"""Early Door of Time story stage: Zelda's escape and the moat Ocarina play in any quest order.
+"""Early Door of Time story stage: Zelda's escape and the moat Ocarina play in any quest order; the clock gate.
 
 Both early door modes let the first pull write ``Complete`` (song_only's opening already writes ``Step06``)
 before the native counted-stone escape. Four native Hyrule Field modules key the escape and the moat on the exact
@@ -17,6 +17,13 @@ default or save layout changes:
   output deletes the four moat sensor areas: uncollected, they stay through Step06/Complete, even before the
   escape, while the air wall and the event wait for ``MOAT_READY``.
 
+A fourth unsaved row, ``CLOCK_READY``, is both early doors' gate: the Field owl arrival ``ARRIVED`` (A) and the
+send-off (S), the two saved inputs the native Field clock needs to cycle (the separate first-adult hold aside).
+song_only's altar flow and reaction read it (``door``). Open mode's Temple door module, Market_Common_f252, gets
+the same substitution on node8 (its Step06 comparator); all three inputs of node5, the OR behind the door's isOpen
+and IsSkipAnim, then read it instead of the scene proxy (node4) and Step06. A fast-start initial value of A (the
+Kaepora skip composes first) is kept; every other field of the rows read stays exact.
+
 Native facts, build e0f3ccfa, independently decoded (whole-file SHA-256 pins). The string pool's offset is the
 u32 at 0x24. A node header's Name field is a pool-relative class name followed by its murmur3. A String input
 record holds its name, source and flags (node -1: its default), and its default; a Bool output word holds its
@@ -27,7 +34,9 @@ String input and Bool output point at them and both counts drop to one; the now-
 32f7 node5's own class slot (28 bytes) is too short, so it shares node4's rewritten class, parameter and output
 names and takes ``MOAT_READY`` in its old default slot (30 bytes). No other reference points into any
 rewritten slot. Source records, node13's generic plug and its query list entry move from node4's IsEqual to
-node5. Not a general AINB writer.
+node5. In f252, node5's proxy and IsEqual sources, its generic plug and its first query list entry move to node8's
+Bool (its IsAfter source already reads output 0); node6, the unused Bool reader, stays native. Not a general AINB
+writer.
 """
 
 import hashlib
@@ -43,8 +52,10 @@ from clawshot.save import key
 
 MOAT_READY = "Clawshot.Door.MoatReady"  # unsaved BoolExp: the moat Ocarina, its air wall and event may play
 MOAT_AREAS_DONE = "Clawshot.Door.MoatAreasDone"  # unsaved BoolExp: the moat sensor areas may go
+CLOCK_READY = "Clawshot.Door.ClockReady"  # unsaved BoolExp: the Field clock may run; both early Door gates
 ESCAPED = "HavePlayedEvent.HyruleField_DoorOfTime_Escape"
 COLLECTED = "HavePlayedEvent.Dm_MelodyGet_Time"
+ARRIVED = "HyruleField_ArriveEntrance"  # saved: the Field owl arrival (A), the native clock's other input
 
 _SENDOFF = "HavePlayedEvent.Dm_HrlField_0020"
 _AFTER = {step: f"DoorOfTime_IsAfter_{step}_Exp" for step in ("Step2_2", "Step03", "Step04")}  # strictly past
@@ -95,15 +106,16 @@ def _history(name: str) -> tuple[str, dict]:
     }
 
 
-# Every native row the three expressions read, exactly as the game has it.
+# Every native row the four expressions read, exactly as the game has it.
 _SOURCES = {
     **{name: _native_expression(name, ((12, _STEP), (2, step))) for step, name in _AFTER.items()},
     **{
         name: _native_expression(name, ((1, f"Step_Get_StoneOf{stone}"), (2, "Complete")))
         for stone, name in _STONES.items()
     },
-    **{name: _history(name) for name in (_SENDOFF, ESCAPED, COLLECTED)},
+    **{name: _history(name) for name in (_SENDOFF, ESCAPED, COLLECTED, ARRIVED)},
 }
+_INITIAL = (ARRIVED,)  # a fast-start initial value may set (the Kaepora skip restores the skipped owl's A)
 _PREPARED = (*((_EXPRESSION, stone, False) for stone in _STONES.values()), (_BOOL, _SENDOFF, False))
 # (opcode, name, negated) reads, ANDed left to right.
 _EXPRESSIONS = {
@@ -115,6 +127,7 @@ _EXPRESSIONS = {
         (_BOOL, COLLECTED, True),
     ),
     MOAT_AREAS_DONE: ((_EXPRESSION, _AFTER["Step04"], False), (_BOOL, COLLECTED, False)),
+    CLOCK_READY: ((_BOOL, ARRIVED, False), (_BOOL, _SENDOFF, False)),
 }
 
 
@@ -130,14 +143,17 @@ def _postfix(reads: tuple[tuple[int, str, bool], ...]) -> list[list[byml.U64]]:
 
 
 def add_expressions(tree: dict) -> None:
-    """Append the stage's three unsaved BoolExp rows to a loaded GameDataList root.
+    """Append the stage's four unsaved BoolExp rows to a loaded GameDataList root.
 
     Checks every native row they read (and the DoorOfTime step order) first; refuses a second application or
-    a hash already taken. No other row, default or the save layout metadata changes.
+    a hash already taken. No other row, default or the save layout metadata changes. A fast-start initial value
+    already in the tree (``_INITIAL``) is kept, as long as it is a Bool and the row's other fields are native.
     """
     data = tree["Data"]
     for name, (kind, expected) in _SOURCES.items():
         found = [row for row in data[kind] if row.get("Hash") == expected["Hash"]]
+        if name in _INITIAL and len(found) == 1 and type(found[0].get("DefaultValue")) is bool:
+            expected = {**expected, "DefaultValue": found[0]["DefaultValue"]}
         if len(found) != 1 or not byml.same(found[0], expected):
             raise PatchError(f"Door of Time stage: changed native {kind} {name}: {found!r}")
     steps = [row for row in data["Enum"] if row.get("Hash") == key(_STEP)]
@@ -256,6 +272,19 @@ _MODULES = (
     ),
 )
 
+# Open mode's Temple door: node5 (OperateORFixInputTrue) ORs the scene proxy's EventBool (node4) with node8's
+# Step06 IsAfter and IsEqual into the door's isOpen and IsSkipAnim. Node8's class and ChallengeName default slots
+# have no other reference (every string reference in the module is a 4-aligned u32). Native entries kept as they
+# are (node5's second source, two query list entries) are checked too.
+_GATE = _Module(
+    "Logic/Market_Common_f252.logic.module.ainb",
+    "5b4152c4e56bf51b7f2400fbdd6a39e4b506f3104cee49a24f6f49e72eb4d6a4",
+    (_comparator(CLOCK_READY, 8, 0x25C, 0x17E8, "Step06", 0x177C, (0xAF8, 0xAE0), after_connected=True),),
+    sources=((0x1898, (4, 1), (8, 0)), (0x18A0, (8, 0), (8, 0)), (0x18A8, (8, 2), (8, 0))),  # node5's three inputs
+    plugs=((0x938, 4, 8),),  # node5's generic plug
+    queries=((0x18FC, 4, 8), (0x1900, 8, 8), (0x1904, 8, 8)),  # node5's query list
+)
+
 
 def _text(data: bytes, offset: int) -> str:
     end = data.find(b"\0", offset)
@@ -332,11 +361,12 @@ def _stage(module: _Module, data: bytes) -> bytes:
     return bytes(content)
 
 
-def build(romfs: str | Path) -> list[BuiltFile]:
-    """The four story modules for both early door modes: same length, within their native allocations."""
+def build(romfs: str | Path, *, gate: bool = False) -> list[BuiltFile]:
+    """The four story modules for both early door modes and, with ``gate`` (open mode), the Temple door module:
+    same length, within their native allocations."""
     romfs = Path(romfs)
     staged = []
-    for module in _MODULES:
+    for module in (*_MODULES, _GATE) if gate else _MODULES:
         data = (romfs / module.path).read_bytes()
         staged.append((module.path, len(data), _stage(module, data)))
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)

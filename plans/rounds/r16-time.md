@@ -143,3 +143,145 @@ The test-only fix records actual completed-transition history, reads native Fire
 
 Targeted real-dump closure **passes:97 tests**, all three consumer modules, with matching narrow format/lint checks. The unchanged harness file hashes are recorded in that proof and checked again for final-head verification; no v3 overlay rebuild is needed because production source is still the frozen `81bf50f`.
 
+## rc.7 played results and clock follow-up (2026-11-17)
+
+Kareem's observations, relayed by Claude, supersede the earlier pending-acceptance wording above. Longshot is
+`v3.0.0-rc.7`; its current launcher executable is under `builds/rc/bin`. This agent did not launch the game.
+
+| Played control | Accepted result | Remaining failure |
+|---|---|---|
+| `time-gate-open-v3` | **Gate PASS:** shut before Zelda; Zelda's Letter, Impa's Lullaby and the Field send-off played; Door open afterward. | **Clock FAIL:** no ordinary Field progression; Sun's Song changes appearance then snaps back. Captured state has A false despite real send-off. |
+| `time-order-open-v3` | **Order repair PASS:** Door open; first-pull scenes played; Barinade completed; Zelda's escape still played after the early pull; moat granted both Ocarina of Time and Song of Time; return to adult worked. | **Clock FAIL under B's hold:** night after the drawbridge scene and Sun's Song still snaps back. Claude's corrected snapshot read has A/S true and ENV false throughout; B becomes true after first pull. The earlier A-false attribution was wrong. |
+
+The new order evidence is preserved in private backups matching
+`work/save-backups/2026-11-17_*-r16-time-order-open-v3-*`; the earlier gate evidence uses the corresponding
+`time-gate-open-v3` families. These are player observations, not replacement automated oracles.
+**Kareem's product note:** “a lot of cutscenes, they need to go.” Deferred to a later cutscene-skip track;
+no additional scene suppression is authorized in this round.
+
+### Full predicate and limits of the night diagnosis
+
+The earlier send-off-only explanation is withdrawn. A is saved Bool `HyruleField_ArriveEntrance`
+(`0x804aec99`), S is `HavePlayedEvent.Dm_HrlField_0020`, and B is
+`HrlField_HasEnteredFirstTime_Adult`. Outside normal pause/explicit-time overrides, native stop helper
+`0x345c020` stops when `!R && (!A || B)`; unrestricted story cycling needs `R || (A && S && !B)`.
+R is the special live `Meet_DekuTree == Ready` override, not Forest-stone completion.
+In the ordinary, non-override update branch, missing A selects 21600 seconds (06:00); A present with B selects
+72000 (20:00). Without S, otherwise-running time clamps at 54000 (15:00). Native update also has explicit-world/
+timeline branches before the fixed-time selector: world flags bits24/25 feed clock offset0x58, distinct from
+ordinary base time at0x28. The original synthetic replay covered the ordinary branch, not all live overrides.
+
+The captured gate save is child, A false, B false, S true, `Meet_DekuTree=Complete`, Castle Complete and Door
+Step02: stopped clock follows directly, but **20:00/B does not follow from those saved inputs**.
+Night appearance alone cannot identify the live clock value or prove B true. Kareem's reported night/snap-back
+remains ground truth; a differing live override/environment is not established merely by the save.
+The immutable pre-courtyard source already has A false, `_0000`/`_0010` true, `_0005` false and
+`HyruleField_ChangeENV=true`; the played gate copy retains that environment flag. Its current Kaepora setting
+being off does not undo inherited progress. The history pattern resembles the old partial skip, but its provenance
+is **[INFERENCE]** about that particular historical save, not a claim that Kareem selected that skip for this test.
+Claude subsequently confirmed all four of Kareem's own seeds use the Kaepora skip. The authentic Jabu source has
+A true; Claude's corrected read of played order snapshots1–28 agrees: **A=true, S=true, ENV=false throughout**,
+**B=false at1, B=true from5 onward**. That20:00/snap-back is exactly the B hold, not A.
+Private immutable-source proof: `clock-control-source-state.json`; played snapshot facts are Claude's report.
+
+The native escape flow's sole time setter is `DoorOfTime` Event34,
+`EventWorldManagerController.EventTrigger_SetTime(TimeHour=12, TimeMin=0)`: **noon, not night**.
+An ordinary stopped update with A/S true and B true then selects20:00, so the scene's appearance afterward does
+not imply an arbitrary-time A hold. The original issue's stuck-night association with an escape remains
+**[INFERENCE]** without its saved B/override state. This corrects the interim night-from-A hypothesis.
+
+The native B clearer is `Dm_SY_BancChangeArrive` entry `Dm_SY_BancChangeArrive_HyruleField_02`:
+Event257 queries B; true goes to Event434 (`B=false`), then Event550 fade-out, Event555 two updates,
+Event552 fade-in and Event99's camera subflow. Its EventSetting uses the same entry and NoPauseEvent.
+Its sole requesting actor is the normal **adult Market→Field exit**:
+`Banc/Market/Market_Adult_Static.bcett.byml`, hash8090100398624302801,
+`Common_FieldDungeonEntranceSet_bad1`. Player contact requests the arrival with no quest-step guard.
+The child exit, a warp and immediate Temple return bypass it. The old v3 checklist permitted that bypass;
+it did not require this native clearer. B remains natively clearable by walking this adult exit.
+
+**0.2.2 known-fix item:** Kaepora fast start omits `HyruleField_ArriveEntrance=true`, a native effect of the
+skipped first Field owl. Users selecting that skip, **including closed Door mode**, can retain the native
+missing-A clock stop after Zelda/Impa's real send-off. Restore that skip effect; do not advertise repair of
+existing saved progress. Claude confirmed the affected skip is selected in all four of Kareem's own seeds.
+
+### Completed safety audit and approved implementation
+
+The initial no-edits safety hold was resolved before production edits. Fresh data/BoolExp closure and all
+three native executable segments found B's only data reader at its arrival-clear query. Its native readers
+are the clock stop, fixed-time selector and `Game.WorldMgr` inspection getter: **no check, spawn or story-step
+reader was found**. Preserve the native0055 set and adult Market exit. Claude approved one additional,
+conditional clear only after the Temple's adult→child flow sets `Sequence_IsChildhood=true`; timer-blocked
+returns and adult warps remain native. No load-time/global clear or product save-repair pass.
+
+A is **not clock-only**: in addition to the clock/inspection readers, native code packs it into a saved-Bool
+condition snapshot. No data reader or additional writer was found. Restoring A after the real send-off
+reproduces native post-owl state for every known consumer; it does not pretend other scenes were played.
+Fresh requester/flow tracing corrected the first route audit: the normal Field→Market arrival can advance
+Castle to `Step02_01` without the owl, deleting its sensor. Thus a Door-only A lock would strand a natural
+route. The real send-off must restore missing A in **every** mode, without other history writes.
+
+Approved scope (Claude, before coding): one unsaved A AND S expression for both early gates; matching
+`Field Owl Arrival` logic and early return minima; independent Kaepora RED/fix; missing-A restoration at
+the real send-off; B clear only in `Market_Adult_Field_AdultToChild`; retain the order repair. Closed's item
+gate, first-adult scenes and ordinary adult Market clearer stay native. ClockTransitions/ClockGate/ClockLogic
+implemented those slices; integration, staging and the frozen gate remain this agent's responsibility.
+
+Plan/estimate posted before implementation: implementation/staging60–90 minutes, frozen synthetic10–15,
+full dump90–110 based on prior measured runs. Recheck inherited `CLAWSHOT_WORKERS` and game/stream processes
+at **each stage start**, reducing to one worker during play/streaming. Stage natural-owl and explicit-Kaepora
+new games, adult Market walk-out and immediate child return; then freeze and run one complete synthetic
+plus complete dump gate. Game boot/play evidence remains Kareem's/Claude's; this agent never starts the game.
+
+### Adult-before-Talon trade-cell answer
+
+cs16b's report-only audit found **no offered-setting route remaining** under the approved gates. Both early
+modes need the real send-off; closed still needs native Door quest progress. The courtyard requires Castle
+Step04, whose only native writer is the Talon wake movie. Free time travel only relaxes adult return;
+Forest openness/skips and a child Prelude landing do not bypass that first-pull story gate.
+
+The trade cell itself is unchanged: adult trade variants still hide the Cucco, so Letter-before-adult-trade
+guidance remains. D31/R13 keep trade rewards out of the pool. The two apparent hold gaps,
+`LW Trade Cojiro` and `ZD Trade Prescription`, are `gift_rules.toml` class `more`, excluded by
+`gifts.seed_checks`; they do not introduce pooled variants. Actual CLI
+`--logic adult_trade_shuffle=true --print-settings` refused with exit2 (unsupported native patch).
+No trade-policy edit was made. Releasing trade items or adding an earlier first-pull route requires reopening
+this audit; old/debug/cross-seed saves are outside the offered-settings claim.
+
+### v4 staging and closed-output evidence
+
+Standalone Kaepora RED at942a903: `test_kaepora_skip_lets_the_clock_run_after_the_real_sendoff`
+gave **1 failed, 1 passed** before the TOML fix; the selected skip remained at06:00 after the real-send-off
+history while the native-owl control ran. Full printed inputs and the unmodified TOML hash are in
+`work/r16-time/kaepora-arrival-red/`. The independent regression deliberately does not use the new
+send-off fallback, so that fallback cannot hide another skip omission.
+
+Two actual app generations (seed332751819, closed + Kaepora, free travel off/on) passed in78.02/78.59s.
+Against their preserved942a903 controls, **settings, placements, spheres and raw spoiler.json are unchanged**.
+Both add `romfs/Event/EventFlow/Market_Adult_Field_AdultToChild.bfevfl.zs`; both change exactly:
+
+- `romfs/Event/EventFlow/DoorOfTime.bfevfl.zs`
+- `romfs/GameData/GameDataList.Product.110.byml.zs`
+- `romfs/System/Resource/ResourceSizeTable.Product.111.Nin_Ounce_NVN2.rsizetable.zs`
+
+No files are removed. The GameData delta was decoded from those existing outputs only, with **no extra
+generation or test run** (Claude's request): the sole value change in the complete typed tree is
+`Data/Bool[Hash=0x804aec99]` (`HyruleField_ArriveEntrance`), `DefaultValue=false→true`.
+Hash2152393881, reset8, save index0 and every other key/row/header stay identical, including S/B.
+Decompressed sizes stay1,463,136B without free travel and1,463,228B with it. Both profiles select Kaepora;
+the all-mode runtime flow repairs use existing A/B keys, and the new unsaved ClockReady row is early-mode
+only. No extra skip-off generation was run. Evidence: `work/r16-time/closed-gamedata-entry-diff.json`
+and `clock-v4-closed-output/candidate-proof.json`.
+
+Four isolated v4 overlays/profiles passed launcher dry runs; no game was started. Their private checklist,
+`work/r16-time/ingame/TIME-CHECKLIST-V4.md`, has exactly four short parts, estimated35–55min in game
+(not measured). The historical corridor genuinely starts A/S/B=false; the historical pre-third-stone
+Jabu save genuinely starts A/S=true, B=false. **No A/B/S, age, quest or scene-history save edit is needed
+or performed.** Only the disclosed inventory/D-pad words change on private copies, verified against
+the full original save trees and source hashes. Fresh profiles contain no savedata.
+
+The old installed `builds/v3.0.0-rc.4/bin/longshot.exe` path was removed; the first staging attempt stopped
+before writes and printed that path. After correcting only the pin to the discovered
+`builds/rc/bin/longshot.exe`, staging completed in60.45s. Native0055/adult-arrival writer files are not
+shipped. All stages checked inherited workers and process pressure; OBS was active, so the app/staging
+runs used one worker. The only pre-freeze formatter pass left all11 owned Python files unchanged.
+Boot, runtime `mods:` load lines, live clock progression and actual save persistence remain **unplayed**.

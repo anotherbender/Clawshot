@@ -161,6 +161,7 @@ def test_native_source_boundaries_and_natural_order(produced, flow, entry, targe
     assert result["writes"] == ([(step, target)] if STEPS.index(step) <= index else [])
     if flow == "DoorOfTime":
         assert after["HavePlayedEvent.Dm_HrlField_0020"] is True
+        assert after["HyruleField_ArriveEntrance"] is True  # the real send-off repairs a missed owl
         # The real send-off recounts before the Fire guard. An already-won Fire stone must still count.
         assert after["Step_DoorOfTime"] == ("Step2_1" if step == "Complete" else "Step02")
         assert after["DoorOfTime_GetStoneCount"] == (1 if step == "Complete" else 2)
@@ -174,6 +175,8 @@ def test_native_source_boundaries_and_natural_order(produced, flow, entry, targe
             extra=(evfl.read(native[DOOR_FLOW]),),
             entries=((flow, entry),),
         )
+        if flow == "DoorOfTime":
+            expected["HyruleField_ArriveEntrance"] = True
         assert after == expected
         assert (result["rewards"], result["writes"], result["notices"]) == (
             old["rewards"],

@@ -91,10 +91,11 @@ age_return_bypass_families = ["Progressive Strength Upgrade"]
 # Safe lower bound: closed Door requires Ocarina 2 + Time + the completed courtyard/Impa story.
 # Native child Bracelet requires Saria but adds no adult copy tier; the kit places the first adult copy itself.
 age_return_fill_inventory = { "Ocarina" = 2, "Song of Time" = 1, "Sarias Song" = 1, "Goron Bracelet" = 1, "Met Child Zelda" = 1 }
-# Both early modes retain the compulsory Impa send-off (round16, native clock flag; see child_temple_of_time).
+# Both early modes retain the compulsory native clock unlock (round16; see child_temple_of_time): Impa's send-off
+# and the Hyrule Field arrival. Closed's Door does not read the arrival, so its kit above is unchanged.
 # They cannot assume optional child strength/Saria/Time-ocarina pickups in that kit.
 # The proof remains independent; unshuffled child-only prerequisites can make early return impossible.
-age_return_door_inventory = { song_only = { "Ocarina" = 1, "Song of Time" = 1, "Met Child Zelda" = 1 }, open = { "Met Child Zelda" = 1 } }
+age_return_door_inventory = { song_only = { "Ocarina" = 1, "Song of Time" = 1, "Met Child Zelda" = 1, "Field Owl Arrival" = 1 }, open = { "Met Child Zelda" = 1, "Field Owl Arrival" = 1 } }
 age_return_door_families = { song_only = ["Bow", "Progressive Hookshot", "Progressive Strength Upgrade", "Small Key (Forest Temple)", "Boss Key (Forest Temple)", "Sarias Song", "Ocarina"], open = ["Bow", "Progressive Hookshot", "Progressive Strength Upgrade", "Small Key (Forest Temple)", "Boss Key (Forest Temple)", "Sarias Song", "Ocarina"] }
 
 # Native-slot tier policy (r13, Kareem/Claude 2026-11-12): conservatively retain the adult Silver -> Golden

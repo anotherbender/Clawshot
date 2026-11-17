@@ -9,11 +9,12 @@
 #   placement data (Market_Child_Static, read by E:/OOTRemake/work/r4-logic-child/actors.py).
 
 # D35: closed by default. Kareem, 2026-11-16 (round16), then Claude's explicit
-# both-early-modes confirmation: both wait for the real Impa field send-off, which
-# unlocks the native clock. Song-only retains its song/either-ocarina requirement;
-# open needs no songs/stones. Adult return is separate.
+# both-early-modes confirmation: both wait for the native clock unlock, the real Impa
+# field send-off plus the Hyrule Field arrival ('Field Owl Arrival'). Song-only retains
+# its song/either-ocarina requirement; open needs no songs/stones. Closed keeps its
+# native item gate. Adult return is separate.
 
 [exits."Temple of Time"."Beyond Door of Time"]
-rule = "(door_of_time == 'open' and 'Met Child Zelda') or (can_play(Song_of_Time) and ((door_of_time == 'song_only' and 'Met Child Zelda') or (has_all_stones and (Ocarina, 2) and 'Met Child Zelda')))"
+rule = "(door_of_time == 'open' and 'Met Child Zelda' and 'Field Owl Arrival') or (can_play(Song_of_Time) and ((door_of_time == 'song_only' and 'Met Child Zelda' and 'Field Owl Arrival') or (door_of_time == 'closed' and has_all_stones and (Ocarina, 2) and 'Met Child Zelda')))"
 was = "can_open_door_of_time"
-source = "Kareem, 2026-11-16, round16 (r16-time.md), plus Claude's explicit both-early-modes confirmation: open and song_only wait for HavePlayedEvent.Dm_HrlField_0020, Impa's field send-off represented by Met Child Zelda; native clock advancement reads that history. Open needs no songs/stones; song_only needs learned Time song and either child ocarina, no stones. Closed retains sections41/46's courtyard/Impa, stones, Time ocarina/song requirements. Native escape and moat checks remain available after an early pull via guarded late-step predicates and forward-only quest writes. Forest return and Prelude remain separate."
+source = "Kareem, 2026-11-16, round16 (r16-time.md), plus Claude's explicit both-early-modes confirmation: open and song_only stay shut until the unsaved Clawshot.Door.ClockReady = HyruleField_ArriveEntrance ('Field Owl Arrival') AND HavePlayedEvent.Dm_HrlField_0020 (Impa's send-off, 'Met Child Zelda'), the exact native clock predicate (work/r16-time/clock-full-predicate-findings.md). Open needs no songs/stones; song_only needs learned Time song and either child ocarina, no stones. Closed keeps sections41/46's courtyard/Impa, stones, Time ocarina/song requirements; its branch is closed-only because every early-mode opening reads ClockReady. Native escape and moat checks remain available after an early pull via guarded late-step predicates and forward-only quest writes. Forest return and Prelude remain separate."

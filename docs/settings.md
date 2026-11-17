@@ -288,8 +288,8 @@ credit is a separate bug, not a failure of this map-access correction.
 | Option | Requirement / effect |
 |---|---|
 | `--door-of-time closed` | Default, native: meet Zelda and Impa at the child castle, complete the three Spiritual Stones, then obtain the Ocarina of Time and playable Song of Time. |
-| `--door-of-time song_only` | Meet Zelda and finish Impa's field send-off, then either child ocarina and the learned Song of Time. No stones needed to open the Door. |
-| `--door-of-time open` | The Door stays shut until Zelda/Impa's field send-off, then opens without songs or stones; the first-pull pedestal has no extra item gate. |
+| `--door-of-time song_only` | Field-arrival clock state and Impa's real field send-off, then either child ocarina and the learned Song of Time. No stones needed to open the Door. |
+| `--door-of-time open` | The Door waits for Field-arrival clock state and Impa's real field send-off, then opens without songs or stones; the first-pull pedestal has no extra item gate. |
 | `--logic free_time_travel=true` | Experimental, default off: adult return before Forest completion. The app's **Free time travel (experimental)** switch is the same override. |
 
 Door mode and reverse travel are independent. The default return guarantee proves an adult can
@@ -302,12 +302,16 @@ native repair follows the Fire/Water counter and adds no Forest condition. All D
 counter until the real Impa send-off, recount there, and ignore calls after escape. This also covers
 closed mode when shuffled songs allow stones before Zelda. The native courtyard Step01 reset remains;
 early-mode post-pull callbacks do not roll the completed Door quest back.
-These new gates/order repairs are built, **not yet checked in game**; earlier Door/first-pull checks
-(R10-DOOR-SONG/OPEN) do not certify them.
+Kareem passed the open-mode send-off gate and the early-pull escape/moat order repair on Longshot rc.7.
+The additional clock-state fixes below await their four in-game controls.
 
-**Prevents new clock freezes; does not repair already-frozen saves.** Both early modes now require the
-real send-off because the remake's clock reads its event history. Rebuilding an old early-Door seed can
-change placements, spheres and output; do not replace a played seed or use a new output to repair its save.
+**For new seeds; no save-repair pass.** Both early modes read the
+arrival flag and the real send-off history. Kaepora fast start now preserves the skipped owl's
+arrival effect; the actual send-off restores it if a different route missed the owl.
+Returning to child through the Temple clears the pending first-adult clock hold without changing
+the native first-adult scenes or the adult Market exit.
+An adult who warps out before walking Market → Hyrule Field keeps the native first-night hold; walk that exit or return to child through the Temple to clear it.
+Rebuilding an old seed can change output; do not replace a played seed or assume save compatibility.
 
 **The three stones alone do not trigger Zelda's escape.** Visit the child castle courtyard and
 finish Impa's send-off too: Malon's fixed Weird Egg / Chicken wakes Talon to reach that route.
@@ -324,7 +328,8 @@ remain at child gifts. Validation names the fixed checks and offers a closed doo
 shuffle. This is a construction limitation, not proof that no physical route exists;
 in particular, the logic for the unshuffled Time-song gift already requires all three stones.
 Free time travel replaces that return proof, so with it on all three door modes are accepted
-with Chest only; returning to child after an early door has not been checked in game.
+with Chest only. Early open-mode return and the preserved moat rewards passed on rc.7; the new
+immediate-child-return clock fix remains unplayed.
 
 An open-bridge, early-door seed can validly require adult Link before Gohma. Its play note
 explains when no child-only opening guide exists instead of rejecting the beatable seed.

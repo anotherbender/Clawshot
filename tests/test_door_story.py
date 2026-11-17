@@ -58,6 +58,9 @@ BRIDGE = "IsHyruleFieldBridgeClose"
 OPENED = "Market_Child_TimeTempleDoor_Opened"
 OPENING = "HavePlayedEvent.Dm_TimeTemple_0010"
 TIME_SONG = "IsGet.Item_Melody_TimeSong"
+ARRIVED = "HyruleField_ArriveEntrance"  # the Field owl arrival the native clock reads; natural routes met the owl
+ARRIVE = {"GameDataName": ARRIVED, "Index": -1, "Value": True}  # the send-off's fallback write when it is unset
+CLOCK_READY = "Clawshot.Door.ClockReady"  # the early door stage's unsaved BoolExp: the arrival and the send-off
 START = {
     "Step_Get_StoneOfForest": "Complete",
     "Step_Get_StoneOfFire": "Ready",
@@ -68,6 +71,7 @@ START = {
     OPENED: False,
     OPENING: False,
     TIME_SONG: True,
+    ARRIVED: True,
 }
 STONES = (("Ready", "Ready"), ("Complete", "Ready"), ("Ready", "Complete"), ("Complete", "Complete"))  # Fire, Water
 # Every lower DoorOfTime writer the early modes guard: (flow, writer, step written, native next or None).
@@ -308,7 +312,8 @@ def run(fc, start, state, *, orders=ORDERS, forward=(), order=False, scenes=Fals
 
     A reference engine models the story's promises on a flow without them: it never moves the ``forward`` quests
     back; with ``order`` the stone count entry runs only after the send-off and before the escape, and the
-    send-off's Step02 (native Event7) is followed by that count before its native continuation."""
+    send-off's Step02 (native Event7) is followed by the Field arrival when it is still unset, then by that count,
+    before its native continuation."""
     effects = []
     budget = [2000]
 
@@ -321,6 +326,8 @@ def run(fc, start, state, *, orders=ORDERS, forward=(), order=False, scenes=Fals
         if query == READ_BOOL:
             return state[params["GameDataName"]]
         assert query == BOOL_EXP, (query, params)
+        if params["GameDataName"] == CLOCK_READY:
+            return state[ARRIVED] and state[SENDOFF]
         expression = params["GameDataName"]
         quest, after, step = expression.removesuffix("_Exp").partition("_IsAfter_")
         if after:
@@ -372,6 +379,9 @@ def run(fc, start, state, *, orders=ORDERS, forward=(), order=False, scenes=Fals
                         state[f"HavePlayedEvent.{params['EventName']}"] = True
                     effects.append((actor.name, action, params))
                 if order and (fc.name, event.name) == ("DoorOfTime", "Event7"):
+                    if not state[ARRIVED]:
+                        state[ARRIVED] = True
+                        effects.append(("GameDataActor", SET_BOOL, ARRIVE))
                     effects.append(RECOUNT)
                     count()
                 at = event.next
@@ -472,9 +482,9 @@ def escape_ready(state, mode):
 
 def door_opens(flows, state, mode, orders=ORDERS):
     """Whether the Door of Time opens now, the Time song learned: the shipped altar flow decides in closed and
-    song_only; open's physical door module reads the send-off history (door.build rebinds it)."""
+    song_only; open's physical door module reads the stage's clock readiness, the Field arrival and the send-off."""
     if mode == "open":
-        return state[door.SENDOFF]
+        return state[ARRIVED] and state[door.SENDOFF]
     effects, _ = outcome(flows[DOOR], "DoorOfTime_OpenDoor", state, orders=orders)
     return "Dm_TimeTemple_0010" in scenes_of(effects)
 
@@ -483,7 +493,8 @@ def expected_story(old, path, early=True):
     """``old`` with exactly the contracted edits. Early modes: each lower writer becomes a strict IsAfter query at
     its own index and its write moves to the end, native next kept. The door flow in every mode: the counter
     entry first asks for the played send-off, then for an unplayed escape, before native Event38 (a missing case
-    ends it); the send-off's Step02 continues through its own registered count, then native Event62."""
+    ends it); the send-off's Step02 asks for the Field arrival, sets it only when unset, then continues through
+    its own registered count to native Event62."""
     fc = deepcopy(old)
     actor = next(i for i, candidate in enumerate(fc.actors) if candidate.name == "GameDataActor")
     queries = fc.actors[actor].queries
@@ -497,7 +508,7 @@ def expected_story(old, path, early=True):
         expression = {"GameDataName": f"DoorOfTime_IsAfter_{step}_Exp"}
         fc.events[at] = evfl.SwitchEvent(name, actor, queries.index(BOOL_EXP), cases, expression)
     if path == DOOR:
-        sendoff, escape, recount = range(len(fc.events), len(fc.events) + 3)
+        sendoff, escape, recount, arrival, arrived = range(len(fc.events), len(fc.events) + 5)
         counter = fc.entry_point(COUNT)
         played = queries.index(HAVE_PLAYED)
         fc.events += [
@@ -506,14 +517,22 @@ def expected_story(old, path, early=True):
                 "ClawshotDoorCountEscape", actor, played, [(1, counter.main_event)], {"EventName": ESCAPE_EVENT}
             ),
             evfl.SubFlowEvent("ClawshotDoorSendoffRecount", "", COUNT, index(fc, "Event62"), None),
+            evfl.SwitchEvent(
+                "ClawshotClockArrival",
+                actor,
+                queries.index(READ_BOOL),
+                [(0, recount), (1, arrived)],
+                {"GameDataName": ARRIVED, "Index": -1},
+            ),
+            evfl.ActionEvent("ClawshotClockArrived", actor, fc.actors[actor].actions.index(SET_BOOL), recount, ARRIVE),
         ]
         counter.main_event = sendoff
         fc.entry_point("DoorOfTime_SendOff").sub_flow_events.append(recount)
         if early:
-            named(fc, "Event7").cases = [(0, recount), (1, moved["Event7"])]
-            fc.events[moved["Event7"]].next = recount
+            named(fc, "Event7").cases = [(0, arrival), (1, moved["Event7"])]
+            fc.events[moved["Event7"]].next = arrival
         else:
-            named(fc, "Event7").next = recount
+            named(fc, "Event7").next = arrival
     return fc
 
 
@@ -610,9 +629,10 @@ def check_composed(path, alone, composed, orders, early=True):
         starts += [COUNT, "DoorOfTime_SendOff", *(() if early else (index(alone, "Event7"),))]
     options = {"forward": ("DoorOfTime",) if early else (), "order": path == DOOR}
     fires = ("Ready", "KakarikoVillageNpc", "Complete")
-    for start, current, fire, sendoff, escaped in product(starts, STEPS, fires, (False, True), (False, True)):
+    histories = product((False, True), repeat=3)  # send-off, escape, Field arrival
+    for start, current, fire, (sendoff, escaped, arrived) in product(starts, STEPS, fires, histories):
         stones = {"Step_Get_StoneOfFire": fire, "Step_Get_StoneOfWater": "Complete"}
-        state = {**START, **stones, "Step_DoorOfTime": current, SENDOFF: sendoff, ESCAPED: escaped}
+        state = {**START, **stones, "Step_DoorOfTime": current, SENDOFF: sendoff, ESCAPED: escaped, ARRIVED: arrived}
         expected = outcome(alone, start, state, orders=orders, **options)
         for flow in composed:
             assert outcome(flow, start, state, orders=orders) == expected, (start, state)
@@ -993,7 +1013,8 @@ def test_another_flowchart_and_a_second_application_are_refused():
         changes = door_story.changes(early=early)
         with pytest.raises(PatchError, match="DoorOfTime"):
             changes[DOOR](evfl.write(castle_flow()))
-        for path, transform in changes.items():
+        for path in sorted(FLOWS.keys() & changes.keys()):  # the era flow's own refusals: test_clock_transitions
+            transform = changes[path]
             once = transform(evfl.write(FLOWS[path]()))
             with pytest.raises(PatchError, match="ClawshotDoor"):
                 transform(once)

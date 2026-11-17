@@ -37,6 +37,17 @@ rule = "is_child and has_all_stones and 'Met Child Zelda'"
 was = "is_child and has_all_stones"
 source = "Section46: HyruleField_Child_Prefab_0ce5 requires DoorOfTime Step03; courtyard/Impa initialize its progression. _91f9's Step04 moat pickup runs DoorOfTime_GetOcarinaOfTime then Dm_MelodyGet_Time, so both rewards share the story prerequisite."
 
+# Clock arrival (round16 cs16b): the native clock runs only with saved HyruleField_ArriveEntrance (A) AND Impa's
+# send-off history (S); 'Met Child Zelda' models S. This event models A as the game sets it: the native owl
+# arrival or, when a natural route deleted the owl first, the story patch's restore at the real send-off, which
+# itself lands child Link in this field. It is not the literal owl history. No Forest completion; the adult
+# first-arrival hold (HrlField_HasEnteredFirstTime_Adult) is temporary and stays unmodelled.
+
+[events."Hyrule Field"."Field Owl Arrival"]
+rule = "is_child"
+new = true
+source = "work/r16-time/clock-full-predicate-findings.md: clock stop helper 0x345c020 hard-stops at 06:00 without A = saved HyruleField_ArriveEntrance (0x804aec99); unrestricted cycle needs A and S (HavePlayedEvent.Dm_HrlField_0020). The only A writer in all 914 event files is Goto_HyruleCastle Event153, entry Goto_HyruleCastle_Kaepora_00 (Event196 -> 208 -> 160 -> 60 -> 153, before Dm_HrlField_0000/0005/0010 and the Step02 write Event14); no event clears it, so it is monotone. HyruleField_Child_Prefab_de5f (Child_Static Area_b52e 6015224556942575734 at (159,163,285), EventRequestActor 893417770466804315 requesting HyruleField_Goto_HyruleCastle_Kaepora) plays it when child Link touches the area while Dm_HrlField_0010 is unplayed; node5 deletes the area once Goto_HyruleCastle is after Step01. No Forest-stone or item prerequisite. clock-arrival-data-route-audit.json / clock-era-market-init.json: the Field Market entrance actor 17785097056595296494 runs Dm_SY_BancChangeArrive_Market -> Goto_HyruleCastle_EntryMarket Event51 (Step02_01) without A, deleting the owl; the story patch therefore restores A at the real Impa send-off when unset (all Door modes), and DoorOfTime Event124 boots that send-off in HyruleField_Child (HyruleField_DoorOfTime_SendOff). The Kaepora skip restores A too. Either way A needs child Link in Hyrule Field and no optional item."
+
 # Grottos: every grotto entrance is visible in the remake and the Stone of Agony (now the Echo Gem) finds Gold
 # Skulltulas, not grottos (cross-area decision, Main, round 4). HyruleField's only two AgonyStoneReactArea actors
 # are at Gold Skulltulas inside grottos.

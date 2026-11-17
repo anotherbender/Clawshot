@@ -321,13 +321,14 @@ No quest/reward/saved default is forced. First-arrival gameplay acceptance remai
 `Settings.door_of_time = closed | song_only | open` (D35, default closed) is separate.
 `prepare` derives its matching logic constant; contradictory `--logic door_of_time` is refused.
 The child-temple override requires stones + Ocarina2 + playable Time song when closed.
-Both early modes require `Met Child Zelda` (the completed Impa field send-off, whose native history
-unlocks clock progression): song-only additionally requires either child ocarina + learned Time song;
-open requires no items. Kareem chose the open-Door physical gate on2026-11-16; Claude explicitly
-extended the protection to song-only on2026-11-17 (`rounds/r16-time.md`).
-`patch.door` supplies matching physical/altar gates; closed receives only the shared ordering repair. Open reuses the ungated
-attention module for first/repeat pulls; its common gate reads actual send-off and skips the native
-opening scene. Song-only retains its learned-song/melody/scene/once and Step06 path after send-off.
+Both early modes require `Met Child Zelda` (the completed Impa field send-off) and `Field Owl Arrival`
+(saved `HyruleField_ArriveEntrance`, not literal owl history). Song-only additionally requires either
+child ocarina + learned Time song; open requires no items. Kareem chose the open-Door physical gate
+on2026-11-16; Claude approved both-mode clock protection and the complete arrival predicate
+on2026-11-17 (`rounds/r16-time.md`).
+`patch.door` supplies matching physical/altar gates using one unsaved A AND S expression.
+Open reuses the ungated attention module for first/repeat pulls and skips the native opening scene.
+Song-only retains its learned-song/melody/scene/once and Step06 path after both clock prerequisites.
 All modes defer the native Fire/Water stone counter until the real Impa send-off, recount there,
 and ignore later counter calls after the escape history is played. This covers stones before Zelda,
 including closed mode with shuffled songs, without inventing completion or history.
@@ -336,14 +337,18 @@ native counter's Fire/Water completions and source-history guards, not an added 
 Nine late Door writes are forward-only. The courtyard's native forced Step01 reset remains untouched
 so stone-before-Zelda orders still reach Impa's exact-Step01 lesson; it cannot undo an actual early pull,
 which needs the send-off. Bridge raising waits for send-off and cannot repeat after escape.
-Closed's item gate remains native; its shared ordering repair changes DoorOfTime and the resource table.
-No stone quest completion, inventory grant, saved history/default or first-adult scene is forged.
-This is prevention for new seeds, not a repair for already-frozen saves; the rc.5 player check is pending.
+Closed's item gate remains native. Every mode receives the shared ordering repair, a missing-arrival
+restoration only at the real send-off, and a conditional first-adult-hold clear only in the Temple's
+`Market_Adult_Field_AdultToChild` transition. The native0055 set and adult Market→Field clear remain
+unchanged; an adult who only warps away retains the native hold. Kaepora fast start preserves the
+arrival effect omitted by its skipped owl. The clock fixes add no inventory or unrelated completion/scene history.
+This is prevention for new seeds, not a save-repair pass. Kareem passed the open gate and escape/moat
+order on rc.7; the additional clock corrections await four new controls.
 
 The data-defined return kit's lower-bound inventory and staged families vary with door mode.
-Both early-mode minima retain compulsory `Met Child Zelda`, matching the real send-off gate;
-earlier pulls still cannot assume optional child Saria/strength/Time-ocarina finds. The independent
-first-pull oracle remains mandatory and may refuse combinations with unshuffled child-only
+Both early-mode minima retain compulsory `Met Child Zelda` and `Field Owl Arrival`, matching the
+clock-ready gate; earlier pulls still cannot assume optional child Saria/strength/Time-ocarina finds.
+The independent first-pull oracle remains mandatory and may refuse combinations with unshuffled child-only
 prerequisites. No automatic free-travel or guarantee override. Native Fairy Ocarina is child-only
 (section 37), so the sourced `age_ocarina.toml` helpers require Ocarina2 for adult song use;
 otherwise the new Fairy-only first-pull route would incorrectly pass adult Mido.

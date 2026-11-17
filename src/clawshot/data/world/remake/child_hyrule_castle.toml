@@ -13,8 +13,9 @@
 # - Placement data (HyruleCastle_Static/_Dynamic, read by E:/OOTRemake/work/r4-logic-child/actors.py), Banc
 #   coordinates in metres, y up.
 
-# Time of day: the remake's clock starts only once Link has met Zelda. Rules in other areas ask for this event
-# with every child `at_night` / `at_dampe_time` (cross-area decision, Main, round 4).
+# Time of day: the remake's clock starts only once Link has met Zelda and has the Hyrule Field arrival ('Field Owl
+# Arrival', child_hyrule_field.toml). Rules in other areas ask for 'Time Flows' with every child `at_night` /
+# `at_dampe_time` (cross-area decision, Main, round 4; native clock predicate, round16).
 
 [events."HC Garden Skippable Locations"."Met Child Zelda"]
 rule = "is_child"
@@ -22,9 +23,9 @@ new = true
 source = "Section46: Met Child Zelda models completion of the courtyard AND Impa lesson/accepted send-off through DoorOfTime Step02, not first courtyard contact. HyruleCastle_Prefab_941f requests the meeting at Goto_HyruleCastle Step04; Goto_HyruleCastle Event30/32 completes it and initializes DoorOfTime Step01. Step01 Impa talk starts Dm_MelodyGet_Zelda; the after-lesson talk Event124 reserves HyruleField_DoorOfTime_SendOff, whose Event7 writes Step02 without an additional inventory/stone test. Same route as HC Zeldas Letter and Song from Impa; Hyrule Castle Grounds -> HC Garden requires Weird Egg or Chicken (OoTR Overworld.json:1379), representing Talon's wake-up."
 
 [events."HC Garden"."Time Flows"]
-rule = "is_child and 'Met Child Zelda'"
+rule = "is_child and 'Met Child Zelda' and 'Field Owl Arrival'"
 new = true
-source = "Eurogamer, 'all new changes' (https://www.eurogamer.net/all-new-changes-zelda-ocarina-of-time-switch-2): time does not start to flow until Link has met Princess Zelda; she is met in the castle garden (Npc_Hylia_Zelda_Child 13027585550451396507 at (5,128,-257); Nintendo Life Hyrule Castle guide, steps 8-10)"
+source = "Eurogamer, 'all new changes' (https://www.eurogamer.net/all-new-changes-zelda-ocarina-of-time-switch-2): time does not start to flow until Link has met Princess Zelda; she is met in the castle garden (Npc_Hylia_Zelda_Child 13027585550451396507 at (5,128,-257); Nintendo Life Hyrule Castle guide, steps 8-10). Native round16 predicate (work/r16-time/clock-full-predicate-findings.md, executed clock update 0x3cdf70 and stop helper 0x345c020): the day/night cycle runs only with saved HyruleField_ArriveEntrance ('Field Owl Arrival') AND HavePlayedEvent.Dm_HrlField_0020 (Impa's send-off, 'Met Child Zelda'); without the arrival it holds 06:00, without the send-off 15:00. Neither Forest completion nor the Door quest is read."
 
 # Grottos: every grotto entrance is visible in the remake and the Stone of Agony (now the Echo Gem) finds Gold
 # Skulltulas, not grottos (cross-area decision, Main, round 4).

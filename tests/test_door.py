@@ -1,23 +1,27 @@
 """Synthetic door contracts and world/CS1 boundaries; no game trees or decoded data fixtures."""
 
+import itertools
 from copy import deepcopy
 
 import pytest
+from test_door_stage import ARRIVED, evaluate, indexed, synthetic_game_data
 
 from clawshot.__main__ import main
 from clawshot.formats import evfl
 from clawshot.generate import FillError, Settings, prepare
 from clawshot.generate.fill import return_guarantee_conflict
-from clawshot.patch import door, gifts
+from clawshot.patch import door, door_stage, gifts
 from clawshot.patch.plan import PatchError
+from clawshot.save import key
 from clawshot.world import ADULT, CHILD, load_spec
 
 # An early door under the adult-return guarantee needs movable gifts and songs (fill.return_guarantee_conflict).
 GIFTS = ("Chest", *gifts.GIFT_TYPES)
 
 
-def run_open_flow(fc, state, *, recommended=True, quest_ready=False):
-    """Evaluate the door's native state-changing actions; presentation calls have no inventory effect."""
+def run_open_flow(fc, state, *, expression, recommended=True):
+    """Evaluate the door's native state-changing actions; presentation calls have no inventory effect.
+    ``expression(name, state)`` answers a GameData BoolExp query from the current state."""
     scenes, writes = [], []
 
     def run(index):
@@ -32,7 +36,7 @@ def run_open_flow(fc, state, *, recommended=True, quest_ready=False):
                 elif query == "EventQueryHavePlayedEvent":
                     value = 0 if state.get("HavePlayedEvent." + params["EventName"], False) else 1
                 elif query == "EventQueryIsGameDataBoolExp":
-                    value = 0 if quest_ready else 1
+                    value = 0 if expression(params["GameDataName"], state) else 1
                 elif query == "EventQueryIsRecommendedMelody":
                     value = 0 if recommended else 1
                 else:
@@ -98,35 +102,37 @@ def synthetic_flow():
     )
 
 
+def synthetic_expressions():
+    """The stage's BoolExp rows written into synthetic GameData, evaluated over a flow's state."""
+    tree = synthetic_game_data()
+    door_stage.add_expressions(tree)
+    rows = indexed(tree)
+    return lambda name, state: evaluate(rows, key(name), state)
+
+
 @pytest.mark.parametrize(
-    "learned,recommended,opened,played,sendoff",
-    [
-        (True, True, False, False, False),
-        (True, True, False, False, True),
-        (False, True, False, False, True),
-        (True, False, False, False, True),
-        (True, True, True, False, True),
-        (True, True, False, True, True),
-    ],
+    "learned,recommended,opened,played,arrived,sendoff", itertools.product((False, True), repeat=6)
 )
-def test_song_only_opens_after_sendoff_and_retains_song_play_and_saved_once_gates(
-    learned, recommended, opened, played, sendoff
+def test_song_only_opens_with_the_field_clock_and_retains_song_play_and_saved_once_gates(
+    learned, recommended, opened, played, arrived, sendoff
 ):
     original = synthetic_flow()
     patched = evfl.read(door.song_flow(evfl.write(original)))
+    expression = synthetic_expressions()
     state = {
         door.TIME_SONG: learned,
         door.OPENED: opened,
+        ARRIVED: arrived,
         door.SENDOFF: sendoff,
         "HavePlayedEvent.Dm_TimeTemple_0010": played,
     }
-    scenes, writes = run_open_flow(patched.flowchart, state, recommended=recommended)
-    success = learned and recommended and not opened and not played and sendoff
+    scenes, writes = run_open_flow(patched.flowchart, state, expression=expression, recommended=recommended)
+    success = learned and recommended and not opened and not played and arrived and sendoff
     assert scenes == (["Dm_TimeTemple_0010"] if success else [])
     assert writes == ([door.OPENED, "Step_DoorOfTime"] if success else [])
     if success:
         assert state["Step_DoorOfTime"] == "Step06"
-        assert run_open_flow(patched.flowchart, deepcopy(state)) == ([], [])
+        assert run_open_flow(patched.flowchart, deepcopy(state), expression=expression) == ([], [])
     # Restore only the intentional entry/edge/guards; every unrelated native path remains exact.
     del patched.flowchart.events[len(original.flowchart.events) :]
     patched.flowchart.entry_points[0].main_event = original.flowchart.entry_points[0].main_event
@@ -145,11 +151,11 @@ def test_song_patch_refuses_changed_native_gate():
     "mode,items,expected",
     [
         ("open", {}, False),
-        ("open", {"Met Child Zelda": 1}, True),
+        ("open", {"Met Child Zelda": 1, "Field Owl Arrival": 1}, True),
         ("song_only", {"Ocarina": 1}, False),
         ("song_only", {"Song of Time": 1}, False),
         ("song_only", {"Ocarina": 1, "Song of Time": 1}, False),
-        ("song_only", {"Ocarina": 1, "Song of Time": 1, "Met Child Zelda": 1}, True),
+        ("song_only", {"Ocarina": 1, "Song of Time": 1, "Met Child Zelda": 1, "Field Owl Arrival": 1}, True),
         ("closed", {"Ocarina": 2, "Song of Time": 1}, False),
         ("closed", {"Ocarina": 1, "Song of Time": 1, "Kokiri Emerald": 1, "Goron Ruby": 1, "Zora Sapphire": 1}, False),
         ("closed", {"Ocarina": 2, "Song of Time": 1, "Kokiri Emerald": 1, "Goron Ruby": 1, "Zora Sapphire": 1}, False),
@@ -208,9 +214,7 @@ def test_cli_explicit_door_mode_overrides_an_effective_settings_string(capsys):
     settings = Settings.from_string(capsys.readouterr().out.strip())
     assert settings.door_of_time == "song_only"
     resolved, world = prepare(load_spec(), settings)
-    # song_only's compulsory first-pull kit: a child ocarina, the learned Time song and Impa's send-off story.
-    song_kit = {"Ocarina": 1, "Song of Time": 1, "Met Child Zelda": 1}
-    assert world.settings["age_return_fill_inventory"] == resolved.logic["age_return_fill_inventory"] == song_kit
+    assert world.settings["age_return_fill_inventory"] == resolved.logic["age_return_fill_inventory"]
     # Switch the effective song_only string back to closed through the same path; its stale kit must not survive.
     assert main(["--settings", resolved.to_string(), "--door-of-time", "closed", "--print-settings"]) == 0
     switched = Settings.from_string(capsys.readouterr().out.strip())

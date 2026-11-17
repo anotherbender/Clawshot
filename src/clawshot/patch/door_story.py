@@ -16,6 +16,15 @@ In every door mode, stone counting waits for the real send-off and stops after t
 This prevents premature Step03/bridge raising, including the native closed-mode escape sensor. The
 send-off recounts before Event62, preserving Darunia's independently guarded Fire continuation. The
 counter's original branches, bridge write and count values stay native; no saved history is forged.
+
+Two clock transitions ship in every mode too. The native clock runs only with the Hyrule Field owl arrival
+(``HyruleField_ArriveEntrance``, set natively only by the owl's Goto_HyruleCastle Event153), the send-off's
+history and no first-adult hold (``HrlField_HasEnteredFirstTime_Adult``). Routes that reach the courtyard
+without that owl leave the arrival unset, so after the send-off scene (Event10) and its Step02 the arrival is
+asked and, only when unset, set before the recount. The first-adult hold is set by Dm_TimeTemple_0055 and
+cleared natively when adult Link walks from the Market to the Field; ``Market_Adult_Field_AdultToChild``
+clears it as well, right after its native ``Sequence_IsChildhood`` write, so a real return to child never
+keeps the hold. Both reuse the native query/setter shape; no other history, quest or inventory is written.
 """
 
 from collections.abc import Callable
@@ -26,11 +35,16 @@ from clawshot.patch.write import FileChanges
 
 ESCAPE_READY = "Clawshot.Door.EscapeReady"  # the door stage's unsaved BoolExp: Zelda's escape may play now
 
+_ARRIVED = "HyruleField_ArriveEntrance"  # saved Bool, the Field owl arrival the native clock reads
+_FIRST_ADULT = "HrlField_HasEnteredFirstTime_Adult"  # saved Bool, the first adult arrival's clock hold
+_CLOCK = "ClawshotClock"
 _CHALLENGE = "DoorOfTime"
 _PREFIX = "ClawshotDoor"
 _GAME_DATA_ACTOR = "GameDataActor"
 _READ_EXPRESSION = "EventQueryIsGameDataBoolExp"
 _READ_HISTORY = "EventQueryHavePlayedEvent"
+_READ_BOOL = "EventQueryIsGameDataBool"
+_SET_BOOL = "EventTriggerSetGameDataBool"
 _ESCAPE_EVENT = "HyruleField_DoorOfTime_Escape"
 _SENDOFF_EVENT = "Dm_HrlField_0020"
 _COUNTER = "DoorOfTime_CheckStoneNum"
@@ -60,9 +74,13 @@ _GUARDS = {
     "Event/EventFlow/Npc_Hylia_Zelda_Child.bfevfl.zs": (("Event42", "Srep2_1_1", None, _QUIET),),
 }
 _COMPLETE = {_DOOR_FLOW: ("Event93", "Complete", None, _WRITE)}
-_BRIDGE_ACTION = "EventTriggerSetGameDataBool"
 # (event, its native parameters, its native next): the drawbridge raise behind Step03.
 _BRIDGE = {_DOOR_FLOW: ("Event77", {"GameDataName": "IsHyruleFieldBridgeClose", "Index": -1, "Value": True}, "Event4")}
+_ERA_FLOW = "Event/EventFlow/Market_Adult_Field_AdultToChild.bfevfl.zs"
+_ERA = "Market_Adult_Field_AdultToChild"  # its flowchart and only entry, requested by the Master Sword pedestal
+_ERA_SWAP = "ReplaceEquipmentForEraChange"  # the registered equipment sub flow, native Event7, before the age write
+_CHILDHOOD = {"GameDataName": "Sequence_IsChildhood", "Index": -1, "Value": True}  # native Event1, then Event0
+_TO_CHILD = {"NextBanc": "Market_Child", "BootEventName": "Dm_TimeTemple_0075"}  # native Event0's travel
 
 
 def _op(fc: evfl.Flowchart, event: evfl.Event) -> str | None:
@@ -104,6 +122,20 @@ def _next_name(fc: evfl.Flowchart, event: evfl.Event) -> str | None:
     return fc.events[event.next].name if isinstance(event, evfl.ActionEvent) and event.next != evfl.NONE else None
 
 
+def _plays_sendoff(fc: evfl.Flowchart, start: int, writer: int) -> bool:
+    """Whether the plain action chain from ``start`` plays the send-off scene before it reaches ``writer``."""
+    at, played, seen = start, False, set()
+    while at != writer:
+        event = fc.events[at] if at != evfl.NONE and at not in seen else None
+        if not isinstance(event, evfl.ActionEvent):
+            return False
+        seen.add(at)
+        scene = _op(fc, event) == "EventSystemActor.EventTransition"
+        played = played or (scene and (event.params or {}).get("EventName") == _SENDOFF_EVENT)
+        at = event.next
+    return played
+
+
 def _forward(path: str, data: bytes, *, early: bool) -> bytes:
     """Repair counted-stone ordering in every mode; guard late quest writes only in early modes."""
     document = evfl.read(data)
@@ -117,6 +149,7 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
     renamed = {f"{_PREFIX}{name}Write" for name, *_ in guards}
     if path == _DOOR_FLOW:
         renamed.update(f"{_PREFIX}{name}" for name in ("CountSendoff", "CountEscape", "SendoffRecount"))
+        renamed.update(f"{_CLOCK}{name}" for name in ("Arrival", "Arrived"))
     if done := [event.name for event in fc.events if event.name in renamed]:
         raise PatchError(f"Door of Time: {flow} is already patched: {done}")
     index = {event.name: i for i, event in enumerate(fc.events)}
@@ -134,6 +167,8 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
             or sendoff.sub_flow_events
         ):
             raise PatchError(f"Door of Time: changed counter/send-off entries: {counter!r}, {sendoff!r}")
+        if not _plays_sendoff(fc, sendoff.main_event, index["Event7"]):
+            raise PatchError(f"Door of Time: {flow} send-off no longer plays {_SENDOFF_EVENT} straight into Event7")
         sendoff_write = fc.events[index["Event7"]]
     for name, step, tail, params in pinned:
         write = fc.events[index[name]]
@@ -150,7 +185,7 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
         next_name = _next_name(fc, raise_bridge)
         if (
             not isinstance(raise_bridge, evfl.ActionEvent)
-            or _op(fc, raise_bridge) != f"{_GAME_DATA_ACTOR}.{_BRIDGE_ACTION}"
+            or _op(fc, raise_bridge) != f"{_GAME_DATA_ACTOR}.{_SET_BOOL}"
             or raise_bridge.params != params
             or next_name != tail
         ):
@@ -173,7 +208,11 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
         fc.events.append(write)
     if path == _DOOR_FLOW:
         history_query = _slot(fc.actors[actor].queries, _READ_HISTORY)
+        read_bool = _slot(fc.actors[actor].queries, _READ_BOOL)
+        set_bool = _slot(fc.actors[actor].actions, _SET_BOOL)
         first = len(fc.events)
+        recount, arrival = first + 2, first + 3
+        arrived = {"GameDataName": _ARRIVED, "Index": -1}
         fc.events.extend(
             [
                 evfl.SwitchEvent(
@@ -191,18 +230,65 @@ def _forward(path: str, data: bytes, *, early: bool) -> bytes:
                     {"EventName": _ESCAPE_EVENT},
                 ),
                 evfl.SubFlowEvent(f"{_PREFIX}SendoffRecount", "", _COUNTER, index["Event62"], None),
+                # The send-off scene has played: an owl-less route still lacks the arrival the clock reads.
+                evfl.SwitchEvent(f"{_CLOCK}Arrival", actor, read_bool, [(0, recount), (1, first + 4)], arrived),
+                evfl.ActionEvent(f"{_CLOCK}Arrived", actor, set_bool, recount, {**arrived, "Value": True}),
             ]
         )
         counter.main_event = first
-        sendoff.sub_flow_events.append(first + 2)
+        sendoff.sub_flow_events.append(recount)
         # Hook before Event62: its native end and Darunia's guard remain untouched in either edit order.
-        sendoff_write.next = first + 2
+        sendoff_write.next = arrival
         if early:
             guard = fc.events[index["Event7"]]
-            guard.cases = [(case, first + 2 if case == 0 else target) for case, target in guard.cases]
+            guard.cases = [(case, arrival if case == 0 else target) for case, target in guard.cases]
     result = evfl.write(document)
     if evfl.read(result) != document:
         raise PatchError(f"Door of Time: {path} does not read back as the edited flow")
+    return result
+
+
+def _child_return(data: bytes) -> bytes:
+    """Clear a pending first-adult hold once the Temple has made Link a child again, then travel natively."""
+    document = evfl.read(data)
+    fc = document.flowchart
+    if fc is None or fc.name != _ERA:
+        raise PatchError(f"Door of Time: {_ERA_FLOW} holds no {_ERA} flowchart")
+    if done := [event.name for event in fc.events if event.name.startswith(_CLOCK)]:
+        raise PatchError(f"Door of Time: {_ERA} is already patched: {done}")
+    index = {event.name: i for i, event in enumerate(fc.events)}
+    if missing := [name for name in ("Event6", "Event7", "Event1", "Event0") if name not in index]:
+        raise PatchError(f"Door of Time: {_ERA} lacks native events {missing}")
+    entries = [entry for entry in fc.entry_points if entry.name == _ERA]
+    if [(entry.main_event, entry.sub_flow_events) for entry in entries] != [(index["Event6"], [index["Event7"]])]:
+        raise PatchError(f"Door of Time: changed {_ERA} entries: {fc.entry_points!r}")
+    swap, age, travel = (fc.events[index[name]] for name in ("Event7", "Event1", "Event0"))
+    if (
+        not isinstance(swap, evfl.SubFlowEvent)
+        or (swap.flowchart, swap.entry_point, swap.next) != (_ERA_SWAP, _ERA_SWAP, index["Event1"])
+        or not isinstance(age, evfl.ActionEvent)
+        or _op(fc, age) != f"{_GAME_DATA_ACTOR}.{_SET_BOOL}"
+        or age.params != _CHILDHOOD
+        or age.next != index["Event0"]
+        or not isinstance(travel, evfl.ActionEvent)
+        or _op(fc, travel) != "GameSystemActor.EventReserveBancChange"
+        or {name: (travel.params or {}).get(name) for name in _TO_CHILD} != _TO_CHILD
+    ):
+        raise PatchError(f"Door of Time: changed native {_ERA} age change: {swap!r}, {age!r}, {travel!r}")
+    actor = _game_data_actor(fc)
+    read_bool = _slot(fc.actors[actor].queries, _READ_BOOL)
+    set_bool = _slot(fc.actors[actor].actions, _SET_BOOL)
+    hold, clear = len(fc.events), len(fc.events) + 1
+    held = {"GameDataName": _FIRST_ADULT, "Index": -1}
+    # The native Field clearer's shape (Dm_SY_BancChangeArrive Event257/434): only a set hold is cleared.
+    fc.events += [
+        evfl.SwitchEvent(f"{_CLOCK}ChildReturn", actor, read_bool, [(0, clear), (1, age.next)], held),
+        evfl.ActionEvent(f"{_CLOCK}ReturnedChild", actor, set_bool, age.next, {**held, "Value": False}),
+    ]
+    age.next = hold
+    result = evfl.write(document)
+    if evfl.read(result) != document:
+        raise PatchError(f"Door of Time: {_ERA_FLOW} does not read back as the edited flow")
     return result
 
 
@@ -214,8 +300,8 @@ def _transform(path: str, *, early: bool) -> Callable[[bytes], bytes]:
 
 
 def changes(*, early: bool = True) -> FileChanges:
-    """Shared stone-order repair, plus late-write guards when the Door may open early.
+    """Shared stone-order repair and clock transitions, plus late-write guards when the Door may open early.
 
     The courtyard reset is native. Event62 and its tail stay compatible with Darunia in either edit order."""
     paths = _GUARDS if early else (_DOOR_FLOW,)
-    return {path: _transform(path, early=early) for path in paths}
+    return {**{path: _transform(path, early=early) for path in paths}, _ERA_FLOW: _child_return}

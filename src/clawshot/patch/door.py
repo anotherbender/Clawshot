@@ -1,4 +1,4 @@
-"""Door of Time: native closed; both early modes wait for Impa's field send-off.
+"""Door of Time: native closed; both early modes wait for the Field clock (the owl arrival and Impa's send-off).
 
 No stone quest, inventory grant, saved default/history or first-adult scene is forged.
 Early modes keep the escape/moat sources available after first pull; late callbacks cannot
@@ -6,13 +6,11 @@ undo Complete. The pre-send-off courtyard reset stays native. Audit: plans/round
 """
 
 import argparse
-import hashlib
-import struct
 import sys
 from collections.abc import Mapping
 from pathlib import Path
 
-from clawshot.formats import byml, evfl, rstb, zsdic
+from clawshot.formats import byml, evfl
 from clawshot.patch import age, door_stage, door_story
 from clawshot.patch.gamedata import GAME_DATA_LIST, BuiltFile
 from clawshot.patch.plan import PatchError, Plan
@@ -23,8 +21,6 @@ from clawshot.save import key
 MODES = ("closed", "song_only", "open")
 FLOW = "Event/EventFlow/DoorOfTime.bfevfl.zs"
 PLACEMENT = "Banc/Market/Market_Child_Static.bcett.byml.zs"
-DOOR_LOGIC = "Logic/Market_Common_f252.logic.module.ainb"
-DOOR_LOGIC_SHA256 = "5b4152c4e56bf51b7f2400fbdd6a39e4b506f3104cee49a24f6f49e72eb4d6a4"
 DRAW_GROUP = 11738513547087641325
 DRAW_LOGIC = "Logic/Module/Market_Child_Prefab/Market_Child_Prefab_e700.logic.module.ain"
 DRAW_BINDINGS = {
@@ -62,12 +58,12 @@ def _altar_reaction(data: bytes, values: list[list[byml.U64]]) -> bytes:
 
 
 def song_reaction(data: bytes) -> bytes:
-    """React after the send-off, before Step05; never replace songs once the door is opened."""
+    """React once the Field clock may run, before Step05; never replace songs once the door is opened."""
     return _altar_reaction(
         data,
         [
             [byml.U64(0), byml.U64(key(OPENED))],
-            [byml.U64(0), byml.U64(key(SENDOFF))],
+            [byml.U64(10), byml.U64(key(door_stage.CLOCK_READY))],
             [byml.U64(5)],
             [byml.U64(4)],
         ],
@@ -92,7 +88,7 @@ def open_reaction(data: bytes) -> bytes:
 
 
 def song_flow(data: bytes) -> bytes:
-    """Bypass the stone quest gate, retaining the real send-off, learned song and native play/once/scene."""
+    """Bypass the stone quest gate, retaining the Field clock gate, learned song and native play/once/scene."""
     document = evfl.read(data)
     fc = document.flowchart
     if fc is None or fc.name != "DoorOfTime":
@@ -132,9 +128,10 @@ def song_flow(data: bytes) -> bytes:
             {"GameDataName": TIME_SONG, "Index": -1},
         )
     )
+    # The stone gate's own BoolExp query, asking for the Field clock instead.
     fc.events.append(
         evfl.SwitchEvent(
-            "ClawshotDoorSendoff", opened.actor, query, [(0, first)], {"GameDataName": SENDOFF, "Index": -1}
+            "ClawshotDoorClockReady", gate.actor, gate.query, [(0, first)], {"GameDataName": door_stage.CLOCK_READY}
         )
     )
     predecessor.next = opened_index
@@ -197,43 +194,12 @@ def changes(_placements: Mapping[str, str], *, mode: str = "closed") -> FileChan
 
 
 def build(romfs: str | Path, *, mode: str = "closed") -> list[BuiltFile]:
-    """Open the physical gate only after the real send-off, retaining the native allocation.
-
-    This pinned native graph already has an unused Bool reader (node6). Rebind it to
-    the send-off and connect all three node5 OR inputs to that reader, not the quest
-    threshold or event proxy. ActorLogicGateDoor consumes the OR for isOpen/IsSkipAnim.
-    Byte offsets are independently decoded native facts, not a general AINB writer.
-    """
+    """Early modes: the story stage's modules; open also the Temple door module, which opens on the clock gate."""
     if mode not in MODES:
         raise PatchError(f"unknown door_of_time mode {mode!r}")
     if mode == "closed":
         return []
-    romfs = Path(romfs)
-    story = door_stage.build(romfs)
-    if mode == "song_only":
-        return story
-    data = (romfs / DOOR_LOGIC).read_bytes()
-    if hashlib.sha256(data).hexdigest() != DOOR_LOGIC_SHA256:
-        raise PatchError("open door: native common door module fingerprint changed")
-    content = bytearray(data)
-    flag = OPENED.encode() + b"\0"
-    offset = data.index(flag)
-    content[offset : offset + len(flag)] = (SENDOFF.encode() + b"\0").ljust(len(flag), b"\0")
-    # Multi-source records: node index / output index; flags and all offsets stay native.
-    for offset in (0x1898, 0x18A0, 0x18A8):
-        struct.pack_into("<hh", content, offset, 6, 0)
-    # Query dependencies retain the native duplicates; update the OR's generic plug too.
-    for offset in (0x18FC, 0x1900, 0x1904):
-        struct.pack_into("<H", content, offset, 6)
-    struct.pack_into("<i", content, 0x938, 6)
-    # Activate node6's previously unused Bool output, preserving its string-pool index.
-    struct.pack_into("<I", content, 0x1770, struct.unpack_from("<I", data, 0x1770)[0] | (1 << 31))
-    dictionaries = zsdic.Dictionaries.from_romfs(romfs)
-    table = rstb.read(dictionaries.decompress(rstb.TABLE_PATH, (romfs / rstb.TABLE_PATH).read_bytes()))
-    entry = table.get(DOOR_LOGIC)
-    if entry is None or entry < len(content):
-        raise PatchError(f"open door: missing/short native module allocation {entry!r}")
-    return [BuiltFile(DOOR_LOGIC, bytes(content), len(data), len(content), entry), *story]
+    return door_stage.build(romfs, gate=mode == "open")
 
 
 def write(romfs: str | Path, out: str | Path, *, mode: str = "closed") -> list[WrittenFile]:
