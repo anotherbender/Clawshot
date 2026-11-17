@@ -178,10 +178,15 @@ def test_deku_tree_slingshot_in_the_basement_is_not_beatable(deku_slice):
         for name, loc in deku_slice.locations.items()
         if loc.vanilla is not None
     }
+    # The remake cannot escape the vanilla Slingshot room without an already-held tool.
+    vanilla["Deku Tree Map Chest"], vanilla["Deku Tree Slingshot Chest"] = (
+        vanilla["Deku Tree Slingshot Chest"],
+        vanilla["Deku Tree Map Chest"],
+    )
     check_beatable(deku_slice, vanilla)
     swapped = vanilla | {
         "Deku Tree Basement Chest": "Progressive Slingshot",
-        "Deku Tree Slingshot Chest": vanilla["Deku Tree Basement Chest"],
+        "Deku Tree Map Chest": vanilla["Deku Tree Basement Chest"],
     }
     with pytest.raises(FillError, match="the goal cannot be reached"):
         check_beatable(deku_slice, swapped)
@@ -197,9 +202,10 @@ def test_deku_tree_top_floor_and_basement_need_a_verified_ranged_weapon(deku_sli
     for name in ("Deku Tree Compass Chest", "Deku Tree GS Compass Room", "Deku Tree Basement Chest"):
         assert not without.can_access(deku_slice.locations[name]), name
         assert with_weapon.can_access(deku_slice.locations[name], CHILD), name
-    # Entry still needs a Deku Shield, not either ranged weapon; exit/reload recovery is a separate question.
-    for name in ("Deku Tree Map Chest", "Deku Tree Slingshot Chest", "Deku Tree Slingshot Room Side Chest"):
-        assert without.can_access(deku_slice.locations[name], CHILD), name
+    assert without.can_access(deku_slice.locations["Deku Tree Map Chest"], CHILD)
+    for name in ("Deku Tree Slingshot Chest", "Deku Tree Slingshot Room Side Chest"):
+        assert not without.can_access(deku_slice.locations[name], CHILD), name
+        assert with_weapon.can_access(deku_slice.locations[name], CHILD), name
 
 
 def test_night_comes_only_after_meeting_zelda():

@@ -54,6 +54,11 @@ source = "data: Enemy_Skulltula_Gold 13609975487234437568, room 3 at y 121; Nint
 # Obj_InsideTheDekuTree_FallingLadder_A_01 (y 116) above the entrance door; both chests are reached by vines after
 # the drop (Slingshot chest y 112, side chest y 116). OoT Randomizer's room has no exit (it is a dead end there).
 
+[exits."Deku Tree Lobby"."Deku Tree Slingshot Room"]
+rule = "here(has_shield) and (can_use(Slingshot) or can_use(Boomerang) or can_use(Bow))"
+was = "here(has_shield)"
+source = "Kareem in game, 2026-11-16, Longshot rc.4 (roadmap Round 16): no save warp, every room autosaves; entering without an exit tool traps Link. Require the existing eye-switch exit predicate before entry; retain the scrub's shield requirement. Neither chest may supply its own first escape tool"
+
 [exits."Deku Tree Slingshot Room"."Deku Tree Lobby"]
 rule = "can_use(Slingshot) or can_use(Boomerang) or can_use(Bow)"
 new = true

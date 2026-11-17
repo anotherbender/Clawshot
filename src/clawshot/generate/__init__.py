@@ -22,6 +22,7 @@ from clawshot.generate.fill import (
     Settings,
     allowed,
     check_beatable,
+    check_no_traps,
     fill,
     return_guarantee_conflict,
     shuffled_locations,
@@ -121,9 +122,9 @@ def from_placements(
     (``fill.with_screens``: fixed-tier order, D25 bomb packs, Skulltula ammo containers), set before any assignment
     is checked. This world's own items may sit in other games' worlds, so the screens hold each item as many times as
     the pool :func:`generate` would fill (refused as there when it cannot be built) or the supplied placements give:
-    a lower tier or a container placed remotely still counts as obtainable, never as guaranteed first. No beatability
-    search: the placer proved the seed across its whole multiworld, where this world's progression can sit in other
-    games."""
+    a lower tier or a container placed remotely still counts as obtainable, never as guaranteed first. The placer
+    proves the goal/age-return across its whole multiworld. Local evidenced physical-trap checks still run; they
+    never assume a remote future item is already held."""
     settings, world = prepare(spec, settings)
     vanilla = dict(vanilla or {})
     shuffled = shuffled_locations(world, settings)
@@ -151,6 +152,7 @@ def from_placements(
         for name in world.locations
         if name in shuffled_set or name in fixed
     }
+    check_no_traps(world, out)
     return Seed(world, seed, settings, out, shuffled, spheres=[])
 
 

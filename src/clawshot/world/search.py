@@ -282,6 +282,10 @@ class Search:
         self._dirty = False
 
     # questions
+    def inventory(self, age: str) -> Mapping[str, int]:
+        """Logical item/event counts usable by this age, including the independent child prefix."""
+        self.update()
+        return self._child_counts if age == CHILD else self.counts
 
     def can_reach(self, region: str, age: str | None = None) -> bool:
         self.update()
@@ -379,7 +383,12 @@ class Search:
                 mandatory[name] = low
         return mandatory
 
-    def collect_spheres(self, placements: Mapping[str, str]) -> list[list[str]]:
+    def collect_spheres(
+        self,
+        placements: Mapping[str, str],
+        *,
+        observe: Callable[["Search", int], None] | None = None,
+    ) -> list[list[str]]:
         """Collect placed items sphere by sphere until nothing new is reachable, in world order.
 
         A failed location waits for its region or rule inputs to change. A globally collected check may later
@@ -397,6 +406,8 @@ class Search:
         spheres: list[list[str]] = []
         while True:
             self.update()
+            if observe is not None:
+                observe(self, len(spheres))
             todo, self._spots_todo = self._spots_todo, []
             found: list[tuple[_Spot, bool, bool]] = []
             for spot in todo:

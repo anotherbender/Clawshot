@@ -72,9 +72,11 @@ def test_post_mido_free_shield_opens_the_scrub_without_buying_a_deku_shield():
     assert search.can_reach("KF Outside Deku Tree", CHILD)
     assert search.holds("Deku Shield")
     assert not search.holds("Buy Deku Shield")
-    assert search.can_reach("Deku Tree Slingshot Room", CHILD)
+    assert not search.can_reach("Deku Tree Slingshot Room", CHILD)
     assert not search.holds("Defeat Queen Gohma")
     assert not search.can_reach("LW Bridge From Forest", CHILD)
+    search.collect("Boomerang")
+    assert search.can_reach("Deku Tree Slingshot Room", CHILD)
 
 
 @pytest.mark.parametrize("forest", ["closed", "closed_deku", "open"])
@@ -83,8 +85,10 @@ def test_free_shield_follows_the_merged_forest_mode_without_bootstrapping_mido(f
     search = Search(world)
     assert search.holds("Deku Shield") is (forest == "open")
     assert not search.holds("Kokiri Sword")
-    assert search.can_reach("Deku Tree Slingshot Room", CHILD) is (forest == "open")
+    assert not search.can_reach("Deku Tree Slingshot Room", CHILD)
     assert search.can_reach("LW Bridge From Forest", CHILD) is (forest != "closed")
+    search.collect("Boomerang")
+    assert search.can_reach("Deku Tree Slingshot Room", CHILD) is (forest == "open")
 
 
 def test_adult_cannot_claim_the_child_shopkeepers_free_shield():

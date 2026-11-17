@@ -141,6 +141,20 @@ Sources: `plans/04-world-format.md`, Ages; `src/clawshot/world/search.py`;
 `src/clawshot/data/world/remake/sheik.toml`; `plans/playtest/answers.md`, R9-FREE-TRAVEL and
 R10-FIRST-PULL-FIXED. Non-default Door of Time modes passed first in-game checks; returning to child afterwards is untested. See [settings](settings.md).
 
+**No save warp (Round 16).** The remake autosaves room changes; an older manual save is not a logic escape.
+The Slingshot Room's entry now requires its existing usable Slingshot/Boomerang/Bow exit condition as well
+as the scrub's shield condition. Neither room chest can supply its own first escape tool. A Slingshot copy
+may still be there when another usable exit tool is already available.
+
+`world/softlocks.py` checks returns at the initial frontier and each full collection sphere, preserving
+age-specific inventory and arrival time. Targets are physical safe anchors: child Link's House or Kokiri
+Forest, adult Temple of Time, never the abstract `Root`. Generated and external placements are refused
+when the data's `softlock_verified_regions` certificate fails. **This first slice certifies the played
+Slingshot trap only**, not the whole world. Unscoped `audit(world, placements)` reports unresolved graph
+returns for triage; absent ordinary edges and unverified song permissions are not physical-trap proof.
+Farore's Wind ownership alone does not prove a previously set escape point. Evidence, sweep counts and
+the next-slice unknown-route probe: [Round 16 softlocks](../plans/rounds/r16-softlocks.md).
+
 Imported Gerudo Fortress rules treat `Gerudo_Membership_Card` as friendly access. In the remake the guards,
 desert gate, Training Ground entrance and horseback archery check Spirit quest progress, which the
 captain's native hand-over writes after giving the card. D39 keeps `Hideout Gerudo Membership Card`

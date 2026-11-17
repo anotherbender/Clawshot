@@ -346,8 +346,28 @@ Ganon (round 2's partial port used `'Defeat Queen Gohma'`).
 
 **Key logic and the vanilla placement.** OoT Randomizer counts a dungeon's small keys for the worst order in which
 its doors could be opened, so its own vanilla key layout is not always provably enough: the Spirit Temple's Silver
-Gauntlets chest asks for 5 keys, and the vanilla child side holds 2. The vanilla-placement test therefore holds each
-dungeon's small keys from the start; key logic is exercised by the seed tests, where the fill places keys.
+Gauntlets chest asks for 5 keys, and the vanilla child side holds 2. The all-check oracle therefore holds each
+dungeon's small keys and a Slingshot from the start: vanilla's first Slingshot is self-locked by the no-save-warp
+entry policy. Separate regressions prove that refusal; generated seeds exercise normal key/escape-tool placement.
+
+**No-save-warp return certificate (Round 16 first slice).** Native data names `softlock_anchors` by age
+(child Link's House or Kokiri Forest, adult Temple of Time), `softlock_virtual_regions` for nonphysical
+spawn/song dispatchers, and the evidenced physical `softlock_verified_regions`. The first accepted slice
+contains only the played Slingshot Room trap. Its entry preserves the shield rule and also requires its
+existing usable Slingshot/Boomerang/Bow exit predicate; a room reward cannot provide its own entry tool.
+
+`Search.collect_spheres(..., observe=...)` calls the observer at every inventory frontier, including the
+initial state and the final fixed point. `Search.inventory(age)` exposes the correct child-prefix/shared
+view. `world.softlocks.reachable_traps` reverses currently usable edges over `(region, time)` per age;
+waiting is allowed where `time_passes`, never by borrowing another age's items. Reaching any physical
+anchor for that age suffices. Ownership alone supplies no Farore's Wind point. Unverified song escapes
+are not assumed. The unscoped `audit` is a diagnostic ledger, not proof that every missing graph return
+is a physical trap; `regions=` restricts a certificate. Ordinary missing returns and song-arrival triage
+remain next-slice work in `rounds/r16-softlocks.md`, not fabricated permissive edges.
+
+Every solo goal proof also refuses failures in the native verified-region scope. External placements,
+which still skip the solo goal/first-pull proofs, run that same scoped physical-trap refusal. This changes
+placements even with Token off, including Defaults; no settings string can opt out of the native policy.
 
 ## Generating a seed
 
@@ -415,8 +435,9 @@ fill. The screen pool includes each item as many times as either the normalized 
 assignments provide; a remote lower tier/container is obtainable, never assumed guaranteed before its gate.
 An unbuildable progressive pool is refused. Data exclusions, including House100's nonprogression-only rule,
 cannot be widened by supplied assignments. Unshuffled sources retain their native rewards.
-These calls deliberately skip local beatability/return proofs: the external placer must prove its whole world
-or multiworld. They choose no hints, have no spheres and report a null opening route; they are not certified solo seeds.
+These calls deliberately skip local goal/age-return proofs: the external placer must prove its whole world
+or multiworld. They still refuse evidenced physical traps in the native scope. They choose no hints, have no
+spheres and report a null opening route; they are not certified solo seeds.
 Ordinary CLI/app generation still fills and proves the seed.
 
 Native progressive preparation and chest-only copies, source-bound key/progressive

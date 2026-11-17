@@ -1,6 +1,7 @@
-"""The ported world (all of OoT Randomizer's overworld and vanilla dungeons, with the remake's overrides): it loads,
-its vanilla placement is beatable, its rules say what OoT Randomizer's and the remake's say, and seeds with the
-default settings are beatable and reproducible."""
+"""The real graph loads, preserves sourced rules, and produces beatable reproducible seeds.
+
+The all-check oracle supplies keys and a Slingshot: vanilla's own first Slingshot is now self-locked by policy.
+"""
 
 import os
 import subprocess
@@ -40,14 +41,12 @@ def vanilla_placements(world) -> dict[str, str]:
     return {n: loc.vanilla for n, loc in world.locations.items() if loc.vanilla is not None and loc.n64_only is None}
 
 
-def test_vanilla_placement_is_beatable(world):
-    """OoT Randomizer counts a dungeon's small keys for the worst order of its locked doors, so its own vanilla key
-    layout is not provably enough (the Spirit Temple's Silver Gauntlets chest asks for 5 keys; the child side has
-    2). Key logic is what seeds test below; here every other item lies where the game puts it, and each dungeon's
-    small keys are held from the start."""
+def test_all_other_vanilla_checks_with_keys_and_an_escape_tool(world):
+    """Worst-order key logic needs upfront keys. No-save-warp entry safety also
+    requires an upfront Slingshot; the vanilla room cannot supply its own entry tool."""
     placements = vanilla_placements(world)
     keys = [item for item in placements.values() if world.items[item].type == "SmallKey"]
-    search = Search(world, keys)
+    search = Search(world, [*keys, "Slingshot"])
     search.collect_spheres(placements)
     assert search.won()
     assert search.holds("Time Travel") and search.can_reach("Ganondorf Boss Room", ADULT)
@@ -94,7 +93,8 @@ def test_forest_start(world):
 
     search = reachable(world, ["Kokiri Sword", "Buy Deku Shield"])
     assert search.holds("Showed Mido Sword & Shield")
-    assert search.can_reach("Deku Tree Slingshot Room", CHILD)  # here(has_shield)
+    assert search.can_reach("Deku Tree Lobby", CHILD)
+    assert not search.can_reach("Deku Tree Slingshot Room", CHILD)
     assert not search.can_reach("LW Bridge From Forest")  # can_leave_forest: Gohma first
 
 

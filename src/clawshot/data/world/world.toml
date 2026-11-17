@@ -61,6 +61,13 @@ skip_mido = false
 # D35: paired with patch.door, separate from free_time_travel.
 door_of_time = "closed"
 
+# Round 16, maintainer scope: physical safe anchors, never the abstract Root/save-warp dispatcher.
+# First slice certifies the played Slingshot trap only; full-graph return debt stays diagnostic.
+# Evidence and deferred region ledger: plans/rounds/r16-softlocks.md.
+softlock_anchors = { child = ["KF Links House", "Kokiri Forest"], adult = ["Temple of Time"] }
+softlock_verified_regions = ["Deku Tree Slingshot Room"]
+softlock_virtual_regions = ["Root", "Root Exits", "Child Spawn", "Adult Spawn", "Prelude of Light Warp", "Minuet of Forest Warp", "Bolero of Fire Warp", "Serenade of Water Warp", "Nocturne of Shadow Warp", "Requiem of Spirit Warp", "Farores Wind Warp"]
+
 # Adult return pedestal: Market_Adult_Prefab_89da deletes its attention actor until the Forest quest is complete.
 # Dm_SY_BancChange_EscapeDungeon Event199 completes that quest after the Forest blue warp, not medal possession.
 # Exact source: plans/03-game-data.md section 16; the search keeps a separate pre-pull child inventory until then.

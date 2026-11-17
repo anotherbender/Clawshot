@@ -1053,11 +1053,34 @@ def fill(
     return result
 
 
+def _refuse_traps(search: Search, sphere: int) -> None:
+    if not search.world.settings.get("softlock_anchors"):
+        return
+    from clawshot.world.softlocks import reachable_traps
+
+    regions = search.world.settings.get("softlock_verified_regions")
+    if regions is not None and not any(search.can_reach(name) for name in regions):
+        return
+    if traps := reachable_traps(search, sphere, regions=regions):
+        details = "; ".join(f"{t.age}: {t.region} ({t.time})" for t in traps[:8])
+        raise FillError(
+            f"reachable softlock after sphere {sphere}: {details}. "
+            "No return path with the items held; the remake has no save warp.",
+            stage="softlock",
+        )
+
+
+def check_no_traps(world: World, placements: Mapping[str, str]) -> None:
+    """Refuse traps in the evidenced acceptance scope, including external placements."""
+    if world.settings.get("softlock_anchors"):
+        Search(world).collect_spheres(placements, observe=_refuse_traps)
+
+
 def check_beatable(world: World, placements: dict[str, str]) -> list[list[str]]:
     """The beatability search: collect everything reachable from the start; the goal must be met. Returns the
     spheres (location names) on success."""
     search = Search(world)
-    spheres = search.collect_spheres(placements)
+    spheres = search.collect_spheres(placements, observe=_refuse_traps)
     if not search.won():
         unreached = [name for name in placements if name not in search.collected]
         raise FillError(f"the goal cannot be reached; {len(unreached)} placed items never reachable: {unreached[:10]}")
