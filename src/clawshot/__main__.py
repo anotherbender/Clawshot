@@ -83,7 +83,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--door-of-time",
         choices=("closed", "song_only", "open"),
-        help="closed: stones, Ocarina of Time and Time song (default); song_only: either ocarina; open: no items",
+        help=(
+            "closed: stones, Time ocarina/song (default); "
+            "song_only: after Zelda/Impa send-off, either ocarina and Time song; "
+            "open: after Zelda/Impa send-off, no songs or stones"
+        ),
     )
     parser.add_argument(
         "--songs", choices=("song", "anywhere"), help="song locations only (default), or all songs anywhere"

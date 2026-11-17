@@ -8,11 +8,12 @@
 # - Event flow DoorOfTime (romfs EventFlow, decoded in E:/OOTRemake/work/r1-research/decoded/evfl_all.json) and the
 #   placement data (Market_Child_Static, read by E:/OOTRemake/work/r4-logic-child/actors.py).
 
-# D35 (Kareem, round10): closed by default. Song-only keeps native ocarina play/learned-song
-# checks but bypasses both quest gates; open uses the native gate module at Ready and an
-# ungated child pedestal. Adult return/Prelude remain independent. Native trace: section41.
+# D35: closed by default. Kareem, 2026-11-16 (round16), then Claude's explicit
+# both-early-modes confirmation: both wait for the real Impa field send-off, which
+# unlocks the native clock. Song-only retains its song/either-ocarina requirement;
+# open needs no songs/stones. Adult return is separate.
 
 [exits."Temple of Time"."Beyond Door of Time"]
-rule = "door_of_time == 'open' or (can_play(Song_of_Time) and (door_of_time == 'song_only' or (has_all_stones and (Ocarina, 2) and 'Met Child Zelda')))"
+rule = "(door_of_time == 'open' and 'Met Child Zelda') or (can_play(Song_of_Time) and ((door_of_time == 'song_only' and 'Met Child Zelda') or (has_all_stones and (Ocarina, 2) and 'Met Child Zelda')))"
 was = "can_open_door_of_time"
-source = "D35 (Kareem, 2026-11-09); sections41/46: closed retains the native courtyard/Impa story chain, three stones, Time ocarina and playable Time song. Native altar requires DoorOfTime Step05 and Event60 requires after-Step04; shuffled inventory alone does not advance them. song_only bypasses both quest gates and permits either child ocarina; open has no inventory/story prerequisite. Forest-return and Prelude gates remain."
+source = "Kareem, 2026-11-16, round16 (r16-time.md), plus Claude's explicit both-early-modes confirmation: open and song_only wait for HavePlayedEvent.Dm_HrlField_0020, Impa's field send-off represented by Met Child Zelda; native clock advancement reads that history. Open needs no songs/stones; song_only needs learned Time song and either child ocarina, no stones. Closed retains sections41/46's courtyard/Impa, stones, Time ocarina/song requirements. Native escape and moat checks remain available after an early pull via guarded late-step predicates and forward-only quest writes. Forest return and Prelude remain separate."

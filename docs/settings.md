@@ -288,21 +288,28 @@ credit is a separate bug, not a failure of this map-access correction.
 | Option | Requirement / effect |
 |---|---|
 | `--door-of-time closed` | Default, native: meet Zelda and Impa at the child castle, complete the three Spiritual Stones, then obtain the Ocarina of Time and playable Song of Time. |
-| `--door-of-time song_only` | Either child ocarina and the learned Song of Time. Passed a first in-game check with the Fairy Ocarina and two stones (R10-DOOR-SONG); the opening scene still shows all three stones. |
-| `--door-of-time open` | Opens the door and first-pull pedestal without items. Passed a first in-game check: open door, first pull and first-adult scenes (R10-DOOR-OPEN). |
+| `--door-of-time song_only` | Meet Zelda and finish Impa's field send-off, then either child ocarina and the learned Song of Time. No stones needed to open the Door. |
+| `--door-of-time open` | The Door stays shut until Zelda/Impa's field send-off, then opens without songs or stones; the first-pull pedestal has no extra item gate. |
 | `--logic free_time_travel=true` | Experimental, default off: adult return before Forest completion. The app's **Free time travel (experimental)** switch is the same override. |
 
 Door mode and reverse travel are independent. The default return guarantee proves an adult can
 unlock return from the minimum mandatory first-pull inventory and adult checks; optional child
 errands are not assumed. Early-door settings can be refused with unshuffled child-only prerequisites.
-There is no automatic free-travel override. Early Zelda escape/moat story timing with an open door
-still needs a player check.
+There is no automatic free-travel override. Both early modes keep the escape and both moat rewards
+available after an early sword pull: finish all three stone quests, return as child, then approach the
+Market from Hyrule Field and collect the moat pickup. Late scenes do not roll the completed Door quest back.
+These new gates/order repairs are built, **not yet checked in game**; earlier Door/first-pull checks
+(R10-DOOR-SONG/OPEN) do not certify them.
+
+**Prevents new clock freezes; does not repair already-frozen saves.** Both early modes now require the
+real send-off because the remake's clock reads its event history. Rebuilding an old early-Door seed can
+change placements, spheres and output; do not replace a played seed or use a new output to repair its save.
 
 **The three stones alone do not trigger Zelda's escape.** Visit the child castle courtyard and
 finish Impa's send-off too: Malon's fixed Weird Egg / Chicken wakes Talon to reach that route.
-Both moat rewards, Saria's song source and the closed Door of Time require the completed
+Both moat rewards, Saria's song source and every Door mode require the completed
 courtyard/Impa sequence in logic, even if ocarinas or songs were shuffled elsewhere
-(`Met Child Zelda` models DoorOfTime Step02). Zelda's Letter stays at Zelda (D31); no child-Zelda
+(`Met Child Zelda` models the completed send-off). Zelda's Letter stays at Zelda (D31); no child-Zelda
 skip or quest-precompletion patch is offered. The native-data trace is
 [section 46](../plans/03-game-data.md#46-round-14-child-story-and-field-music).
 Kareem passed the staged Longshot story controls on 2026-11-13, including Saria before Darunia and escape/reload.

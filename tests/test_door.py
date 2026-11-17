@@ -99,30 +99,36 @@ def synthetic_flow():
 
 
 @pytest.mark.parametrize(
-    "learned,recommended,opened,played",
+    "learned,recommended,opened,played,sendoff",
     [
-        (True, True, False, False),
-        (False, True, False, False),
-        (True, False, False, False),
-        (True, True, True, False),
-        (True, True, False, True),
+        (True, True, False, False, False),
+        (True, True, False, False, True),
+        (False, True, False, False, True),
+        (True, False, False, False, True),
+        (True, True, True, False, True),
+        (True, True, False, True, True),
     ],
 )
-def test_song_only_opens_without_quests_but_retains_song_play_and_saved_once_gates(
-    learned, recommended, opened, played
+def test_song_only_opens_after_sendoff_and_retains_song_play_and_saved_once_gates(
+    learned, recommended, opened, played, sendoff
 ):
     original = synthetic_flow()
     patched = evfl.read(door.song_flow(evfl.write(original)))
-    state = {door.TIME_SONG: learned, door.OPENED: opened, "HavePlayedEvent.Dm_TimeTemple_0010": played}
+    state = {
+        door.TIME_SONG: learned,
+        door.OPENED: opened,
+        door.SENDOFF: sendoff,
+        "HavePlayedEvent.Dm_TimeTemple_0010": played,
+    }
     scenes, writes = run_open_flow(patched.flowchart, state, recommended=recommended)
-    success = learned and recommended and not opened and not played
+    success = learned and recommended and not opened and not played and sendoff
     assert scenes == (["Dm_TimeTemple_0010"] if success else [])
     assert writes == ([door.OPENED, "Step_DoorOfTime"] if success else [])
     if success:
         assert state["Step_DoorOfTime"] == "Step06"
         assert run_open_flow(patched.flowchart, deepcopy(state)) == ([], [])
-    # Restore only the intentional entry/edge/appended query; all other flow data must be native.
-    patched.flowchart.events.pop()
+    # Restore only the intentional entry/edge/guards; every unrelated native path remains exact.
+    del patched.flowchart.events[len(original.flowchart.events) :]
     patched.flowchart.entry_points[0].main_event = original.flowchart.entry_points[0].main_event
     patched.flowchart.events[2].next = original.flowchart.events[2].next
     assert patched == original
@@ -138,10 +144,12 @@ def test_song_patch_refuses_changed_native_gate():
 @pytest.mark.parametrize(
     "mode,items,expected",
     [
-        ("open", {}, True),
+        ("open", {}, False),
+        ("open", {"Met Child Zelda": 1}, True),
         ("song_only", {"Ocarina": 1}, False),
         ("song_only", {"Song of Time": 1}, False),
-        ("song_only", {"Ocarina": 1, "Song of Time": 1}, True),
+        ("song_only", {"Ocarina": 1, "Song of Time": 1}, False),
+        ("song_only", {"Ocarina": 1, "Song of Time": 1, "Met Child Zelda": 1}, True),
         ("closed", {"Ocarina": 2, "Song of Time": 1}, False),
         ("closed", {"Ocarina": 1, "Song of Time": 1, "Kokiri Emerald": 1, "Goron Ruby": 1, "Zora Sapphire": 1}, False),
         ("closed", {"Ocarina": 2, "Song of Time": 1, "Kokiri Emerald": 1, "Goron Ruby": 1, "Zora Sapphire": 1}, False),

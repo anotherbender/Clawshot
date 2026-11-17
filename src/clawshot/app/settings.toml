@@ -32,7 +32,7 @@ label = "Door of Time"
 kind = "choice"
 choices = ["closed", "song_only", "open"]
 group = "World"
-help = "Choose whether the door needs the Spiritual Stones, Ocarina of Time and Song of Time, just the song and an ocarina, or nothing. All three door modes have passed a first in-game check."
+help = "Closed keeps the usual stones, Ocarina of Time and Song of Time route. Both early modes wait until you meet Zelda and finish Impa's field send-off: Song-only then needs the learned Song of Time and either ocarina; Open needs no songs or stones. The escape and both moat rewards remain available after pulling the sword early."
 clears = { logic = ["door_of_time"] }
 [free_time_travel]
 label = "Free time travel (experimental)"
@@ -147,8 +147,8 @@ closed_deku = "Open bridge only"
 open = "Open forest and Mido"
 [door_of_time.labels]
 closed = "Closed (vanilla)"
-song_only = "Song of Time only"
-open = "Open"
+song_only = "Time song after Zelda"
+open = "Open after meeting Zelda"
 [fast_start.labels]
 intro = "Skip the opening movie"
 saria = "Skip Saria's opening scene"
@@ -191,8 +191,8 @@ closed_deku = "Open the forest bridge immediately. Mido still needs your sword a
 open = "Open the forest bridge immediately and let you past Mido without showing a sword and shield."
 [door_of_time.choice_help]
 closed = "Open the door with the Spiritual Stones, Ocarina of Time and Song of Time, like the usual route. Its first in-game check passed."
-song_only = "Open the door with the learned Song of Time and either ocarina, without the stones. Its first in-game check passed; returning to child after an early visit is untested."
-open = "The door starts open without the stones or song. Its first in-game check passed; returning to child after an early visit is untested."
+song_only = "Meet Zelda and finish Impa's field send-off, then open the Door with the learned Song of Time and either ocarina, without stones. The escape and both moat rewards remain available after pulling early. These updated protections await their in-game check."
+open = "The Door stays shut until you meet Zelda as a child and finish Impa's field send-off, then opens without stones, an ocarina or songs. The escape and both moat rewards remain available after pulling early. These protections prevent new clock freezes, not repair frozen saves; the in-game check is pending."
 [fast_start.choice_help]
 intro = "Remove the opening movie entirely. New-game setup and Navi waking Link still run. Movie removal passed a new-game check."
 saria = "Skip Saria's opening scene while keeping the forest visited so its pause map remains available. This does not give an item or change forest access."

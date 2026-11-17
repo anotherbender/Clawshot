@@ -320,13 +320,19 @@ No quest/reward/saved default is forced. First-arrival gameplay acceptance remai
 
 `Settings.door_of_time = closed | song_only | open` (D35, default closed) is separate.
 `prepare` derives its matching logic constant; contradictory `--logic door_of_time` is refused.
-The child-temple override requires stones + Ocarina2 + playable Time song when closed,
-either child ocarina + Time song for song_only, and no items for open. `patch.door` supplies
-the paired native transforms; closed emits nothing. Song-only removes both the altar's Step05
-reaction gate and the flow's quest-progress gate, retaining learned song, melody, scene history,
-opened flag and Step06 writes. Open changes the physical gate module's threshold to Ready
-without resizing its string pool, and reuses the ungated attention module for first/repeat pulls.
-No stone quest completion, inventory grant or first-adult scene is forged.
+The child-temple override requires stones + Ocarina2 + playable Time song when closed.
+Both early modes require `Met Child Zelda` (the completed Impa field send-off, whose native history
+unlocks clock progression): song-only additionally requires either child ocarina + learned Time song;
+open requires no items. Kareem chose the open-Door physical gate on2026-11-16; Claude explicitly
+extended the protection to song-only on2026-11-17 (`rounds/r16-time.md`).
+`patch.door` supplies matching physical/altar gates; closed emits nothing. Open reuses the ungated
+attention module for first/repeat pulls; its common gate reads actual send-off and skips the native
+opening scene. Song-only retains its learned-song/melody/scene/once and Step06 path after send-off.
+Both early modes extend escape/moat actor predicates through late Door states with all three native
+stone-quest completions and source-history guards. `patch.door_story` makes every lower Door write
+forward-only while preserving native rewards, continuations and the first-pull Complete write.
+No stone quest completion, inventory grant, saved history/default or first-adult scene is forged.
+This is prevention for new seeds, not a repair for already-frozen saves; the rc.4 player check is pending.
 
 The data-defined return kit's lower-bound inventory and staged families vary with door mode:
 earlier pulls cannot assume optional child Saria/strength/Time-ocarina finds. The independent

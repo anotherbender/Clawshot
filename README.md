@@ -104,8 +104,9 @@ Dampé still shows a heart prize but gives the shuffled item.
 
 First expert gallery rewards, merchant experiments and some Skulltula House rewards stay
 unchanged until their tests pass; the 10-token swap alone has been observed, not every threshold.
-The Door of Time's song-only and open modes each passed a first in-game check (the door and
-first sword pull); returning to child afterwards is untested.
+The Door of Time's earlier song-only and open modes passed a first door/sword-pull check.
+Both now wait for Zelda/Impa's send-off and preserve the later escape/moat rewards after an early pull;
+these new protections await the Longshot in-game check. They prevent new freezes, not repair frozen saves.
 
 Cows, dungeon completion rewards, pots, crates and loose rupees are not shuffled.
 Of the dungeon items, only small keys can leave their dungeon, and only when you opt in:
