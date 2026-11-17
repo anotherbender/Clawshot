@@ -15,6 +15,8 @@ from pathlib import Path
 
 import zstandard
 
+from .._limits import MAX_FILE_SIZE
+
 MAGIC = b"NXAR"
 SUPPORTED_VERSIONS = {(0, 2), (0, 3)}
 HEADER_SIZE = 256
@@ -23,7 +25,6 @@ REQUIRED_FEATURE_HEADER_PAGES = 1
 CHECK_SIZE = 16384
 MAX_CATALOG = 16 << 20
 MAX_MOUNT_METADATA = 256 << 20
-MAX_FILE_SIZE = 512 << 20
 ABSENT = 0xFFFFFFFF
 
 # §4 snapshot types and the required extensions this reader understands (unknown required ones reject, §11).

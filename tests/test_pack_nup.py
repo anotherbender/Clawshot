@@ -2,16 +2,21 @@
 
 import hashlib
 import json
+import random
 import struct
+import tracemalloc
 
 import pytest
 import zstandard
 
 from clawshot.pack import VERSION_FILES, PackError, build, runtime, tree_digest, version_digest
+from clawshot.pack._nup import read as nup
+from clawshot.pack._nup.format import NupError
+from clawshot.pack._nup.read import NupReader
 from clawshot.pack.source import local_romfs, open_nup
 
 
-def write_nup(path, packages):
+def write_nup(path, packages, *, compressor=None, raw=False):
     """Build v1 records from the public format; all contents are invented by tests."""
     dirs, files, roots = [], [], []
     for version, kind, contents, *title in packages:
@@ -52,8 +57,8 @@ def write_nup(path, packages):
     blob_offset = (128 + toc_size + 15) & ~15
     blob, file_records = bytearray(), bytearray()
     for i, (_, data) in enumerate(files):
-        compressed = zstandard.ZstdCompressor().compress(data)
-        codec = int(len(compressed) < len(data))
+        compressed = (compressor or zstandard.ZstdCompressor()).compress(data)
+        codec = int(not raw and len(compressed) < len(data))
         payload = compressed if codec else data
         offset = blob_offset + len(blob) if data else 0
         file_records.extend(
@@ -217,3 +222,124 @@ def test_existing_nup_seed_is_verified_without_cache_or_hookshot(tmp_path, monke
     assert note.read_text() == "already generated"
     assert note.stat().st_mtime_ns == before
     assert sorted(p.name for p in root.iterdir()) == ["folders.json", "pack.json", "seed"]
+
+
+def _rewrite_file(path, index=0, *, size=None, extent_size=None):
+    data = bytearray(path.read_bytes())
+    toc_start, toc_size = struct.unpack_from("<QQ", data, 8)
+    packages = struct.unpack_from("<I", data, toc_start + 4)[0]
+    directories = struct.unpack_from("<Q", data, toc_start + 8)[0]
+    record = toc_start + 48 + packages * 64 + directories * 24 + index * 80
+    if size is not None:
+        struct.pack_into("<Q", data, record + 8, size)
+    if extent_size is not None:
+        struct.pack_into("<Q", data, record + 24, extent_size)
+    data[24:56] = hashlib.sha256(data[toc_start : toc_start + toc_size]).digest()
+    path.write_bytes(data)
+
+
+def test_oversized_declared_file_is_refused_before_payload_allocation(tmp_path):
+    path = write_nup(tmp_path / "expanded.nup", [(131072, 1, {"repeat": b"x" * 1024})])
+    _rewrite_file(path, size=2 << 30)
+    assert path.stat().st_size < 1024
+    tracemalloc.start()
+    try:
+        with pytest.raises(PackError, match="file limit"), open_nup(path):
+            pytest.fail("oversized metadata reached member access")
+        _, peak = tracemalloc.get_traced_memory()
+    finally:
+        tracemalloc.stop()
+    assert peak < 1 << 20, f"2 GiB declaration allocated {peak} bytes"
+    path.unlink()  # rejection closes the mmap and handle
+
+
+def test_direct_read_cannot_bypass_file_limit(tmp_path):
+    path = write_nup(tmp_path / "direct.nup", [(131072, 1, {"file": b"x"})])
+    with NupReader(str(path)) as reader:
+        name, _, sha, offset, stored, codec = reader.files[0]
+        reader.files[0] = (name, (512 << 20) + 1, sha, offset, stored, codec)
+        with pytest.raises(NupError, match="file limit"):
+            reader.read_file(0)
+
+
+def test_file_limit_boundary(tmp_path, monkeypatch):
+    payload = b"boundary" * 1024
+    path = write_nup(tmp_path / "boundary.nup", [(131072, 1, {"file": payload})])
+    monkeypatch.setattr(nup, "MAX_FILE_SIZE", len(payload))
+    with open_nup(path) as source:
+        assert source.read("file") == payload
+    monkeypatch.setattr(nup, "MAX_FILE_SIZE", len(payload) - 1)
+    with pytest.raises(PackError, match="file limit"), open_nup(path):
+        pass
+
+
+@pytest.mark.parametrize("compressed", [False, True])
+def test_tampered_file_is_hashed_before_assembly(tmp_path, compressed):
+    payload = b"x" * (8 << 20) if compressed else bytes(range(256)) * (32 << 10)
+    path = write_nup(tmp_path / "tampered.nup", [(131072, 1, {"file": payload})], raw=not compressed)
+    with open_nup(path) as source:
+        assert source.read("file") == payload
+        _, _, _, offset, stored, _ = source.reader.file_info(source.files["file"])
+    data = bytearray(path.read_bytes())
+    if compressed:
+        replacement = zstandard.ZstdCompressor().compress(b"y" * len(payload))
+        assert len(replacement) == stored
+        data[offset : offset + stored] = replacement
+    else:
+        data[offset + stored - 1] ^= 1
+    path.write_bytes(data)
+    with NupReader(str(path)) as reader:
+        tracemalloc.start()
+        try:
+            with pytest.raises(NupError, match="SHA"):
+                reader.read_file(0)
+            _, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+    # The decoded chunks fit; joining them before rejecting would need another 8 MiB.
+    assert peak < 12 << 20, f"tampered file allocated {peak} bytes"
+
+
+@pytest.mark.parametrize("content_size", [False, True])
+def test_frame_expansion_cannot_exceed_declared_file_size(tmp_path, content_size):
+    path = write_nup(
+        tmp_path / "hidden-size.nup",
+        [(131072, 1, {"file": b"x" * (8 << 20)})],
+        compressor=zstandard.ZstdCompressor(write_content_size=content_size),
+    )
+    _rewrite_file(path, size=1024)
+    tracemalloc.start()
+    try:
+        with pytest.raises(PackError, match="size mismatch"), open_nup(path) as source:
+            source.read("file")
+        _, peak = tracemalloc.get_traced_memory()
+    finally:
+        tracemalloc.stop()
+    assert peak < 1 << 20, f"1 KiB declaration expanded to {peak} bytes"
+
+
+def test_truncated_frame_checksum_is_refused(tmp_path):
+    path = write_nup(
+        tmp_path / "truncated.nup",
+        [(131072, 1, {"file": b"x" * 1024})],
+        compressor=zstandard.ZstdCompressor(write_checksum=True),
+    )
+    with NupReader(str(path)) as reader:
+        assert reader.read_file(0) == b"x" * 1024
+        stored = reader.files[0][4]
+    _rewrite_file(path, extent_size=stored - 1)
+    with pytest.raises(PackError), open_nup(path) as source:
+        source.read("file")
+
+
+@pytest.mark.parametrize("content_size", [False, True])
+@pytest.mark.parametrize("checksum", [False, True])
+def test_streamed_frames_preserve_raw_and_compressed_blocks(tmp_path, content_size, checksum):
+    payload = random.Random(31).randbytes(128 << 10) + b"repeated" * (32 << 10)
+    path = write_nup(
+        tmp_path / "blocks.nup",
+        [(131072, 1, {"file": payload})],
+        compressor=zstandard.ZstdCompressor(write_content_size=content_size, write_checksum=checksum),
+    )
+    with open_nup(path) as source:
+        assert source.read("file") == payload

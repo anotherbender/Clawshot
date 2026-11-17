@@ -18,6 +18,10 @@ import struct
 from typing import TYPE_CHECKING
 
 from . import format as F
+from .._limits import MAX_FILE_SIZE
+
+# Zstandard's maximum decoded block size (RFC 8878, section 3.1.1.2.3).
+BLOCK_SIZE = 128 << 10
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -148,6 +152,9 @@ class NupReader:
         for _ in range(file_count):
             (off, ln), size, sha, eoff, esz, codec = F.parse_file(toc, pos)
             pos += F.FILE_SIZE
+            if size > MAX_FILE_SIZE:
+                raise F.NupError(
+                    f"file {len(self.files)}: declared size {size} exceeds the {MAX_FILE_SIZE}-byte file limit")
             self.files.append((self._pool_str(off, ln), size, sha, eoff, esz, codec))
 
         slot_end = pool_off
@@ -208,24 +215,63 @@ class NupReader:
     def file_info(self, file_index: int) -> tuple[bytes, int, bytes, int, int, F.Codec]:
         return self.files[file_index]
 
-    def read_file(self, file_index: int) -> bytes:
-        name, size, sha, eoff, esz, codec = self.files[file_index]
-        if size == 0:
-            data = b""
-        elif codec == F.CODEC_RAW:
-            data = self._mm[eoff:eoff + esz]
-            if len(data) != esz:
-                raise F.NupError(f"short read for {name!r}")
+    def _file_chunks(self, size: int, eoff: int, esz: int, codec: F.Codec):
+        end = eoff + esz
+        if codec == F.CODEC_RAW:
+            for pos in range(eoff, end, BLOCK_SIZE):
+                yield self._mm[pos:min(pos + BLOCK_SIZE, end)]
         elif codec == F.CODEC_ZSTD:
             import zstandard
-            comp = self._mm[eoff:eoff + esz]
-            if len(comp) != esz:
-                raise F.NupError(f"short read for {name!r}")
-            dctx = zstandard.ZstdDecompressor()
-            data = dctx.decompress(comp, max_output_size=size)
+            header = self._mm[eoff:min(eoff + 18, end)]
+            frame = zstandard.get_frame_parameters(header)
+            if frame.content_size not in (size, zstandard.CONTENTSIZE_UNKNOWN):
+                raise F.NupError(f"size mismatch: Zstandard frame declares {frame.content_size} != {size}")
+            if frame.window_size > MAX_FILE_SIZE:
+                raise F.NupError("Zstandard window exceeds the file limit")
+            header_size = zstandard.frame_header_size(header)
+            decoder = zstandard.ZstdDecompressor().decompressobj()
+            decoder.decompress(header[:header_size])
+            pos = eoff + header_size
+            # Feed one complete block at a time: decompressobj exposes EOF (unlike
+            # stream_reader), and a block expands to at most 128 KiB. The native
+            # decoder still validates its contents and the optional frame checksum.
+            # Framing: https://www.rfc-editor.org/rfc/rfc8878#section-3.1.1.2
+            while pos + 3 <= end:
+                block = int.from_bytes(self._mm[pos:pos + 3], "little")
+                last, kind, length = block & 1, (block >> 1) & 3, block >> 3
+                if kind == 3 or length > BLOCK_SIZE:
+                    raise F.NupError("invalid Zstandard block header")
+                stored = 1 if kind == 1 else length
+                stop = pos + 3 + stored + (4 if last and frame.has_checksum else 0)
+                if stop > end:
+                    raise F.NupError("truncated Zstandard block or checksum")
+                yield decoder.decompress(self._mm[pos:stop])
+                pos = stop
+                if last:
+                    if not decoder.eof:
+                        raise F.NupError("truncated Zstandard frame")
+                    return
+            raise F.NupError("truncated Zstandard frame")
         else:
             raise F.NupError(f"unknown codec {codec}")
-        assert len(F.Codec) == 2
-        if len(data) != size:
-            raise F.NupError(f"size mismatch for {name!r}: {len(data)} != {size}")
-        return data
+
+    def read_file(self, file_index: int) -> bytes:
+        name, size, sha, eoff, esz, codec = self.files[file_index]
+        if size > MAX_FILE_SIZE:
+            raise F.NupError(f"declared file size {size} exceeds the {MAX_FILE_SIZE}-byte file limit")
+        if codec == F.CODEC_RAW and esz != size:
+            raise F.NupError(f"size mismatch for {name!r}: {esz} != {size}")
+        parts = []
+        digest = hashlib.sha256()
+        total = 0
+        for data in self._file_chunks(size, eoff, esz, codec):
+            total += len(data)
+            if total > size:
+                raise F.NupError(f"size mismatch for {name!r}: {total} > {size}")
+            digest.update(data)
+            parts.append(data)
+        if total != size:
+            raise F.NupError(f"size mismatch for {name!r}: {total} != {size}")
+        if digest.digest() != sha:
+            raise F.NupError(f"file SHA256 mismatch for {name!r}")
+        return b"".join(parts)

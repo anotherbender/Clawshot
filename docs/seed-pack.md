@@ -121,6 +121,9 @@ The newest base/update package must contain a complete supported RomFS. Add-ons 
 incomplete or unsupported newer updates never fall back to an older package. Every resource read
 is checked against its NUP SHA256. The same four-resource fingerprint is computed **from inside
 the container**, not from its name or display-version metadata.
+Declared files are capped at 512 MiB, above the largest supported dump member, before reading any payload.
+Raw extents and Zstandard blocks are hashed incrementally; the file is assembled only after its size and SHA256
+match. Zstandard decoding checks the complete frame and refuses expansion beyond the declared size.
 
 ### NX input
 

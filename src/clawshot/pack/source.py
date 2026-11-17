@@ -78,12 +78,7 @@ class NupRomfs:
     def read(self, relative: str) -> bytes:
         if relative not in self.files:
             raise PackError(f"NUP newest package is missing romfs/{relative}; a complete supported dump is required")
-        index = self.files[relative]
-        data = self.reader.read_file(index)
-        expected = self.reader.file_info(index)[2]
-        if hashlib.sha256(data).digest() != expected:
-            raise PackError(f"NUP SHA256 mismatch: romfs/{relative}")
-        return data
+        return self.reader.read_file(self.files[relative])
 
 
 class NxRomfs:
