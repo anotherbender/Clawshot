@@ -66,7 +66,13 @@ class ItemActors:
         for actor, names in by_actor.items():
             if len(names) == 1:
                 continue
-            dungeons = [items[name].dungeon for name in names]
+            # Fortress keys share the generic display but use explicit source-bound target credit.
+            dungeons = [
+                "Thieves Hideout"
+                if actor == "Item_Dungeon_SmallKey" and items[name].type == "HideoutSmallKey"
+                else items[name].dungeon
+                for name in names
+            ]
             if None in dungeons or len(set(dungeons)) != len(dungeons):
                 raise ItemActorError(f"the actor {actor!r} gives {names}: only one item per dungeon may share it")
 

@@ -1,0 +1,55 @@
+# Native guard floor sources, grouped by actor identity across drop/event/resting forms.
+# Torch-room correspondence is unproven: each source conservatively requires every
+# inherited guard-access event, not a guessed suffix-to-torch mapping. No rescue or card flow is patched.
+
+[locations."Hideout 1 Torch Jail Gerudo Key"]
+n64_only = "replaced by the four hash-linked native Fortress source identities; torch-room correspondence unproven"
+source = "plans/rounds/r18-keys.md; r17-dungeon-items.md section 2: four key actor identities, eight placed forms, not eight obtainable keys"
+
+[locations."Hideout 2 Torches Jail Gerudo Key"]
+n64_only = "replaced by the four hash-linked native Fortress source identities; torch-room correspondence unproven"
+source = "plans/rounds/r18-keys.md; r17-dungeon-items.md section 2: native identity/source audit"
+
+[locations."Hideout 3 Torches Jail Gerudo Key"]
+n64_only = "replaced by the four hash-linked native Fortress source identities; torch-room correspondence unproven"
+source = "plans/rounds/r18-keys.md; r17-dungeon-items.md section 2: native identity/source audit"
+
+[locations."Hideout 4 Torches Jail Gerudo Key"]
+n64_only = "replaced by the four hash-linked native Fortress source identities; torch-room correspondence unproven"
+source = "plans/rounds/r18-keys.md; r17-dungeon-items.md section 2: native identity/source audit"
+
+[locations."Gerudo Fortress Jail Key 01"]
+new = true
+region = "Gerudo Fortress"
+area = "GerudoFortress"
+type = "Collectable"
+vanilla = "Small Key (Thieves Hideout)"
+rule = "'Hideout 1 Torch Jail Gerudo' and 'Hideout 2 Torches Jail Gerudo' and 'Hideout 3 Torches Jail Gerudo' and 'Hideout 4 Torches Jail Gerudo'"
+source = "plans/rounds/r18-keys.md: Obj_Dungeon_SmallKey_GerudoFortress_01, resting Hash 14727159573379044362; guard/event/resting source preserved. Conservative intersection of OoTR Overworld.json guard routes; exact torch mapping unproven. Kareem played guard floor drops, 2026-11-17."
+
+[locations."Gerudo Fortress Jail Key 02"]
+new = true
+region = "Gerudo Fortress"
+area = "GerudoFortress"
+type = "Collectable"
+vanilla = "Small Key (Thieves Hideout)"
+rule = "'Hideout 1 Torch Jail Gerudo' and 'Hideout 2 Torches Jail Gerudo' and 'Hideout 3 Torches Jail Gerudo' and 'Hideout 4 Torches Jail Gerudo'"
+source = "plans/rounds/r18-keys.md: Obj_Dungeon_SmallKey_GerudoFortress_02, resting Hash 5303541637929200213; same conservative guard-route intersection as source 01, no guessed torch mapping."
+
+[locations."Gerudo Fortress Jail Key 03"]
+new = true
+region = "Gerudo Fortress"
+area = "GerudoFortress"
+type = "Collectable"
+vanilla = "Small Key (Thieves Hideout)"
+rule = "'Hideout 1 Torch Jail Gerudo' and 'Hideout 2 Torches Jail Gerudo' and 'Hideout 3 Torches Jail Gerudo' and 'Hideout 4 Torches Jail Gerudo'"
+source = "plans/rounds/r18-keys.md: Obj_Dungeon_SmallKey_GerudoFortress_03, resting Hash 1406667554698159711; rescue flow Event169 binds SmallKeyForEvent_03. Missing thief Banc DropActor override does not negate Kareem's played floor-drop fact. Same conservative guard-route intersection."
+
+[locations."Gerudo Fortress Jail Key 04"]
+new = true
+region = "Gerudo Fortress"
+area = "GerudoFortress"
+type = "Collectable"
+vanilla = "Small Key (Thieves Hideout)"
+rule = "'Hideout 1 Torch Jail Gerudo' and 'Hideout 2 Torches Jail Gerudo' and 'Hideout 3 Torches Jail Gerudo' and 'Hideout 4 Torches Jail Gerudo'"
+source = "plans/rounds/r18-keys.md: Obj_Dungeon_SmallKey_GerudoFortress_04, resting Hash 10731814783987785199; same conservative guard-route intersection as source 01, no guessed torch mapping."

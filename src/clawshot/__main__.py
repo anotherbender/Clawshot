@@ -77,6 +77,12 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     parser.add_argument(
+        "--shuffle-hideout-keys",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="experimental, default off: four Fortress guard floor keys into shuffled chests; card scene stays vanilla",
+    )
+    parser.add_argument(
         "--forest",
         choices=("closed", "closed_deku", "open"),
         help="closed: vanilla; closed_deku: exit only; open: exit and Mido",
@@ -131,6 +137,7 @@ def main(argv: list[str] | None = None) -> int:
         for option, field in (
             ("shuffle", "shuffle"),
             ("dungeon_items", "dungeon_items"),
+            ("shuffle_hideout_keys", "shuffle_hideout_keys"),
             ("areas", "areas"),
             ("goal", "goal"),
             ("skip", "fast_start"),

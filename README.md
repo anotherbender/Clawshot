@@ -69,7 +69,9 @@ The [Tracker tab](docs/tracker.md) reads saved inventory and per-dungeon keys, w
 
 - **Shuffled now:** chests, shop shelves, NPC gifts and songs, one-time Deku Scrub sales.
 - **Optional:** boss Heart Containers, floor Heart Pieces, Gold Skulltulas (requires chests),
-  and small keys outside their own dungeon (opt-in **Small keys anywhere**). Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys; built, not yet played in game.
+  and small keys outside their own dungeon (opt-in **Small keys anywhere**, now including Well/Shadow floor keys;
+  those sources are built, not played). **Fortress jail keys** are a separate experimental, default-off option;
+  the card scene stays vanilla. Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys.
 - **Not shuffled yet:** cows, dungeon rewards, pots, crates and loose rupees.
 
 Choose the kinds you want. The UI starts with Recommended; the generator's Defaults shuffle chests
@@ -113,8 +115,10 @@ later escape/moat order repair and immediate child-return clock clear passed on 
 The first-arrival lighting repair awaits v5 play checks. For new seeds; no save-repair or older-seed compatibility guarantee.
 
 Cows, dungeon completion rewards, pots, crates and loose rupees are not shuffled.
-**Small keys anywhere** puts the dungeon chest keys in any supported shuffled chest,
-including other dungeons and the overworld. Experimental **All dungeon items anywhere**
+**Small keys anywhere** puts dungeon chest keys and the Well/Shadow floor keys in supported shuffled chests,
+including other dungeons and the overworld. The two new floor sources give their own key or a red rupee and keep a
+key-shaped model; built, not played. **Fortress jail keys** is a separate default-off switch with the same source
+reward limit; all four rescues and the captain's vanilla card scene remain. Experimental **All dungeon items anywhere**
 also releases maps, compasses and boss keys, including Ganon's Castle's boss key; that new
 mode is built and untested in game. Defaults and both presets keep every dungeon item home.
 A dungeon item found outside its dungeon names that dungeon in its pickup messages

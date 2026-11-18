@@ -3166,3 +3166,51 @@ where = "Adult Kakariko Shooting Gallery, daytime with Fairy Bow: win the normal
 oot_randomizer_name = ""
 source = "cs10a native MiniGame_HitTarget Event449 hard-mode branch, Event599 repeat 70, normal Kakariko_Get_Quiver gate; Kareem fixed 20 pool approval, section 40."
 ids = ["MiniGame_HitTarget/Event599"]
+
+[[location]]
+location = "Bottom of the Well Freestanding Key"
+name = "Well Floor Key Pickup"
+where = "Bottom of the Well, room 3: collect the floor pickup after the room puzzle"
+oot_randomizer_name = "Bottom of the Well Freestanding Key"
+source = "plans/rounds/r18-keys.md; native room-3 pickup/retirement trace"
+ids = ["17649154319341333603"]
+
+[[location]]
+location = "Shadow Temple Freestanding Key"
+name = "Shadow Skull-Pot Key Pickup"
+where = "Shadow Temple, skull-pot room: break the large skull pot with bombs, then collect its floor pickup"
+oot_randomizer_name = "Shadow Temple Freestanding Key"
+source = "plans/rounds/r18-keys.md; ShadowTemple_Gimmick:LargeJar_Key and native room-13 pickup trace"
+ids = ["12562389953863361839"]
+
+[[location]]
+location = "Gerudo Fortress Jail Key 01"
+name = "Fortress Guard 01 Floor Reward"
+where = "Gerudo Fortress cell halls: collect the defeated guard's floor reward; exact torch-room mapping is unverified"
+oot_randomizer_name = ""
+source = "plans/rounds/r18-keys.md; native key-01 identity across guard/event/resting forms"
+ids = ["14727159573379044362"]
+
+[[location]]
+location = "Gerudo Fortress Jail Key 02"
+name = "Fortress Guard 02 Floor Reward"
+where = "Gerudo Fortress cell halls: collect the defeated guard's floor reward; exact torch-room mapping is unverified"
+oot_randomizer_name = ""
+source = "plans/rounds/r18-keys.md; native key-02 identity across guard/event/resting forms"
+ids = ["5303541637929200213"]
+
+[[location]]
+location = "Gerudo Fortress Jail Key 03"
+name = "Fortress Guard 03 Floor Reward"
+where = "Gerudo Fortress cell halls: collect the defeated guard's floor reward; exact torch-room mapping is unverified"
+oot_randomizer_name = ""
+source = "plans/rounds/r18-keys.md; native key-03 identity across guard/event/resting forms"
+ids = ["1406667554698159711"]
+
+[[location]]
+location = "Gerudo Fortress Jail Key 04"
+name = "Fortress Guard 04 Floor Reward"
+where = "Gerudo Fortress cell halls: collect the defeated guard's floor reward; exact torch-room mapping is unverified"
+oot_randomizer_name = ""
+source = "plans/rounds/r18-keys.md; native key-04 identity across guard/event/resting forms"
+ids = ["10731814783987785199"]

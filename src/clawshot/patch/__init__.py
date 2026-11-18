@@ -17,7 +17,7 @@ from typing import Any
 
 from clawshot.census import definitions as census_definitions
 from clawshot.census.scan import scan
-from clawshot.generate import Seed, Settings, from_placements, generate, play_note, prepare, spoiler
+from clawshot.generate import Seed, Settings, from_placements, generate, key_families, play_note, prepare, spoiler
 from clawshot.generate import hints as stone_hints
 from clawshot.generate import names as location_names
 from clawshot.generate import tokens as token_policy
@@ -101,8 +101,15 @@ def make_seed(
     chests = [name for name in shuffled if world.locations[name].type == "Chest"]
     shop_locations = tuple(name for name in shuffled if world.locations[name].type == "Shop")
     floor_pickups = sum(world.locations[name].type in (drops.SHUFFLE, freestanding.SHUFFLE) for name in shuffled)
+    key_pickups = sum(
+        world.locations[name].type in (key_families.FLOOR_KEY_SOURCE, key_families.HIDEOUT_KEY_SOURCE)
+        for name in shuffled
+    )
     token_locations = [name for name in shuffled if world.locations[name].type == token_policy.SHUFFLE]
-    if len(chests) + len(shop_locations) + floor_pickups + len(token_locations) != len(shuffled) and not extra_steps:
+    if (
+        len(chests) + len(shop_locations) + floor_pickups + len(token_locations) + key_pickups != len(shuffled)
+        and not extra_steps
+    ):
         raise PatchError("non-chest shuffle needs a kind-specific extra patch step")
     token_rewards = token_policy.REWARDS if token_locations else {}
     if unadmitted := sorted({family for _, family in token_rewards.values()} - token_policy.ADMITTED_FAMILIES):
@@ -148,6 +155,26 @@ def make_seed(
         new_files.update(delivery.new_files)
     if custom.changes:
         changes += (custom.changes,)
+    from clawshot.patch import floor_keys, jail_keys
+
+    floor_placements = {
+        name: out.placements[name]
+        for name in out.shuffled
+        if out.world.locations[name].type == key_families.FLOOR_KEY_SOURCE
+    }
+    jail_placements = {
+        name: out.placements[name]
+        for name in out.shuffled
+        if out.world.locations[name].type == key_families.HIDEOUT_KEY_SOURCE
+    }
+    if jail_placements:
+        changes += (jail_keys.build(romfs, jail_placements).changes,)
+    if floor_placements:
+        delivery = floor_keys.build(romfs, floor_placements)
+        changes += (delivery.changes,)
+        if overlap := sorted(new_files.keys() & delivery.new_files.keys()):
+            raise PatchError(f"custom items and floor-key pickups both create {overlap}")
+        new_files.update(delivery.new_files)
     if receive_event:
         event_changes, event_files = receive_event_patch.changes(romfs)
         changes += (event_changes,)

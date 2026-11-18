@@ -235,11 +235,12 @@ def bound(plan: Plan) -> Plan:
 # Targets
 
 
-def test_targets_cover_every_logic_small_key_dungeon_and_exclude_fortress_keys():
+def test_targets_cover_every_logic_small_key_dungeon_and_fortress_inventory():
     world = build_world(load_spec())
     keyed = {item.dungeon for item in world.items.values() if item.type == SMALL_KEY and item.dungeon is not None}
-    assert set(TARGETS) == keyed
-    assert world.items["Small Key (Thieves Hideout)"].dungeon is None  # the fortress keys stay as they are
+    assert set(TARGETS) == keyed | {"Thieves Hideout"}
+    assert TARGETS["Thieves Hideout"].id == "GerudoFortress"
+    assert world.items["Small Key (Thieves Hideout)"].dungeon is None
     chest_areas = {d.area for d in census_definitions.load() if d.kind == CHEST}
     assert all(target.id in chest_areas for target in TARGETS.values())
 

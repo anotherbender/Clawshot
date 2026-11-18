@@ -14,6 +14,12 @@ kind = "choice"
 choices = ["own_dungeon", "anywhere", "all_anywhere"]
 group = "Items"
 help = "Choose whether dungeon items stay in their own dungeon or can be in chests anywhere. Small keys anywhere moves only small keys; boss keys, maps and compasses stay in their own dungeon. All dungeon items anywhere is experimental and moves all of them."
+[shuffle_hideout_keys]
+label = "Fortress jail keys (experimental)"
+kind = "boolean"
+group = "Items"
+help = "Off by default; needs shuffled chests. Shuffle the four defeated guards' floor keys into chests, trading red rupees back to their pickups. Rewards keep a key-shaped floor model. All four carpenter rescues and the captain's vanilla card scene remain required. Built, not yet played."
+enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests to move Fortress jail keys." }]
 [songs]
 label = "Song placement"
 kind = "choice"
@@ -182,8 +188,8 @@ Freestanding = "Heart pieces lying around the world can become the same items as
 Token = "Gold Skulltulas can give other rewards, and tokens can be found in shuffled chests; needs Chest shuffle, off in both presets. All 100 native sources take part. Played families allow tokens, fixed majors/equipment, new bottles, all rupee colours, hearts/capacity, ordinary ammo/Bombchus, magic jars/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed and Ocarina of Time. Each member still needs its own native structural check. Ammo needs an existing container; Bombs/Bombchus need a Bomb Bag (D25), never a free bag or weapon. Fairy Ocarina, songs, progressive copies/tiers, keys/maps/compasses, Buy*/shop stock, trade items and Gerudo Pass stay excluded at Skulltulas. Field/ranch trees work by day; tower needs night/retrieval; wetlands needs child kill then adult crate. Seed use without buying does not consume it."
 [dungeon_items.choice_help]
 own_dungeon = "Find a dungeon's keys, maps and compasses only inside that dungeon."
-anywhere = "Small keys can be in any shuffled chest, including other dungeons and the overworld. The pickup message names the key's dungeon (in English in every language). The game's key counters only show the dungeon you are in."
-all_anywhere = "Experimental, off by default: built, but not yet played in game. Small keys, boss keys (Ganon's Castle's too), maps and compasses can be in any shuffled chest, including other dungeons and the overworld. Both pickup messages name the target dungeon in English in every language. Other kinds of check never hold a dungeon item outside its own dungeon. Needs Chest shuffle."
+anywhere = "Small keys can be in any shuffled chest, including the Well and Shadow floor keys. Their floor pickups give their own key or a red rupee and retain a key-shaped model; these new source adapters are built, not yet played. Needs Chest shuffle. Fortress jail keys have a separate switch. Pickup messages name the target dungeon; counters show only the dungeon you are in."
+all_anywhere = "Experimental: small keys (including Well/Shadow floor keys), boss keys (Ganon's Castle's too), maps and compasses can be in any shuffled chest. Floor-key source replacements keep a key-shaped model and need play checks; Fortress jail keys have a separate switch. Both pickup messages name the target dungeon. Needs Chest shuffle."
 [songs.choice_help]
 song = "Find songs only at the usual song rewards."
 anywhere = "Songs can appear in the other places you shuffle. Song of Storms and Minuet of the Forest have been played after finding them in chests."

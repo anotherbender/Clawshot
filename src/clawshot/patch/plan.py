@@ -22,10 +22,10 @@ from clawshot.census.definitions import Definition
 from clawshot.census.scan import CHEST, Location
 from clawshot.chest_openings import source_for
 from clawshot.generate import Seed
-from clawshot.generate.fill import SMALL_KEY
+from clawshot.generate.fill import HIDEOUT_KEY_SOURCE, HIDEOUT_SMALL_KEY, SMALL_KEY
 from clawshot.patch.events import REMOVE, ChestEvent
 from clawshot.patch.items import ItemActors
-from clawshot.patch.key_targets import BY_ID, DUNGEON_TARGETS, TARGETS, DungeonGrant
+from clawshot.patch.key_targets import BY_ID, DUNGEON_TARGETS, HIDEOUT, TARGETS, DungeonGrant
 from clawshot.progressive import CHAINS
 from clawshot.world.model import World
 
@@ -189,6 +189,7 @@ def restrict_event_openings(spec: dict, world: World, links: Links, events: Mapp
         for name, info in world.items.items()
         if info.type in {"SmallKey", "BossKey", "GanonBossKey", "Map", "Compass"} and info.dungeon in DUNGEON_TARGETS
     ]
+    dungeon_items.extend((name, HIDEOUT.id) for name, info in world.items.items() if info.type == HIDEOUT_SMALL_KEY)
     copies = [family for family in CHAINS if family in world.progressive]
     exclusions = {}
     for name, chests in links.chests.items():
@@ -200,6 +201,7 @@ def restrict_event_openings(spec: dict, world: World, links: Links, events: Mapp
                 continue
             blocked.update(copies)
             blocked.update(item for item, target in dungeon_items if chest.area != target)
+            blocked.update(item for item, _ in dungeon_items if world.items[item].type == HIDEOUT_SMALL_KEY)
         if blocked != set(world.locations[name].excluded_items):
             exclusions[name] = sorted(blocked)
     if not exclusions:
@@ -240,6 +242,10 @@ def _named_key(seed: Seed, location: str, item: str, area: str | None) -> str | 
     Other supported families are routed by ``dungeon_item`` only with the all-anywhere opt-in."""
     world = seed.world
     info = world.items[item]
+    if info.type == HIDEOUT_SMALL_KEY:
+        if not seed.settings.shuffle_hideout_keys:
+            raise PatchError(f"{location}: Fortress keys need shuffle_hideout_keys")
+        return HIDEOUT.id
     if info.dungeon is None:
         return None
     target = TARGETS.get(info.dungeon) if info.type == SMALL_KEY else None
@@ -270,7 +276,7 @@ def make_plan(
     With ``anywhere`` a small key outside its dungeon's area is named (:func:`_named_key`).
     Other moved items retain native grants wherever present; small-chest map/compass/boss
     pickups and physical off-area destinations need source-bound dungeon credit."""
-    anywhere = seed.settings.dungeon_items in {"anywhere", "all_anywhere"}
+    anywhere = seed.settings.dungeon_items in {"anywhere", "all_anywhere"} or seed.settings.shuffle_hideout_keys
     changes, unchanged = [], []
     overrides = overrides or {}
     for name in seed.shuffled:
@@ -278,6 +284,11 @@ def make_plan(
             # Other shuffled kinds are handled by make_seed's registered patch steps.
             if anywhere:
                 item = seed.placements[name]
+                if (
+                    seed.world.items[item].type == HIDEOUT_SMALL_KEY
+                    and seed.world.locations[name].type == HIDEOUT_KEY_SOURCE
+                ):
+                    continue  # the original source's unmoved key retains its native Fortress grant
                 if _named_key(seed, name, item, seed.world.locations[name].area) is not None:
                     raise PatchError(f"{name}: {item} outside its dungeon needs a named grant, which only chests have")
             continue

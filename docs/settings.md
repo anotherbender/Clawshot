@@ -76,7 +76,8 @@ Token off. This is an explicit placement rule, not a consequence of which Skullt
 There is no progression-at-100 opt-in this round; #12 remains open.
 
 Cows, dungeon completion rewards, pots, crates, loose
-rupees, recovery hearts, loose keys and silver-rupee puzzles stay unchanged. Pot and ground-rupee
+rupees, recovery hearts, Treasure Chest Game keys and silver-rupee puzzles stay unchanged.
+Pot and ground-rupee
 experiments are not seed options: grants were observed, but a thrown pot stranded and lost its
 reward. Completion and recovery are not solved by a destruction flag.
 
@@ -390,6 +391,24 @@ dungeon or nothing.
 `--dungeon-items anywhere` (the UI choice **Small keys anywhere**) moves **small keys only**,
 into shuffled chests whose access and native opening contracts permit it, including other dungeons
 and the overworld. An off-dungeon key is delivered as a named chest grant; no other shuffled kind can grant one.
+Both release modes now include the Well and Shadow Temple floor keys and require Chest shuffle.
+Those floor sources keep their own key or give a red rupee; replacement pickups retain a key-shaped
+model and the native room retirement/reveal wiring. Other dungeons' keys, majors, hearts and shields
+are not floor-key rewards. These two new source adapters are **built, not played**; own-dungeon mode
+leaves their sources untouched.
+
+`--shuffle-hideout-keys` (UI: **Fortress jail keys (experimental)**) separately releases the four
+Fortress guard floor keys into supported shuffled chests. Default **off** in both presets;
+`--no-shuffle-hideout-keys` overrides a settings string. Chest shuffle is required. Each guard's
+drop, staged event pickup and resting pickup remain one check. Replacement rewards are red rupees
+with the native key-shaped floor display. Chest keys credit only Fortress inventory, not guard defeat,
+source collection, carpenter rescues or Spirit progress. Free all four carpenters and receive the
+captain's unchanged card (D39); the card alone does not clear guards. **Built, not played.**
+
+The four jail sources use stable native actor/Hash identities, not a guessed torch-room match.
+Until that correspondence is verified, logic conservatively requires access to all four guard
+fights before relying on any shuffled jail-floor reward. Native jail-door spending remains unchanged.
+
 The experimental `--dungeon-items all_anywhere` (UI: **All dungeon items anywhere**) also
 releases maps, compasses and boss keys, including Ganon's Castle's boss key, into supported
 shuffled chests. It is off in defaults and both presets. Source-bound grants write only the

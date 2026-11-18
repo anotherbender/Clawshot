@@ -31,7 +31,11 @@ def test_every_supported_placement_and_linked_gift_has_directions_for_all_copies
             (definition.kind in GIFT_KINDS and definition.oot_randomizer_name)
             or (
                 definition.kind == "freestanding"
-                and definition.vanilla_item in {"Obj_Heart_Piece", "Obj_GerudoValley_Heart_Piece"}
+                and (
+                    definition.vanilla_item in {"Obj_Heart_Piece", "Obj_GerudoValley_Heart_Piece"}
+                    or definition.vanilla_item == "Obj_Dungeon_SmallKey"
+                    or definition.name.startswith("Gerudo Fortress Jail Key ")
+                )
             )
         ):
             continue

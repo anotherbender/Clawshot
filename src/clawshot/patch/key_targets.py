@@ -7,8 +7,8 @@ outside its own dungeon therefore needs a grant that names the target's three ex
 the census Banc folder and the ``DungeonInfo`` struct share one name, :attr:`KeyTarget.id`, and so does the label of
 its English name in ``LocationMsg/Location.msbt`` (build e0f3ccfa; the name itself is read from the player's dump).
 
-The Gerudo Fortress (row ``GerudoFortress_Adult``, logic item type ``HideoutSmallKey``) is not a target: its keys
-have no logic dungeon and stay where the fill already keeps them. Keyless dungeons have no small key to send.
+The Gerudo Fortress's separate default-off jail-key option uses the same inventory
+leaves but has no logical dungeon; its source collection/rescue state remains native.
 """
 
 from dataclasses import dataclass
@@ -35,6 +35,8 @@ _TARGETS = (
     KeyTarget("Gerudo Training Ground", "GerudoTrainingGround", "GerudoTrainingGround"),
     KeyTarget("Ganons Castle", "InsideGanonCastle", "InsideGanonCastle"),
 )
+
+HIDEOUT = KeyTarget("Thieves Hideout", "GerudoFortress", "GerudoFortress")
 
 # The other dungeon-item families also exist in the three child dungeons and Ice Cavern.
 DUNGEON_TARGETS = MappingProxyType(
@@ -73,7 +75,9 @@ class DungeonGrant:
         return f"DungeonInfo.{self.target}.IsGet{self.family}"
 
 
-TARGETS: MappingProxyType[str, KeyTarget] = MappingProxyType({target.dungeon: target for target in _TARGETS})
+TARGETS: MappingProxyType[str, KeyTarget] = MappingProxyType(
+    {target.dungeon: target for target in (*_TARGETS, HIDEOUT)}
+)
 """Logic dungeon -> its target: every dungeon with logic small keys (``data/world/items.toml``)."""
 
 BY_ID: MappingProxyType[str, KeyTarget] = MappingProxyType({target.id: target for target in TARGETS.values()})

@@ -149,3 +149,19 @@ def test_a_new_file_may_not_take_a_changed_files_path(romfs, tmp_path):
             extra_changes=({NATIVE: lambda data: data},),
             new_files={NATIVE: NewFile(b"")},
         )
+
+
+def test_added_component_in_existing_pack_gets_allocation_and_actor_growth(romfs, tmp_path):
+    def transform(data):
+        packed = sarc.read(data)
+        packed[NEW_POUCH] = created_pack()[NEW_POUCH]
+        packed[NATIVE_PARAM] = byml.write({"Components": {f"RewardRef{i}": "?" + NEW_POUCH for i in range(20)}})
+        return sarc.write(packed)
+
+    out = tmp_path / "changed-pack"
+    write(Plan([], [], []), romfs, out, extra_changes=({NATIVE: transform},))
+    packed = sarc.read(decompressed(romfs, out, NATIVE))
+    table = rstb.read(decompressed(romfs, out, rstb.TABLE_PATH))
+    assert table.get(NEW_POUCH) == rstb.required_size(NEW_POUCH, len(packed[NEW_POUCH]))
+    assert table.get(NATIVE_PARAM) >= rstb.required_size(NATIVE_PARAM, len(packed[NATIVE_PARAM]), 20)
+    assert table.get(SHARED) == SHARED_ENTRY

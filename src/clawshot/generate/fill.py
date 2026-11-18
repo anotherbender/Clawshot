@@ -25,6 +25,16 @@ from clawshot.world.search import Search
 
 SMALL_KEY = "SmallKey"
 """The item type ``anywhere`` lets out of its dungeon, into chests only."""
+HIDEOUT_SMALL_KEY = "HideoutSmallKey"
+"""The Gerudo Fortress jail keys' item type. No logic dungeon holds them: a chest grants one with named Fortress
+credit (``clawshot.patch.key_targets``), a jail source with its native key."""
+FLOOR_KEY_SOURCE = "KeyPickup"
+"""The Well and Shadow floor-key sources' location type in a seed whose small keys leave their dungeon into shuffled
+chests (``clawshot.generate.key_families``). Chosen by the settings, never a ``shuffle`` kind."""
+HIDEOUT_KEY_SOURCE = "HideoutKeyPickup"
+"""The four Fortress jail-key sources' location type with ``shuffle_hideout_keys``. Never a ``shuffle`` kind."""
+HIDEOUT_KEY_DESTINATIONS = ("Chest", HIDEOUT_KEY_SOURCE)
+"""Where a Fortress key may go: a chest (named Fortress grant) or a jail source (its native key)."""
 RELEASED_DUNGEON_ITEM_TYPES: dict[str, frozenset[str]] = {
     "own_dungeon": frozenset(),
     "anywhere": frozenset({SMALL_KEY}),
@@ -88,8 +98,10 @@ class Settings:
     every other location keeps its vanilla item. ``dungeon_items`` keeps a dungeon's keys, maps and
     compasses in that dungeon (``own_dungeon``), also lets its small keys out, into any chest (``anywhere``; boss
     keys, maps and compasses still stay), or lets all of them out, Ganon's Castle's boss key included, into any
-    chest (``all_anywhere``, experimental; needs ``Chest`` shuffled). ``logic`` overrides logic settings from
-    ``settings.toml``.
+    chest (``all_anywhere``, experimental). Both release modes need ``Chest`` shuffled (Round 18: before, ``anywhere``
+    without it was accepted and moved nothing) and also shuffle the Well and Shadow floor keys' sources;
+    ``shuffle_hideout_keys`` (needs ``Chest``) shuffles the four Fortress jail keys' sources
+    (``clawshot.generate.key_families``). ``logic`` overrides logic settings from ``settings.toml``.
 
     ``areas`` and ``goal`` cut the world down to a slice (a playtest of a few areas): only the regions in those
     census areas (Banc folders) and the area-less start regions, with ``goal`` in place of the world's. Empty: the
@@ -106,6 +118,7 @@ class Settings:
 
     shuffle: tuple[str, ...] = tuple(DEFAULTS["shuffle"])
     dungeon_items: str = DEFAULTS["dungeon_items"]
+    shuffle_hideout_keys: bool = DEFAULTS["shuffle_hideout_keys"]
     logic: dict[str, Any] = field(default_factory=dict)
     areas: tuple[str, ...] = ()
     goal: str | None = None
@@ -152,8 +165,19 @@ class Settings:
             raise ValueError("logic must contain finite JSON values") from error
         if self.dungeon_items not in DUNGEON_ITEM_CHOICES:
             raise ValueError(f"dungeon_items must be one of {DUNGEON_ITEM_CHOICES}, not {self.dungeon_items!r}")
-        if self.dungeon_items == "all_anywhere" and "Chest" not in self.shuffle:
-            raise ValueError("dungeon_items 'all_anywhere' moves items only into shuffled chests: shuffle Chest")
+        if self.dungeon_items != "own_dungeon" and "Chest" not in self.shuffle:
+            # Round 18: released keys, the Well/Shadow floor keys among them, leave their dungeon only into chests.
+            raise ValueError(
+                f"dungeon_items {self.dungeon_items!r} moves keys only into shuffled chests: shuffle Chest"
+            )
+        if sources := sorted(set(self.shuffle) & {FLOOR_KEY_SOURCE, HIDEOUT_KEY_SOURCE}):
+            raise ValueError(
+                f"{sources} are not shuffle kinds: floor keys follow dungeon_items, jail keys shuffle_hideout_keys"
+            )
+        if not isinstance(self.shuffle_hideout_keys, bool):
+            raise ValueError("shuffle_hideout_keys must be a boolean")
+        if self.shuffle_hideout_keys and "Chest" not in self.shuffle:
+            raise ValueError("shuffle_hideout_keys moves the jail keys into shuffled chests: shuffle Chest")
         if self.goal is not None and not self.areas:
             raise ValueError("a goal is given only with the areas of a slice")
         if self.songs not in ("song", "anywhere"):
@@ -204,6 +228,8 @@ class Settings:
         if self.areas:
             out["areas"] = list(self.areas)
             out["goal"] = self.goal
+        if self.shuffle_hideout_keys:
+            out["shuffle_hideout_keys"] = True  # absent when off: existing settings strings and logs keep their bytes
         if self.item_location_types:
             out["item_location_types"] = {
                 k: list(self.item_location_types[k]) for k in sorted(self.item_location_types)
@@ -256,6 +282,18 @@ def is_restricted(world: World, settings: Settings, item: str) -> bool:
     return info.dungeon is not None and info.type not in RELEASED_DUNGEON_ITEM_TYPES[settings.dungeon_items]
 
 
+def key_source_types(settings: Settings) -> tuple[str, ...]:
+    """The key-source location types a seed shuffles besides ``shuffle``, chosen by its settings, never named in them:
+    the floor keys' when small keys leave their dungeon into shuffled chests, the jail keys' with
+    ``shuffle_hideout_keys``. Own-dungeon floor keys stay native."""
+    kinds = []
+    if SMALL_KEY in RELEASED_DUNGEON_ITEM_TYPES[settings.dungeon_items]:
+        kinds.append(FLOOR_KEY_SOURCE)
+    if settings.shuffle_hideout_keys:
+        kinds.append(HIDEOUT_KEY_SOURCE)
+    return tuple(kinds)
+
+
 def _in_dungeon_area(world: World, location: str, dungeon: str) -> bool:
     """Logical dungeon routes can contain checks physically outside its Banc (the Spirit hands).
 
@@ -298,6 +336,10 @@ def allowed(world: World, settings: Settings, location: str, item: str) -> bool:
         return False
     if location_type in settings.exclusive_location_types and (types is None or location_type not in types):
         return False
+    if world.items[item].type == HIDEOUT_SMALL_KEY and (
+        not settings.shuffle_hideout_keys or location_type not in HIDEOUT_KEY_DESTINATIONS
+    ):
+        return False  # only a named chest grant or a jail source's native key credits the Fortress
     dungeon = world.items[item].dungeon
     if dungeon is None or _in_dungeon_area(world, location, dungeon):
         return True
@@ -306,13 +348,14 @@ def allowed(world: World, settings: Settings, location: str, item: str) -> bool:
 
 
 def shuffled_locations(world: World, settings: Settings) -> list[str]:
-    """Locations of a shuffled type that hold an item in the remake (not N64-only) and are not held to their
-    vanilla item (``keep_vanilla``, a reason, e.g. the Treasure Chest Game's room boxes: D17). The others keep
-    their vanilla item."""
+    """Locations of a shuffled type (``shuffle`` and :func:`key_source_types`) that hold an item in the remake (not
+    N64-only) and are not held to their vanilla item (``keep_vanilla``, a reason, e.g. the Treasure Chest Game's room
+    boxes: D17). The others keep their vanilla item."""
+    kinds = {*settings.shuffle, *key_source_types(settings)}
     return [
         name
         for name, loc in world.locations.items()
-        if loc.type in settings.shuffle
+        if loc.type in kinds
         and loc.vanilla is not None
         and loc.n64_only is None
         and getattr(loc, "keep_vanilla", None) is None

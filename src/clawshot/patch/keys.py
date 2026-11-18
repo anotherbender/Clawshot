@@ -211,7 +211,8 @@ class _Compiler:
             return self.bindings[key]
         grant = self.grants[target]
         if grant.family != "Content":
-            if grant.target not in {value.id for value in DUNGEON_TARGETS.values()}:
+            targets = TARGETS if grant.family == "SmallKey" else DUNGEON_TARGETS
+            if grant.target not in {value.id for value in targets.values()}:
                 raise PatchError(f"unsupported dungeon-item target {grant.target!r}")
             if grant.family not in {"SmallKey", "BossKey", "Map", "Compass"}:
                 raise PatchError(f"unsupported dungeon-item family {grant.family!r}")

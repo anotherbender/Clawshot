@@ -89,6 +89,7 @@
 "Small Key (Bottom of the Well)" = { actor = "Item_Dungeon_SmallKey", source = "census: 1 chest in BottomOfTheWell" }
 "Small Key (Gerudo Training Ground)" = { actor = "Item_Dungeon_SmallKey", source = "census: 9 chests in GerudoTrainingGround" }
 "Small Key (Ganons Castle)" = { actor = "Item_Dungeon_SmallKey", source = "census: 1 chest in InsideGanonCastle" }
+"Small Key (Thieves Hideout)" = { actor = "Item_Dungeon_SmallKey", source = "r18-keys: canonical named Fortress credit; four native guard floor sources, D39 card unchanged" }
 
 # Native shop pouch actors may also be granted through the chest get event.
 # Counts/targets come from PouchActorInfo; in-game certification remains per family (D15).

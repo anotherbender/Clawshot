@@ -262,6 +262,20 @@ def write(
                 new_data = transform(new_data)
         if path.startswith("Pack/Actor/") and path.endswith(".pack.zs"):
             growths = member_growth(data, new_data) | getitem_member_growth(data, new_data)
+            old_members, packed_members = sarc.read(data), sarc.read(new_data)
+            for member, content in packed_members.items():
+                if member not in old_members and table.get(member) is None:
+                    _absent(romfs, table, member, f"{path}: added pack member")
+                    table.set(member, _entry_for(member, content))
+                    members_grew = True
+                elif member.endswith(rstb.ACTOR_PARAM) and old_members.get(member) != content:
+                    required = _entry_for(member, content)
+                    entry = table.get(member)
+                    if entry is None:
+                        raise PatchError(f"{member}: the native actor parameter has no size entry")
+                    if required > entry:
+                        table.set(member, required)
+                        members_grew = True
             for member, growth in growths.items():
                 if member not in member_entries:
                     entry = table.get(member)

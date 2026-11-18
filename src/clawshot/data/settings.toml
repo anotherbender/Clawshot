@@ -3,6 +3,7 @@
 [defaults]
 shuffle = ["Chest"]
 dungeon_items = "own_dungeon"
+shuffle_hideout_keys = false # Round 18, Kareem: the four Fortress jail keys get their own opt-in; needs Chest shuffle
 fast_start = ["intro"]
 songs = "song"
 shop_prices = "vanilla"
