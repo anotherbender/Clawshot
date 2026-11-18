@@ -7,9 +7,8 @@ new = true
 region = "Bottom of the Well Main Area"
 type = "Chest"
 vanilla = "Scrub Business Seed"
-rule = "False"
-source = "Census chest 6064359710907908886, room 11 past the Lullaby crawlspace. A fake floor separates it from the entrance and drops into Dead Hand's room. No verified route to open the chest; https://www.videogameschronicle.com/guide/zelda-oot-remake-full-bottom-of-the-well-walkthrough/."
-keep_vanilla = "Route to the chest behind room 11's fake floor (a hole into Dead Hand's room) is not established: no guide opens it; walking round the hole with the Lens or jumping it is an in-game question (r4-logic-child.md Bottom of the Well; child-chests.md)."
+rule = "is_child and can_play(Zeldas_Lullaby) and can_use(Lens_of_Truth)"
+source = "Kareem, played chest hunt 2026-11-18 spot 12: jump the hidden hole beyond the Lullaby crawlspace (native room 11, Hash 6064359710907908886). Claude requires usable Lens of Truth for first-time hidden-hole safety despite the played blind jump; keep the hall's existing child/Lullaby access; plans/rounds/r18-chests.md."
 
 [locations."Bottom of the Well Front Center Bombable Chest"]
 n64_only = "No corresponding chest or bombable mound in the remake's front corridor; all twelve census chests accounted for separately."

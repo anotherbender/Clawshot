@@ -83,7 +83,7 @@ that proves the model, not that every route has been verified in the game.
 
 | Feature | Current evidence and limits |
 |---|---|
-| Chests | Changed chest rewards work in game. 168 of 184 ordinary chests are shuffled; unresolved routes and repeat rewards stay unchanged. Includes the played Lost Woods bean ledge, ranch tower Hookshot route, late windmill Longshot route and Goron City sign-puzzle solution; duplicate/failure copies stay vanilla. |
+| Chests | Changed chest rewards work in game. 178 of 184 ordinary chests are shuffled; duplicate/failure copies and repeat rewards stay unchanged. Includes the played Field/Lake routes, four-torch Lake grotto, Valley grottos, Fortress underground, Fountain scarecrow and Well hidden-hole routes; the Well conservatively requires the Lens. |
 | Shops | Shuffled native shop items and purchases work in game. Arbitrary major items cannot use a stand-in shelf display. |
 | NPC gifts and songs | Gift swaps and Great Fairy once-only rewards work in game, as does the Kokiri shopkeeper's extended gift window. All seven frog checks have passed their in-game experiment. Not every gift or item combination has been played. |
 | One-time Business Scrubs | Four kinds of one-time Deku Scrub sale are enabled; repeat vendors stay unchanged. The implementation is tested, but the recorded results do not establish every shuffled sale in game. |

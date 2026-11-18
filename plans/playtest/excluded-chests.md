@@ -1,8 +1,9 @@
 # Excluded chest checks — Track C register addendum
 
-Part of [questions.md](questions.md), not new logic or seed data. Read with `git show r5/seeds:<path>`;
-branch observed at `b42b0f4c1602`. All **20** entries currently have `rule = "False"` and `keep_vanilla`.
-Each question below names the exact entry that evidence may unlock. Hash, not a list index, is the chest identity.
+Historical Round-5 register, part of [questions.md](questions.md). Original entries were all held.
+Current admissions: [round 17](../rounds/r17-chests-tokens.md) and [round 18](../rounds/r18-chests.md).
+Only XC06, XC07, XC09, XC10, XC17 and XC18 remain held: noncanonical copies, a failure chest or repeat rewards.
+The other fourteen entries have played routes. Hash, not a list index, is the chest identity.
 Positions are identification aids for Claude (Banc x/y/z), not copied placements.
 
 Answer records must include **age, progress, tools, surface entrance, path, appearance trigger and safe collection/return**.
@@ -14,7 +15,7 @@ No code/data edits are made by Track E. Entries exist on `r5/seeds`; do not inve
 Use existing area visits/logs: Dampe's two rupees share AO02's race log; GC signs share one puzzle visit. LW05 is now
 an alias of XC19, GE01 of XC04; answer each once. LLR02 now covers tower token only; chest climb is XC14.
 GROT01/02 and GE02 keep scrub/entrance/resource observations, while exact chest conditions live here.
-The 9 checks already asked on 2026-11-08 remain pending and absent from all routes.
+The original visit prompts below are historical; use the round records above for answered requirements.
 
 ## XC01 — Bottom Of The Well Room 11 Chest (Item_ScrubBusinessSeed)
 
@@ -43,7 +44,7 @@ The 9 checks already asked on 2026-11-08 remain pending and absent from all rout
 ## XC04 — Gerudo Valley Chest (Item_ScrubBusinessSeed)
 
 - **Where/when:** adult first; child comparison only after return. Session [10](session-10.md); Hash `6463521162691873710`, Banc position (31.2, -22.6, 37.0).
-- **Do/watch:** At Valley underwater hole, the old silver rock is gone. What now opens or reaches the Seed chest? Try ordinary dive/Scale/Boots as available, then record actual blocker, route and safe return. Check whether child can use the same entrance.
+- **Answered (Kareem, 2026-11-18):** Silver Gauntlets lift the grey entrance boulder; Iron Boots reach the underwater chest. The old “silver rock is gone” premise was incorrect. Octoroks can be ignored.
 - **Unlock target:** `src/clawshot/data/world/remake/extra_gerudo_valley.toml` → `[locations."Gerudo Valley Chest (Item_ScrubBusinessSeed)"]` (`rule` and `keep_vanilla`).
 - **Answer changes:** verified entrance/appearance/tool/age conditions supply this entry's reach rule; a repeat or mutually-exclusive copy stays excluded unless reviewer establishes correct check identity.
 - **Source:** `r5/seeds:plans/rounds/r5-seeds.md`, “Excluded checks”; `r5/seeds:src/clawshot/data/world/remake/extra_gerudo_valley.toml`; branch census-readable name mapped to this Hash. No OoTR name is fabricated.

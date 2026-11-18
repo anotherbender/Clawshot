@@ -46,7 +46,7 @@ in chests only; see [Progressive items](#progressive-items).
 
 | Kind | Scope and acceptance |
 |---|---|
-| `Chest` | 168 of 184 ordinary chests; changed chest grants work in game. Includes the played Lost Woods bean ledge, adult Hookshot ranch tower, late Longshot windmill and sign-puzzle solution. Duplicate/failure copies and unresolved/repeat chests stay unchanged. Treasure Chest Game reward swap is built but untested and held; its 11 game boxes stay unchanged. |
+| `Chest` | 178 of 184 ordinary chests; changed chest grants work in game. Includes the played bridge bean, ranch Hookshot, late windmill Longshot, Field/Lake, four-torch Lake grotto, Valley grottos, Fortress underground, Fountain scarecrow, Well hidden-hole and sign-puzzle routes. The Well requires the Lens conservatively. Duplicate/failure copies and repeat chests stay unchanged. Treasure Chest Game reward swap is built but untested and held; its 11 game boxes stay unchanged. |
 | `Shop` | Ordinary shop shelves, native-display items only; slot swaps, restock and Castle Town purchases have in-game evidence. Bought goods (refills, ammo, Bombchus, bottle contents, hearts and magic jars) go only to shop shelves in every seed; no setting moves one to a chest, gift, scrub, floor pickup or Skulltula. Mask loans stay unchanged. |
 | `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper and all seven frog checks. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the unaccepted checks below. |
 | `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. Implementation tested; not every sale has recorded in-game acceptance. |

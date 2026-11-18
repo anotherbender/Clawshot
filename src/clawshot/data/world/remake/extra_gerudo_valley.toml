@@ -5,27 +5,24 @@ new = true
 region = "GV Storms Grotto"
 type = "Chest"
 vanilla = "Rupees (20)"
-rule = "False"
-source = "Adult invisible-chest copy shares child spot; remade grotto entrance unresolved, so neither copy is progression (r4-logic-adult.md Gerudo Valley)."
-keep_vanilla = "Adult invisible-chest copy shares child spot; remade grotto entrance unresolved, so neither copy is progression (r4-logic-adult.md Gerudo Valley)."
+rule = "is_adult"
+source = "Kareem, played chest hunt 2026-11-18 spot 8: Song of Storms opens the tent grotto, invisible chest opens without Lens. Existing adult Storms entrance retained. Canonical adult Hash 18413589940135955604 only; child copy stays vanilla under the one-check-per-pair ruling; plans/rounds/r18-chests.md."
 
 [locations."Gerudo Valley Chest (Item_ScrubBusinessSeed)"]
 new = true
 region = "GV Octorok Grotto"
 type = "Chest"
 vanilla = "Scrub Business Seed"
-rule = "False"
-source = "Underwater grotto entrance changed from N64 silver-rock route; r4-logic-adult.md Gerudo Valley explicitly leaves its opener unresolved."
-keep_vanilla = "Underwater grotto entrance changed from N64 silver-rock route; r4-logic-adult.md Gerudo Valley explicitly leaves its opener unresolved."
+rule = "can_use(Iron_Boots)"
+source = "Kareem, played chest hunt 2026-11-18 spot 9: Silver Gauntlets lift the entrance rock (existing GV Octorok Grotto exit rule), Iron Boots reach the underwater chest; Octoroks can be ignored. Native Hash 6463521162691873710 is below the grotto water plane; plans/rounds/r18-chests.md."
 
 [locations."Gerudo Valley Chest (TBox_Rupee_Green)"]
 new = true
 region = "GV Storms Grotto"
 type = "Chest"
 vanilla = "Rupee (1)"
-rule = "False"
-source = "New grotto chest: pairing the remade grotto entrance to the inherited storms route is unresolved (r4-logic-adult.md Gerudo Valley)."
-keep_vanilla = "New grotto chest: pairing the remade grotto entrance to the inherited storms route is unresolved (r4-logic-adult.md Gerudo Valley)."
+rule = "is_adult"
+source = "Kareem, played chest hunt 2026-11-18 spot 8: both tent grotto chests are free after the existing adult Song of Storms entrance. Green Hash 17750686910716887133 is shared across ages and contributes one check; plans/rounds/r18-chests.md."
 
 [locations."Gerudo Valley Chest (TBox_Rupee_Red) [Child]"]
 new = true
@@ -33,5 +30,5 @@ region = "GV Storms Grotto"
 type = "Chest"
 vanilla = "Rupees (20)"
 rule = "False"
-source = "Child invisible-chest copy shares adult spot; remade grotto entrance unresolved, so neither copy is progression (r4-logic-adult.md Gerudo Valley)."
-keep_vanilla = "Child invisible-chest copy shares adult spot; remade grotto entrance unresolved, so neither copy is progression (r4-logic-adult.md Gerudo Valley)."
+source = "Round-17 one-canonical-check ruling; Kareem's played 2026-11-18 spot 8 confirms the adult route, not a practical child route from the desert. Adult Hash 18413589940135955604 is canonical; plans/rounds/r18-chests.md."
+keep_vanilla = "Noncanonical child copy of the adult tent-grotto red chest; distinct native flag does not authorize a second pool contribution."

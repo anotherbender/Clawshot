@@ -31,3 +31,8 @@ source = "placement data, HyruleField_Child_Static/_Dynamic"
 [locations."LH Deku Scrub Grotto Center"]
 n64_only = "the remake's Lake Hylia grotto (under the pushable Obj_Tombstone_A_03 on the island at (-205,138,455), room at y 98) holds one red-rupee chest (Obj_TBox_A_01_NoBake 6900843020594897860) and no scrub; HyruleField's three-scrub grotto (seeds, nuts, bombs) lies inside Lon Lon Ranch's fences, at (-36,151,291)"
 source = "placement data, HyruleField_Child_Static/_Dynamic"
+
+[exits."Lake Hylia"."LH Grotto"]
+rule = "is_child or can_use(Scarecrow) or here(can_plant_bean) or plant_beans or 'Water Temple Clear'"
+was = "True"
+source = "Kareem, played chest hunt 2026-11-18 spot 6; native Obj_Tombstone_A_03 covers the island hole in both ages. Push the gravestone; no song, explosive or lift gate. Reuse Lake Hylia's existing LH Fishing Island access, including child bean history and the full-lake event, instead of inherited N64 free grotto access; plans/rounds/r18-chests.md."

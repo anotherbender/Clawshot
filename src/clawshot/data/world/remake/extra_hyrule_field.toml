@@ -5,27 +5,24 @@ new = true
 region = "Hyrule Field"
 type = "Chest"
 vanilla = "Rupees (20)"
-rule = "False"
-source = "Adult red-rupee chest near a Poe; exact Fairy Note/appearance trigger not established by r4-logic-child.md Hyrule Field or the read-only actor probe."
-keep_vanilla = "Adult red-rupee chest near a Poe; exact Fairy Note/appearance trigger not established by r4-logic-child.md Hyrule Field or the read-only actor probe."
+rule = "is_adult"
+source = "Kareem, played chest hunt 2026-11-18 spot 3: free open-air south grove chest, no Poe kill or Fairy Note. Native Hash 1163740567397714729 exists only in HyruleField_Adult_Dynamic; plans/rounds/r18-chests.md."
 
 [locations."Hyrule Field Chest (TBox_Rupee_Red) #2"]
 new = true
 region = "Hyrule Field"
 type = "Chest"
 vanilla = "Rupees (20)"
-rule = "False"
-source = "Adult red-rupee chest near a Poe; exact Fairy Note/appearance trigger not established by r4-logic-child.md Hyrule Field or the read-only actor probe."
-keep_vanilla = "Adult red-rupee chest near a Poe; exact Fairy Note/appearance trigger not established by r4-logic-child.md Hyrule Field or the read-only actor probe."
+rule = "is_adult"
+source = "Kareem, played chest hunt 2026-11-18 spot 4: free open-air north tree chest, no Poe kill or Fairy Note. Native Hash 9891111455604007674 exists only in HyruleField_Adult_Dynamic; plans/rounds/r18-chests.md."
 
 [locations."Hyrule Field Chest (TBox_Rupee_Red) #3"]
 new = true
 region = "Lake Hylia"
 type = "Chest"
 vanilla = "Rupees (20)"
-rule = "False"
-source = "Adult red-rupee chest near the lakeside Poe; appearance trigger and low-water approach unresolved in r4-logic-child.md Hyrule Field."
-keep_vanilla = "Adult red-rupee chest near the lakeside Poe; appearance trigger and low-water approach unresolved in r4-logic-child.md Hyrule Field."
+rule = "is_adult and 'Water Temple Clear'"
+source = "Kareem, played chest hunt 2026-11-18 spot 5: full lake required, Poe need not die. Native Hash 17023457248274633121 exists only in HyruleField_Adult_Dynamic (child has pots instead); reuse the existing Water Temple Clear water-level predicate; plans/rounds/r18-chests.md."
 
 [locations."Hyrule Field Chest (Item_ScrubBusinessSeed)"]
 new = true
@@ -48,6 +45,5 @@ new = true
 region = "LH Grotto"
 type = "Chest"
 vanilla = "Rupees (20)"
-rule = "False"
-source = "Chest is spawned by TreasureBoxAppear_Magic beside timed candles; a free grotto entry does not prove the fire puzzle solved. r4-logic-child.md Lake Hylia and read-only Banc probe."
-keep_vanilla = "Chest is spawned by TreasureBoxAppear_Magic beside timed candles; a free grotto entry does not prove the fire puzzle solved. r4-logic-child.md Lake Hylia and read-only Banc probe."
+rule = "(can_use(Dins_Fire) and (can_use(Sticks) or can_use(Bow))) or can_use(Fire_Arrows)"
+source = "Kareem, played chest hunt 2026-11-18 spot 6: four initially unlit torches, about 15 seconds each; Din's Fire lights three, then child Sticks or adult Bow through a lit torch lights the fourth; adult Fire Arrows alone also works. Island/gravestone access is on the LH Grotto entrance; plans/rounds/r18-chests.md."

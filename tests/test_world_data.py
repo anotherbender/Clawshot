@@ -55,22 +55,12 @@ def test_all_other_vanilla_checks_with_keys_and_an_escape_tool(world):
     # Treasure Chest Game boxes/reward are not exempt; neither is any shuffled or merely unreachable chest.
     excluded = {n for n, loc in world.locations.items() if loc.keep_vanilla and loc.rule.test is False}
     assert excluded == {
-        "Bottom Of The Well Room 11 Chest (Item_ScrubBusinessSeed)",
-        "Gerudo Fortress Chest (TBox_Rupee_Red)",
-        "Gerudo Valley Chest (Item_ScrubBusinessSeed)",
-        "Gerudo Valley Chest (TBox_Rupee_Green)",
-        "Gerudo Valley Chest (TBox_Rupee_Red) [Adult]",
         "Gerudo Valley Chest (TBox_Rupee_Red) [Child]",
         "Goron City Chest (TBox_Rupee_Green)",
         "Graveyard Chest (TBox_Rupee_Blue)",
         "Graveyard Chest (TBox_Rupee_Red)",
-        "Hyrule Field Chest (TBox_Rupee_Red) #1",
-        "Hyrule Field Chest (TBox_Rupee_Red) #2",
-        "Hyrule Field Chest (TBox_Rupee_Red) #3",
-        "Hyrule Field Chest (TBox_Rupee_Red) #4",
         "Kakariko Village Chest (TBox_Rupee_Purple) [Adult]",
         "Kokiri Forest Chest (TBox_Rupee_Purple)",
-        "Zora Fountain Chest (TBox_Rupee_Purple)",
     }
     assert (
         sorted(

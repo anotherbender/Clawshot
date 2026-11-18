@@ -1,4 +1,4 @@
-"""Kareem's round-17 chest hunt: real routes, child history and one canonical copy per pair."""
+"""Played chest hunts: real routes, child history and one canonical copy per pair."""
 
 import pytest
 
@@ -12,10 +12,31 @@ TOWER = "Hyrule Field Chest (Item_ScrubBusinessSeed)"
 WINDMILL = "Kakariko Village Chest (TBox_Rupee_Purple) [Adult Alternative]"
 NORMAL_COPY = "Kakariko Village Chest (TBox_Rupee_Purple) [Adult]"
 SAGES = ("Defeat Phantom Ganon", "Defeat Volvagia", "Defeat Morpha")
+FIELD_CHESTS = tuple(f"Hyrule Field Chest (TBox_Rupee_Red) #{i}" for i in (1, 2))
+LAKE_SHORE = "Hyrule Field Chest (TBox_Rupee_Red) #3"
+LAKE_TORCHES = "Hyrule Field Chest (TBox_Rupee_Red) #4"
+VALLEY_RED = "Gerudo Valley Chest (TBox_Rupee_Red) [Adult]"
+VALLEY_CHILD_COPY = "Gerudo Valley Chest (TBox_Rupee_Red) [Child]"
+VALLEY_GREEN = "Gerudo Valley Chest (TBox_Rupee_Green)"
+VALLEY_UNDERWATER = "Gerudo Valley Chest (Item_ScrubBusinessSeed)"
+FORTRESS = "Gerudo Fortress Chest (TBox_Rupee_Red)"
+FOUNTAIN = "Zora Fountain Chest (TBox_Rupee_Purple)"
+WELL = "Bottom Of The Well Room 11 Chest (Item_ScrubBusinessSeed)"
+PART_TWO = (
+    *FIELD_CHESTS,
+    LAKE_SHORE,
+    LAKE_TORCHES,
+    VALLEY_RED,
+    VALLEY_GREEN,
+    VALLEY_UNDERWATER,
+    FORTRESS,
+    FOUNTAIN,
+    WELL,
+)
 PULL, RETURN = "Hunt Pull Permit", "Hunt Return Permit"
 
 
-def starting_at(region, age):
+def starting_at(region, age, exits=()):
     spec = load_spec()
     spec["start"] = "Hunt Root"
     spec["settings"].update(starting_age=age, age_return_region="Hunt Root")
@@ -24,11 +45,9 @@ def starting_at(region, age):
     # time travel or clear a sage with the test inventory. Keep the existing bean
     # bridge exit, whose here(can_plant_bean) event the ledge must reuse.
     for data in spec["regions"]:
-        if data["name"] == region:
-            data["exits"] = {"LW Bridge": data["exits"]["LW Bridge"]} if region == "Lost Woods" else {}
-            data["events"] = {}
-        elif data["name"] == "LW Bridge":
-            data["exits"] = {}
+        kept = (("LW Bridge",) if region == "Lost Woods" else exits) if data["name"] == region else ()
+        data["exits"] = {name: rule for name, rule in data.get("exits", {}).items() if name in kept}
+        data["events"] = {}
     spec["regions"].append(
         {
             "name": "Hunt Root",
@@ -107,3 +126,139 @@ def test_played_chest_pairs_contribute_only_the_canonical_checks_to_the_fill_poo
     assert {LEDGE, TOWER, WINDMILL} <= selected
     assert selected & {LEDGE, KF_COPY} == {LEDGE}
     assert selected & {WINDMILL, NORMAL_COPY} == {WINDMILL}
+    assert selected & {VALLEY_RED, VALLEY_CHILD_COPY} == {VALLEY_RED}
+    assert set(PART_TWO) <= selected
+
+
+@pytest.mark.parametrize("name", FIELD_CHESTS)
+@pytest.mark.parametrize("age", [CHILD, ADULT])
+def test_field_open_air_chests_need_only_their_native_adult_layer(name, age):
+    world = starting_at("Hyrule Field", age)
+    assert Search(world).can_access(world.locations[name], age) is (age == ADULT)
+
+
+@pytest.mark.parametrize(
+    ("age", "gear", "expected"),
+    [
+        (CHILD, [], False),
+        (CHILD, ["Water Temple Clear"], False),
+        (ADULT, [], False),
+        (ADULT, ["Water Medallion"], False),
+        (ADULT, ["Water Temple Clear"], True),
+    ],
+)
+def test_lake_shore_chest_needs_native_adult_layer_and_full_lake(age, gear, expected):
+    world = starting_at("Lake Hylia", age)
+    assert Search(world, gear).can_access(world.locations[LAKE_SHORE], age) is expected
+
+
+@pytest.mark.parametrize(
+    ("age", "gear", "expected"),
+    [
+        (CHILD, ["Dins Fire"], False),
+        (CHILD, ["Buy Deku Stick (1)"], False),
+        (CHILD, ["Dins Fire", "Buy Deku Stick (1)"], True),
+        (CHILD, ["Dins Fire", "Bow"], False),
+        (CHILD, ["Fire Arrows", "Bow", "Magic Meter"], False),
+        (ADULT, ["Dins Fire"], False),
+        (ADULT, ["Dins Fire", "Buy Deku Stick (1)"], False),
+        (ADULT, ["Bow"], False),
+        (ADULT, ["Dins Fire", "Bow"], True),
+        (ADULT, ["Fire Arrows", "Magic Meter"], False),
+        (ADULT, ["Fire Arrows", "Bow", "Magic Meter"], True),
+    ],
+)
+def test_lake_four_torches_need_a_first_flame_and_a_way_to_reach_the_fourth(age, gear, expected):
+    world = starting_at("LH Grotto", age)
+    assert Search(world, gear).can_access(world.locations[LAKE_TORCHES], age) is expected
+
+
+@pytest.mark.parametrize(
+    ("age", "gear", "expected"),
+    [
+        (CHILD, ["Dins Fire", "Buy Deku Stick (1)"], True),
+        (ADULT, ["Dins Fire", "Bow"], False),
+        (ADULT, ["Dins Fire", "Bow", "Water Temple Clear"], True),
+        (ADULT, ["Dins Fire", "Bow", "Hookshot", "Scarecrow Song", "Ocarina of Time"], True),
+        (ADULT, ["Dins Fire", "Bow", "Hookshot", "Scarecrow Song"], False),
+    ],
+)
+def test_lake_grotto_also_requires_the_existing_island_route(age, gear, expected):
+    world = starting_at("Lake Hylia", age, exits=("LH Grotto",))
+    assert Search(world, gear).can_access(world.locations[LAKE_TORCHES], age) is expected
+
+
+def test_child_planted_lake_bean_opens_the_adult_gravestone_route():
+    world = starting_at("Lake Hylia", CHILD, exits=("LH Grotto", "LH Fishing Island"))
+    search = Search(world, ["Buy Magic Bean", "Dins Fire", "Bow", PULL])
+    assert search.can_access(world.locations[LAKE_TORCHES], ADULT)
+    adult_world = starting_at("Lake Hylia", ADULT, exits=("LH Grotto", "LH Fishing Island"))
+    assert not Search(adult_world, ["Buy Magic Bean", "Dins Fire", "Bow"]).can_access(
+        adult_world.locations[LAKE_TORCHES], ADULT
+    )
+
+
+@pytest.mark.parametrize("name", [VALLEY_RED, VALLEY_GREEN])
+@pytest.mark.parametrize(
+    ("age", "gear", "expected"),
+    [
+        (CHILD, ["Ocarina", "Song of Storms"], False),
+        (ADULT, [], False),
+        (ADULT, ["Song of Storms"], False),
+        (ADULT, ["Ocarina"], False),
+        (ADULT, ["Fairy Ocarina", "Song of Storms"], False),
+        (ADULT, ["Ocarina of Time", "Song of Storms"], True),
+    ],
+)
+def test_tent_grotto_chests_need_adult_storms_but_not_lens(name, age, gear, expected):
+    world = starting_at("GV Fortress Side", age, exits=("GV Storms Grotto",))
+    search = Search(world, gear)
+    assert search.can_access(world.locations[name], age) is expected
+    assert not search.can_access(world.locations[VALLEY_CHILD_COPY], age)
+
+
+@pytest.mark.parametrize(
+    ("age", "gear", "expected"),
+    [
+        (CHILD, ["Silver Gauntlets", "Iron Boots"], False),
+        (ADULT, ["Iron Boots"], False),
+        (ADULT, ["Goron Bracelet", "Iron Boots"], False),
+        (ADULT, ["Megaton Hammer", "Iron Boots"], False),
+        (ADULT, ["Silver Gauntlets"], False),
+        (ADULT, ["Silver Gauntlets", "Iron Boots"], True),
+        (ADULT, ["Golden Gauntlets", "Iron Boots"], True),
+    ],
+)
+def test_valley_underwater_chest_needs_silver_rock_access_and_iron_boots(age, gear, expected):
+    world = starting_at("GV Grotto Ledge", age, exits=("GV Octorok Grotto",))
+    assert Search(world, gear).can_access(world.locations[VALLEY_UNDERWATER], age) is expected
+
+
+@pytest.mark.parametrize("age", [CHILD, ADULT])
+def test_fortress_underground_chest_uses_grounds_access_without_card_or_storms(age):
+    world = starting_at("Gerudo Fortress", age)
+    assert Search(world).can_access(world.locations[FORTRESS], age) is (age == ADULT)
+
+
+@pytest.mark.parametrize("missing", ["Hookshot", "Scarecrow Song", "Ocarina of Time"])
+def test_fountain_masonry_chest_needs_each_piece_of_the_scarecrow_route(missing):
+    world = starting_at("Zoras Fountain", ADULT)
+    gear = ["Hookshot", "Scarecrow Song", "Ocarina of Time"]
+    search = Search(world, [item for item in gear if item != missing])
+    assert not search.can_access(world.locations[FOUNTAIN], ADULT)
+    search.collect(missing)
+    assert search.can_access(world.locations[FOUNTAIN], ADULT)
+    child_world = starting_at("Zoras Fountain", CHILD)
+    assert not Search(child_world, gear).can_access(child_world.locations[FOUNTAIN], CHILD)
+
+
+@pytest.mark.parametrize("missing", ["Lens of Truth", "Zeldas Lullaby", "Ocarina"])
+def test_well_hidden_hole_needs_the_hall_song_and_claudes_lens_guard(missing):
+    world = starting_at("Bottom of the Well Main Area", CHILD)
+    gear = ["Lens of Truth", "Zeldas Lullaby", "Ocarina"]
+    search = Search(world, [item for item in gear if item != missing])
+    assert not search.can_access(world.locations[WELL], CHILD)
+    search.collect(missing)
+    assert search.can_access(world.locations[WELL], CHILD)
+    adult_world = starting_at("Bottom of the Well Main Area", ADULT)
+    assert not Search(adult_world, gear).can_access(adult_world.locations[WELL], ADULT)
