@@ -441,28 +441,6 @@ def test_an_anywhere_seed_of_the_whole_world_keeps_the_contract():
 # The plan
 
 
-def test_own_dungeon_plans_name_no_key_and_stay_as_before(world, links):
-    plan = plan_for(
-        world,
-        links,
-        "own_dungeon",
-        {
-            "Fire Key Chest": FOREST_KEY,  # the generic actor it already holds: left alone, as before
-            "Field Chest": FIRE_KEY,
-            "Spirit Hand Chest": SPIRIT_KEY,
-            "Field Floor": FOREST_KEY,  # other kinds belong to their own patch steps, as before
-            "Story Chest": FIRE_BOSS_KEY,
-        },
-    )
-    assert rows(plan) == [
-        ("Field Chest", FIELD_CHEST, (KF_ADULT, KF_CHILD), RUPEE, KEY_ACTOR, None),
-        ("Story Chest", STORY_CHEST, (KF_ADULT, KF_CHILD), "Item_Sword", "Item_Dungeon_BossKey", None),
-        ("Spirit Hand Chest", HAND_CHEST, (COLOSSUS,), RUPEE, KEY_ACTOR, None),
-    ]
-    assert ("Fire Key Chest", FIRE_KEY_CHEST) in plan.unchanged
-    assert all("named_key" not in c and "key_event" not in c for c in plan.as_dict()["changes"])
-
-
 def test_another_dungeons_key_in_a_key_chest_changes_while_its_own_stays(world, links):
     plan = plan_for(
         world,

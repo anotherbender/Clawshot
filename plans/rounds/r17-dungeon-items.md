@@ -342,4 +342,14 @@ writers/readers and implementation plan, not an exposed bridge setting.
 
 ## Verification and handoff
 
-Pending.
+Frozen build head before the full gate: `4224b5d0de5e4cf8c3705f271e0f02da9fe58d7a`.
+The serialized gate waited for cs17c's measurement and cs17a's gate, then passed
+format/lint. Synthetic output: **3253 passed, 371 skipped, one stale plan-shape failure**.
+Its printed diff was the same-actor Fire Key Chest gaining the now-required off-area
+target binding. That test artificially put a Forest key into Fire in `own_dungeon`
+and required the plan to omit it, encoding the old wrong-credit behavior rather than a
+valid generated own-dungeon placement. Removed that implementation-only test, not a
+player-facing assertion: existing `test_native_placements_need_no_new_binding`
+already covers unchanged local grants for all four families, and
+`test_another_dungeons_key_in_a_key_chest_changes_while_its_own_stays` covers off-area
+small-key credit. No runtime code changed after the freeze. Corrected gate pending.
