@@ -1,0 +1,13 @@
+# Round 17, Kareem 2026-11-17: child Bolero landing has no walking exit; indoor songs work.
+# Child Colossus reverse traversal remains unplayed. Neither unresolved landing rescues the other.
+# A destination reward cannot provide its own escape. Adult arrival rules remain native.
+
+[exits."Bolero of Fire Warp"."DMC Central Local"]
+was = "True"
+rule = "is_adult or can_play(Minuet_of_Forest) or can_play(Serenade_of_Water) or can_play(Nocturne_of_Shadow) or can_play(Prelude_of_Light)"
+source = "Kareem, played 2026-11-17: child cannot leave Bolero's crater landing by walking; held warp songs work indoors. No proven walking exit. Four other safe-destination songs retain native age/instrument permissions; Requiem is not an escape certificate. plans/rounds/r17-bugs.md."
+
+[exits."Requiem of Spirit Warp"."Desert Colossus"]
+was = "True"
+rule = "is_adult or can_play(Minuet_of_Forest) or can_play(Serenade_of_Water) or can_play(Nocturne_of_Shadow) or can_play(Prelude_of_Light)"
+source = "Kareem/Claude, 2026-11-17 round17 conservative policy: child Colossus walk out is untested, so require an already playable safe-destination song as for Bolero. No invented reverse desert exit; Bolero cannot rescue it. plans/rounds/r17-bugs.md."

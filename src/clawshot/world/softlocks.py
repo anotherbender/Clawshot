@@ -3,6 +3,7 @@
 from collections import defaultdict, deque
 from collections.abc import Collection, Mapping
 from dataclasses import dataclass
+from itertools import chain
 
 from clawshot.world.model import World
 from clawshot.world.rules import AGES, DAY, NIGHT
@@ -22,7 +23,7 @@ def reachable_traps(search: Search, sphere: int = 0, *, regions: Collection[str]
 
     A graph failure is a diagnostic candidate, not proof of a physical game trap.
     ``regions`` limits a certificate to explicitly evidenced physical regions.
-    Ordinary missing returns and unverified song permissions remain audit debt.
+    Ordinary missing returns remain audit debt. Native song use includes indoors.
 
     Root is OoTR's abstract spawn/song dispatcher, not a physical return location.
     Native worlds name the actual spawn rooms as their per-age return anchors.
@@ -32,6 +33,10 @@ def reachable_traps(search: Search, sphere: int = 0, *, regions: Collection[str]
     world = search.world
     anchors = world.settings.get("softlock_anchors", {}) if world.start == "Root" else {}
     ignored = set(world.settings.get("softlock_virtual_regions", ())) if anchors else set()
+    # Reuse the world's compiled song/instrument/forest rules, never a spawn or a Farore point.
+    dispatch = world.regions.get("Root Exits")
+    song_regions = world.settings.get("softlock_warp_regions", ())
+    songs = [exit for exit in dispatch.exits if exit.target in song_regions] if dispatch else []
     result = []
     for age in AGES:
         counts = search.inventory(age)
@@ -47,7 +52,7 @@ def reachable_traps(search: Search, sphere: int = 0, *, regions: Collection[str]
                 reverse[(name, DAY)].append((name, NIGHT))
             for tod in (DAY, NIGHT):
                 node = (name, tod)
-                for exit in region.exits:
+                for exit in chain(region.exits, songs):
                     if exit.target not in world.regions or exit.target == "Farores Wind Warp":
                         continue
                     if not exit.rule.fn(counts, age, tod):

@@ -158,9 +158,20 @@ age-specific inventory and arrival time. Targets are physical safe anchors: chil
 Forest, adult Temple of Time, never the abstract `Root`. Generated and external placements are refused
 when the data's `softlock_verified_regions` certificate fails. **This first slice certifies the played
 Slingshot trap only**, not the whole world. Unscoped `audit(world, placements)` reports unresolved graph
-returns for triage; absent ordinary edges and unverified song permissions are not physical-trap proof.
-Farore's Wind ownership alone does not prove a previously set escape point. Evidence, sweep counts and
-the next-slice unknown-route probe: [Round 16 softlocks](../plans/rounds/r16-softlocks.md).
+returns for triage; absent ordinary edges are not physical-trap proof. Held warp songs now count as
+returns indoors too (Kareem, played 2026-11-17), through the same age/instrument rules as normal travel.
+Farore's Wind ownership alone still does not prove a previously set escape point.
+
+**Child warp arrivals (Round 17).** Bolero's crater landing has no child walking escape (Kareem,
+played). Requiem's child Colossus walking return is untested. Both require an already playable Minuet,
+Serenade, Nocturne or Prelude before logic counts their child destinations; neither hazardous arrival
+rescues the other, and a reward there cannot provide its own first escape song. Adult arrival rules
+are unchanged. This safety policy affects all new seeds, including Defaults, without changing settings.
+[Round 17 evidence and short play checks](../plans/rounds/r17-bugs.md).
+
+New seeds also validate the incoming native era-change Kokiri Sword equipment candidate against pouch
+ownership before equipping it. An absent sword clears only that candidate; no item is granted and logic
+does not gain a sword from time travel. Built/native-data-tested, not yet played in game.
 
 Imported Gerudo Fortress rules treat `Gerudo_Membership_Card` as friendly access. In the remake the guards,
 desert gate, Training Ground entrance and horseback archery check Spirit quest progress, which the

@@ -378,10 +378,17 @@ existing usable Slingshot/Boomerang/Bow exit predicate; a room reward cannot pro
 initial state and the final fixed point. `Search.inventory(age)` exposes the correct child-prefix/shared
 view. `world.softlocks.reachable_traps` reverses currently usable edges over `(region, time)` per age;
 waiting is allowed where `time_passes`, never by borrowing another age's items. Reaching any physical
-anchor for that age suffices. Ownership alone supplies no Farore's Wind point. Unverified song escapes
-are not assumed. The unscoped `audit` is a diagnostic ledger, not proof that every missing graph return
-is a physical trap; `regions=` restricts a certificate. Ordinary missing returns and song-arrival triage
-remain next-slice work in `rounds/r16-softlocks.md`, not fabricated permissive edges.
+anchor for that age suffices. Ownership alone supplies no Farore's Wind point. Since Kareem's played
+2026-11-17 indoor-song result, `softlock_warp_regions` names the song dispatchers usable from physical
+regions: the checker reuses their compiled `Root Exits` rules, retaining instrument, age and time.
+Neither spawn dispatcher nor Farore's Wind is in that list. The unscoped `audit` is a diagnostic ledger,
+not proof that every missing graph return is a physical trap; `regions=` restricts a certificate.
+
+Round 17's `remake/child_warp_returns.toml` guards child Bolero and Requiem arrivals on a held playable
+Minuet, Serenade, Nocturne or Prelude. Child crater has no walking escape (Kareem, played); Colossus is
+conservatively held until its child walking route is tested. A destination cannot supply its own escape
+song, the two hazardous arrivals cannot rescue one another, and adult items cannot rescue a child
+prefix. Adult arrivals stay native. No new walking exit is invented. See `rounds/r17-bugs.md`.
 
 Every solo goal proof also refuses failures in the native verified-region scope. External placements,
 which still skip the solo goal/first-pull proofs, run that same scoped physical-trap refusal. This changes
