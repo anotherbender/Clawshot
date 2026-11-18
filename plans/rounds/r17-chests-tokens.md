@@ -466,3 +466,34 @@ This evidence commit freezes source/docs for the corrective format/lint/full syn
 Runtime checks/caps and owned lock are unchanged. No edits after freeze; authoritative actual gate counts,
 commands and process snapshots go to `gate-results.json` / `gate-*.log`. READY reports this exact frozen head
 only after every gate and the same-world Token-off byte comparison pass.
+
+## Final gate and post-gate handoff
+
+**READY runtime head: `55b1307d2ba90a3afb8861c1de6c9379f113ec04`.** Corrective gate passed:
+Ruff format (426 files) and lint; synthetic **3321 passed, 378 skipped** with `-n 12`/workers12;
+layered dump **375 passed** with `-n 12`/workers4; all **eight** same-world Token-off placement/full-spoiler
+byte comparisons identical. Both runtime processes were absent at every gate-stage start. Owned lock released.
+Actual commands/process snapshots/results remain in `E:/OOTRemake/work/r17-tokens/gate-results.json` / `gate-*.log`.
+READY was posted before attribution; the accepted merge is not blocked by the probes below.
+
+### PARTIAL 125/400 — residual attribution; rerun in round 18
+
+Claude stopped this post-gate probe because Kareem is restarting the PC. **Single worker, game active**
+(`CLAWSHOT_WORKERS=1`), started at 07:11. The intended two 200-seed keys-anywhere arms were isolated
+main `945c996` plus the three chest admissions only, and main plus played gift holds/normal-held staging only.
+Main package paths and each arm's chest count/hold policy were asserted before generation.
+
+| Isolated arm | Completed / intended | First-attempt failures | Exhausted seeds | Mean production attempts |
+|---|---:|---:|---:|---:|
+| Main + chests only | 63 / 200 | 29 | 0 | 1.873 |
+| Main + gift holds only | 62 / 200 | 46 | 1 | 3.323 |
+
+**Partial observations, not a completed attribution or causal conclusion.** The isolated gift-only arm's
+exhaustion is retained in the raw error payload; it is not an exhaustion in the accepted combined 500-seed run.
+Different incomplete cohorts and interrupted sampling do not support a final residual-cost estimate.
+Preserved unchanged: `E:/OOTRemake/work/r17-tokens/attribution-400.json` (**125/400 rows**) and probe script.
+**Rerun both complete arms and investigate residual cost in round 18**, not this round; no further runtime edits.
+
+At Claude's wrap-up instruction, `bg_28` was cancelled, the owned attribution process tree stopped
+(no matching owned descendants remained), and cs17c's `r17/gate.lock` released. This is a docs-only
+post-gate supplement; runtime/code remain at the gated head. **No tests run for this wrap-up.**
