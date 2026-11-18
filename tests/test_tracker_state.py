@@ -446,3 +446,43 @@ def test_save_identity_from_the_seeds_added_flags(tmp_path, places):
     assert unverifiable["identity"]["status"] == "unverifiable"
     assert any("Cannot confirm" in w for w in unverifiable["warnings"])
     assert build_state(plain, parse(bool_total=5))["identity"]["status"] == "unverifiable"
+
+
+def test_scripted_key_pickups_use_source_bools_and_remote_fortress_keys_keep_their_total(tmp_path):
+    floor = {
+        "Bottom of the Well Freestanding Key": "BottomOfTheWell_Level_Room_03_Get_SmallKey",
+        "Shadow Temple Freestanding Key": "ShadowTemple_Level_Room_13_GetKey",
+    }
+    jail = {f"Gerudo Fortress Jail Key 0{i}": f"IsGet_SmallKey_GerudoFortress.SmallKey0{i}" for i in range(1, 5)}
+    sources = {**floor, **jail}
+    places = {name: Place("Test", None, "Collectable", vanilla="Small Key (Thieves Hideout)") for name in sources}
+    places["Obsolete Torch Key"] = Place(
+        "Test", None, "Collectable", vanilla="Small Key (Thieves Hideout)", n64_only=True
+    )
+    places.update({f"Remote Key {i}": Place("Test", None, "Chest") for i in range(4)})
+    placements = {
+        **dict.fromkeys(sources, "Rupees (20)"),
+        **{f"Remote Key {i}": "Small Key (Thieves Hideout)" for i in range(4)},
+    }
+    locations = {name: {"ids": [str(100 + i)]} for i, name in enumerate(placements)}
+    seed = load_seed(make_seed(tmp_path, placements, locations, patch={}), index=lambda: places)
+    flags = dict.fromkeys(sources.values(), False)
+    flags[floor["Bottom of the Well Freestanding Key"]] = True
+    flags[jail["Gerudo Fortress Jail Key 01"]] = True
+    flags["DungeonInfo.GerudoFortress.IsGetSmallKeyOnce"] = True
+    state = build_state(
+        seed,
+        parse(
+            flags,
+            {"DungeonInfo.GerudoFortress.SmallKeyNum": 2, "DungeonInfo.GerudoFortress.SmallKeyTotalNum": 4},
+            keys=(101,),
+        ),
+    )
+    progress = checks(state)
+    assert progress["Bottom of the Well Freestanding Key"]["collected"] is True
+    assert progress["Shadow Temple Freestanding Key"]["collected"] is False  # even with its Hash present
+    assert progress["Gerudo Fortress Jail Key 01"]["collected"] is True
+    assert all(progress[f"Gerudo Fortress Jail Key 0{i}"]["collected"] is False for i in range(2, 5))
+    fortress = next(row for row in state["dungeons"] if row["id"] == "GerudoFortress")
+    assert fortress["name"] == "Gerudo Fortress"
+    assert fortress["small_keys"] == {"held": 2, "found": 4, "total": 4, "first_found": True}

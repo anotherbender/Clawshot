@@ -65,6 +65,7 @@ DUNGEON_LABELS = {
     "Ice Cavern": "Ice Cavern",
     "Gerudo Training Ground": "Gerudo Training Ground",
     "Ganons Castle": "Ganon's Castle",
+    "Thieves Hideout": "Gerudo Fortress",
 }
 
 

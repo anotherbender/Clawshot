@@ -50,7 +50,7 @@ TOKEN_TYPES = ("Token", "GS Token")
 
 # World dungeon name -> the ``DungeonInfo.<name>`` Struct holding its saved key/map/compass leaves, in game order.
 # Names: sloperina-FINDINGS.md section 1 ("Dungeon names ... same as the map name") and plans/03-game-data.md
-# section 44 (the 14 dungeon Structs; FinalBattleField and GerudoFortress hold no world dungeon's items).
+# section 44 (the native dungeon Structs; Fortress jail keys have their own family, not a logic dungeon).
 DUNGEON_INFO = {
     "Deku Tree": "InsideTheDekuTree",
     "Dodongos Cavern": "DodongoCavern",
@@ -64,6 +64,7 @@ DUNGEON_INFO = {
     "Ice Cavern": "IceCavern",
     "Gerudo Training Ground": "GerudoTrainingGround",
     "Ganons Castle": "InsideGanonCastle",
+    "Thieves Hideout": "GerudoFortress",
 }
 
 # How a check's collection is read from a save (``Check.method``).
@@ -307,6 +308,18 @@ def _token_sources(spoiler: Mapping[str, Any]) -> dict[str, tuple[int, ...]]:
     return {name: tuple(sorted(sources)) for name, sources in out.items()}
 
 
+@cache
+def _key_source_flags() -> Mapping[str, str]:
+    """Scripted floor keys retire on native named Bools, never their absent actor-Hash save rows."""
+    from clawshot.generate.key_families import HIDEOUT_SOURCES
+    from clawshot.patch.floor_keys import SOURCES
+
+    return {
+        **{name: source.collected for name, source in SOURCES.items()},
+        **{name: f"IsGet_SmallKey_GerudoFortress.SmallKey{actor[-2:]}" for name, actor in HIDEOUT_SOURCES.items()},
+    }
+
+
 def _classify(
     name: str,
     place: Place | None,
@@ -317,6 +330,8 @@ def _classify(
 ) -> tuple[str, str, tuple[str, ...], tuple[int, ...], str | None, bool]:
     """(kind, method, flags, hashes, reason, flag is added by the patch)."""
     location_type = place.type if place else None
+    if name in _key_source_flags():
+        return "freestanding", NAMED_BOOL, (_key_source_flags()[name],), (), None, False
     if name in tokens:
         if name in chests:
             raise SeedError(f"the spoiler's patch plan lists {name!r} as both a chest and a Gold Skulltula source")

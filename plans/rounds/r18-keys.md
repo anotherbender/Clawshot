@@ -98,3 +98,101 @@ recipes rather than silently offering keys with no named-grant destination.
 Defaults and Recommended keep own-dungeon mode and jail keys off; no version bump
 was made (maintainer-owned). The stable native source names also replace the four
 unlinked torch-named key checks in the model.
+
+## Staged Longshot checks (unplayed)
+
+Packets are focused diagnostics, **not generated/beatable seeds**. Built by the
+same external `stage_packets.py` against actual main `2ba2f9a` and candidate
+`5d5dae738b`; all emitted chest bindings and resources read back. No inventory,
+quest, rescue, source-collection or game-start defaults are patched.
+
+| Family | Launcher under `E:/OOTRemake/work/r18-keys/ingame/` | Main control / candidate |
+|---|---|---|
+| Well | `Test - well - main-control.bat`, `Test - well - candidate.bat` | Both give one named Well key in Mido's top-left chest. Main floor pickup remains a key; candidate floor pickup gives 20 rupees, no additional key. |
+| Shadow | `Test - shadow - main-control.bat`, `Test - shadow - candidate.bat` | Both give one named Shadow key in Mido's top-left chest. Main skull-pot pickup remains a key; candidate gives 20 rupees, no additional key. |
+| Fortress | `Test - fortress - main-control.bat`, `Test - fortress - candidate.bat` | All four Mido chests. Main can encode only its existing generic chest key: no Fortress target/credit. Candidate names and credits four Fortress keys; guard floor rewards give rupees instead of extra keys. |
+
+The Fortress control limitation is intentional and explicit: main has no
+`shuffle_hideout_keys` option or named Fortress target. It is its native generic
+chest-key path, not a fabricated main target write. Its guards retain their native
+keys. The paired checks expose the missing family support, not an invented claim
+that vanilla guard keys themselves were broken.
+
+Each launcher is adapted from the current Longshot template (including current
+`builds/channel/version/bin` layout), selects exactly one real mod folder,
+clears `HOS_FS_OVERLAY` and uses a separate packet-owned user folder. Actual
+`CLAWSHOT_DRY_RUN=1` via `cmd.exe`: **all six exit 0**, selecting rc.7; proof
+`ingame/launcher-dryruns.json`. No game start/boot performed.
+
+**Fixture status:** only empty packet-owned users are staged at present. Requested
+approved natural pre-source save copies on the thread; none opened or edited.
+Short checks need copies with source uncollected, the relevant age/tools/story
+state reached naturally, and the packet's Mido chests unopened. Claude must supply
+or approve those copies and boot-check before handing the short route to Kareem.
+The empty users are safe new-game launchers, not a claim that those prerequisites
+have already been reached. From new games the full natural-age/quest routes take
+hours; no short estimate applies without the fixture.
+
+### Acceptance checklist
+
+Run each control first, then start the candidate from an independent copy of the
+same pre-check snapshot. Do not reuse the control's progress. Teleport/clock only;
+no age, inventory, quest, guard-defeat or source-collected cheats.
+
+1. **Remote credit** (2–4 minutes per prepared pair). Open the indicated Mido
+   chest(s), confirm target-named text on candidate keys, save and Continue.
+   Enter the target naturally or via the allowed teleport and inspect its key
+   counter. Well/Shadow both controls and candidates add one to the target.
+   Fortress main generic keys must not credit Fortress; candidate adds exactly four.
+   No source-collected/carpenter/card completion may appear from remote credit.
+2. **Well floor** (5–10 minutes per prepared pair). Reach the native room-3
+   source with the puzzle still unsolved. Solve it. Leave the reward uncollected,
+   leave/re-enter and Save/Continue: it must recover. Collect it: main adds the
+   native Well key; candidate adds 20 rupees, not a key. Re-enter and reload again:
+   no duplicate. Spend a real Well key at an unopened native lock; save/reload
+   retains remaining/found inventory separately.
+3. **Shadow floor** (5–10 minutes per prepared pair). With bombs, break the
+   native large skull pot in room 13. The reveal must finish (`Act_Pop`/`Rotate_Obj`),
+   not hang. Repeat the uncollected recovery and collected no-repeat checks above.
+   Main gives a key; candidate gives 20 rupees and leaves the key count unchanged.
+   Spend a native Shadow lock key and reload; no extra grant appears.
+4. **All four Fortress guards/rescues** (15–25 minutes per prepared pair).
+   Start before every guard/source/rescue. After remote candidate keys, guards
+   must remain hostile and the captain/card scene must not have happened.
+   Defeat each guard, observe the floor drop (not a hand-over), leave one
+   uncollected for the re-entry/reload recovery test, then pick up each reward.
+   Candidate gives one red-rupee reward per identity, no fifth key; main keeps
+   native keys. Spend the four candidate keys on the normal jail doors and
+   actually rescue all four carpenters. Do not bypass fights or shutters.
+   The captain must appear once at the fourth rescue, run
+   `Meet_FourCarpenter_ClearEvent`, give the unchanged card and advance Spirit
+   Step02; ordinary guards clear only then. Re-entry and Continue must retain
+   rescues, spent keys and card without duplicate floor rewards or scene.
+5. **Loading proof and saved values.** Record `mods: <resource> <- <packet path>`
+   for the Kokiri chest Banc and candidate source resources:
+   Well/Shadow native Banc plus generated `Obj_Dungeon_SmallKey_Floor_<area>` pack;
+   Shadow additionally `Event/EventFlow/ShadowTemple_Gimmick.bfevfl.zs`;
+   Fortress the four `Obj_Dungeon_SmallKey_GerudoFortress_0N.pack.zs` files.
+   Check target `SmallKeyNum`, `SmallKeyTotalNum`, `IsGetSmallKeyOnce`, source
+   collection Bools and carpenter counters/Spirit step on the packet's saved copy.
+   Models/text/HUD alone are not ownership or once-only proof.
+
+With all prerequisites prepared: **45–80 minutes for all three control/candidate
+pairs**, including all four rescues twice, reloads and loading/save inspection (estimate, not measured).
+No acceptance was played. Stop a pair if its main control does not show the
+expected baseline and hand Claude the loading evidence/state; do not interpret
+a non-reproducing control as a passing fix.
+
+## End-to-end generation / tracker smoke
+
+Own seed `180618`, Chest + small keys anywhere + jail keys on: native preparation,
+fill, beatability and writer passed, **174 shuffled checks, 23 spheres, 116 resources**.
+All six source replacement adapters were exercised. External `seed-smoke-proof.json`
+records the effective recipe; this is not a player's seed or a played claim.
+
+Tracker now includes Fortress remaining/found/seed-total inventory and reads the
+six pickups' named native collection Bools, not their absent actor-Hash records.
+`CLAWSHOT_WORKERS=1 uv run pytest tests/test_tracker_state.py
+tests/test_tracker_http.py tests/test_key_families.py -q` → **37 passed, 14.61 s**.
+The own smoke seed loads with Fortress total **4**, and its six source checks
+resolve to the expected named Bools. No save was needed/read for that smoke.

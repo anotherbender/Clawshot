@@ -5,6 +5,12 @@ is the number available to spend now; **Found / total** is the acquired count, i
 keys, out of that seed's dungeon total. Keys found outside their dungeon still appear under the
 correct dungeon. Boss key, map and compass are separate saved flags.
 
+The **Gerudo Fortress** row includes the four jail keys, including keys found in remote chests
+with the separate experimental jail-key option. The four guard-floor checks and the Well/Shadow
+floor-key checks read their native saved collection Bools, not actor-Hash records. Defeating a
+guard or finding a jail key elsewhere does not by itself complete its floor-reward check.
+These new source adapters and their played tracker updates still await in-game acceptance.
+
 ## Start tracking
 
 1. Generate a seed, or **View seed** under Generate → My seeds.
