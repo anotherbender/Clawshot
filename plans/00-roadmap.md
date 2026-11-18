@@ -1455,3 +1455,21 @@ On a 0.2.0 seed, the day was stuck instead. Kareem's current seed has the Door o
 
 Cap each file's declared size and hash it block by block, as the `.nx` reader does since `4617fb5`. Add tests,
 including a crafted oversized entry that is refused before allocation.
+
+### Outcome (released as 0.2.2, 2026-11-17)
+
+- Track A merged: Slingshot Room entry guard, softlock checker and scoped refusal (`33e8895`..`f93cd4b`).
+- Track C merged as `af6a7b4`; #31 closed.
+- Track B grew into the clock chain and merged as `ef0d932`; #32 closed. The Field clock needs the owl's
+  `HyruleField_ArriveEntrance`, Impa's send-off `Dm_HrlField_0020`, no first-adult hold
+  `HrlField_HasEnteredFirstTime_Adult`, and `HyruleField_ChangeENV` false (the first-visit palette pins the sun).
+  Open and song-only Doors wait for the send-off. The send-off restores the owl flags and clears ENV; the
+  forest exit no longer sets ENV once the owl or send-off has played; returning to child clears the hold; the
+  stone counter recounts after the send-off in every mode; the escape and moat play after an early pull. Played
+  on Longshot rc.7 (v4/v5 checks).
+- Follow-ups merged as `ed9f257`: the Kaepora skip marks Hyrule Field visited (map and minimap), and a Water Temple
+  precaution requires the Ice Cavern end-chest source (unmodded debug check: the switch doesn't latch pre-quest;
+  exact predicate unproven).
+- Gates now run with `uv run --with pytest-xdist pytest -n 12`: synthetic about 4 min, dump about 25 min.
+- Plans for round 17 on branches: `r17/skip-zelda` (`763cfcf`) and `r17/child-sword` (`7308a83`).
+- No community seeds for 0.2.2 (Kareem: players generate their own).
