@@ -1,6 +1,6 @@
 """The real graph loads, preserves sourced rules, and produces beatable reproducible seeds.
 
-The all-check oracle supplies keys and a Slingshot: vanilla's own first Slingshot is now self-locked by policy.
+The all-check oracle supplies keys, Slingshot and Hookshot: vanilla puts both escape tools behind themselves.
 """
 
 import os
@@ -42,11 +42,11 @@ def vanilla_placements(world) -> dict[str, str]:
 
 
 def test_all_other_vanilla_checks_with_keys_and_an_escape_tool(world):
-    """Worst-order key logic needs upfront keys. No-save-warp entry safety also
-    requires an upfront Slingshot; the vanilla room cannot supply its own entry tool."""
+    """Worst-order keys and no-save-warp escape guards need upfront tools;
+    neither vanilla Slingshot nor Dampé's Hookshot can supply its own entry tool."""
     placements = vanilla_placements(world)
     keys = [item for item in placements.values() if world.items[item].type == "SmallKey"]
-    search = Search(world, [*keys, "Slingshot"])
+    search = Search(world, [*keys, "Slingshot", "Hookshot"])
     search.collect_spheres(placements)
     assert search.won()
     assert search.holds("Time Travel") and search.can_reach("Ganondorf Boss Room", ADULT)

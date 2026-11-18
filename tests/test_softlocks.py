@@ -188,7 +188,14 @@ PRESETS = {
 @pytest.mark.parametrize("preset", PRESETS)
 @pytest.mark.parametrize("number", [0, 7, 42])
 def test_fixed_real_world_seeds_have_no_evidenced_reachable_traps(preset, number):
-    # Round 16 first slice: ordinary missing returns and song-arrival triage remain diagnostic.
-    # Keep this explicit so widening/narrowing the production scope cannot hide this regression.
+    # Keep the evidenced scope explicit so a production-scope regression cannot hide a known trap.
+    # Ordinary missing returns still remain diagnostic.
     seed = generate(load_spec(), number, PRESETS[preset])
-    assert audit(seed.world, seed.placements, regions=("Deku Tree Slingshot Room",)) == [], (preset, number)
+    assert (
+        audit(
+            seed.world,
+            seed.placements,
+            regions=("Deku Tree Slingshot Room", "Graveyard Dampes Grave", "Desert Colossus"),
+        )
+        == []
+    ), (preset, number)

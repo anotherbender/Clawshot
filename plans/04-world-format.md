@@ -364,9 +364,9 @@ Ganon (round 2's partial port used `'Defeat Queen Gohma'`).
 
 **Key logic and the vanilla placement.** OoT Randomizer counts a dungeon's small keys for the worst order in which
 its doors could be opened, so its own vanilla key layout is not always provably enough: the Spirit Temple's Silver
-Gauntlets chest asks for 5 keys, and the vanilla child side holds 2. The all-check oracle therefore holds each
-dungeon's small keys and a Slingshot from the start: vanilla's first Slingshot is self-locked by the no-save-warp
-entry policy. Separate regressions prove that refusal; generated seeds exercise normal key/escape-tool placement.
+Gauntlets chest asks for 5 keys, and the vanilla child side holds 2. The all-check oracle holds each dungeon's small
+keys, Slingshot and Hookshot from the start: vanilla puts the Slingshot and Dampé's Hookshot behind their own
+no-save-warp entry guards. Separate regressions prove those refusals; generated seeds exercise normal placement.
 
 **Dungeon-item placement modes (Round 17, #14).** `own_dungeon` retains physical Banc
 attribution. `anywhere` releases ordinary small keys only; `all_anywhere` also releases
@@ -380,11 +380,11 @@ graphs write exactly `DungeonInfo.<target>.IsGetMap/IsGetCompass/IsGetBossKey`, 
 the source chest's generic actor is unchanged. The default and presets stay own-dungeon.
 This new off-area family delivery has not yet been played; see `rounds/r17-dungeon-items.md`.
 
-**No-save-warp return certificate (Round 16 first slice).** Native data names `softlock_anchors` by age
+**No-save-warp return certificate (Rounds 16–18).** Native data names `softlock_anchors` by age
 (child Link's House or Kokiri Forest, adult Temple of Time), `softlock_virtual_regions` for nonphysical
-spawn/song dispatchers, and the evidenced physical `softlock_verified_regions`. The first accepted slice
-contains only the played Slingshot Room trap. Its entry preserves the shield rule and also requires its
-existing usable Slingshot/Boomerang/Bow exit predicate; a room reward cannot provide its own entry tool.
+spawn/song dispatchers, and evidenced physical `softlock_verified_regions`: the played Slingshot Room and
+Dampé traps, plus Kareem's warp-only Colossus ruling. Slingshot Room entry preserves its shield rule and requires
+the usable Slingshot/Boomerang/Bow exit tool; a room reward cannot provide its own entry tool.
 
 `Search.collect_spheres(..., observe=...)` calls the observer at every inventory frontier, including the
 initial state and the final fixed point. `Search.inventory(age)` exposes the correct child-prefix/shared
@@ -396,11 +396,17 @@ regions: the checker reuses their compiled `Root Exits` rules, retaining instrum
 Neither spawn dispatcher nor Farore's Wind is in that list. The unscoped `audit` is a diagnostic ledger,
 not proof that every missing graph return is a physical trap; `regions=` restricts a certificate.
 
-Round 17's `remake/child_warp_returns.toml` guards child Bolero and Requiem arrivals on a held playable
-Minuet, Serenade, Nocturne or Prelude. Child crater has no walking escape (Kareem, played); Colossus is
-conservatively held until its child walking route is tested. A destination cannot supply its own escape
-song, the two hazardous arrivals cannot rescue one another, and adult items cannot rescue a child
-prefix. Adult arrivals stay native. No new walking exit is invented. See `rounds/r17-bugs.md`.
+`remake/child_warp_returns.toml` guards child Bolero and both-age Requiem arrivals on a held playable
+Minuet, Serenade, Nocturne or Prelude. Colossus walk-in has the same guard and its reverse Wasteland edge is
+closed: Kareem ruled Colossus warp-exit-only at either age (2026-11-18). Child crater has no walking escape
+(Kareem, played). A destination cannot supply its own escape song, the two hazardous arrivals cannot rescue one
+another, and adult items cannot rescue a child prefix. No walking exit is invented.
+
+`remake/dampe_returns.toml` guards the whole grave descent with adult-usable Hookshot. The translated grave
+region covers race start/course and both co-located goal rewards; neither chest can supply its own escape.
+There is no reverse race return. Its windmill exit and access event require Hookshot, not the N64 Song of Time.
+Ordinary `Kak Windmill` access from the village is unchanged. Native boundary facts and unresolved whole-world
+audit questions are in `rounds/r18-logic.md`.
 
 Every solo goal proof also refuses failures in the native verified-region scope. External placements,
 which still skip the solo goal/first-pull proofs, run that same scoped physical-trap refusal. This changes

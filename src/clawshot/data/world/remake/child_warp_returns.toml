@@ -1,6 +1,6 @@
 # Round 17, Kareem 2026-11-17: child Bolero landing has no walking exit; indoor songs work.
-# Child Colossus reverse traversal remains unplayed. Neither unresolved landing rescues the other.
-# A destination reward cannot provide its own escape. Adult arrival rules remain native.
+# Round 18: Colossus is warp-exit-only at both ages (Kareem, 2026-11-18).
+# A destination reward cannot provide its own escape; Bolero retains its child-only guard.
 
 [exits."Bolero of Fire Warp"."DMC Central Local"]
 was = "True"
@@ -9,5 +9,15 @@ source = "Kareem, played 2026-11-17: child cannot leave Bolero's crater landing 
 
 [exits."Requiem of Spirit Warp"."Desert Colossus"]
 was = "True"
-rule = "is_adult or can_play(Minuet_of_Forest) or can_play(Serenade_of_Water) or can_play(Nocturne_of_Shadow) or can_play(Prelude_of_Light)"
-source = "Kareem/Claude, 2026-11-17 round17 conservative policy: child Colossus walk out is untested, so require an already playable safe-destination song as for Bolero. No invented reverse desert exit; Bolero cannot rescue it. plans/rounds/r17-bugs.md."
+rule = "can_play(Minuet_of_Forest) or can_play(Serenade_of_Water) or can_play(Nocturne_of_Shadow) or can_play(Prelude_of_Light)"
+source = "Kareem ruling, 2026-11-18: Colossus can be left only by another warp song at either age; Wasteland walking return is impractical. Preserve the four established safe destinations and age-usable instrument rules; neither Requiem itself nor the unresolved child Bolero is an escape. plans/rounds/r18-logic.md."
+
+[exits."Wasteland Near Colossus"."Desert Colossus"]
+was = "True"
+rule = "can_play(Minuet_of_Forest) or can_play(Serenade_of_Water) or can_play(Nocturne_of_Shadow) or can_play(Prelude_of_Light)"
+source = "Kareem ruling, 2026-11-18: any Colossus arrival, including a desert walk-in, needs an already age-usable escape song; its own reward cannot bootstrap escape. Internal temple/fountain/grotto returns preserve this entry invariant. plans/rounds/r18-logic.md."
+
+[exits."Desert Colossus"."Wasteland Near Colossus"]
+was = "True"
+rule = "False"
+source = "Kareem ruling, 2026-11-18: reverse Haunted Wasteland traversal is impractical at both ages. Colossus is warp-exit-only; the checker must not certify a fictional walking escape. plans/rounds/r18-logic.md."

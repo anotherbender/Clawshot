@@ -27,4 +27,11 @@ def native_preset(romfs, request):
 def test_native_gift_presets_have_no_evidenced_reachable_traps(romfs, native_preset, number):
     name, spec, settings, step = native_preset
     seed = make_seed(romfs, number, settings, spec, extra_steps=[step]).seed
-    assert audit(seed.world, seed.placements, regions=("Deku Tree Slingshot Room",)) == [], (name, number)
+    assert (
+        audit(
+            seed.world,
+            seed.placements,
+            regions=("Deku Tree Slingshot Room", "Graveyard Dampes Grave", "Desert Colossus"),
+        )
+        == []
+    ), (name, number)

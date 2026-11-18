@@ -1,0 +1,23 @@
+# Round 18: the single translated grave region covers race start, course and both goal rewards.
+# No save warp. Guard the whole descent, rather than relying on either shuffled goal chest.
+# Kak Windmill itself remains freely accessible from the village; only the grave's approach needs Hookshot.
+
+[exits."Graveyard"."Graveyard Dampes Grave"]
+was = "is_adult"
+rule = "can_use(Hookshot)"
+source = "Kareem, played 2026-11-18: no return after Dampé's race, windmill exit needs Hookshot. Banc Graveyard_Adult_Static start shutter 15463667043472836912 and goal shutter 9791590597827914786 close behind the race; both reward chests share the goal. Conservative whole-descent guard; plans/rounds/r18-logic.md."
+
+[exits."Graveyard Dampes Grave"."Graveyard"]
+was = "True"
+rule = "False"
+source = "Kareem, played 2026-11-18: cannot walk back after the race. Native start shutter opens only in Playing/PlayingSecond (UnderTheGrave_Prefab_eb77); final timed shutter lies before both goal chests. No invented reverse race or save warp; plans/rounds/r18-logic.md."
+
+[exits."Graveyard Dampes Grave"."Kak Windmill"]
+was = "is_adult and can_play(Song_of_Time)"
+rule = "can_use(Hookshot)"
+source = "Kareem, played 2026-11-18; Graveyard_Adult_Dynamic Obj_HookShotTarget_A_01 14424380246501499337 above the goal at (-26.2,92.1,77.6), then Adult_Static transition 1143018541481239924 to KakarikoWindmill_GraveYardSide. No Time Block in the native grave. plans/rounds/r18-logic.md."
+
+[events."Graveyard Dampes Grave"."Dampes Windmill Access"]
+was = "is_adult and can_play(Song_of_Time)"
+rule = "can_use(Hookshot)"
+source = "Same physical windmill approach as the exit: Kareem played 2026-11-18 and native Hookshot target 14424380246501499337. Song of Time is the N64 route, not the remake route; plans/rounds/r18-logic.md."
