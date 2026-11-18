@@ -352,4 +352,23 @@ valid generated own-dungeon placement. Removed that implementation-only test, no
 player-facing assertion: existing `test_native_placements_need_no_new_binding`
 already covers unchanged local grants for all four families, and
 `test_another_dungeons_key_in_a_key_chest_changes_while_its_own_stays` covers off-area
-small-key credit. No runtime code changed after the freeze. Corrected gate pending.
+small-key credit. No Track B runtime code changed after that freeze.
+
+### Rebased merge candidate
+
+Claude moved main to `6ec4fdb` with Track A and directed a rebase before the full gate.
+Cancelled the queued old-base corrective runner; the shared lock belonged to cs17c,
+not this track, and was left untouched. No child pytest process remained.
+`git rebase 6ec4fdb` completed cleanly.
+
+Rebased focused command (`CLAWSHOT_WORKERS=1`, dump variables unset):
+`uv run pytest tests/test_dungeon_item_plan.py tests/test_dungeon_items.py
+tests/test_generate_dungeon_areas.py tests/test_key_text.py tests/test_key_model.py
+tests/test_settings_native_logic.py tests/test_app_schema.py`
+→ **959 passed, 2 skipped in 151.21 seconds**. Both runtime process counts were zero.
+
+The merge candidate is frozen after this documentation update, before the full gate.
+Gate commands use the requested xdist settings and existing round16 layered dump;
+`E:/OOTRemake/work/r17-dungeon-items/gate-results.json` and `gate-{stage}.log`
+retain the observed per-stage process checks, worker counts, exits and test output.
+Full rebased gate result is pending; no further runtime changes are planned.
