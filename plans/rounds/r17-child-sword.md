@@ -10,6 +10,11 @@ No fix is implemented or certified by this document.
 only gives the player more capability, not a trap. The proposed ownership guard
 below is retained for later implementation; it is not part of the 0.2.2 work.
 
+**Round 17 follow-through:** Claude authorized importing this docs-only branch into `r17/bugs`;
+cs17a implements the candidate ownership guard there after 0.2.2. The evidence below remains the
+historical investigation, not gameplay acceptance. Current implementation, regression proof and
+the pending three-minute game check: [Track A](r17-bugs.md).
+
 ## Evidence scope
 
 A tester reported completing Forest Temple as adult after an early Door pull,
