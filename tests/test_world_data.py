@@ -50,7 +50,7 @@ def test_all_other_vanilla_checks_with_keys_and_an_escape_tool(world):
     search.collect_spheres(placements)
     assert search.won()
     assert search.holds("Time Travel") and search.can_reach("Ganondorf Boss Room", ADULT)
-    # Only the nineteen explicitly documented keep-vanilla checks are exempt (the Goron City sign puzzle's failure
+    # Only the explicitly documented keep-vanilla checks are exempt (the Goron City sign puzzle's failure
     # chest is reachable but deliberately never holds a check). D17's reachable
     # Treasure Chest Game boxes/reward are not exempt; neither is any shuffled or merely unreachable chest.
     excluded = {n for n, loc in world.locations.items() if loc.keep_vanilla and loc.rule.test is False}
@@ -64,15 +64,12 @@ def test_all_other_vanilla_checks_with_keys_and_an_escape_tool(world):
         "Goron City Chest (TBox_Rupee_Green)",
         "Graveyard Chest (TBox_Rupee_Blue)",
         "Graveyard Chest (TBox_Rupee_Red)",
-        "Hyrule Field Chest (Item_ScrubBusinessSeed)",
         "Hyrule Field Chest (TBox_Rupee_Red) #1",
         "Hyrule Field Chest (TBox_Rupee_Red) #2",
         "Hyrule Field Chest (TBox_Rupee_Red) #3",
         "Hyrule Field Chest (TBox_Rupee_Red) #4",
-        "Kakariko Village Chest (TBox_Rupee_Purple) [Adult Alternative]",
         "Kakariko Village Chest (TBox_Rupee_Purple) [Adult]",
         "Kokiri Forest Chest (TBox_Rupee_Purple)",
-        "Lost Wood Chest (TBox_Rupee_Purple)",
         "Zora Fountain Chest (TBox_Rupee_Purple)",
     }
     assert (

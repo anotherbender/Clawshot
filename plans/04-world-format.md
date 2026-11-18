@@ -432,16 +432,15 @@ resources under `<dir>/romfs/` plus `<dir>/spoiler.json`:
       BossHeart/Freestanding), each filled from the first pool items it may take, as OoT Randomizer fills shops first.
    4. Type-held items (`item_location_types`: songs, shop refills, gift items), most constrained first, as one
       stage retried on its own up to 15 times (OoT Randomizer's `fill_ownworld_restrictive` for songs and shops).
-      Holds that include Token remain in the shared progression pool or its later filler match instead.
+      Progression items whose holds include Token remain in shared progression instead; normal held items keep
+      this constrained stage so general tokens cannot consume their last compatible destinations.
       With Gift and Token enabled, the chest-safety-derived holds also include Token for independently admitted
       `token_rewards.toml` members, without admitting their chest path. Songs and Scrub-only capacity holds stay intact.
    5. D25's bomb and Bombchu packs, only where the Bomb Bag is needed.
    6. Shared progression, native-display items first (with Shop, so the second shield finds a way past Mido).
       Skulltula rewards and spilled tokens participate in this same assumed fill, with the same `allowed` predicate
       and stage-local swaps; no earlier Token palette commits progression while borrowing later openers.
-      Token items use a seeded weighted random candidate order: Chest weight 2, Skulltula weight 1.
-      This is a soft preference only: reachability, `allowed` and safe swaps still decide, with no reserved quota.
-      Token-off follows the unchanged shuffle and consumes the same random draws as before.
+      Token items retain the same seeded random candidate ordering as other progression; no weight or reserved quota.
    7. Remaining Skulltulas: a seeded deterministic bipartite match from the non-progression pool. Each item copy
       has edges only to locations accepted by `allowed`, including existing container screens. Match mandatory
       Token-only copies first, then optional copies in shuffled-pool order. Augmenting paths preserve capacity
@@ -449,9 +448,9 @@ resources under `<dir>/romfs/` plus `<dir>/spoiler.json`:
       No cohort is committed by a per-item existential fit, and no filler item becomes a container or progression.
    8. Priority items (restriction only), then the rest anywhere; with Shop, all filler uses restriction checks,
       native-display items last.
-   In every stage but the return kit's forward placement and the filler, an item with no reachable location left
-   takes one its stage filled earlier, if that location is reachable without the item there, which is placed again
-   under the same rules (Archipelago's safe swap, `Fill.py` at `1041167c`; each item name displaced at most twice).
+   During restrictive stages other than the return kit, an item with no reachable location left takes one its
+   stage filled earlier, if that location is reachable without the item there, which is placed again under the
+   same rules (Archipelago's safe swap, `Fill.py` at `1041167c`; each item name displaced at most twice).
    A failed fill is retried with the same generator, up to 10 times.
 3. The beatability search on the result: collect sphere by sphere from the start; the goal must hold. A seed that
    fails is never returned.

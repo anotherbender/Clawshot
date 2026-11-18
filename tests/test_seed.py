@@ -19,7 +19,7 @@ def test_every_placeable_item_has_an_actor():
     table.check(world.items)
     named: dict[str, list] = {}
     for d in load_definitions():
-        named.setdefault(d.oot_randomizer_name, []).append(d)
+        named.setdefault(d.oot_randomizer_name or d.name, []).append(d)
     shuffled = shuffled_locations(world, SLICE)
     assert shuffled
     for name in shuffled:

@@ -249,7 +249,7 @@ More admitted progression may compete differently, but no percentage is guarante
 would increase actual token capacity; more Gift/Shop checks do not directly do so. No item or check type is admitted
 merely to improve this metric.
 
-### Candidate implementation
+### Rejected weighting candidate (not shipped)
 
 Proposed by cs17c: weighted random ordering only for token-item candidates with Token on, chest weight 2 and
 Skulltula weight 1. This is a soft preference, not a reserved quota or hard exclusion. The same reachability,
@@ -296,7 +296,7 @@ Recommended's twenty candidate seeds actually placed the formerly gift-held item
 Effective holds remain `Boss/Cutscene/NPC/Token`, never Chest. Defaults has zero such draws because those items
 are absent from its pool, not because the new destinations failed.
 
-Output changes: Token-on fill/gift holds, and newly admitted chests with **Token either on or off**. The planned
+Final output changes are the Token-on gift-derived holds, and newly admitted chests with **Token either on or off**. The planned
 Token-off comparison isolates old versus new **fill on the same current world**; it does not claim byte identity
 to released 0.2.2 after adding checks. No version bump made here; maintainer release handling is required.
 Final gate results and READY status are recorded in the verification evidence and coordination handoff below.
@@ -330,10 +330,139 @@ Focused chest/Token/gift tests on the combined code: **117 passed in 12.30 s**; 
 This evidence commit freezes the merge head for **one full gate**, serialized under `r17/gate.lock`.
 Each stage checks both runtime processes: no game means synthetic `-n 12`/workers12 and dump
 `-n 12`/workers4; either game means `-n 4`/workers1. Synthetic clears all dump inputs; dump reuses
-the established layered fixture. No source or documentation changes after freeze.
+the established layered fixture. That first freeze was superseded by the failure/corrective split below.
 
 Authoritative final results: `E:/OOTRemake/work/r17-tokens/gate-results.json` and `gate-*.log`;
 the coordinator's READY handoff names the frozen head and actual counts after all stages pass.
 The same-world Token-off byte comparison uses main `945c996`'s retained fill, not the older
 pre-Track-B baseline (which remains unchanged for the original paired measurement).
 No agent-started game test is claimed. Played route evidence above belongs to Kareem; the TCG packet is unplayed.
+
+## Corrective Token capacity acceptance (Claude, 2026-11-18)
+
+The first merged-head gate on `c4f2f108bc` passed format/lint, then synthetic reported
+**3320 passed, 378 skipped, 3 failed**; dump never started. Logs preserved at
+`E:/OOTRemake/work/r17-tokens/failed-final-c4f2f108/`.
+
+Two failures were stale admission contracts: `test_seed` used only OoTR names instead of the production
+`oot_randomizer_name or name` identity fallback; the vanilla-world oracle still exempted the three now-admitted
+chests. Both contracts now include the played checks without weakening their actor/reachability assertions.
+
+The actual fill failure was existing `test_softlocks` Token seed42. A one-attempt diagnostic printed 38 empty
+Skulltulas and 42 nominally admitted filler copies, but six arrow copies shared one slot: only 37 copies
+could be matched. Fifty tokens had gone to chests. This was soft preference exceeding actual shared capacity,
+not a missing item admission or route.
+
+Correction: only after the existing mandatory/optional matching fails, return a token from a shuffled chest
+to an allowed Skulltula reachable with that chest token removed, then rematch with the freed chest. Stop
+immediately when matching succeeds. Fixed/held sources are ineligible; `allowed()`, stock and logic stay intact.
+Already-successful matchings keep the exact placements, remaining lists and RNG state.
+
+Focused correction proof: **110 passed in 14.42 s**, including all three original failures, scarce-ammo
+regressions, feasible capacity recovery, self-lock refusal and held-token immutability. The narrow formatter
+printed one wrapped comprehension; fixed exactly as printed.
+
+Claude's acceptance before refreezing: at least 500 seeds across Defaults, Recommended, small keys anywhere
+and all/open; parallel workers12 with the game absent; zero exhausted seeds. Both probes use 125 seeds
+`0–124` per recipe, native production pool/setup, stock conservation and beatability. Each already-successful
+matching is compared against the retained main matcher, including RNG state; overflows counted separately.
+
+The stricter **one-attempt diagnostic** finished at 05:50:52: **332 passed, 168 failed**, every failure in
+progression before filler matching; **332/332 completed matchings unchanged**, zero stock/comparison/filler
+failures. These are not 500 accepted seeds, and successful-subset token means are not final shares.
+Evidence: `sweep-500-first-attempt.json` (original script retained alongside it).
+
+The production acceptance probe uses the **existing 10-attempt generation budget**, not an increased retry
+limit, and records every internal retry separately. It is running before any corrective refreeze.
+Script/results: `E:/OOTRemake/work/r17-tokens/sweep-500.py` / `production-sweep-500.json`.
+It self-stops at 07:10 for the 07:15 deadline. If not clean, Claude requires dropping 2:1 weighting and the
+capacity repair while retaining played gift holds, the three admissions, stale-test fixes and documentation,
+then gating that split. No full gate starts before selecting and freezing the accepted path.
+
+Claude additionally requires a matched **main `945c996` no-weighting baseline**, not eventual success alone:
+the same 500 seed/recipe pairs at one attempt, plus mean attempts under the existing production retry budget.
+Baseline runs from an isolated detached checkout, with imported module paths asserted; it includes main's own
+world/holds, not candidate data with only a sampler substitution. Evidence: `baseline-500.py` / `baseline-500.json`.
+Its first-attempt successes are reused as production successes; failures restart with the ordinary ten-attempt
+budget, whose attempts (including exhausted seeds) are counted separately. Heavy runs share the gate lock.
+A regression of more than a few percentage points in first-attempt failure rate or noticeable mean-attempt
+increase requires the no-weighting split even if every production seed eventually succeeds.
+
+### Path selected at 06:06 — no-weighting split
+
+Candidate production probe completed at 06:06:14: **498/500 generated**, two exhausted seeds
+(`Recommended + Token + small keys anywhere`, seeds42 and109; both late Milk Bottle progression).
+No native filler repair was invoked. First-attempt failures remained **168/500 = 33.6%**;
+mean production attempts over all 500 seeds, including exhausted ones, **1.694**.
+Evidence: `production-sweep-500.json`; full first/last error payloads are retained there.
+
+This fails Claude's zero-exhaustion condition regardless of the pending baseline comparison. At 06:06,
+well before the 07:15 deadline, cs17c selected the authorized **no-weighting split**: removed the 2:1
+ordering, capacity repair and their now-obsolete tests; retained played gift-hold extension, all three
+canonical chest admissions, actor-name/oracle contract fixes and research. Main's uniform candidate ordering
+is retained, with the normal-held staging correction below. No compatibility, stock or logic relaxation.
+
+The genuine main baseline continues for the requested failure-rate/mean-attempt comparison. The kept
+split is also queued for the same 500 native pairs, to report its actual final reward mix rather than
+reusing the rejected candidate's percentages. Focused failed-case proof precedes that split sweep.
+All heavy probes serialize; no final corrective gate before final scope and evidence freeze.
+
+### Matched main baseline and retry cost
+
+Main's genuine 500-seed probe finished at 06:19:38, workers12, game absent. Every seed was first called
+with `attempts=1`; failures were then generated with the existing ten-attempt production budget.
+Means below cover all 125 pairs per recipe, including exhausted attempts in the candidate.
+
+| Recipe (+Token) | Main first-failure % | Weighted first-failure % | Main mean attempts | Weighted mean attempts |
+|---|---:|---:|---:|---:|
+| Defaults | 11.2 | 14.4 | 1.168 | 1.192 |
+| Recommended | 17.6 | 40.0 | 1.232 | 1.696 |
+| Small keys anywhere | 40.8 | 67.2 | 1.752 | 2.760 |
+| All/open | 17.6 | 12.8 | 1.192 | 1.128 |
+| Overall (500 seeds) | 21.8 | 33.6 | 1.336 | 1.694 |
+
+Main exhausted none; candidate exhausted two. This is the requested whole-main versus whole-candidate
+comparison (candidate also has the new holds/checks), not a sampler-only causal isolation. It reinforces
+the conservative rejection already selected: failure rate up 11.8 percentage points, mean attempts up 26.8%.
+Raw evidence: `baseline-500.json`, `sweep-500-first-attempt.json`, `production-sweep-500.json`.
+
+The split's first focused run exposed two existing new gift-hold regressions, normal-class Defense and
+gold rupee: diagnostic printed `Gift=Fairy Ocarina`, `Skulltula=Token`, only `Chest` empty, held Defense
+left over. Main's unconstrained late filler cannot place that held item. No test was weakened or reseeded.
+Normal held items now retain the existing **early constrained type-held stage**, reserving their compatible
+slots before tokens consume them; progression Token holds remain shared (the earlier Sword/Token regression).
+No weight, capacity-repair swap, new setting, admission or logic change. The same failed cases and the full
+Token/gift suite precede the final split's 500-pair production/share probe.
+
+### Final no-weighting split acceptance and corrective freeze
+
+Focused proof after the printed normal-held fix: **104 passed in 14.78 s**, including every previously
+failed case. No test weakened, reclassified or reseeded.
+
+The final split's same 500 native pairs finished at **06:37:03**, workers12, no game present:
+**500/500 generated and passed beatability/stock checks; zero exhausted seeds** with the unchanged
+production ten-attempt limit. This does not mean zero internal retries.
+
+| Recipe (+Token) | Main native-token % | Final split native-token % | Split first-failure % | Split mean attempts |
+|---|---:|---:|---:|---:|
+| Defaults | 56.376 | 55.744 | 11.2 | 1.144 |
+| Recommended | 56.912 | 54.112 | 34.4 | 1.504 |
+| Small keys anywhere | 55.184 | 52.464 | 51.2 | 2.464 |
+| All/open | 56.328 | 54.168 | 14.4 | 1.160 |
+| Overall (500 seeds) | 56.200 | 54.122 | 27.8 | 1.568 |
+
+Each recipe now has 168 Chest and 100 Token destinations. Main has 165 Chest. The final split keeps
+the requested played holds/checks, whose whole-bundle retry cost remains above main; no attribution to
+the removed weighting and no retry-limit increase. Evidence: `split-focused.log`, `split-500.json`;
+the baseline/candidate data above remain immutable. These final percentages supersede rejected-candidate
+percentages as measurements of the kept scope; no percentage is guaranteed for other seeds.
+
+**Corrective frozen scope:** uniform progression ordering; no weighting or capacity-repair swap;
+played Token gift-hold extension with normal-held staging; three canonical chests; stale actor/oracle
+contracts; Water save-edit evidence and all requested research/TCG packet. Other hunt routes, duplicate
+copies, failure/repeat chests and D17 prize release remain held. No version bump or agent-started game.
+
+This evidence commit freezes source/docs for the corrective format/lint/full synthetic/full dump gate.
+Runtime checks/caps and owned lock are unchanged. No edits after freeze; authoritative actual gate counts,
+commands and process snapshots go to `gate-results.json` / `gate-*.log`. READY reports this exact frozen head
+only after every gate and the same-world Token-off byte comparison pass.

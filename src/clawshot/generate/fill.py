@@ -350,15 +350,7 @@ def _fill_restrictive(
         search = Search(world, [*assumed, *items])
         search.collect_spheres(placements)
         candidates = [name for name in locations if allowed(world, settings, name, item)]
-        if item == "Gold Skulltula Token" and "Token" in settings.shuffle:
-            # Weighted random order, not a hard chest reservation: a chest gets twice
-            # a Skulltula's weight, but reachability and safe swaps still decide.
-            candidates.sort(
-                key=lambda name: rng.random() ** (0.5 if world.locations[name].type == "Chest" else 1.0),
-                reverse=True,
-            )
-        else:
-            rng.shuffle(candidates)
+        rng.shuffle(candidates)
         if item in native:
             reserve = (
                 shop_refills > 0 and sum(world.locations[name].type == "Shop" for name in locations) <= shop_refills
@@ -1015,13 +1007,15 @@ def fill(
     shop_refills = _fill_dungeon_items(world, settings, rng, placements, locations, pool, shop_refills)
     shop_refills = _fill_palettes(world, settings, rng, placements, locations, pool, shop_refills)
     unrestricted = pool
-    # Skulltula-compatible holds belong to shared progression or its late filler match, not an earlier frozen batch.
+    # Progression-compatible Token holds stay shared; normal held items need their slots before tokens consume them.
     token_held = {item for item, kinds in held.items() if "Token" in kinds} if "Token" in settings.shuffle else set()
     # Type-held ammo still needs the stronger D25 bag gate in its dedicated stage.
     type_held = [
         item
         for item in unrestricted
-        if item in held and item not in token_held and not item.startswith(_BOMB_AMMO_PREFIXES)
+        if item in held
+        and (item not in token_held or not world.items[item].progression)
+        and not item.startswith(_BOMB_AMMO_PREFIXES)
     ]
     unrestricted = [item for item in unrestricted if item not in type_held]
     shop_refills = _fill_type_held(

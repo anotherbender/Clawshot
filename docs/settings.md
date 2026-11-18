@@ -56,7 +56,7 @@ in chests only; see [Progressive items](#progressive-items).
 
 With Gift and Token selected, played bottles, Double Defense, the Echo Gem and gold rupees may also reach
 Skulltulas; this does not allow their unverified chest grants. Fixed Nut/Stick upgrades remain Scrub-only.
-Token placement uses a seeded 2:1 chest-versus-Skulltula weight, not a fixed percentage or reserved chest quota.
+Token placement retains the existing seeded random ordering; there is no target percentage or weighting.
 Reachability, container requirements, pool composition and earlier fill stages still limit the result.
 
 Skulltula ammo requires its existing container before the source; refills never grant a bag or weapon.

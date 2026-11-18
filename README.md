@@ -94,7 +94,6 @@ that proves the model, not that every route has been verified in the game.
 
 With Token added to the shipped presets, played bottle, Double Defense, Echo Gem and gold-rupee rewards
 may also reach Skulltulas without becoming chest-safe; fixed Nut/Stick upgrades remain Scrub-only.
-Token items use a soft 2:1 chest-versus-Skulltula destination weight, still subject to logic and placement restrictions.
 
 **Confirmed with Gift shuffle:** the first two Bombchu Bowling wins and both normal
 shooting-gallery prizes give the seed's rewards (`R10-MINIGAMES-CHILD-JABU`,

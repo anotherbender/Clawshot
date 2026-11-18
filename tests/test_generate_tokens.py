@@ -611,32 +611,3 @@ def test_existing_empty_nut_bag_allows_a_refill_without_a_capacity_upgrade():
     assert (
         sum(item == "Deku Nuts (5)" for name, item in placements.items() if world.locations[name].type == SHUFFLE) == 1
     )
-
-
-@pytest.mark.parametrize("chest_rule", ["True", "Gold_Skulltula_Token"])
-def test_token_chest_weight_preserves_both_randomness_and_reachable_fallback(chest_rule):
-    spec = {
-        "start": "Start",
-        "goal": "Gold_Skulltula_Token",
-        "items": {TOKEN_ITEM: {"type": "Token"}, ADMITTED_RUPEES: {"class": "normal"}},
-        "regions": [
-            {
-                "name": "Start",
-                "locations": {
-                    "Chest": {"type": "Chest", "vanilla": ADMITTED_RUPEES, "rule": chest_rule},
-                    "Skulltula": {"type": GS, "vanilla": TOKEN_ITEM, "rule": "True"},
-                },
-            }
-        ],
-    }
-    chest_tokens = 0
-    for number in range(256):
-        seed = generate(spec, number, Settings(shuffle=("Chest", SHUFFLE)), attempts=1)
-        assert Counter(seed.placements.values()) == Counter({TOKEN_ITEM: 1, ADMITTED_RUPEES: 1})
-        chest_tokens += seed.placements["Chest"] == TOKEN_ITEM
-    if chest_rule == "True":
-        # Two equal-access checks: Chest has weight 2, Skulltula 1. Broad bounds
-        # detect missing/reversed weighting, not a particular seeded permutation.
-        assert 150 <= chest_tokens <= 195, chest_tokens
-    else:
-        assert chest_tokens == 0  # preference never puts the only token behind itself
