@@ -303,7 +303,7 @@ Final gates pending; not READY.
 
 ## Verification and handoff
 
-Planned narrow proof: `tests/test_generate_tokens.py` and `tests/test_settings_songs.py`. New synthetic coverage
+Focused proof: `tests/test_world_chest_hunt.py`, `tests/test_generate_tokens.py` and `tests/test_settings_songs.py`. New synthetic coverage
 checks soft weighted placement without self-locking, exact item/token conservation, and each formerly gift-held
 reward actually reaching a Skulltula without becoming chest-safe (including normal-class Defense/gold rupee
 through late filler). Existing scarce-arrow and shared-progression regressions remain unchanged.
@@ -312,9 +312,18 @@ Existing native coverage `test_every_admitted_member_has_its_native_shape_and_a_
 every catalogue donor, including these five item names. No new native input or working-set file is required;
 reuse `E:/OOTRemake/work/rounds/r16/time-layered-dump`.
 
-Gate began on `45946c8a62` under the round-17 lock, with no game process present.
-Targeted Token/gift regressions: **103 passed in 6.11 s**. Format check printed one required one-line
-`build_world` call in `tests/test_settings_songs.py`; that exact formatting cause was fixed. No failed test,
-full synthetic or dump stage was rerun. Continuing from format, with stage-start process/cap checks.
-Logs and same-world Token-off byte comparison: `E:/OOTRemake/work/r17-tokens/`.
+The old-base gate began on `45946c8a62`: targeted **103 passed in 6.11 s**; format printed one
+required one-line `build_world` call, fixed exactly as printed. Claude then required stopping that
+gate and rebasing onto Track A's merged main, `6ec4fdb`; the stopped gate is not final acceptance.
+Only cs17c's owned lock was released. Its logs remain under `old-base-551d869/`.
+
+Rebase onto `6ec4fdb` was clean: `5d8135aa4aca37a9dc715f958cf1db246f8a22c7`.
+Focused tests on that rebased code: **117 passed in 11.51 s**; no game process present,
+`CLAWSHOT_WORKERS=4`, serialized with the round-17 lock and no dump inputs.
+Evidence: `E:/OOTRemake/work/r17-tokens/rebased-focused.log`.
+
+**Final gate held by Claude's instruction:** Track B merges first; then rebase onto it and wait
+for Claude's word before freezing and running the full gate. No final gate is queued or running.
+Stage-start process checks and required worker caps remain mandatory. Same-world Token-off byte
+comparison and final gate logs belong under `E:/OOTRemake/work/r17-tokens/`.
 No agent-started game test is claimed. Played route evidence above belongs to Kareem; the TCG packet is unplayed.
