@@ -122,12 +122,17 @@ Each new output includes `clawshot-seed.json` with its seed number, settings, fi
 Clawshot version and supported game build. Play checks this record and the seed contents, not
 the old dump path. Saves and logs are outside the hashed seed folder.
 
-When Play creates a seed's `user` folder, it copies only `option.sav` and `account.sav` once
-from the chosen build's `user/save/<id>/` (the newest ID folder by modification time).
-Camera speed, Invert Jump and ocarina controls therefore carry over if those files exist.
-Existing seed users/options are kept unchanged; `slot_NN` progress is never copied.
-Missing source files are skipped and named in Play's result. The game's own
-`hookshot_options.ini` / `longshot_options.ini` stays in the game folder and needs no copy.
+When Play creates a seed's `user` folder, and only then, it copies `option.sav` and `account.sav` from the newest
+`save/<id>/` folder (by modification time) of the user folder your own start of that game uses, plus Longshot's
+`longshot_options.ini` (menu choices and controls), which Longshot reads from its `--user` folder. A file already in
+the seed's folder is never overwritten. For a Longshot Launcher that is the folder it starts every build with: a
+portable launcher's `LongshotLauncher-data/user`, an installed one's `%APPDATA%\Longshot`, on Linux
+`$XDG_DATA_HOME/longshot` (`~/.local/share/longshot`). A Hookshot game folder: its `user` folder; Hookshot's
+`hookshot_options.ini` stays in its game folder and needs no copy. A Longshot game folder chosen directly: `user` in it
+on Windows, `~/.local/share/longshot` on Linux, with `longshot_options.ini` from beside the game. Camera speed, Invert
+Jump, ocarina controls and Longshot's menu settings therefore carry over if those files exist. Existing seed
+users/options are kept unchanged; `slot_NN` progress is never copied. Missing source files are skipped and named in
+Play's result.
 
 **Copy to my emulator** asks for your emulator's mod folder for this game once and remembers it.
 Back up your normal emulator saves before confirming. The copy is real files in

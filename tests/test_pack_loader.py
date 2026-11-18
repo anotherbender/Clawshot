@@ -274,6 +274,8 @@ def test_unstartable_game_refuses_before_saves_log_or_process(tmp_path, monkeypa
 )
 def test_native_start_hands_the_checked_plan_to_one_process(tmp_path, monkeypatch, platform, game, program):
     root, exe = pack_with_game(tmp_path, game)
+    # A Linux Longshot's own user folder is ${XDG_DATA_HOME}/longshot: keep it inside the test.
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "share"))
     plan = runtime.launch_plan(root, exe.parent.parent)
     assert plan["command"] == [str(exe), "--user", str(root / "user")]
     monkeypatch.setattr("clawshot.pack.hookshot.sys.platform", platform)
@@ -288,7 +290,8 @@ def test_native_start_hands_the_checked_plan_to_one_process(tmp_path, monkeypatc
     monkeypatch.setattr(runtime.subprocess, "Popen", recorded)
     process, options = runtime.start_game(plan, process_lister=lambda: [])
     assert process == "synthetic process"
-    assert options["missing"] == ["option.sav", "account.sav"]
+    settings = ["longshot_options.ini"] if program == "longshot" else []
+    assert options["missing"] == ["option.sav", "account.sav", *settings]
     ((command, cwd, env, log),) = started
     assert command == plan["command"] and cwd == str(exe.parent.parent)
     assert env["HOS_MODS"] == str(root) and env[f"{program.upper()}_NO_UPDATE_CHECK"] == "1"

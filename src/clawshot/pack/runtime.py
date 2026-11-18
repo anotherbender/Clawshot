@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from clawshot.pack import PackError, check_version, generate, tree_digest
-from clawshot.pack.hookshot import PROGRAMS, detect, game_folders, native_suffix
+from clawshot.pack.hookshot import LAUNCHER_DATA, PROGRAMS, GameInfo, detect, game_folders, native_suffix
 
 RUNNING_GAME = "Hookshot or Longshot is already running. Quit it, then press Play."
 NO_PLAY = "Play needs Windows or Linux. Open the seed folder and load romfs as a mod in your emulator."
@@ -19,6 +19,9 @@ OTHER_SYSTEM = (
     "Choose a Hookshot or Longshot game built on this computer, then press Play."
 )
 NOT_CHECKED = "Clawshot could not check running programs. Close Hookshot or Longshot and try Play again."
+SAVE_OPTIONS = ("option.sav", "account.sav")
+LONGSHOT_OPTIONS = "longshot_options.ini"
+ONCE = "Options are copied only when Play creates this seed's save folder, never over its files."
 
 
 def play_refusal(exe: Path | str | None = None, platform: str | None = None) -> str:
@@ -139,6 +142,33 @@ def check_mod_layout(root: Path) -> None:
         )
 
 
+def player_user(installation: GameInfo) -> tuple[Path, Path | None]:
+    """The user folder (save/<id>) and Longshot settings file of the player's own start of the chosen game.
+
+    Facts only, read 2026-11-17, no code copied: Longshot reads longshot_options.ini from its --user folder, else
+    beside the game (host/options_path.c). The Longshot Launcher starts every build with one --user folder
+    (Core/MakeGameCommand.cs GamePlay.UserFolder, Core/Saves.cs SaveEnvironment.LongshotUser, Core/LauncherHome.cs
+    PortableUser): on Windows a portable launcher's LongshotLauncher-data\\user, else %APPDATA%\\Longshot; on Linux
+    ${XDG_DATA_HOME:-$HOME/.local/share}/longshot, $HOME being a portable AppImage's <AppImage>.home. Started by
+    itself, Longshot keeps its saves in <game>/user on Windows and in that Linux folder (Longshot README, "Where the
+    files go"). Hookshot: <game>/user, its hookshot_options.ini staying in the game folder. The build's system
+    decides: Play starts only this computer's.
+    """
+    folder, home = installation.folder, installation.launcher
+    if installation.game == "Hookshot":
+        return folder / "user", None
+    if installation.exe.suffix.lower() != ".exe":
+        base = home if home is not None and home.name.endswith(".AppImage.home") else Path.home()
+        user = Path(os.environ.get("XDG_DATA_HOME") or base / ".local/share") / "longshot"
+    elif home is None:
+        user = folder / "user"
+    elif home.name.casefold() == LAUNCHER_DATA.casefold():
+        user = home / "user"
+    else:
+        user = Path(os.environ.get("APPDATA") or Path.home() / "AppData/Roaming") / "Longshot"
+    return user, (folder if home is None else user) / LONGSHOT_OPTIONS
+
+
 def launch_plan(root: Path, game: Path) -> dict:
     """Read-only plan shared by pack Play and the UI; root contains exactly seed/romfs.
 
@@ -165,6 +195,7 @@ def launch_plan(root: Path, game: Path) -> dict:
     log = root / f"{program}_log.txt"
     if any(path.resolve() != path for path in (user, log, root / "seed")):
         raise PackError("The seed, saves or log path is a link. Generate a new seed in a fresh output folder.")
+    player, settings = player_user(installation)
     return {
         "game": installation.game,
         "version": installation.version,
@@ -177,34 +208,43 @@ def launch_plan(root: Path, game: Path) -> dict:
         "unset_environment": ["HOS_FS_OVERLAY"],
         "mod": str(root / "seed"),
         "user": str(user),
+        # Read only, by prepare_user when it creates user: the save/<id> folders and the options files, never slots.
+        "player_user": str(player),
+        "player_options": None if settings is None else str(settings),
         "log": str(log),
     }
 
 
 def prepare_user(plan: dict) -> dict:
-    """Initialize a fresh seed user with options/account only; never import progress or overwrite a seed file."""
+    """Initialize a fresh seed user with options/account and Longshot's settings file from the player's own user folder
+    (``player_user``); never import progress or overwrite a seed file."""
     user = Path(plan["user"])
     try:
         user.mkdir()
     except FileExistsError:
         if not user.is_dir():
             raise PackError(f"The seed user path is not a folder: {user}") from None
-        return {"copied": [], "missing": [], "message": "Existing seed saves and game options kept."}
-    saves = Path(plan["cwd"]) / "user/save"
+        return {"copied": [], "missing": [], "message": "Existing seed saves and game options kept. " + ONCE}
+    saves = Path(plan["player_user"]) / "save"
     accounts = [folder for folder in saves.iterdir() if folder.is_dir()] if saves.is_dir() else []
     source = max(accounts, key=lambda folder: (folder.stat().st_mtime_ns, folder.name), default=None)
+    copies = {
+        name: None if source is None else (source / name, user / "save" / source.name / name) for name in SAVE_OPTIONS
+    }
+    if plan["player_options"]:
+        copies[LONGSHOT_OPTIONS] = (Path(plan["player_options"]), user / LONGSHOT_OPTIONS)
     copied, missing = [], []
-    for name in ("option.sav", "account.sav"):
-        if source is None or not (source / name).is_file():
+    for name, pair in copies.items():
+        if pair is None or not pair[0].is_file():
             missing.append(name)
             continue
+        origin, destination = pair
         try:
-            incoming = (source / name).open("rb")
+            incoming = origin.open("rb")
         except FileNotFoundError:
             missing.append(name)
             continue
         with incoming:
-            destination = user / "save" / source.name / name
             destination.parent.mkdir(parents=True, exist_ok=True)
             try:
                 outgoing = destination.open("xb")
@@ -220,7 +260,7 @@ def prepare_user(plan: dict) -> dict:
     message = "Game options carried over: " + ", ".join(copied) + "." if copied else "No game options copied."
     if missing:
         message += " Source missing: " + ", ".join(missing) + "; skipped."
-    return {"copied": copied, "missing": missing, "message": message}
+    return {"copied": copied, "missing": missing, "message": message + " " + ONCE}
 
 
 def start_game(plan: dict, *, process_lister=None) -> tuple[subprocess.Popen, dict]:

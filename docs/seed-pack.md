@@ -38,11 +38,17 @@ player-facing summary (steps, known issues, the Discord link); this file has the
    Only Play requires the bin executable. If no game folder was saved, Play stops and points to the
    emulator steps below. A missing bin executable is a hard stop: the folder-root launcher ignores save
    isolation and is never used. Quit any running Hookshot or Longshot first; Play refuses while one runs.
-   Start a **new game**; later plays continue this pack's saves. First Play copies only
-   `option.sav` and `account.sav` from the newest ID folder under the chosen build's `user/save`,
-   preserving game options such as Invert Jump. Existing seed users are left alone; no `slot_NN`
-   playthrough is copied or reset. Missing source files are skipped and reported in the Play result.
-   The game's own `*_options.ini` remains in its game folder and needs nothing.
+   Start a **new game**; later plays continue this pack's saves. Only when Play creates the pack's `user` folder
+   does it copy your game options in, never over a file already there: `option.sav` and `account.sav` (Invert
+   Jump, camera, Ocarina controls) from the newest ID folder under `save` in the user folder your own start of
+   that game uses, and for Longshot also `longshot_options.ini` (the in-game menu's choices and your controls),
+   which Longshot reads from its `--user` folder. With a Longshot Launcher that is the folder it starts every build
+   with: a portable launcher's `LongshotLauncher-data\user`, an installed one's `%APPDATA%\Longshot`, on Linux
+   `$XDG_DATA_HOME/longshot` (`~/.local/share/longshot`). A Hookshot game folder: its `user` folder; Hookshot's
+   `hookshot_options.ini` stays in its game folder. A Longshot game folder chosen directly: `user` in it on Windows,
+   `~/.local/share/longshot` on Linux, with `longshot_options.ini` from beside the game. Existing seed users are left
+   alone; no `slot_NN` playthrough is copied or reset. Missing source files are skipped and reported in the Play
+   result.
 6. `seed/play-note.md` and `seed/spoiler.json` both reveal item locations; open them only if you want spoilers.
    For reports, attach only the whole `<pack>/hookshot_log.txt` or `<pack>/longshot_log.txt` (if Longshot's
    is empty, its own `longshot_log.txt` in the game folder), not `pack.json`, saves, seed folders or your

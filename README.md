@@ -35,8 +35,10 @@ that output. Clawshot is not affiliated with or endorsed by Nintendo.
    **Play note (spoilers)** is optional: it reveals item locations and all shuffled rewards; it does not open automatically.
 5. **Hookshot or Longshot:** on Game, choose its game folder (or your Longshot Launcher folder) and press
    **Detect**, quit any running Hookshot or Longshot, then press **Play** and start a new game.
-   This seed has its own playthrough. First Play copies only `option.sav` and `account.sav` from the chosen
-   game's newest save-ID folder, keeping options such as Invert Jump; no progress slots are copied.
+   This seed has its own playthrough. Only when Play creates its save folder does it copy `option.sav` and
+   `account.sav` from the newest save-ID folder of the chosen game's own user folder (a Longshot Launcher's shared
+   one), plus Longshot's `longshot_options.ini`, keeping options such as Invert Jump; it never overwrites the seed's
+   files and copies no progress slots.
    **Emulator instead:** back up your normal saves, then **Copy to my emulator**, choose this game's
    mod folder and enable only that seed. Existing copies are never replaced.
 

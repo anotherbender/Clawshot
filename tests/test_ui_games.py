@@ -33,6 +33,8 @@ def test_http_migrates_game_selection_switches_and_rejects_changed_seed(made_ui_
         json.dumps({"format": 1, "builds": [{"folder": str(build), "version": "v3.0.0-rc.2", "default": True}]}),
         encoding="utf-8",
     )
+    # A Linux build's launcher user folder is ${XDG_DATA_HOME}/longshot: keep it inside the test.
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "share"))
     config = tmp_path / "paths.json"
     config.write_text(json.dumps({"hookshot": str(hookshot)}), encoding="utf-8")
     preferences = Preferences(config)
@@ -57,7 +59,7 @@ def test_http_migrates_game_selection_switches_and_rejects_changed_seed(made_ui_
         assert request(server, "select-seed", {"output": result["output"]})[0] == 200
         status, _, played = request(server, "play", {"game": str(launcher)})
         assert status == 200, played
-        assert played["options"]["missing"] == ["option.sav", "account.sav"]
+        assert played["options"]["missing"] == ["option.sav", "account.sav", "longshot_options.ini"]
         plan = plans[-1]
         root = Path(result["output"])
         assert plan["command"] == [str(exe), "--user", str(root / "user")]

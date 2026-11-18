@@ -54,7 +54,7 @@ label = "Finish the new seed folder"
 help = "Move the finished seed into your new output folder. If another seed is already there, stop instead of replacing it."
 [play]
 label = "Play"
-help = "Start this seed in your chosen Hookshot or Longshot game with its own save folder. First Play carries over option.sav and account.sav if available, not your progress slots. Existing seed options stay unchanged."
+help = "Start this seed in your chosen Hookshot or Longshot game with its own save folder. Only when Play creates that folder does it copy option.sav and account.sav, plus Longshot's longshot_options.ini, from the game's own user folder (a Longshot Launcher's shared one) if available, not your progress slots. It never overwrites the seed's files."
 note = "Quit a running Hookshot or Longshot game before starting another seed. Play needs Windows or Linux and a game build that can load mods."
 [seeds]
 label = "My seeds"

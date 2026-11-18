@@ -39,10 +39,12 @@ STEPS
    version verification does it make a small private .romfs-* cache in this pack;
    the cache is removed when generation ends. Never share that cache or "seed".
 3. Hookshot or Longshot: quit the game, run "Play seed.bat" and start a NEW GAME.
-   It uses its own save folder. First Play copies only option.sav and account.sav
-   (your game options) from the chosen game's newest save-ID folder, never slot_NN
-   progress. Existing seed saves/options are never replaced. Missing files are
-   skipped and reported. If Play says your game cannot load mods, update it.
+   It uses its own save folder. Only when Play creates that folder does it copy
+   option.sav and account.sav (your game options) from the newest save-ID folder of
+   the chosen game's own user folder (a Longshot Launcher's shared one), plus
+   Longshot's longshot_options.ini; never slot_NN progress. Existing seed
+   saves/options are never replaced. Missing files are skipped and reported.
+   If Play says your game cannot load mods, update it.
    Emulator: back up your saves for this game first (a new game overwrites them),
    then follow "Emulator / console loading" in docs\seed-pack.md.
 4. seed\play-note.md and seed\spoiler.json both hold spoilers: the play note's
