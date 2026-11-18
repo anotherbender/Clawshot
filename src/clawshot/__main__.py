@@ -129,6 +129,12 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="fast-start skips (default: intro); mido is a legacy alias for --forest open",
     )
+    parser.add_argument(
+        "--skippable-story",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="allow skipping non-choice Talon/Zelda/Impa/Saria speech; encounters and rewards remain (default off)",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -141,6 +147,7 @@ def main(argv: list[str] | None = None) -> int:
             ("areas", "areas"),
             ("goal", "goal"),
             ("skip", "fast_start"),
+            ("skippable_story", "skippable_story"),
             ("songs", "songs"),
             ("shop_prices", "shop_prices"),
             ("shop_slots", "shop_slots"),

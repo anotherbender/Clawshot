@@ -22,7 +22,7 @@ from functools import partial
 from pathlib import Path
 
 from clawshot.formats import byml, evfl
-from clawshot.patch import mido
+from clawshot.patch import mido, owl_skips
 from clawshot.patch.plan import PatchError, Plan
 from clawshot.patch.write import FileChanges, WrittenFile
 from clawshot.patch.write import write as write_patch
@@ -149,6 +149,10 @@ def opening_without_movie(data: bytes) -> bytes:
 FLOW_EDITS: dict[str, tuple[str, Callable[[bytes], bytes]]] = {
     "opening_without_movie": (OPENING_FLOW, opening_without_movie),
     "deku_tree_after_mido": (mido.FLOW, mido.complete_deku_meeting),
+    **{
+        f"kaepora_{scene.flow}": (scene.path, partial(owl_skips.omit_lines, scene=scene))
+        for scene in owl_skips.SCENES
+    },
 }
 
 

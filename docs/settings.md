@@ -243,6 +243,10 @@ native grants and admission rules, not a claim that every item/age pair has been
 The [round18 audit](../plans/rounds/r18-equipment.md) separates played results, native-data evidence
 and unverified boundaries. Wrong-age item-bar precautions remain [below](#hints-models-and-age-warnings).
 
+Song lessons bypass their interactive repeat-the-notes segment when neither ocarina is owned.
+The teacher's demonstration, automatic performance, actual song/shuffled reward and story continuation remain.
+This prevents the played no-ocarina shoulder-note softlock; the new scene change itself awaits play acceptance.
+
 ## Shops and scrub prices
 
 | Option | Behavior |
@@ -286,6 +290,12 @@ restriction; Navi waking Link and normal new-game initialization still run. Movi
 **passed Kareem's new-game check on 2026-11-12**. `--skip intro saria deku_tree kaepora`
 selects fast-start skips; `--skip` alone disables them. These are separate from shuffled kinds.
 
+`--skippable-story` is a separate default-off option (app: **Skippable story dialogue**).
+It enables the native skip button during non-choice Talon wake-up, child Zelda, Impa and Saria farewell
+speech. Encounters and choices still play; item grants and flag writes are outside the skippable regions.
+First-pull Rauru and Sheik are unchanged. `--no-skippable-story` disables it; CS1 stores the choice.
+Built and native-data-tested, **not yet played**.
+
 The Kaepora skip also marks the skipped first-field panorama complete, ending its native
 music-suppression window. The previous preset could leave Hyrule Field silent during the day.
 This changes **new games only**, not existing saves. Kareem verified the repaired field
@@ -295,6 +305,15 @@ The skip now also preserves `IsVisitLocation.HyruleField`, normally supplied by 
 location UI and required for the Field map. Like the Saria skip's Kokiri Forest visit flag, this
 also reveals the area's pause map before the first visit. This new-game minimap/full-map correction
 still awaits in-game verification; existing saved visit state is not migrated.
+
+With Kaepora skipped, later castle/Field/river/woods owl speech is also omitted while each scene's
+map banner and flags still run. Summit and Lake Hylia flight offers/flights remain available.
+These additional omissions are built/native-data-tested, not yet played.
+
+Every new seed also refuses to start Dampé's race without an owned Hookshot or Longshot.
+The refusal fades and returns Link to the existing Kakariko-side Graveyard surface spawn,
+because merely refusing below the one-way descent would still trap him. Both prizes remain shuffled.
+This admission/return change is built/native-data-tested, not yet played.
 
 Every new seed enables the D-pad HUD shortcuts from the start, independently of fast-start
 choices (including `--skip` with no selections): **Navi, Ocarina, Boots and Masks**.

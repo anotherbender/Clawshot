@@ -126,6 +126,7 @@ class Settings:
     exclusive_location_types: tuple[str, ...] = ()
     location_type_items: dict[str, tuple[str, ...]] = field(default_factory=dict)
     fast_start: tuple[str, ...] = tuple(DEFAULTS["fast_start"])
+    skippable_story: bool = DEFAULTS["skippable_story"]
     songs: str = DEFAULTS["songs"]
     shop_prices: str = DEFAULTS["shop_prices"]
     shop_slots: int = DEFAULTS["shop_slots"]
@@ -192,6 +193,8 @@ class Settings:
             raise ValueError("scrub_price must be an integer from 0 to 1000 rupees")
         if not isinstance(self.cheap_deku_shield, bool):
             raise ValueError("cheap_deku_shield must be a boolean")
+        if not isinstance(self.skippable_story, bool):
+            raise ValueError("skippable_story must be a boolean")
         if not isinstance(self.forest, str) or self.forest not in CATALOG["forest"]:
             raise ValueError("forest must be 'closed', 'closed_deku' or 'open'")
         if self.door_of_time not in ("closed", "song_only", "open"):
@@ -214,6 +217,7 @@ class Settings:
             "dungeon_items": self.dungeon_items,
             "logic": {k: self.logic[k] for k in sorted(self.logic)},
             "fast_start": list(self.fast_start),
+            "skippable_story": self.skippable_story,
             "songs": self.songs,
             "shop_prices": self.shop_prices,
             "shop_slots": self.shop_slots,

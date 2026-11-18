@@ -5,6 +5,7 @@ shuffle = ["Chest"]
 dungeon_items = "own_dungeon"
 shuffle_hideout_keys = false # Round 18, Kareem: the four Fortress jail keys get their own opt-in; needs Chest shuffle
 fast_start = ["intro"]
+skippable_story = false # opt-in skip-button regions around non-choice story speech, never encounter/grant skips
 songs = "song"
 shop_prices = "vanilla"
 shop_slots = 8 # Round 8: first N native shelf indices per ordinary shop; 0 keeps all contents vanilla
