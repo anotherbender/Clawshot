@@ -371,4 +371,32 @@ The merge candidate is frozen after this documentation update, before the full g
 Gate commands use the requested xdist settings and existing round16 layered dump;
 `E:/OOTRemake/work/r17-dungeon-items/gate-results.json` and `gate-{stage}.log`
 retain the observed per-stage process checks, worker counts, exits and test output.
-Full rebased gate result is pending; no further runtime changes are planned.
+**Full rebased gate passed on `8454bd79905b39164ba024c75c31eb37633a7a99`:**
+
+| Check | Observed result |
+|---|---|
+| `uv run ruff format --check` | exit0 |
+| `uv run ruff check` | exit0 |
+| `CLAWSHOT_WORKERS=12 uv run --with pytest-xdist pytest -n 12` | 3301 passed, 378 skipped; 221.41s |
+| `CLAWSHOT_WORKERS=4 uv run --with pytest-xdist pytest -m dump -n 12` | 375 passed; 1079.10s |
+
+The dump stage used all three requested dump variables and the existing round16
+layered fixture; no additional fixture files were needed. Both pytest stages reported
+36 existing iterator-parametrization deprecation warnings. No game process was present
+at any stage start; the owned lock was released by the runner's finally block.
+This final handoff update changes documentation only; runtime and tests remain those
+of the passing frozen head.
+
+**READY for review, not an in-game acceptance claim.** The experimental default-off
+`all_anywhere` mode is built, generated/beatability/readback checked and UI-smoked.
+Seed170214-v2's isolated Longshot packet is under
+`E:/OOTRemake/work/r17-dungeon-items/ingame/`:
+`Test - dungeon items 170214.bat` and `CHECK-DUNGEON-ITEMS.md`.
+Claude must boot-check it; Kareem must show loaded-file proof plus named pickup,
+destination map/compass/boss-door behavior and Save–Continue. No game was started,
+and no player seed/save was opened or changed.
+
+Accepted remaining scope: Well/Shadow floor keys and Fortress guard-dropped jail keys
+are adapter plans only, preserving the four-rescue/card scene; Treasure Chest Game is
+held and owned by cs17c. Reward shuffle and N-of-rewards bridge conditions are plans,
+not exposed settings. Their unresolved product calls and native proof edges are above.
