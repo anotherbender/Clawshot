@@ -5,6 +5,7 @@ items. Rewrite every grant of a logical check, including both capacity tiers, an
 its explicit selection identity. When native gates hide every repeat offer, finish
 before opening the shop UI. Puzzle, cancel/shortfall paths, ordinary menus and
 success-only saved flags stay native; optional fees cover only shuffled families.
+A shield reward also removes the shared get's equipment prerequisite (``patch.scrub_shields``).
 """
 
 import tomllib
@@ -15,6 +16,7 @@ from typing import Any
 from clawshot.formats import evfl
 from clawshot.generate import Settings, prepare
 from clawshot.patch import items as item_actors
+from clawshot.patch import scrub_shields
 from clawshot.patch.plan import PatchError
 from clawshot.patch.shops import SHOPS_TOML
 from clawshot.patch.write import FileChanges
@@ -202,6 +204,8 @@ def changes(placements: Mapping[str, str], *, prices: Mapping[str, int] | None =
             raise PatchError(f"{PATH}: changed flow does not read back")
         return out
 
+    if any(actor in scrub_shields.SHIELDS for actor in placements.values()):
+        return {PATH: transform, **scrub_shields.changes()}
     return {PATH: transform}
 
 

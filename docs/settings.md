@@ -215,8 +215,28 @@ but show no model; the Ocarina of Time plays songs. Din's Fire and Adult's Walle
 Other gift actors remain subject to the sourced chest allowlist and destination holds, not blanket
 permission for every gift to go in a chest. Authoritative restrictions: `data/settings.toml`.
 
-Shuffled ocarinas come from chests or story scenes, not ordinary gifts, minigame prizes,
-frog rewards, digging rewards or Deku Scrub purchases. This avoids a crash when receiving them.
+Shuffled ocarinas avoid show-item hand-overs: ordinary gifts, minigame prizes, frog rewards,
+digging rewards and Deku Scrub purchases exclude both instruments before fill, including external
+placements. Chests and direct story grants remain allowed; Ocarina of Time also has its separately
+played Skulltula pickup. The show-item crash is not established to be age-specific.
+
+### Cross-age equipment receipts
+
+Age restrictions govern **use**, not ownership. There is no blanket matching-age placement rule.
+Native shops still refuse child tunic purchases; unsupported shelf displays and the five-item
+boss-heart/floor palette remain restricted. Trade-cell items stay vanilla.
+
+Newly generated scrub shield sales keep the native inventory grant and one-frame yield, then
+finish without requiring any shield to equip. This covers an adult owning only the unusable Deku
+Shield, as in issue #33, and opposite-age Mirror/Deku receipts. The patch does **not request forced
+auto-equip** or enable wrong-age shield use. Inventory, native auto-selection and equipment are
+separate; manual equipment remains available at the usable age. Built/native-data-tested,
+**not played yet**; old generated folders are not repaired.
+
+Other chest/gift/pickup paths do not use that scrub-only equipment wait. They retain their existing
+native grants and admission rules, not a claim that every item/age pair has been played.
+The [round18 audit](../plans/rounds/r18-equipment.md) separates played results, native-data evidence
+and unverified boundaries. Wrong-age item-bar precautions remain [below](#hints-models-and-age-warnings).
 
 ## Shops and scrub prices
 

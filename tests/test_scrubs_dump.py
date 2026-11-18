@@ -1,11 +1,13 @@
 import copy
 
 import pytest
+from test_scrub_shields import OUTCOMES, run
 from test_scrubs import guard_destination, restore_offer_guard
 
 from clawshot.census.scan import GAME_DATA_LIST, read_romfs_byml, scan
 from clawshot.formats import evfl, zsdic
-from clawshot.patch import scrubs
+from clawshot.patch import bags, scrub_shields, scrubs
+from clawshot.patch.items import load
 from clawshot.save import murmur3_32
 
 
@@ -52,7 +54,6 @@ def test_once_sales_change_all_copies_and_tiers_but_no_price_or_saved_gate(romfs
 def test_whole_seed_assigns_one_item_to_every_tier_and_copy_without_changing_prices(romfs, tmp_path):
     from clawshot.generate import Settings
     from clawshot.patch import make_seed, write_seed
-    from clawshot.patch.items import load
 
     output = make_seed(romfs, 7, Settings(shuffle=("Chest", "Scrub")))
     write_seed(output, romfs, tmp_path / "seed")
@@ -95,3 +96,91 @@ def test_unshuffled_scrubs_guard_every_empty_or_hidden_offer_before_shop_ui(romf
             assert guard_destination(after.flowchart, incoming, offers) == expected
     restore_offer_guard(after.flowchart)
     assert after == before
+
+
+def _flow(romfs, dicts, path):
+    return evfl.read(dicts.decompress(path, (romfs / path).read_bytes()))
+
+
+def _successors(event):
+    if isinstance(event, (evfl.SwitchEvent, evfl.SubFlowSwitchEvent)):
+        return [index for _, index in event.cases]
+    if isinstance(event, evfl.ForkEvent):
+        return [*event.forks, event.join]
+    return [getattr(event, "next", evfl.NONE)]
+
+
+def _reaches(fc, entry, target):
+    """Whether ``entry`` reaches the event at ``target``, entering same-flow sub-calls."""
+    todo, seen, entries = [fc.entry_point(entry).main_event], set(), {entry}
+    while todo:
+        index = todo.pop()
+        if index == target:
+            return True
+        if not 0 <= index < len(fc.events) or index in seen:
+            continue
+        seen.add(index)
+        event = fc.events[index]
+        todo.extend(_successors(event))
+        if (
+            isinstance(event, (evfl.SubFlowEvent, evfl.SubFlowSwitchEvent))
+            and event.flowchart in ("", fc.name)
+            and event.entry_point not in entries
+        ):
+            entries.add(event.entry_point)
+            todo.append(fc.entry_point(event.entry_point).main_event)
+    return False
+
+
+@pytest.mark.dump
+def test_scrub_shield_wait_is_scrub_only_and_ends_for_every_equip_outcome(romfs):
+    """The real scrub helper must finish an inventory-only shield receipt, regardless of equipped gear."""
+    dicts = zsdic.Dictionaries.from_romfs(romfs)
+    native = _flow(romfs, dicts, scrub_shields.PATH)
+    fc = native.flowchart
+    helper = next(i for i, event in enumerate(fc.events) if event.name == "Event444")
+    reaching = {entry.name for entry in fc.entry_points if _reaches(fc, entry.name, helper)}
+    assert reaching == {"DekuShield_GetAndEquipCheck", "GetInEvent_NotTurn_2DShop"}
+    callers = set()
+    for path in sorted((romfs / "Event/EventFlow").glob("*.bfevfl.zs")):
+        other = _flow(romfs, dicts, path.relative_to(romfs).as_posix()).flowchart
+        for event in other.events if other else ():
+            if (
+                isinstance(event, (evfl.SubFlowEvent, evfl.SubFlowSwitchEvent))
+                and event.flowchart == scrub_shields.FLOW
+                and event.entry_point in reaching
+            ):
+                callers.add(other.name)
+    assert callers == {"Enemy_Scrub_Business_Common", "Enemy_Scrub_Business_Dream"}
+    for equipped in ({0: "Weapon_Shield_Mirror"}, {}):
+        assert run(fc, "Item_Shield_Mirror", equipped) == (None, [("Item_Shield_Mirror", False)])
+    data = dicts.decompress(scrub_shields.PATH, (romfs / scrub_shields.PATH).read_bytes())
+    after = evfl.read(bags.handover_transform(scrub_shields.transform(data))).flowchart
+    for content in ("Item_Shield_Mirror", "TBox_Shield_Deku", "TBox_Shield_Hylian"):
+        for equipped, frames in OUTCOMES.values():
+            assert run(after, content, equipped) == (frames, [(content, False)])
+    restored = evfl.read(scrub_shields.transform(data))
+    events = restored.flowchart.events
+    add = next(event for event in events if event.name == "Event442")
+    wait = next(event for event in events if event.name == "Event513")
+    add.next = next(i for i, event in enumerate(events) if event.name == "Event514")
+    wait.next = next(i for i, event in enumerate(events) if event.name == "Event509")
+    assert restored == native
+
+
+@pytest.mark.dump
+def test_shield_rewards_are_the_pouch_shield_rows(romfs):
+    dicts = zsdic.Dictionaries.from_romfs(romfs)
+    rows = read_romfs_byml(romfs, dicts, "RSDB/PouchActorInfo.Product.111.rstbl.byml.zs")
+    shields = {row["__RowId"] for row in rows if row.get("PouchCategory") == "Shield"}
+    assert shields == scrub_shields.SHIELDS
+    table = load()
+    assert {item for item, actor in table.actors.items() if actor in shields} == {
+        "Deku Shield",
+        "Hylian Shield",
+        "Mirror Shield",
+    }
+    # The helper's "Item_Shield_Mirror" check names the pouch row; both ages equip Weapon_Shield_Mirror.
+    mirror = next(row for row in rows if row["__RowId"] == "Item_Shield_Mirror")
+    for age in ("ChildEquipment", "AdultEquipment"):
+        assert mirror[age].startswith("Work/Actor/Weapon_Shield_Mirror.")
