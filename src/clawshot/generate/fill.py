@@ -119,6 +119,9 @@ class Settings:
     shuffle: tuple[str, ...] = tuple(DEFAULTS["shuffle"])
     dungeon_items: str = DEFAULTS["dungeon_items"]
     shuffle_hideout_keys: bool = DEFAULTS["shuffle_hideout_keys"]
+    dungeon_rewards: bool = DEFAULTS["dungeon_rewards"]
+    bridge: str = DEFAULTS["bridge"]
+    bridge_count: int = DEFAULTS["bridge_count"]
     logic: dict[str, Any] = field(default_factory=dict)
     areas: tuple[str, ...] = ()
     goal: str | None = None
@@ -178,6 +181,13 @@ class Settings:
             raise ValueError("shuffle_hideout_keys must be a boolean")
         if self.shuffle_hideout_keys and "Chest" not in self.shuffle:
             raise ValueError("shuffle_hideout_keys moves the jail keys into shuffled chests: shuffle Chest")
+        if type(self.dungeon_rewards) is not bool:
+            raise ValueError("dungeon_rewards must be a boolean")
+        limits = {"vanilla": 0, "stones": 3, "medallions": 6, "rewards": 9}
+        if not isinstance(self.bridge, str) or self.bridge not in limits:
+            raise ValueError("bridge must be vanilla, stones, medallions or rewards")
+        if type(self.bridge_count) is not int or not 0 <= self.bridge_count <= limits[self.bridge]:
+            raise ValueError(f"bridge_count for {self.bridge} must be an integer from 0 to {limits[self.bridge]}")
         if self.goal is not None and not self.areas:
             raise ValueError("a goal is given only with the areas of a slice")
         if self.songs not in ("song", "anywhere"):
@@ -214,6 +224,9 @@ class Settings:
         out: dict[str, Any] = {
             "shuffle": list(self.shuffle),
             "dungeon_items": self.dungeon_items,
+            "dungeon_rewards": self.dungeon_rewards,
+            "bridge": self.bridge,
+            "bridge_count": self.bridge_count,
             "logic": {k: self.logic[k] for k in sorted(self.logic)},
             "fast_start": list(self.fast_start),
             "skippable_story": self.skippable_story,
@@ -324,6 +337,11 @@ def allowed(world: World, settings: Settings, location: str, item: str) -> bool:
         if destinations is not None and location not in destinations:
             return False
     location_type = world.locations[location].type
+    if settings.dungeon_rewards:
+        # Reward-only means both directions, even if an advanced recipe loosens derived restrictions.
+        reward = world.items[item].stone or world.items[item].medallion
+        if reward != (location_type == "DungeonReward"):
+            return False
     if item.startswith(SHOP_ONLY_PREFIX) and location_type != "Shop":
         return False
     if location_type == "Missable" and world.items[item].progression:
@@ -358,7 +376,7 @@ def shuffled_locations(world: World, settings: Settings) -> list[str]:
     return [
         name
         for name, loc in world.locations.items()
-        if loc.type in kinds
+        if (loc.type in kinds or (settings.dungeon_rewards and loc.type == "DungeonReward"))
         and loc.vanilla is not None
         and loc.n64_only is None
         and getattr(loc, "keep_vanilla", None) is None

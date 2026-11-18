@@ -72,7 +72,8 @@ The [Tracker tab](docs/tracker.md) reads saved inventory and per-dungeon keys, w
   and small keys outside their own dungeon (opt-in **Small keys anywhere**, now including Well/Shadow floor keys;
   those sources are built, not played). **Fortress jail keys** are a separate experimental, default-off option;
   the card scene stays vanilla. Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys.
-- **Not shuffled yet:** cows, dungeon rewards, pots, crates and loose rupees.
+- **Experimental, default off:** dungeon rewards shuffled among their nine native slots (Rauru included), and a stones/medallions/rewards-count bridge. Built, not played; native completion scenes and Light Arrow trials stay intact.
+- **Not shuffled yet:** cows, pots, crates and loose rupees.
 
 Choose the kinds you want. The UI starts with Recommended; the generator's Defaults shuffle chests
 only. Some checks stay unchanged pending in-game tests; the evidence and limits are below.
@@ -114,7 +115,7 @@ Both wait for Field-arrival clock state and Zelda/Impa's real send-off. The open
 later escape/moat order repair and immediate child-return clock clear passed on Longshot rc.7.
 The first-arrival lighting repair awaits v5 play checks. For new seeds; no save-repair or older-seed compatibility guarantee.
 
-Cows, dungeon completion rewards, pots, crates and loose rupees are not shuffled.
+Cows, pots, crates and loose rupees are not shuffled. Dungeon reward shuffle is a separate experimental option, off by default; it does not move rewards outside their nine slots.
 **Small keys anywhere** puts dungeon chest keys and the Well/Shadow floor keys in supported shuffled chests,
 including other dungeons and the overworld. The two new floor sources give their own key or a red rupee and keep a
 key-shaped model; built, not played. **Fortress jail keys** is a separate default-off switch with the same source

@@ -35,6 +35,7 @@ def resource_modes():
     yield "mixed-small-keys-anywhere", replace(all_kinds, dungeon_items="anywhere")
     yield "fortress-jail-keys", Settings(shuffle_hideout_keys=True)
     yield "mixed-all-key-sources", replace(all_kinds, dungeon_items="anywhere", shuffle_hideout_keys=True)
+    yield "dungeon-rewards-bridge", Settings(dungeon_rewards=True, bridge="rewards", bridge_count=9)
     skips = tuple(name for name in gamedata.load() if name not in ("mido", "forest_exit"))
     for forest in CATALOG["forest"]:
         yield f"forest-{forest}", replace(all_kinds, forest=forest, fast_start=skips)

@@ -83,6 +83,16 @@ def main(argv: list[str] | None = None) -> int:
         help="experimental, default off: four Fortress guard floor keys into shuffled chests; card scene stays vanilla",
     )
     parser.add_argument(
+        "--dungeon-rewards",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="experimental: shuffle stones/medallions only among the nine rewards, including Rauru",
+    )
+    parser.add_argument("--bridge", choices=("vanilla", "stones", "medallions", "rewards"))
+    parser.add_argument(
+        "--bridge-count", type=int, help="unique rewards to open bridge only; stones 0..3, medals 0..6, rewards 0..9"
+    )
+    parser.add_argument(
         "--forest",
         choices=("closed", "closed_deku", "open"),
         help="closed: vanilla; closed_deku: exit only; open: exit and Mido",
@@ -144,6 +154,9 @@ def main(argv: list[str] | None = None) -> int:
             ("shuffle", "shuffle"),
             ("dungeon_items", "dungeon_items"),
             ("shuffle_hideout_keys", "shuffle_hideout_keys"),
+            ("dungeon_rewards", "dungeon_rewards"),
+            ("bridge", "bridge"),
+            ("bridge_count", "bridge_count"),
             ("areas", "areas"),
             ("goal", "goal"),
             ("skip", "fast_start"),

@@ -1,0 +1,97 @@
+# Identifiers only; native grant sites from r17-dungeon-items.md section 3.
+# Completion readers remain native (Claude, accepting Kareem's r18 table, 2026-11-18).
+[slots."ToT Reward from Rauru"]
+item = "Light Medallion"
+actor = "Item_Medal_Light"
+flow = "Dm_SageRoom_0005"
+event = "Event48"
+notes = "Event432"
+[slots."Queen Gohma"]
+item = "Kokiri Emerald"
+actor = "Item_Stone_Forest"
+flow = "Dm_Kokiri_0130"
+event = "Event22"
+notes = "Event109"
+[slots."King Dodongo"]
+item = "Goron Ruby"
+actor = "Item_Stone_Fire"
+flow = "Dm_DeathMtTrail_0025"
+event = "Event26"
+notes = "Event205"
+[slots."Barinade"]
+item = "Zora Sapphire"
+actor = "Item_Stone_Water"
+flow = "Dm_ZoraFountain_0030"
+event = "Event3"
+notes = "Event159"
+[slots."Phantom Ganon"]
+item = "Forest Medallion"
+actor = "Item_Medal_Forest"
+flow = "Dm_Awake_Forest_Get"
+version = "110"
+event = "Event13"
+notes = "Event46"
+[slots."Volvagia"]
+item = "Fire Medallion"
+actor = "Item_Medal_Fire"
+flow = "Dm_Awake_Fire_Get"
+version = "110"
+event = "Event13"
+notes = "Event46"
+[slots."Morpha"]
+item = "Water Medallion"
+actor = "Item_Medal_Water"
+flow = "Dm_Awake_Water_Get"
+version = "110"
+event = "Event13"
+notes = "Event45"
+[slots."Bongo Bongo"]
+item = "Shadow Medallion"
+actor = "Item_Medal_Shadow"
+flow = "Dm_Awake_Shadow_Get"
+version = "110"
+event = "Event3"
+notes = "Event46"
+[slots."Twinrova"]
+item = "Spirit Medallion"
+actor = "Item_Medal_Spirit"
+flow = "Dm_Awake_Spirit_Get"
+version = "110"
+event = "Event14"
+notes = "Event47"
+
+# Applied when either reward shuffle or a count bridge is enabled; never rewrite translated data.
+[completion.helpers.has_all_stones]
+rule = "'Defeat Queen Gohma' and 'Defeat King Dodongo' and 'Defeat Barinade'"
+source = "r18-rewards.md: native Door and moat readers follow completed child quests, not reward ownership; Claude 2026-11-18"
+[completion.locations."ToT Light Arrows Cutscene"]
+rule = "is_adult and 'Defeat Bongo Bongo' and 'Defeat Twinrova'"
+source = "AllSage Event25/26 read Shadow/Spirit awakening histories; EscapeDungeon completes those scenes after the bosses; r17-dungeon-items.md section 3"
+
+# A closed-door pull necessarily completed these quests. The adult-return construction
+# starts beyond that pull and must not forget its mandatory child story state.
+[completion.closed_pull_inventory]
+"Defeat Queen Gohma" = 1
+"Defeat King Dodongo" = 1
+"Defeat Barinade" = 1
+[completion.locations."Sheik in Kakariko"]
+rule = "is_adult and 'Defeat Phantom Ganon' and 'Defeat Volvagia' and 'Defeat Morpha'"
+source = "Native sage quest completion, not shuffled medals; r18-rewards.md reader table"
+
+[bridge.vanilla]
+rule = "'Defeat Bongo Bongo' and 'Defeat Twinrova' and 'Clawshot Light Arrow Story'"
+source = "AllSage Event11 advances Defeat_Ganon Step01 after the Temple scene, independently of its shuffled gift; r17-dungeon-items.md section 4"
+[bridge.stones]
+rule = "has_stones(clawshot_bridge_count)"
+source = "Kareem 2026-11-18: unique owned stones alone open the bridge; native Light Arrow trials stay intact"
+[bridge.medallions]
+rule = "has_medallions(clawshot_bridge_count)"
+source = "Kareem 2026-11-18: unique owned medallions including Light, not completed sages"
+[bridge.rewards]
+rule = "has_dungeon_rewards(clawshot_bridge_count)"
+source = "Kareem 2026-11-18: unique owned stones plus medallions; 0..9"
+[story_event]
+region = "Temple of Time"
+name = "Clawshot Light Arrow Story"
+rule = "is_adult and 'Defeat Bongo Bongo' and 'Defeat Twinrova'"
+source = "Market_Adult_Prefab_c668 and AllSage Event25/26: native Temple scene requires both awakening histories, not Light Arrow ownership"

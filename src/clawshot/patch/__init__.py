@@ -92,6 +92,10 @@ def make_seed(
     if freestanding.SHUFFLE in settings.shuffle:
         spec = freestanding.restrict_spec(spec, definitions)
     fast_settings = gamedata.load()
+    if settings.dungeon_rewards:
+        from clawshot.patch import rewards
+
+        extra_steps = (*extra_steps, lambda placements: rewards.changes(romfs, placements))
     names = [*settings.fast_start, *CATALOG["forest"][settings.forest]["fast_start"]]
     chosen = [*gamedata.load_always(), *gamedata.select(fast_settings, names)]
     _, world = prepare(spec, settings)
@@ -192,7 +196,7 @@ def make_seed(
         from clawshot.patch.age import changes as age_changes
 
         changes += (age_changes(out.placements, free_time_travel=True),)
-    from clawshot.patch import dampe_safety, door, equipment, start_items, story_dialogue
+    from clawshot.patch import dampe_safety, door, equipment, reward_bridge, start_items, story_dialogue
 
     changes += (
         door.changes(out.placements, mode=settings.door_of_time),
@@ -201,6 +205,7 @@ def make_seed(
         dampe_safety.changes(),
         story_dialogue.changes(enabled=settings.skippable_story),
     )
+    changes += (reward_bridge.changes(mode=settings.bridge, count=settings.bridge_count),)
     item_names: dict[str, str] = {}
     if out.hints:
         item_names, hint_changes = hint_step(romfs, out, table)
@@ -212,7 +217,10 @@ def make_seed(
         if item in ("Hookshot", "Progressive Hookshot")
     ]
     changes += (text.sheik_hint_changes(romfs, hookshot_locations),)
-    fast_files = tuple(door.build(romfs, mode=settings.door_of_time))
+    fast_files = (
+        *door.build(romfs, mode=settings.door_of_time),
+        *reward_bridge.build(romfs, mode=settings.bridge, count=settings.bridge_count),
+    )
     plan = make_plan(out, links, table, chest_events.load(), overrides=custom.actors)
     from clawshot.patch import keys, progressive, progressive_bonus
 

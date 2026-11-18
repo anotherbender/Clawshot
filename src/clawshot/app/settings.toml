@@ -20,6 +20,34 @@ kind = "boolean"
 group = "Items"
 help = "Off by default; needs shuffled chests. Shuffle the four defeated guards' floor keys into chests, trading red rupees back to their pickups. Rewards keep a key-shaped floor model. All four carpenter rescues and the captain's vanilla card scene remain required. Built, not yet played."
 enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests to move Fortress jail keys." }]
+[dungeon_rewards]
+label = "Dungeon reward shuffle (experimental)"
+kind = "boolean"
+group = "Items"
+help = "Off by default. Shuffle the three stones and six medallions only among their nine reward slots, including Rauru on the first sword pull. Bosses, blue warps, sage scenes, world restoration, the closed Door and Light Arrow story still follow completion. Built, not played."
+[bridge]
+label = "Ganon's Castle bridge (experimental)"
+kind = "choice"
+choices = ["vanilla", "stones", "medallions", "rewards"]
+group = "World"
+help = "Vanilla follows the native Light Arrow story. Count modes open only the bridge with N unique owned rewards; Light Arrows are still needed inside. Built, not played."
+[bridge.labels]
+vanilla = "Vanilla story"
+stones = "Stones"
+medallions = "Medallions"
+rewards = "Stones and medallions"
+[bridge.choice_help]
+vanilla = "Keep the native bridge scene after the Temple's Light Arrow story."
+stones = "Require the selected count of unique owned Spiritual Stones, from zero to three."
+medallions = "Require the selected count of unique owned medallions, including Light, from zero to six."
+rewards = "Require the selected count of unique owned stones and medallions, from zero to nine."
+[bridge_count]
+label = "Bridge reward count"
+kind = "integer"
+min = 0
+max = 9
+group = "World"
+help = "Vanilla uses zero. Stones allows 0–3; Medallions 0–6; Stones and medallions 0–9. This does not remove the native Light Arrow trials."
 [songs]
 label = "Song placement"
 kind = "choice"

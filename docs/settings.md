@@ -75,9 +75,9 @@ The 100-token House reward accepts only non-progression items in every seed, inc
 Token off. This is an explicit placement rule, not a consequence of which Skulltulas are reachable.
 There is no progression-at-100 opt-in this round; #12 remains open.
 
-Cows, dungeon completion rewards, pots, crates, loose
-rupees, recovery hearts, Treasure Chest Game keys and silver-rupee puzzles stay unchanged.
-Pot and ground-rupee
+Cows, pots, crates, loose rupees, recovery hearts, Treasure Chest Game keys and
+silver-rupee puzzles stay unchanged. Dungeon rewards have their own default-off
+option below. Pot and ground-rupee
 experiments are not seed options: grants were observed, but a thrown pot stranded and lost its
 reward. Completion and recovery are not solved by a destruction flag.
 
@@ -342,6 +342,34 @@ replacement: normal middle position, sword-only refusal, clear after adding a sh
 no Deku Tree talk with its mouth open. Reload also passed: after Continue, Mido's dialogue
 finished normally and the Deku Tree's mouth was open. Shuffled own-dungeon map/compass
 credit is a separate bug, not a failure of this map-access correction.
+
+## Dungeon rewards and Ganon's Castle bridge
+
+`--dungeon-rewards` (app: **Dungeon reward shuffle**) is experimental and off by default.
+It shuffles the three Spiritual Stones and six medallions only among their nine reward
+slots, including Rauru's Light Medallion on the first sword pull. Rewards cannot go
+to chests, gifts, shops or Skulltulas, and other items cannot occupy reward slots.
+The first pull still grants the sword and retains the native song/story sequence.
+
+Native boss deaths, blue warps, sage scenes, world restoration, carpenters/card and
+time travel remain completion-driven. In particular, the closed Door follows the
+three child dungeon completions, not the shuffled stones. Prelude follows Forest
+completion; Light Arrows follow the Shadow and Spirit awakening scenes, not their
+medallions. Logic uses those same completion predicates with reward shuffle on.
+The native animated emblem in each sage/stone scene remains its source symbol;
+the acquisition window, owned reward and Zelda Notes target follow the shuffled item.
+
+`--bridge vanilla` is the default native story route. The experimental count modes
+`--bridge stones --bridge-count N`, `--bridge medallions --bridge-count N`, and
+`--bridge rewards --bridge-count N` count unique owned rewards, respectively 0–3,
+0–6 (including Light), and 0–9. Vanilla requires count zero. Invalid combinations
+are refused. These settings open **only the bridge**: they give no Light Arrows,
+complete no sages and skip none of the six native Light Arrow trial cores.
+With Gift shuffle, the native Light Arrow story still runs even if its gift moved.
+
+Both features are **built, not played**. Native data identifies the bridge's story
+trigger and saved event latch; it does not prove an isolated Longshot check.
+Maintainer reader table and controls: [Round 18 rewards](../plans/rounds/r18-rewards.md).
 
 ## Door of Time and returning to child
 

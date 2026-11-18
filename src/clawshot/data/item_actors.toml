@@ -39,6 +39,15 @@
 "Quiver (50)" = { actor = "Item_Quiver_Large", source = "RSDB/PouchActorInfo native large tier, Round 14 section 47; capacity alone is not Bow" }
 "Piece of Heart" = { actor = "Obj_Heart_Piece", source = "GF Chest, Graveyard Heart Piece Grave Chest, Graveyard Dampe Race Freestanding PoH, ZD Chest" }
 "Gold Skulltula Token" = { actor = "Item_Token_Gold", source = "Token shuffle: native token inventory actor (PouchActorInfo Item_Token_Gold, TokenGold, FixedMaxNum 100); both native chest flows add ContentName through GetPouchContent; KF Storms Grotto Chest token played, Kareem 2026-11-14, rounds/r15-scrub-tokens.md" }
+"Kokiri Emerald" = { actor = "Item_Stone_Forest", source = "Dm_Kokiri_0130/Event22; r18 reward-only shuffle" }
+"Goron Ruby" = { actor = "Item_Stone_Fire", source = "Dm_DeathMtTrail_0025/Event26" }
+"Zora Sapphire" = { actor = "Item_Stone_Water", source = "Dm_ZoraFountain_0030/Event3; Ruto display is not a grant" }
+"Forest Medallion" = { actor = "Item_Medal_Forest", source = "Dm_Awake_Forest_Get.110/Event13" }
+"Fire Medallion" = { actor = "Item_Medal_Fire", source = "Dm_Awake_Fire_Get.110/Event13" }
+"Water Medallion" = { actor = "Item_Medal_Water", source = "Dm_Awake_Water_Get.110/Event13" }
+"Shadow Medallion" = { actor = "Item_Medal_Shadow", source = "Dm_Awake_Shadow_Get.110/Event3" }
+"Spirit Medallion" = { actor = "Item_Medal_Spirit", source = "Dm_Awake_Spirit_Get.110/Event14" }
+"Light Medallion" = { actor = "Item_Medal_Light", source = "Dm_SageRoom_0005/Event48; first sword pull" }
 
 "Rupee (1)" = { actor = "TBox_Rupee_Green", source = "KF Midos Bottom Left Chest" }
 "Rupees (5)" = { actor = "TBox_Rupee_Blue", source = "KF Midos Top Left Chest, KF Midos Top Right Chest" }

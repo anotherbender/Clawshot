@@ -17,6 +17,7 @@ files = [
     "Logic/HyruleField_Child_Prefab_9e35.logic.module.ainb", # R16: escape storm
     "Logic/HyruleField_Child_Prefab_91f9.logic.module.ainb", # R16: late moat pickup
     "Logic/HyruleField_Child_Prefab_32f7.logic.module.ainb", # R16: moat sensors/air wall
+    "Logic/GanonCastle_Level_Field_00_Prefab_14ba.logic.module.ainb", # R18: count bridge, retaining native scene/latch
     "Sequence/SetPouchAndStatusForGameStart.module.ainb", # R13: new-game-only item-bar initialization
 ]
 patterns = [
