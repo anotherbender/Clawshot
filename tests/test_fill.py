@@ -260,3 +260,46 @@ def test_a_late_item_that_finds_the_only_chest_before_mido_full_swaps_into_it():
     for number in range(20):
         seed = generate(spec, number, Settings(), attempts=1)
         assert seed.placements["Before Mido"] == "Sword", (number, seed.placements)
+
+
+def test_shop_filler_leaves_chests_for_released_maps_and_compasses():
+    # Broad all_anywhere seeds reached filler with enough chests for all twenty maps/compasses.
+    # Combining priority + normal lists backwards let normal rupees consume those chests first.
+    spec = {
+        "start": "Temple",
+        "goal": "True",
+        "settings": {"native_shop_items": ["Buy Refill"]},
+        "items": {
+            "Map (Temple)": {"type": "Map", "class": "priority"},
+            "Compass (Temple)": {"type": "Compass", "class": "priority"},
+            "Coin": {"class": "normal"},
+            "Buy Refill": {"class": "normal"},
+        },
+        "regions": [
+            {
+                "name": "Temple",
+                "dungeon": "Temple",
+                "exits": {"Village": "True"},
+                "locations": {
+                    "Map Chest": {"type": "Chest", "vanilla": "Map (Temple)", "rule": "True"},
+                    "Compass Chest": {"type": "Chest", "vanilla": "Compass (Temple)", "rule": "True"},
+                },
+            },
+            {
+                "name": "Village",
+                "locations": {
+                    "First Gift": {"type": "NPC", "vanilla": "Coin", "rule": "True"},
+                    "Second Gift": {"type": "NPC", "vanilla": "Coin", "rule": "True"},
+                    "Shop": {"type": "Shop", "vanilla": "Buy Refill", "rule": "True"},
+                },
+            },
+        ],
+    }
+    settings = Settings(shuffle=("Chest", "NPC", "Shop"), dungeon_items="all_anywhere")
+    for number in range(20):
+        seed = generate(spec, number, settings, attempts=1)
+        assert {seed.placements[name] for name in ("Map Chest", "Compass Chest")} == {
+            "Map (Temple)",
+            "Compass (Temple)",
+        }, (number, seed.placements)
+        assert seed.placements["First Gift"] == seed.placements["Second Gift"] == "Coin"

@@ -1032,7 +1032,7 @@ def fill(
     rest = [item for item in filler if not world.items[item].priority]
     if any(world.locations[name].type == "Shop" for name in shuffled):
         native = world.settings.get("native_shop_items", ())
-        priority = [*priority, *rest]
+        priority = [*rest, *priority]  # The stack places priority items before ordinary filler.
         rest = []
         # Leave flexible native displays until filler that can only occupy chests.
         priority.sort(key=lambda item: item not in native)
