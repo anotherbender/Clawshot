@@ -346,9 +346,12 @@ function parseTrackerSections(fragment) {
       }
     }
     if (sections.has("quest")) {
-      const health = state.hearts || {};
+      const health = state.hearts || {}, skulltulas = state.skulltula_checks || {};
       const counts = section("Collection");
-      counts.append(node("p", "tracker-counts", "Hearts " + show(health.containers ?? health.capacity) + " · Pieces " + show(health.pieces) + " · Gold Skulltulas " + show(state.tokens)));
+      // Token stock and Skulltula source checks differ once Tokens are shuffled; Token-off seeds have no source checks.
+      const sources = skulltulas.total ? " · Skulltula checks " + show(skulltulas.collected) + " / " + show(skulltulas.total) +
+        (skulltulas.unknown ? " (" + skulltulas.unknown + " unknown)" : "") : "";
+      counts.append(node("p", "tracker-counts", "Hearts " + show(health.containers ?? health.capacity) + " · Pieces " + show(health.pieces) + " · Gold Skulltulas " + show(state.tokens) + sources));
     }
     if (sections.has("items")) cells("Items & equipment", state.items);
     if (sections.has("quest")) {

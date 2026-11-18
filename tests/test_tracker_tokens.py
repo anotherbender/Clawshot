@@ -2,14 +2,18 @@
 seeds and saves built here, read through the real seed loader, state builder and polling session."""
 
 import json
+import re
 
 import pytest
+from test_tracker_options import NODE, render_tracker
 from test_tracker_saves import ACCOUNT, SECOND, write_slot
 from test_tracker_state import build_save, checks, make_seed
 
 from clawshot import save
 from clawshot.tracker import SeedError, TrackerSession, build_state, load_seed, seeds
 from clawshot.tracker.seeds import SOURCE_SAVE_TYPE, SOURCE_SAVE_VERSION, Place
+from clawshot.ui.server import ASSETS
+from clawshot.ui.tracker import TrackerController
 
 TREE, TOWER, FIELD = 341792603838029977, 2730878115209290675, 2177746409373494991
 FIELD_COMPANION = 2177746409373494989  # spec section 2.1: H xor 2, which for this Hash is H - 2, not H + 2
@@ -267,3 +271,64 @@ def test_session_follows_sources_and_stock_in_the_seeds_save_folder(tmp_path, to
     other = session.snapshot()
     assert states(other["state"]) == (None, None, None, True) and other["state"]["tokens"] == 10
     assert any("Gold Skulltula sources show as unknown" in w for w in other["state"]["warnings"])
+
+
+def test_skulltula_check_totals_count_sources_apart_from_the_stock(tmp_path, token_places):
+    seed = token_seed(tmp_path)
+    cases = {
+        "nothing collected": (token_save(), (0, 3, 0)),
+        "non-token rewards at two sources": (token_save((*pair(TREE), *pair(TOWER)), 9), (2, 3, 0)),
+        "one record of a pair": (token_save((*pair(TREE), FIELD)), (1, 3, 1)),
+        "unaudited layout": (token_save(pair(TREE), version=1), (0, 3, 3)),
+        "no save": (None, (0, 3, 3)),
+    }
+    for why, (value, expected) in cases.items():
+        found = build_state(seed, value)["skulltula_checks"]
+        assert (found["collected"], found["total"], found["unknown"]) == expected, why
+    tokens_off = {name: PLACEMENTS[name] for name in ("Test Token Chest", "Test Boss Heart")}
+    patch = {key: value for key, value in PATCH.items() if key != "tokens"}
+    plain = load_seed(make_seed(tmp_path, tokens_off, LOCATIONS, patch, name="tokens-off"))
+    assert build_state(plain, token_save())["skulltula_checks"] == {"collected": 0, "total": 0, "unknown": 0}
+
+
+@pytest.mark.skipif(NODE is None, reason="Node is needed only for frontend rendering tests")
+def test_tab_and_compact_obs_show_skulltula_checks_beside_the_token_count(tmp_path, token_places):
+    """Round 17 item 5: each surface's rendered Collection line, from the real session and HTTP snapshots."""
+    token = make_seed(tmp_path, PLACEMENTS, LOCATIONS, PATCH)
+    tokens_off = {name: PLACEMENTS[name] for name in ("Test Token Chest", "Test Boss Heart")}
+    patch = {key: value for key, value in PATCH.items() if key != "tokens"}
+    plain = make_seed(tmp_path, tokens_off, LOCATIONS, patch, name="tokens-off")
+    ints = {STOCK: 10, "PlayerStatus.MaxLife": 12, "PouchData.Obj_Heart_Piece.StockNum": 1}
+
+    def write(root, keys, when):
+        layout = {"version": SOURCE_SAVE_VERSION, "save_type": SOURCE_SAVE_TYPE}
+        write_slot(root / "user" / "save" / ACCOUNT, 1, build_save({CHEST_FLAG: True}, ints, keys, **layout), when)
+
+    write(token, (*pair(TREE), *pair(TOWER)), 10 * SECOND)
+    write(plain, (), 10 * SECOND)
+    controller = TrackerController()
+    assert controller.session.configure(token)["status"] == "ok"
+    surfaces = {
+        "tab": (False, ""),
+        "labelled OBS": (True, "#columns=4&labels=1&icons=1"),
+        "compact OBS": (True, "#columns=4&labels=0&icons=1&transparent=0&sections=items,quest,dungeons"),
+        "compact items and quest": (True, "#labels=0&sections=items,quest"),
+    }
+
+    def counts(obs, fragment):
+        rendered = render_tracker(tmp_path, controller.snapshot(obs=obs), obs=obs, fragment=fragment)
+        assert ("tracker-obs" in rendered["requested"]) is obs
+        assert rendered["compact"] is ("labels=0" in fragment)
+        return rendered["counts"]
+
+    line = "Hearts 3 · Pieces 1 · Gold Skulltulas 10"
+    shown = {name: counts(*surface) for name, surface in surfaces.items()}
+    assert shown == {name: [line + " · Skulltula checks 2 / 3"] for name in surfaces}
+    write(token, (*pair(TREE), TOWER), 11 * SECOND)  # one of the Tower's two records: unknown, not collected
+    assert counts(*surfaces["compact OBS"]) == [line + " · Skulltula checks 1 / 3 (1 unknown)"]
+    css = (ASSETS / "tracker.css").read_text(encoding="utf-8")
+    hidden = [rule for rule, block in re.findall(r"([^{}]+)\{([^}]*)\}", css) if "display: none" in block]
+    assert not [rule for rule in hidden if re.search(r"\.tracker-(counts|group|content)\b", rule)]
+
+    assert controller.session.configure(plain)["status"] == "ok"  # Token off: no Skulltula checks, line unchanged
+    assert {name: counts(*surface) for name, surface in surfaces.items()} == {name: [line] for name in surfaces}

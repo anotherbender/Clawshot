@@ -31,9 +31,11 @@ With Gold Skulltula tokens shuffled, each Skulltula is one check, however many a
 counts as collected once its reward has been picked up, whatever that reward is: the game saves two
 records for that Skulltula, and the tracker needs both. Killing it without collecting the drop does not
 count. The **Gold Skulltulas** number is the game's own token count, so it rises for a token found in a
-chest or at a Skulltula and stays the same for any other reward at a Skulltula. A Skulltula shows `?`
-when only one of its two records is set, or when the save is not the save layout those records were
-checked on.
+chest or at a Skulltula and stays the same for any other reward at a Skulltula. Beside it, **Skulltula checks**
+counts collected Skulltulas out of the seed's total (in brackets, how many are unknown), in the tab and in
+every OBS view that shows the quest group, labels on or off; seeds without Token shuffle don't show it.
+A Skulltula shows `?` when only one of its two records is set, or when the save is not the save layout
+those records were checked on.
 
 ## Hookshot Play
 
@@ -89,7 +91,7 @@ The URL fragment defaults to `columns=4&labels=1&icons=1&transparent=0&sections=
 OBS after changing controls. With labels off, successfully loaded icons sit in close cells:
 top-left badges show upgrade tiers and bottom-right badges show counts (bottles, ammo, rupees
 or magic capacity). Greyed-out items are not held; dashed cells and `?` mean unknown.
-Heart, piece and token counts stay visible. Names/details remain available as tooltips and
+Heart, piece, token and Skulltula check counts stay visible. Names/details remain available as tooltips and
 accessible labels. Without a usable item icon, text stays visible even with labels off.
 
 Compact quest cells use flat CSS, not game art: songs are `ZL`, `Ep`, `Sa`, `Su`, `SoT`, `SoS`,
@@ -108,7 +110,7 @@ including spent keys. Other icons are greyed out when missing. Hover for the ful
 unknown flags show `?`. With icons disabled or unavailable, each indicator uses its name and
 saved value instead. Dungeon names and collection counts stay visible with item labels off.
 
-`sections` accepts comma-separated `items`, `quest` and `dungeons`. Quest includes hearts/tokens,
+`sections` accepts comma-separated `items`, `quest` and `dungeons`. Quest includes hearts/tokens/Skulltula checks,
 songs, stones and medallions; Items includes inventory and equipment. Missing, empty or any unknown
 section value shows all. The original group order is preserved, not the order typed in the URL.
 Clearing the last section checkbox restores all three. Partial views omit **Checks by area**;

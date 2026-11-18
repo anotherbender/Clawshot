@@ -599,7 +599,8 @@ def areas(seed: Seed, save: save_format.Save | None, *, show_locations: bool = F
 
 def build_state(seed: Seed, save: save_format.Save | None, *, show_locations: bool = False) -> dict[str, Any]:
     """The tracker's whole view, JSON-able. ``save`` may be ``None`` (seed totals with every save value unknown).
-    ``tokens`` is the native token stock [S6], never a count of collected Skulltula sources [T]."""
+    ``tokens`` is the native token stock [S6], never a count of collected Skulltula sources [T]; those are counted in
+    ``skulltula_checks`` (collected, total and unknown source checks; total 0 when the seed shuffles no Skulltula)."""
     reader = _Reader(save)
     warnings = list(seed.warnings)
     identity = _identity(seed, save)
@@ -613,6 +614,8 @@ def build_state(seed: Seed, save: save_format.Save | None, *, show_locations: bo
     sources = any(c.method == SOURCE_PAIR for c in seed.checks)
     if save is not None and sources and (why := _source_layout(save)):
         warnings.append(f"Gold Skulltula sources show as unknown: {why}.")
+    grouped = areas(seed, save, show_locations=show_locations)
+    skulltulas = [check for area in grouped for check in area["checks"] if check["kind"] == "token"]
     return {
         "seed": dict(seed.metadata),
         "identity": identity,
@@ -622,7 +625,12 @@ def build_state(seed: Seed, save: save_format.Save | None, *, show_locations: bo
         "rewards": rewards(save),
         "hearts": hearts(save),
         "tokens": reader.stock("Item_Token_Gold"),
-        "areas": areas(seed, save, show_locations=show_locations),
+        "skulltula_checks": {
+            "collected": sum(check["collected"] is True for check in skulltulas),
+            "total": len(skulltulas),
+            "unknown": sum(check["collected"] is None for check in skulltulas),
+        },
+        "areas": grouped,
         "show_locations": show_locations,
         "warnings": warnings,
     }
