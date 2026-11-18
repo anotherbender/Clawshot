@@ -120,7 +120,7 @@ one post-three-sages canonical check; normal remains permanently vanilla.
 `CLAWSHOT_WORKERS=1 uv run pytest tests/test_world_chest_hunt.py -q`: **14 passed in 6.89 s**.
 Tests cover child history, age/tool gates, each missing sage, owned medallions not replacing quest completion,
 and only one pool contribution per pair. Three checks join the shuffle (165 → 168); their existing Banc files
-were already in the working set. More hunt answers will batch before the final commit/gate.
+were already in the working set. All other unconfirmed hunt routes remain held in the final batch.
 
 
 ## Treasure Chest Game
@@ -299,7 +299,7 @@ are absent from its pool, not because the new destinations failed.
 Output changes: Token-on fill/gift holds, and newly admitted chests with **Token either on or off**. The planned
 Token-off comparison isolates old versus new **fill on the same current world**; it does not claim byte identity
 to released 0.2.2 after adding checks. No version bump made here; maintainer release handling is required.
-Final gates pending; not READY.
+Final gate results and READY status are recorded in the verification evidence and coordination handoff below.
 
 ## Verification and handoff
 
@@ -322,8 +322,18 @@ Focused tests on that rebased code: **117 passed in 11.51 s**; no game process p
 `CLAWSHOT_WORKERS=4`, serialized with the round-17 lock and no dump inputs.
 Evidence: `E:/OOTRemake/work/r17-tokens/rebased-focused.log`.
 
-**Final gate held by Claude's instruction:** Track B merges first; then rebase onto it and wait
-for Claude's word before freezing and running the full gate. No final gate is queued or running.
-Stage-start process checks and required worker caps remain mandatory. Same-world Token-off byte
-comparison and final gate logs belong under `E:/OOTRemake/work/r17-tokens/`.
+Claude authorized the final gate after Track B merged into main `945c996`.
+Rebase onto that main was clean: `eb32232f7b3f04cc1e407e92d3705dd053952575`.
+Focused chest/Token/gift tests on the combined code: **117 passed in 12.30 s**; no game process,
+`CLAWSHOT_WORKERS=4`, no dump inputs, owned round-17 lock released afterward.
+
+This evidence commit freezes the merge head for **one full gate**, serialized under `r17/gate.lock`.
+Each stage checks both runtime processes: no game means synthetic `-n 12`/workers12 and dump
+`-n 12`/workers4; either game means `-n 4`/workers1. Synthetic clears all dump inputs; dump reuses
+the established layered fixture. No source or documentation changes after freeze.
+
+Authoritative final results: `E:/OOTRemake/work/r17-tokens/gate-results.json` and `gate-*.log`;
+the coordinator's READY handoff names the frozen head and actual counts after all stages pass.
+The same-world Token-off byte comparison uses main `945c996`'s retained fill, not the older
+pre-Track-B baseline (which remains unchanged for the original paired measurement).
 No agent-started game test is claimed. Played route evidence above belongs to Kareem; the TCG packet is unplayed.
