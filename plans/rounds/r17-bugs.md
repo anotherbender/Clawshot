@@ -49,6 +49,21 @@ Tracker stock already appeared on every surface. Skulltula source completion onl
 
 ### Full gate
 
-One serialized final gate remains pending. `OOT_ROMFS=E:/Games/Hookshot/romfs`, `OOT_NUP=E:/Games/Hookshot/The Legend of Zelda Ocarina of Time [0400486024DEC000][v131072].nup`, `OOT_DUMP=E:/OOTRemake/work/rounds/r16/time-layered-dump`. No working-set file added: existing `Event/EventFlow/*.bfevfl.zs` cache pattern already includes `ReplaceEquipmentForEraChange`; checked that exact file is present in the supplied layered fixture.
+One serialized final gate **passed** on `49145420b6adb9b8caf7674fedbccc47a62771a4`. `OOT_ROMFS=E:/Games/Hookshot/romfs`, `OOT_NUP=E:/Games/Hookshot/The Legend of Zelda Ocarina of Time [0400486024DEC000][v131072].nup`, `OOT_DUMP=E:/OOTRemake/work/rounds/r16/time-layered-dump`. No working-set file added: existing `Event/EventFlow/*.bfevfl.zs` cache pattern already includes `ReplaceEquipmentForEraChange`; checked that exact file is present in the supplied layered fixture.
 
-Stage-start tasklist controls worker caps; game was running during narrow proofs, so all used `CLAWSHOT_WORKERS=1`. Heavy work waits for atomic owned `E:/OOTRemake/work/rounds/r17/gate.lock`; no other agent's lock removed.
+Stage-start tasklist controlled worker caps. Synthetic started with a running game: `CLAWSHOT_WORKERS=1`, `-n 4`. Dump started with no game: `CLAWSHOT_WORKERS=4`, `-n 12`. Waited for cs17c's lock, acquired/wrote our own owner record atomically in the runner, and released only our owned lock after success. No suite or stage supervisor deadline; no gate retries.
+
+| Gate | Result |
+|---|---|
+| `uv run ruff format --check` | 423 files already formatted |
+| `uv run ruff check` | All checks passed |
+| `CLAWSHOT_WORKERS=1 uv run --with pytest-xdist pytest -n 4` | 3273 passed, 378 skipped; 1467.01 seconds |
+| `CLAWSHOT_WORKERS=4 uv run --with pytest-xdist pytest -m dump -n 12` | 375 passed; 1174.96 seconds |
+
+Logs/results: `E:/OOTRemake/work/r17-bugs/gate-{format,lint,synthetic,dump}.log`, `gate-results.json`. Synthetic reported 12 warnings, dump 36 (retained in logs); no failing test. Final gate-record commit changes documentation only.
+
+## READY handoff
+
+Implementation commits: `fe8dcde750` (Longshot options), `2ced18e5ff` (tracker counts), `ba14203192` (warp/sword safety); round documentation `49145420b6`; authorized plan merge `806ad8ceb0`. All five requested items have failing-first evidence and passing targeted/full checks. No settings/preset/version bump; changed default output behavior is listed above. No main merge or push.
+
+Remaining: Claude boot-check of the isolated packet, then Kareem's three-minute sword and one-minute Colossus checks. Sword fix is built/native-data-tested, not played; child Colossus remains conservatively guarded until a walking exit is proven. No player action required before the agreed morning play.
