@@ -1,7 +1,7 @@
 # Round 18 Track G — story flows (cs18g)
 
 Agent/model: `openai-codex/gpt-6.1-sol`; branch `r18/story`; starting main `2ba2f9a`.
-Status: implementation in progress; **built, not played**. No game launched; no played seed opened or save changed.
+Status: implementation frozen at `580927e66a`; **built, not played**. No game launched; no played seed opened or save changed.
 
 ## Requested scope and provenance
 
@@ -113,4 +113,31 @@ Only the six story flows and their required resource-size entries may differ in 
 settings provenance must be explicitly accounted for. No unrelated output delta is accepted.
 
 Research scripts and decoded ledgers stay in `E:/OOTRemake/work/r18-story/`, never in this repository.
-Full gate, final head, candidate/main-control packet, checklist, estimate and final handoff remain pending.
+
+## Combined staged controls
+
+Packet: `E:/OOTRemake/work/r18-story/ingame/STORY-CHECKLIST.md`. Two template-derived rc.7 launchers:
+`Test - story-main-control.bat` and `Test - story-candidate.bat`. Each has exactly its own diagnostic mod, no
+overlay, and a distinct **initially empty** test-user save folder. Both actual `cmd.exe` dry runs exit0 and
+resolve `builds/rc/v3.0.0-rc.7/bin/longshot.exe`; neither starts it. Claude must boot-check; Kareem plays.
+
+Control source is an immutable archive of actual main `2ba2f9a507`; candidate source `580927e66a`.
+Both have36 files, identical diagnostic Saria/Impa/Sheik rewards and a blue-rupee first Dampé prize.
+`packet-delta-proof.json` proves the only byte differences are our17 flow files and the resource size table.
+Both have the same existing forest shortcuts/open-Door setup; these are diagnostic packets, not beatable seeds.
+
+No approved track save copies were supplied. The primary plan therefore starts two New Games: **60–100min
+total, unmeasured**; optional later-owl coverage adds10–20min. Child checks take15–25min each, adult checks5–10min
+each, flight/reload coverage10–20min. No setup or product answer is needed from Kareem before morning.
+The checklist explicitly permits temporary control-only ocarina recovery and later flight-only inventory setup;
+neither is represented as natural progression proof. Quest/history/save-state edits remain forbidden.
+`report_saved_state.py` reads only these two newly created test-user roots after play; never normal player saves.
+
+All twelve lessons share the statically audited entry; live no-ocarina controls target Impa and Minuet.
+The four reported owl sites, real summit flight, Talon/Zelda/Impa/Saria skip-button behavior, grants, histories,
+Save/Continue, no-tool surface refusal and Hookshot-positive race remain **unplayed acceptance**, not passes.
+If the native warp/fade refusal fails in play, replace it with the documented fixed-prize fallback before merge.
+
+Candidate/main manifests, source archive, file hashes, launcher logs, packet delta proof and all scripts remain
+private under `work/r18-story/`. The control deliberately stays on pre-fix main; Track C's fill-only fix does not
+change these diagnostic flows. Final gate/head/readiness will be pinned separately after current-main rebase.
