@@ -81,10 +81,41 @@ No failed test was weakened, reclassified or reseeded.
 
 ## Generation attribution
 
-Two original 200-seed arms are being rerun from the exact preserved round-17 implementations,
-not the new round-18 chest world: main `945c996` plus three chests only versus main plus gift holds
-and normal-held staging only. Old 125-row evidence is preserved. No fill edit is authorized here.
-Final raw rows, process snapshots, cause classification and comparison will be recorded before freeze.
+Completed **400/400 rows** (200 seeds per isolated arm), `CLAWSHOT_WORKERS=12`, no game
+present at stage start. Owned lock: 18:16:29–18:34:56. Source is preserved main `945c996`
+plus exact `55b1307` components, not the new round-18 world. All 125 old partial rows
+reproduced exactly; original partial/baseline files remain unchanged.
+
+**Gift holds raised first-attempt failures; chest admissions did not.** Matched seeds 0–124:
+
+| Variant | First-attempt failures | Mean production attempts |
+|---|---:|---:|
+| Main `945c996` (preserved baseline) | 51/125 (40.8%) | 1.752 |
+| Three chests only | 50/125 (40.0%) | 1.808 |
+| Gift holds plus normal-held staging only | 86/125 (68.8%) | 2.992 |
+
+Full 200-seed arms: chests **77** first failures, **zero** exhausted, mean **1.785** attempts;
+gifts **137** first failures, **one** exhausted, mean **2.890**. Bottle/Milk account for
+**75/137 (54.7%)** gift first errors, versus zero for chests/baseline. All first errors are
+progression reachability failures, not Token filler capacity. The isolated arms are not additive:
+the accepted combined round-17 head's preserved 125-seed baseline had 64 first failures and
+zero exhausted. Its result must not be conflated with the isolated gift arm.
+
+Only isolated gift seed50 exhausted: first Bottle, **81 allowed/123 left, 49 other items,
+zero empty reachable**; attempt10 Bottle with Milk, **51 allowed/83 left, nine other items,
+zero empty reachable**. Exact first/final and all ten error payloads are retained; no unchanged rerun.
+
+**[INFERENCE; cs18d's proposal, not implemented]** Newly Token-held bottle progression loses
+reachable compatible slots late in the shared stage. Because this family dominates, measure
+most-constrained-first ordering for non-token held progression *within the existing shared,
+swap-capable progression stage*, preserving native-display order and seeded ties. Do not freeze
+it into an early batch (the existing mixed sword/Token regression forbids that), weaken holds,
+weight Token share, increase retries or special-case Bottle. No fill change this round.
+
+Full method, paired comparisons, every error and source hashes:
+`E:/OOTRemake/work/r18-chests/attribution/REPORT.md`;
+immutable raw `attribution/raw/attribution-400.json` and `.rows.jsonl`.
+This historical attribution is separate from the required round-18 acceptance sweep.
 
 ## Shooting galleries — research only
 
