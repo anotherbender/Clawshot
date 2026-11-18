@@ -65,7 +65,7 @@ door_of_time = "closed"
 # Evidenced traps: played Slingshot Room/Dampé and Kareem's warp-only Colossus policy.
 # Full-graph return debt stays diagnostic; plans/rounds/r18-logic.md records the audit.
 softlock_anchors = { child = ["KF Links House", "Kokiri Forest"], adult = ["Temple of Time"] }
-softlock_verified_regions = ["Deku Tree Slingshot Room", "Graveyard Dampes Grave", "Desert Colossus"]
+softlock_verified_regions = ["Deku Tree Slingshot Room", "Graveyard Dampes Grave", "Wasteland Near Colossus", "Desert Colossus"]
 softlock_virtual_regions = ["Root", "Root Exits", "Child Spawn", "Adult Spawn", "Prelude of Light Warp", "Minuet of Forest Warp", "Bolero of Fire Warp", "Serenade of Water Warp", "Nocturne of Shadow Warp", "Requiem of Spirit Warp", "Farores Wind Warp"]
 # Kareem, played 2026-11-17: warp songs work indoors too. The return checker reuses Root Exits' rules.
 # Farore's Wind still requires an established saved point; ownership alone never supplies one.

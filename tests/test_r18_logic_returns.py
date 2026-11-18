@@ -43,7 +43,7 @@ def test_dampe_does_not_invent_a_reverse_race_or_song_of_time_escape():
 
 
 @pytest.mark.parametrize("age,instrument", [(CHILD, "Fairy Ocarina"), (ADULT, "Ocarina of Time")])
-@pytest.mark.parametrize("arrival", ["Requiem of Spirit Warp", "Wasteland Near Colossus"])
+@pytest.mark.parametrize("arrival", ["Requiem of Spirit Warp", "Wasteland Near Crate"])
 @pytest.mark.parametrize("escape", [None, *ESCAPES])
 def test_every_external_colossus_arrival_needs_a_preheld_usable_escape(age, instrument, arrival, escape):
     spec = load_spec()
@@ -81,3 +81,11 @@ def test_colossus_checker_does_not_certify_reverse_desert_walking(age):
         "age": age,
         "findings": reachable_traps(search),
     }
+
+
+@pytest.mark.parametrize("age", [CHILD, ADULT])
+def test_final_wasteland_leg_cannot_trap_a_songless_walk_in(age):
+    spec = load_spec()
+    spec["start"] = "Wasteland Near Crate"
+    search = Search(build_world(spec), ["Longshot", "Hover Boots", "Lens of Truth", "Magic Meter"])
+    assert not search.can_reach("Wasteland Near Colossus", age), search.reached[age]

@@ -3,11 +3,11 @@ rule = "can_use(Hookshot) and can_use(Iron_Boots) and 'Ice Cavern End Chest Acce
 was = "is_adult and Hookshot and (Iron_Boots or ((Longshot or logic_water_hookshot_entry) and (Progressive_Scale, 2)))"
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (entrance): Iron Boots to sink and Hookshot the underwater target. Claude, 2026-11-17, precaution pending a played pre-Ice check; Kareem informed. Require the real Ice end-chest source as a 0.2.2 safety precaution after a reported pre-Ice hit failed; exact native rejection and a played Clawshot pre-Ice check remain pending. N64 Golden Scale/Longshot entry is not verified."
 
-# Mirror the real Iron Boots chest's access rule, never its shuffled reward.
+# Mirror the real Iron Boots chest's access rule, never its shuffled reward. The Water-quest step follows the lesson.
 [events."Ice Cavern End"."Ice Cavern End Chest Access"]
 new = true
-rule = "is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
-source = "Claude, 2026-11-17, precaution pending a played pre-Ice check; Kareem informed. 0.2.2 safety decision; plans/rounds/r16-water-gate.md. Source is Ice Cavern Iron Boots Chest, Banc/IceCavern/IceCavern_Static.bcett.byml.zs Hash 6859289214373847284; its access rule is ice_cavern.toml:91. The retained SageOfWater:IceCavern_WaterSerenade wrapper advances story progress regardless of shuffled Boots/Serenade; this precaution does not claim the native hit-rejection cause is proven."
+rule = "(is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)) and Ocarina and (is_child or (Ocarina, 2))"
+source = "Claude, 2026-11-17, precaution pending a played pre-Ice check; Kareem informed. 0.2.2 safety decision; plans/rounds/r16-water-gate.md. Source is Ice Cavern Iron Boots Chest, Banc/IceCavern/IceCavern_Static.bcett.byml.zs Hash 6859289214373847284; its access rule is ice_cavern.toml:91. The retained SageOfWater:IceCavern_WaterSerenade wrapper advances story progress regardless of shuffled Boots/Serenade; this precaution does not claim the native hit-rejection cause is proven. Round 18 interim lesson rule (Kareem via Main, 2026-11-18; song_lessons.toml): that wrapper runs Dm_SY_Treasurebox (the chest reward, unguarded), then Event281/Event283 Dm_MelodyGet_Water (Sheik's lesson), and only then sets SageOfWater_GetWaterSerenade and SageOfWater Step05/Step04 (Event285/280, Event284/282), so the step needs the lesson's age-usable Ocarina (age_ocarina.toml)."
 
 [locations."LH Sun"]
 rule = "'Water Temple Clear' and can_use(Bow)"

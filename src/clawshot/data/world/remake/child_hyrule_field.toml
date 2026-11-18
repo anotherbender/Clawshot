@@ -33,9 +33,9 @@ was = "is_child and has_all_stones"
 source = "D16 fixed Time ocarina; section46: native HyruleField_Child_Prefab_0ce5 creates the escape area only at DoorOfTime Step03; Goto_HyruleCastle courtyard initializes that quest, then Impa's send-off and stone-quest checks advance it. The moat actor _91f9 appears at Step04 after escape. No Scale gate (Kareem HF01)."
 
 [locations."Song from Ocarina of Time"]
-rule = "is_child and has_all_stones and 'Met Child Zelda'"
+rule = "is_child and has_all_stones and 'Met Child Zelda' and Ocarina and (is_child or (Ocarina, 2))"
 was = "is_child and has_all_stones"
-source = "Section46: HyruleField_Child_Prefab_0ce5 requires DoorOfTime Step03; courtyard/Impa initialize its progression. _91f9's Step04 moat pickup runs DoorOfTime_GetOcarinaOfTime then Dm_MelodyGet_Time, so both rewards share the story prerequisite."
+source = "Section46: HyruleField_Child_Prefab_0ce5 requires DoorOfTime Step03; courtyard/Impa initialize its progression. _91f9's Step04 moat pickup runs DoorOfTime_GetOcarinaOfTime then Dm_MelodyGet_Time, so both rewards share the story prerequisite. Round 18 interim lesson rule (Kareem via Main, 2026-11-18; song_lessons.toml): Dm_MelodyGet_Time gives the HF Ocarina of Time Item first (Event70, its reward unguarded), then runs the play-along Event83/Event92/Event93 before the song step Event4; the lesson needs an age-usable Ocarina (age_ocarina.toml), already implied by Met Child Zelda's Impa lesson."
 
 # Clock arrival (round16 cs16b): the native clock runs only with saved HyruleField_ArriveEntrance (A) AND Impa's
 # send-off history (S); 'Met Child Zelda' models S. This event models A as the game sets it: the native owl

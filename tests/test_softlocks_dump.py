@@ -31,7 +31,12 @@ def test_native_gift_presets_have_no_evidenced_reachable_traps(romfs, native_pre
         audit(
             seed.world,
             seed.placements,
-            regions=("Deku Tree Slingshot Room", "Graveyard Dampes Grave", "Desert Colossus"),
+            regions=(
+                "Deku Tree Slingshot Room",
+                "Graveyard Dampes Grave",
+                "Wasteland Near Colossus",
+                "Desert Colossus",
+            ),
         )
         == []
     ), (name, number)

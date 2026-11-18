@@ -160,18 +160,22 @@ may still be there when another usable exit tool is already available.
 `world/softlocks.py` checks returns at the initial frontier and each full collection sphere, preserving
 age-specific inventory and arrival time. Targets are physical safe anchors: child Link's House or Kokiri
 Forest, adult Temple of Time, never the abstract `Root`. Generated and external placements are refused
-when the data's `softlock_verified_regions` certificate fails. **This first slice certifies the played
-Slingshot trap only**, not the whole world. Unscoped `audit(world, placements)` reports unresolved graph
-returns for triage; absent ordinary edges are not physical-trap proof. Held warp songs now count as
-returns indoors too (Kareem, played 2026-11-17), through the same age/instrument rules as normal travel.
-Farore's Wind ownership alone still does not prove a previously set escape point.
+when the data's `softlock_verified_regions` certificate fails. Its evidenced scope covers the played
+Slingshot Room and Dampé traps and Kareem's warp-only Colossus policy, not the whole world.
+Unscoped `audit(world, placements)` reports unresolved graph returns for triage; an absent ordinary
+edge is not physical-trap proof. Held warp songs count as returns indoors too (Kareem, played 2026-11-17),
+through the same age/instrument rules as normal travel. Farore's Wind ownership proves no saved escape point.
 
-**Child warp arrivals (Round 17).** Bolero's crater landing has no child walking escape (Kareem,
-played). Requiem's child Colossus walking return is untested. Both require an already playable Minuet,
-Serenade, Nocturne or Prelude before logic counts their child destinations; neither hazardous arrival
-rescues the other, and a reward there cannot provide its own first escape song. Adult arrival rules
-are unchanged. This safety policy affects all new seeds, including Defaults, without changing settings.
-[Round 17 evidence and short play checks](../plans/rounds/r17-bugs.md).
+**One-way arrivals (Round 18).** Dampé's whole grave descent requires usable Hookshot before entry;
+neither race reward can supply it. There is no reverse race return, and the windmill climb uses Hookshot,
+not the N64 Song of Time. Ordinary windmill access from Kakariko is unchanged.
+
+Child Bolero and both-age Requiem arrivals require an already playable Minuet, Serenade, Nocturne or
+Prelude. The final Wasteland leg into Colossus has the same guard, before its one-way boundary.
+Kareem ruled Colossus warp-exit-only at either age: reverse desert walking is impractical. Neither
+hazardous arrival rescues the other and a destination reward cannot provide its own first escape song.
+This affects all new seeds, including Defaults, without changing settings.
+[Evidence and unresolved audit questions](../plans/rounds/r18-logic.md).
 
 New seeds also validate the incoming native era-change Kokiri Sword equipment candidate against pouch
 ownership before equipping it. An absent sword clears only that candidate; no item is granted and logic
@@ -190,8 +194,8 @@ Sources: `src/clawshot/data/world/remake/gifts.toml`; D39 in `plans/decisions.md
 The persistent `Met Child Zelda` event models the **whole courtyard/Impa lesson and accepted
 send-off through DoorOfTime Step02**, not first courtyard contact. Both moat rewards, Saria's
 song source and **every** Door mode require it; shuffled items do not advance native quests.
-Its route is Malon's fixed Egg / Chicken, Talon, the courtyard and Impa. `Field Owl Arrival`
-models the saved arrival effect, not literal owl history: native owl play or the real send-off's
+Its route is Malon's fixed Egg / Chicken, Talon, the courtyard, Impa and an age-usable Ocarina.
+`Field Owl Arrival` models the saved arrival effect, not literal owl history: native owl play or the real send-off's
 missing-arrival restoration supplies it. `Time Flows` and both early Door rules require both events.
 The temporary first-adult clock hold is clearable at the native adult Market exit or a genuine
 Temple return to child; it is not a persistent search prerequisite. The Market Bombchu Shop also
@@ -202,6 +206,14 @@ requires Dodongo's completion and available night. Sources: `remake/child_hyrule
 [clock audit](../plans/rounds/r16-time.md#rc7-played-results-and-clock-follow-up-2026-11-17).
 Kareem verified Saria before Darunia and the Step03 escape/reload controls on Longshot on
 2026-11-13; Bombchu Shop's entrance correction remains native-data evidence.
+
+**Interim song lessons.** All twelve `Dm_MelodyGet_*` song checks require an age-usable Ocarina:
+either instrument as child, Ocarina of Time as adult. Kareem reproduced the no-ocarina Minuet play-back
+softlock and passed its Ocarina control on 2026-11-18. Shuffled gifts still run that play-back.
+The post-lesson Impa send-off and Ice Cavern Water-quest event share the requirement; the moat Ocarina
+and Iron Boots chest rewards are given before their lessons, so those reward rules are not gated.
+This is a logic safeguard, not a fix for walking into an automatic scene without an instrument.
+Track G owns scene safety. Native sources and fail-first proof: [Round 18 logic](../plans/rounds/r18-logic.md).
 
 The independent adult-return proof retains compulsory child story events using the same
 count-cap test as items; optional history is excluded. Both early-door construction bounds include

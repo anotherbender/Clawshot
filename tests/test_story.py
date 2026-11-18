@@ -9,12 +9,16 @@ STONES = {"Kokiri Emerald": 1, "Goron Ruby": 1, "Zora Sapphire": 1}
 MET_ZELDA = "Met Child Zelda"
 
 
-@pytest.mark.parametrize("name", ["HF Ocarina of Time Item", "Song from Ocarina of Time"])
-def test_moat_rewards_need_the_courtyard_and_each_stone_but_no_scale(name):
+@pytest.mark.parametrize(
+    "name,instrument",
+    # Dm_MelodyGet_Time gives the HF item before its lesson; the song needs the lesson's child Ocarina.
+    [("HF Ocarina of Time Item", {}), ("Song from Ocarina of Time", {"Fairy Ocarina": 1, "Ocarina": 1})],
+)
+def test_moat_rewards_need_the_courtyard_and_each_stone_but_no_scale(name, instrument):
     world = build_world(load_spec())
     rule = world.locations[name].rule
-    assert not rule(STONES, CHILD, ALL_TIMES)
-    ready = STONES | {MET_ZELDA: 1}
+    assert not rule(STONES | instrument, CHILD, ALL_TIMES)
+    ready = STONES | instrument | {MET_ZELDA: 1}
     assert rule(ready, CHILD, ALL_TIMES)
     assert not rule(ready, ADULT, ALL_TIMES)
     for stone in STONES:
@@ -26,7 +30,7 @@ def test_meeting_zelda_follows_the_native_castle_route_not_stone_ownership(trade
     spec = load_spec()
     spec["start"] = "Hyrule Field"
     world = build_world(spec)
-    search = Search(world, STONES)
+    search = Search(world, [*STONES, "Fairy Ocarina"])  # Impa's lesson precedes the send-off
     assert not search.can_reach("HC Garden", CHILD)
     assert not search.holds(MET_ZELDA)
     search.collect(trade_item)

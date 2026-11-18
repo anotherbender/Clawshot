@@ -52,13 +52,15 @@ def test_field_arrival_comes_before_zelda_without_items_and_night_waits_for_the_
     assert not search.holds("Time Flows")
     assert not search.can_access(night, CHILD)
     search.collect("Weird Egg")
+    assert not search.holds(SENDOFF)  # Impa's send-off follows her lesson, which needs Link's own Ocarina
+    search.collect("Fairy Ocarina")
     assert search.holds(SENDOFF) and search.holds("Time Flows")
     assert search.can_access(night, CHILD)
 
 
 def test_a_child_meeting_zelda_off_the_field_route_still_gets_the_arrival(worlds):
     """The send-off itself lands child Link in Hyrule Field, so no route holds the send-off without the arrival."""
-    search = Search(worlds["Temple of Time"], ["Weird Egg"])
+    search = Search(worlds["Temple of Time"], ["Weird Egg", "Fairy Ocarina"])
     assert search.holds(SENDOFF)
     assert search.holds(ARRIVAL)
     assert search.holds("Time Flows")

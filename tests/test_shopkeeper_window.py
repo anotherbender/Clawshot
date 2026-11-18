@@ -99,7 +99,7 @@ def test_shuffled_shopkeeper_logic_remains_reachable_after_story_completion(cast
     _, world = prepare(gifts.shopkeeper_spec(load_spec()), Settings())
     inventory = ["Kokiri Sword", "Deku Shield", "Progressive Slingshot"]
     if castle:
-        inventory.append("Weird Egg")
+        inventory += ["Weird Egg", "Fairy Ocarina"]  # the castle story ends with Impa's Ocarina lesson
     search = Search.child_only(world, inventory)
     assert search.holds("Defeat Queen Gohma")
     # Time Flows is actually earned by reaching the remake's castle/Zelda garden.

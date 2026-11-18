@@ -195,7 +195,12 @@ def test_fixed_real_world_seeds_have_no_evidenced_reachable_traps(preset, number
         audit(
             seed.world,
             seed.placements,
-            regions=("Deku Tree Slingshot Room", "Graveyard Dampes Grave", "Desert Colossus"),
+            regions=(
+                "Deku Tree Slingshot Room",
+                "Graveyard Dampes Grave",
+                "Wasteland Near Colossus",
+                "Desert Colossus",
+            ),
         )
         == []
     ), (preset, number)

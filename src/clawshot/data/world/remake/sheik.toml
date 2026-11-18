@@ -1,5 +1,5 @@
 # Native Temple trigger follows the Forest sage quest, never reward ownership.
 [locations."Sheik at Temple"]
-rule = "is_adult and 'Defeat Phantom Ganon'"
+rule = "is_adult and 'Defeat Phantom Ganon' and Ocarina and (is_child or (Ocarina, 2))"
 was = "Forest_Medallion and is_adult"
-source = "Round 9 cs9b; plans/03-game-data.md section 38: Market_Adult_Prefab_edc2 ANDs area contact with SageOfForest_IsCompleted_Exp (Step_SageOfForest Complete); same completion abstraction as age_return_event. Free travel changes neither this trigger nor the reward."
+source = "Round 9 cs9b; plans/03-game-data.md section 38: Market_Adult_Prefab_edc2 ANDs area contact with SageOfForest_IsCompleted_Exp (Step_SageOfForest Complete); same completion abstraction as age_return_event. Free travel changes neither this trigger nor the reward. Round 18 interim lesson rule (Kareem via Main, 2026-11-18; song_lessons.toml): Dm_MelodyGet_Shine runs the play-along Event12/Event13/Event23 before its song step Event53, so it needs an age-usable Ocarina: Ocarina of Time as adult (age_ocarina.toml)."

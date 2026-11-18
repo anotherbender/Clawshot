@@ -397,16 +397,24 @@ Neither spawn dispatcher nor Farore's Wind is in that list. The unscoped `audit`
 not proof that every missing graph return is a physical trap; `regions=` restricts a certificate.
 
 `remake/child_warp_returns.toml` guards child Bolero and both-age Requiem arrivals on a held playable
-Minuet, Serenade, Nocturne or Prelude. Colossus walk-in has the same guard and its reverse Wasteland edge is
-closed: Kareem ruled Colossus warp-exit-only at either age (2026-11-18). Child crater has no walking escape
-(Kareem, played). A destination cannot supply its own escape song, the two hazardous arrivals cannot rescue one
-another, and adult items cannot rescue a child prefix. No walking exit is invented.
+Minuet, Serenade, Nocturne or Prelude. Walking arrival has the same guard before `Wasteland Near Crate ->
+Wasteland Near Colossus`, not after that one-way leg. Colossus's reverse Wasteland edge is closed: Kareem
+ruled it warp-exit-only at either age (2026-11-18). Child crater has no walking escape (Kareem, played).
+A destination cannot supply its own escape song, the hazardous arrivals cannot rescue one another,
+and adult items cannot rescue a child prefix. No walking exit is invented.
 
 `remake/dampe_returns.toml` guards the whole grave descent with adult-usable Hookshot. The translated grave
 region covers race start/course and both co-located goal rewards; neither chest can supply its own escape.
 There is no reverse race return. Its windmill exit and access event require Hookshot, not the N64 Song of Time.
 Ordinary `Kak Windmill` access from the village is unchanged. Native boundary facts and unresolved whole-world
 audit questions are in `rounds/r18-logic.md`.
+
+All twelve song-lesson checks require an age-usable Ocarina pending Track G's scene fix: child may use
+either instrument; adult requires Ocarina of Time. Their existing source/age prerequisites stay intact.
+The post-lesson `Met Child Zelda` send-off and `Ice Cavern End Chest Access` event match the lesson guard.
+The moat Ocarina item and Iron Boots chest reward precede their lessons, so those reward rules stay unchanged.
+Evidence: Kareem's played no-ocarina Minuet softlock and Ocarina control (2026-11-18), native twelve-flow trace
+in `rounds/r18-logic.md`; this changes logic, not native scene triggering.
 
 Every solo goal proof also refuses failures in the native verified-region scope. External placements,
 which still skip the solo goal/first-pull proofs, run that same scoped physical-trap refusal. This changes

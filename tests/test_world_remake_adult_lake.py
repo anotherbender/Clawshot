@@ -103,7 +103,7 @@ def test_junk_chest_and_song_rewards_still_complete_the_ice_source():
     spec["start"] = "Ice Cavern End"
     spec["settings"]["starting_age"] = "adult"
     world = build_world(spec)
-    search = Search(world)
+    search = Search(world, ["Ocarina of Time"])  # the Water-quest step follows Sheik's lesson
     rewards = {"Ice Cavern Iron Boots Chest": "Rupees (5)", "Sheik in Ice Cavern": "Rupees (20)"}
     search.collect_spheres(rewards)
     assert set(rewards) <= search.collected

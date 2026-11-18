@@ -12,10 +12,10 @@ was = "True"
 rule = "can_play(Minuet_of_Forest) or can_play(Serenade_of_Water) or can_play(Nocturne_of_Shadow) or can_play(Prelude_of_Light)"
 source = "Kareem ruling, 2026-11-18: Colossus can be left only by another warp song at either age; Wasteland walking return is impractical. Preserve the four established safe destinations and age-usable instrument rules; neither Requiem itself nor the unresolved child Bolero is an escape. plans/rounds/r18-logic.md."
 
-[exits."Wasteland Near Colossus"."Desert Colossus"]
+[exits."Wasteland Near Crate"."Wasteland Near Colossus"]
 was = "True"
 rule = "can_play(Minuet_of_Forest) or can_play(Serenade_of_Water) or can_play(Nocturne_of_Shadow) or can_play(Prelude_of_Light)"
-source = "Kareem ruling, 2026-11-18: any Colossus arrival, including a desert walk-in, needs an already age-usable escape song; its own reward cannot bootstrap escape. Internal temple/fountain/grotto returns preserve this entry invariant. plans/rounds/r18-logic.md."
+source = "Kareem ruling, 2026-11-18: Colossus is warp-exit-only. The final Wasteland leg has no practical reverse route (OoTR reverse edge is an unverified trick); guard before this one-way leg, not after entering it. Internal temple/fountain/grotto returns preserve this entry invariant. plans/rounds/r18-logic.md."
 
 [exits."Desert Colossus"."Wasteland Near Colossus"]
 was = "True"

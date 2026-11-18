@@ -11,8 +11,9 @@ def test_prelude_needs_adult_forest_completion_not_medal_or_minuet(free_travel):
     spec["settings"]["free_time_travel"] = free_travel
     world = build_world(spec)
     rule = world.locations["Sheik at Temple"].rule
+    lesson = {"Ocarina of Time": 1, "Ocarina": 2}  # the lesson's adult instrument (song_lessons.toml)
     for items in ({}, {"Forest Medallion": 1}, {"Minuet of Forest": 1}, {"Prelude of Light": 1}):
-        assert not rule(items, ADULT, 3)
-    clear = {"Defeat Phantom Ganon": 1}
+        assert not rule(lesson | items, ADULT, 3)
+    clear = lesson | {"Defeat Phantom Ganon": 1}
     assert rule(clear, ADULT, 3)
     assert not rule(clear, CHILD, 3)
