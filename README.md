@@ -83,7 +83,7 @@ that proves the model, not that every route has been verified in the game.
 
 | Feature | Current evidence and limits |
 |---|---|
-| Chests | Changed chest rewards work in game. 165 of 184 ordinary chests are shuffled; unresolved routes and repeat rewards stay unchanged. The Goron City sign-puzzle solution is included, its failure chest is not. |
+| Chests | Changed chest rewards work in game. 168 of 184 ordinary chests are shuffled; unresolved routes and repeat rewards stay unchanged. Includes the played Lost Woods bean ledge, ranch tower Hookshot route, late windmill Longshot route and Goron City sign-puzzle solution; duplicate/failure copies stay vanilla. |
 | Shops | Shuffled native shop items and purchases work in game. Arbitrary major items cannot use a stand-in shelf display. |
 | NPC gifts and songs | Gift swaps and Great Fairy once-only rewards work in game, as does the Kokiri shopkeeper's extended gift window. All seven frog checks have passed their in-game experiment. Not every gift or item combination has been played. |
 | One-time Business Scrubs | Four kinds of one-time Deku Scrub sale are enabled; repeat vendors stay unchanged. The implementation is tested, but the recorded results do not establish every shuffled sale in game. |
@@ -92,7 +92,9 @@ that proves the model, not that every route has been verified in the game.
 | Hints and convenience options | Gossip Stones speak hints without the Mask of Truth by default; this, fast start, the forest option that opens only the exit bridge (`--forest closed_deku`) and 10-rupee Kokiri prices have in-game evidence. |
 | Free time travel | Experimental, off by default. Early adult return, the Prelude scene and the corrected first adult arrival have passed in-game checks. |
 
-With Token added to the shipped presets, existing holds keep bottles, Double Defense, the Echo Gem and gold rupees on gift/story checks rather than Skulltulas; fixed Nut/Stick upgrades remain Scrub-only.
+With Token added to the shipped presets, played bottle, Double Defense, Echo Gem and gold-rupee rewards
+may also reach Skulltulas without becoming chest-safe; fixed Nut/Stick upgrades remain Scrub-only.
+Token items use a soft 2:1 chest-versus-Skulltula destination weight, still subject to logic and placement restrictions.
 
 **Confirmed with Gift shuffle:** the first two Bombchu Bowling wins and both normal
 shooting-gallery prizes give the seed's rewards (`R10-MINIGAMES-CHILD-JABU`,

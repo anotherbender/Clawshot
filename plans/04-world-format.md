@@ -433,10 +433,15 @@ resources under `<dir>/romfs/` plus `<dir>/spoiler.json`:
    4. Type-held items (`item_location_types`: songs, shop refills, gift items), most constrained first, as one
       stage retried on its own up to 15 times (OoT Randomizer's `fill_ownworld_restrictive` for songs and shops).
       Holds that include Token remain in the shared progression pool or its later filler match instead.
+      With Gift and Token enabled, the chest-safety-derived holds also include Token for independently admitted
+      `token_rewards.toml` members, without admitting their chest path. Songs and Scrub-only capacity holds stay intact.
    5. D25's bomb and Bombchu packs, only where the Bomb Bag is needed.
    6. Shared progression, native-display items first (with Shop, so the second shield finds a way past Mido).
       Skulltula rewards and spilled tokens participate in this same assumed fill, with the same `allowed` predicate
       and stage-local swaps; no earlier Token palette commits progression while borrowing later openers.
+      Token items use a seeded weighted random candidate order: Chest weight 2, Skulltula weight 1.
+      This is a soft preference only: reachability, `allowed` and safe swaps still decide, with no reserved quota.
+      Token-off follows the unchanged shuffle and consumes the same random draws as before.
    7. Remaining Skulltulas: a seeded deterministic bipartite match from the non-progression pool. Each item copy
       has edges only to locations accepted by `allowed`, including existing container screens. Match mandatory
       Token-only copies first, then optional copies in shuffled-pool order. Augmenting paths preserve capacity

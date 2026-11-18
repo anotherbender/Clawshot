@@ -46,7 +46,7 @@ in chests only; see [Progressive items](#progressive-items).
 
 | Kind | Scope and acceptance |
 |---|---|
-| `Chest` | 165 of 184 ordinary chests; changed chest grants work in game. Includes the sign-puzzle solution chest, not its failure chest. Unresolved/repeat chests stay unchanged. Treasure Chest Game reward swap is built but untested and held; its 11 game boxes stay unchanged. |
+| `Chest` | 168 of 184 ordinary chests; changed chest grants work in game. Includes the played Lost Woods bean ledge, adult Hookshot ranch tower, late Longshot windmill and sign-puzzle solution. Duplicate/failure copies and unresolved/repeat chests stay unchanged. Treasure Chest Game reward swap is built but untested and held; its 11 game boxes stay unchanged. |
 | `Shop` | Ordinary shop shelves, native-display items only; slot swaps, restock and Castle Town purchases have in-game evidence. Bought goods (refills, ammo, Bombchus, bottle contents, hearts and magic jars) go only to shop shelves in every seed; no setting moves one to a chest, gift, scrub, floor pickup or Skulltula. Mask loans stay unchanged. |
 | `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper and all seven frog checks. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the unaccepted checks below. |
 | `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. Implementation tested; not every sale has recorded in-game acceptance. |
@@ -54,7 +54,10 @@ in chests only; see [Progressive items](#progressive-items).
 | `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
 | `Token` | All 100 native Gold Skulltulas, off in both presets; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, all rupee colours, Heart Pieces/Containers, fixed Nut/Stick capacity, ordinary arrow/bomb/nut/stick bundles, Bombchus, magic jars/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed and Ocarina of Time. Core, packets1–3 and the separate first-Time-ocarina part passed on rc.3; each catalogue member still needs its own native structural check, not every member/boundary was played. See `src/clawshot/data/token_rewards.toml`. Tokens spill only into shuffled chests; non-token grants add no token. The Field tree works by day, the ranch tower needs night/retrieval, and wetlands needs the child wall kill before the adult crate. |
 
-**Current preset limitation:** with Token added, existing holds keep bottles, Double Defense, the Echo Gem and gold rupees on gift/story checks rather than Skulltulas; fixed Nut/Stick upgrades remain Scrub-only.
+With Gift and Token selected, played bottles, Double Defense, the Echo Gem and gold rupees may also reach
+Skulltulas; this does not allow their unverified chest grants. Fixed Nut/Stick upgrades remain Scrub-only.
+Token placement uses a seeded 2:1 chest-versus-Skulltula weight, not a fixed percentage or reserved chest quota.
+Reachability, container requirements, pool composition and earlier fill stages still limit the result.
 
 Skulltula ammo requires its existing container before the source; refills never grant a bag or weapon.
 **D25:** Bombs and Bombchus require an independent Bomb Bag at every shuffled destination, not only Skulltulas.

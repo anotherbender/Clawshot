@@ -41,12 +41,16 @@ meanings in a port. Do not turn a held check into a randomized check just becaus
 The current acceptance boundary is in [settings](settings.md), with observations in
 `plans/playtest/answers.md` and completed results in `plans/00-roadmap.md`.
 
-**Water Temple precaution (0.2.2):** entry requires access to the real Ice Cavern end chest as well
-as Hookshot and Iron Boots, independent of where Boots or Serenade are shuffled. Claude chose this
-safety constraint on 2026-11-17; Kareem was informed. Kareem's played rc.7 check (unmodded fresh game,
-Debug-made adult with Hookshot and Iron Boots, teleported to adult Lake Hylia) found that the submerged
-Hookshot does **not latch** onto the entrance target. This is consistent with the Ice gate, not proof
-of its exact quest/flag predicate; the setup was made with Debug, not normal progression.
+**Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
+access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
+Boots or Serenade are shuffled. Claude chose the r16 precaution on 2026-11-17; Kareem was informed.
+Kareem tested rc.7 unmodded, Debug-made adult with Hookshot and Iron Boots at adult Lake Hylia.
+With the quest at `Ready` and `SageOfWater_GetWaterSerenade=false`, the Hookshot did not latch.
+On the same save, setting the Ice end-chest wrapper's writes, `SageOfWater_GetWaterSerenade=true`
+and `Step_SageOfWater=Step05`, made the switch work and the door open. This confirms that the
+Ice end-chest state enables entry; which of the two values matters was not separated. It is a
+played save-edit control, not a normal-progression or modded Clawshot certification. See
+[the Water gate evidence](../plans/rounds/r16-water-gate.md).
 
 ## Rule language
 

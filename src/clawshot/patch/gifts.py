@@ -45,6 +45,7 @@ from clawshot.census.scan import CHEST, read_romfs_byml, scan
 from clawshot.formats import byml, evfl, zsdic
 from clawshot.formats.byml import I32, U32
 from clawshot.generate import Settings, prepare
+from clawshot.generate import tokens as token_policy
 from clawshot.patch import bags
 from clawshot.patch import items as item_actors
 from clawshot.patch.gamedata import GAME_DATA_LIST
@@ -1069,7 +1070,14 @@ def seed_setup(
     shuffled = seed_checks(world, census, definitions, rules, actors)
     vanilla = {name: world.locations[name].vanilla for name in shuffled}
     chest_actors = {loc.vanilla_item for loc in scan(romfs) if loc.kind == CHEST}
-    held = held_items(world, vanilla.values(), actors, chest_actors, songs=settings.songs)
+    held = held_items(
+        world,
+        vanilla.values(),
+        actors,
+        chest_actors,
+        songs=settings.songs,
+        token_shuffle=token_policy.SHUFFLE in settings.shuffle,
+    )
     songs = (SONG_TYPE,) if settings.songs == "song" else ()
     settings = replace(
         settings,
@@ -1095,12 +1103,19 @@ def seed_setup(
 
 
 def held_items(
-    world: World, items: Iterable[str], actors: ItemActors, chest_actors: set[str], *, songs: str = DEFAULTS["songs"]
+    world: World,
+    items: Iterable[str],
+    actors: ItemActors,
+    chest_actors: set[str],
+    *,
+    songs: str = DEFAULTS["songs"],
+    token_shuffle: bool = False,
 ) -> dict[str, tuple[str, ...]]:
     """Songs-on-songs by default; anywhere releases the whole song family (reviewer, Round 6).
 
     The other eleven songs are inferred from the Song of Storms chest result, not individually verified.
-    Non-song gifts still need a vanilla chest actor or a sourced ``chest_verified`` catalog entry.
+    Non-song gifts still need a vanilla chest actor or a sourced ``chest_verified`` catalog entry for chests.
+    Independently played Token rewards may also use Skulltulas; this does not certify their chest path.
     """
     out = {}
     for item in items:
@@ -1109,4 +1124,6 @@ def held_items(
                 out[item] = (SONG_TYPE,)
         elif actors.actor(item) not in chest_actors and actors.actor(item) not in CATALOG["chest_verified"]:
             out[item] = tuple(t for t in GIFT_TYPES if songs == "anywhere" or t != SONG_TYPE)
+            if token_shuffle and item in token_policy.REWARDS:
+                out[item] += (token_policy.SHUFFLE,)
     return dict(sorted(out.items()))

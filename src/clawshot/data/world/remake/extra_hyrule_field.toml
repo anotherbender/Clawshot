@@ -32,9 +32,8 @@ new = true
 region = "LLR Tower"
 type = "Chest"
 vanilla = "Scrub Business Seed"
-rule = "False"
-source = "Route to the tower upper chest remains an explicit in-game question in r4-logic-child.md Lon Lon Ranch; the lower crawl-hole heart route does not prove access."
-keep_vanilla = "Route to the tower upper chest remains an explicit in-game question in r4-logic-child.md Lon Lon Ranch; the lower crawl-hole heart route does not prove access."
+rule = "is_adult and can_use(Hookshot)"
+source = "Kareem via Claude, 2026-11-17, played finished-save chest hunt: adult Hookshot to the tower vine wall, climb to the high chest; the floor crawl-hole Heart Piece is unrelated (plans/rounds/r17-chests-tokens.md)."
 
 [locations."Hyrule Field Chest (Obj_Heart_Piece)"]
 new = true

@@ -350,7 +350,15 @@ def _fill_restrictive(
         search = Search(world, [*assumed, *items])
         search.collect_spheres(placements)
         candidates = [name for name in locations if allowed(world, settings, name, item)]
-        rng.shuffle(candidates)
+        if item == "Gold Skulltula Token" and "Token" in settings.shuffle:
+            # Weighted random order, not a hard chest reservation: a chest gets twice
+            # a Skulltula's weight, but reachability and safe swaps still decide.
+            candidates.sort(
+                key=lambda name: rng.random() ** (0.5 if world.locations[name].type == "Chest" else 1.0),
+                reverse=True,
+            )
+        else:
+            rng.shuffle(candidates)
         if item in native:
             reserve = (
                 shop_refills > 0 and sum(world.locations[name].type == "Shop" for name in locations) <= shop_refills

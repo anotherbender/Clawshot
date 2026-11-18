@@ -161,3 +161,39 @@ def test_ocarina_restriction_covers_scrub_sales_in_a_mixed_pool(kind):
     spec = gifts.restrict_spec(spec, ())
     seed = generate(spec, 1, Settings(shuffle=("Chest", kind)), attempts=1)
     assert seed.placements == {"Chest": "Fairy Ocarina", "Sale": "Rupees (20)"}
+
+
+@pytest.mark.parametrize("item", ["Bottle", "Bottle with Milk", "Double Defense", "Stone of Agony", "Rupees (200)"])
+def test_played_gift_rewards_can_reach_skulltulas_without_becoming_chest_safe(item):
+    token = "Gold Skulltula Token"
+    places = {
+        "Gift": {"type": "NPC", "vanilla": item, "rule": "True", "excluded_items": [item]},
+        "Chest": {"type": "Chest", "vanilla": "Fairy Ocarina", "rule": "True"},
+        "Skulltula": {"type": "GS Token", "vanilla": token, "rule": "True"},
+    }
+    spec = {
+        "start": "Root",
+        "goal": f"{item!r} and Gold_Skulltula_Token",
+        "items": {
+            item: {"class": "normal" if item in ("Double Defense", "Rupees (200)") else "progression"},
+            "Fairy Ocarina": {},
+            token: {"type": "Token"},
+        },
+        "regions": [{"name": "Root", "locations": places}],
+    }
+    world = build_world(spec)
+    actors = items.load()
+    held = gifts.held_items(world, [item], actors, set(), token_shuffle=True)
+    legacy = gifts.held_items(world, [item], actors, set())
+    assert "Token" not in legacy[item] and "Chest" not in held[item]
+    assert set(held[item]) == {*legacy[item], "Token"}
+    seed = generate(spec, 7, Settings(shuffle=("Chest", "NPC", "Token"), item_location_types=held), attempts=1)
+    assert seed.placements == {"Gift": "Fairy Ocarina", "Chest": token, "Skulltula": item}
+    assert generate(spec, 7, Settings.from_string(seed.settings.to_string()), attempts=1).placements == seed.placements
+
+
+def test_unplayed_gift_grant_does_not_gain_token_destinations():
+    world = build_world({"start": "Root", "goal": "True", "items": {"Letter": {}}, "regions": [{"name": "Root"}]})
+    actors = items.loads('[items]\nLetter = { actor = "Item_ZeldaLetter" }\n')
+    held = gifts.held_items(world, ["Letter"], actors, set(), token_shuffle=True)
+    assert "Token" not in held["Letter"] and "Chest" not in held["Letter"]

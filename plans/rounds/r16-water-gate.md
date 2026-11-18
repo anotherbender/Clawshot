@@ -4,12 +4,13 @@ Branch: `r16/water-gate`, based on main `af6a7b4534e0864fe109cbbe3bece4f638cd1db
 
 ## Approved decision and evidence boundary
 
-Claude, 2026-11-17, precaution pending a played pre-Ice check; Kareem informed.
+Claude, 2026-11-17: initially a precaution pending play; now **confirmed by a played save-edit control** below.
 Claude's 0.2.2 decision requires the real Ice Cavern end-chest source before Water Temple entry, in addition to
 Hookshot and Iron Boots. The basis is the cited tester video
 showing a pre-Ice underwater Hookshot hit with no response, plus cs16c's conditional placement cycle.
 
-This is a **logic safety constraint**, not a proved explanation of the native rejection or a runtime door patch.
+This is a **logic safety constraint**, not a runtime door patch. The played control confirms that the
+Ice end-chest state enables the entrance; the exact predicate within its two writes remains unseparated.
 No OOTRR source was opened or fetched.
 
 ### Played follow-up (Kareem, 2026-11-17)
@@ -18,9 +19,13 @@ No OOTRR source was opened or fetched.
   Boots, and teleported him to adult Lake Hylia.
 - Observation: submerged at the entrance, Hookshot **does not latch onto the switch target**.
   This is a failed latch, not an established accepted hit that the switch ignored.
-- Boundary: this played Debug-made state is **consistent with the Ice gate**, not proof that the
-  end-chest source or a particular quest step/flag is the exact predicate. Normal progression and
-  a Clawshot seed overlay were not exercised. The precaution stands; native latchability needs tracing.
+- Same-save control (Kareem, forwarded by Claude on 2026-11-17): before, with quest `Ready` and
+  `SageOfWater_GetWaterSerenade=false`, the Hookshot did not latch. A save edit set the Ice
+  end-chest wrapper's writes, `SageOfWater_GetWaterSerenade=true` and `Step_SageOfWater=Step05`.
+  The switch then worked and the door opened.
+- Result: the r16 precaution is **confirmed by a played save-edit control**. The Ice end-chest
+  state enables the entrance; which of the two values matters was not separated. Normal
+  progression and a modded Clawshot overlay were not exercised.
 
 ### Read-only native follow-up
 
@@ -40,13 +45,14 @@ No OOTRR source was opened or fetched.
 - A fresh read-only decode of `RSDB/GameSafetySetting.Product.111.rstbl.byml.zs` found Water safety
   rows with escape-range/area settings, not a declared latchability or collision toggle.
 
-These data checks do not identify a quest/flag that changes native Hookshot latching.
+These static checks alone did not identify the native latch predicate. The played control above now
+identifies the enabling Ice-wrapper state bundle, not an individually isolated flag or quest step.
 
 The installed native function index has addresses/sizes without names, and the build no longer retains
 lifted `code_*.c`; the latch implementation was not identified. The rc.7 source survey found no explicit
-quest-driven Hookshot latch patch. This does **not** exclude a port/Debug-state contribution: rc.7 does
-patch physics solver stepping (`nx2/oot_patches.py:602-609`). An unmodded observation alone cannot
-distinguish native quest gating from those alternatives.
+quest-driven Hookshot latch patch. rc.7 does patch physics solver stepping (`nx2/oot_patches.py:602-609`);
+the original failed shot alone could not distinguish quest gating from a port/Debug-state contribution.
+The same-save played control now confirms the state-dependent entrance result without tracing that implementation.
 
 The retained native Ice wrapper sets `SageOfWater_GetWaterSerenade=true` in both branches, then writes
 the saved `Step_SageOfWater` enum (native enum Hash `1443521711`):
@@ -59,7 +65,8 @@ the saved `Step_SageOfWater` enum (native enum Hash `1443521711`):
 References: `SageOfWater` Event127/Event243 select the branch, Event284/Event285 set the source Bool,
 and Event282/Event280 advance the quest. Enum values are from the native `Step_SageOfWater` definition,
 not ordinal indices. Step05 is the latest pre-entry quest control; setting it alone is not the same
-as executing the Ice source wrapper, and no success of a latch test is inferred from these writes.
+as executing the Ice source wrapper. Kareem's successful control set both Step05 and the source Bool,
+so the individual contribution of each remains unknown.
 
 ## Changes
 
@@ -71,7 +78,7 @@ as executing the Ice source wrapper, and no success of a latch test is inferred 
 - Existing Boot-substitution coverage supplies completed Ice history so it continues to isolate the physical
   Boots requirement. New checks cover early H+I/Serenade, junk rewards, the real end rather than Ice arrival,
   the separate Hookshot requirement and the cycle/repair.
-- `docs/logic.md` and `plans/03-game-data.md` label the gate as a precaution and retain the unplayed boundary.
+- Initial documentation labelled this a precaution; the played save-edit control above now confirms it.
 
 The regression uses the real copy-only world and reachability oracle for Chest/Gift, songs anywhere,
 small keys anywhere and an open Door. Unrelated inventory isolates the cycle: Lullaby in Water's Map
@@ -105,14 +112,14 @@ Full gates are intentionally deferred to Claude after r16/time merges and this b
 
 ## Remaining acceptance
 
-**Pending:** identify the native latchability condition and isolate it with a controlled quest/flag
-change. Kareem's rc.7 unmodded Debug-state failure above is played evidence, not a normal-progression
-or modded Clawshot certification. A modded check still needs build/overlay identity, quest/source/played
-flags and the runtime's seed-resource loading proof. The logic guard does not itself change what the
-physical switch accepts. No version bump is included;
+**Confirmed:** the Ice end-chest state enables entry in Kareem's same-save rc.7 control.
+**Still unseparated:** whether the source Bool, Step05, or their combination is the native predicate.
+This is not normal-progression or modded Clawshot certification. A modded check still needs build/overlay
+identity, quest/source/played flags and the runtime's seed-resource loading proof. The logic guard does
+not itself change what the physical switch accepts. No version bump is included;
 Claude owns the combined 0.2.2 integration/release.
 
-## rc.7 Debug capability and next played comparison
+## rc.7 Debug capability and originally proposed comparison
 
 **No quest-step editor exists in rc.7 Debug.** The twelve Debug tools cover player/travel/camera,
 inventory and time (`gpu/vk/vk_menu.cpp:1734-1766,1961`). Inventory's **Quest** section is a list of
@@ -123,11 +130,12 @@ In `host/hos_main.c:767-777,807-820`, the Serenade toggle writes only the learne
 `0x3fa63986`, not source Bool `SageOfWater_GetWaterSerenade` (`0x85114ae5`) or a quest step.
 The writer at `:1148-1160` is Bool-only. Thus **there is no Debug menu value to set for a one-step
 latch proof**. Step05 (`1558058783`, `0x5cde171f`) is a native pre-entry control value, not an available
-UI setting and not a proven latch predicate. The raw-memory bridge is not a quest editor; no memory
-write, save edit or runtime patch was attempted or proposed as this read-only follow-up.
+UI setting and not an individually proven latch predicate. The raw-memory bridge is not a quest editor.
+Investigating agents attempted no memory write, save edit or runtime patch; Kareem's later save-edit
+control is recorded above.
 
-The next non-invasive played comparison is to retain the same Debug-made adult/equipment state,
-complete the **real Ice Cavern end-chest story sequence**, return to adult Lake Hylia, and repeat
+Before that save-edit control, the proposed non-invasive played comparison was to retain the same
+Debug-made adult/equipment state, complete the **real Ice Cavern end-chest story sequence**, return to adult Lake Hylia, and repeat
 the same submerged shot. Record whether it latches and whether the entrance demo starts/bars open.
 A changed outcome supports the precaution, but changes a story-state bundle plus scene loading;
 it does not isolate a particular quest step, source Bool, song Bool or collision attribute.

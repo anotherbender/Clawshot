@@ -5,9 +5,8 @@ new = true
 region = "Kak Windmill"
 type = "Chest"
 vanilla = "Rupees (50)"
-rule = "False"
-source = "Alternative copy of the unresolved upper-windmill chest; not an independent item check (r4-logic-child.md Kakariko)."
-keep_vanilla = "Alternative copy of the unresolved upper-windmill chest; not an independent item check (r4-logic-child.md Kakariko)."
+rule = "is_adult and can_use(Longshot) and 'Defeat Phantom Ganon' and 'Defeat Volvagia' and 'Defeat Morpha'"
+source = "Kareem via Claude, 2026-11-17, played finished-save chest hunt: Longshot onto a rooftop, Longshot from roof to windmill ladder, climb to chest. Hookshot unconfirmed. Alternative is sole canonical copy, requiring Forest/Fire/Water sage completion (Sequence_IsAlternative_KakarikoAdult); normal missable copy stays vanilla (plans/rounds/r17-chests-tokens.md)."
 
 [locations."Kakariko Village Chest (TBox_Rupee_Purple) [Adult]"]
 new = true
@@ -15,5 +14,5 @@ region = "Kak Windmill"
 type = "Chest"
 vanilla = "Rupees (50)"
 rule = "False"
-source = "Upper-windmill chest route is unresolved; its altitude is above the documented windmill heart route (r4-logic-child.md Kakariko). Normal/Alternative Hashes are mutually exclusive copies, not two checks."
-keep_vanilla = "Upper-windmill chest route is unresolved; its altitude is above the documented windmill heart route (r4-logic-child.md Kakariko). Normal/Alternative Hashes are mutually exclusive copies, not two checks."
+source = "Claude, 2026-11-17: normal windmill copy is missable and permanently noncanonical; only the later Alternative copy may shuffle after route proof (plans/rounds/r17-chests-tokens.md)."
+keep_vanilla = "Missable normal-state windmill copy stays vanilla permanently; Alternative is the sole canonical check."
