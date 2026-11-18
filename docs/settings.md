@@ -162,16 +162,16 @@ granted inside one chest event read stale ownership, so that is not supported.
 bug game. All seven passed the frog experiment. The two deterministic Bombchu Bowling
 prizes (first win, second win, then the usual rupees) and both normal shooting-gallery prizes
 are confirmed in game (`R10-MINIGAMES-CHILD-JABU`, `R10-MINIGAMES-ADULT`).
-Rental weapons do not become inventory rewards. The first expert gallery wins are the only
-minigame checks not shuffled yet; their tests have not run.
+Rental weapons do not become inventory rewards. Both expert galleries remain unshuffled:
+native expert wins pay repeatable wallet rupees, with no separate first-win prize.
 
 With `Gift` selected, the child Market Potion Shop bottle tutorial and Dampé's graveyard
 digging prize give shuffled rewards. Both passed their in-game checks on 2026-11-10
 (`R10-MARKET-BOTTLE-FIX`, `R10-DIGGING`). Accept the shop owner's offer by day; the shuffled
 gift skips the bug-catching lesson. Without `Gift`, the free bottle and lesson stay unchanged,
 and logic still counts that bottle. Digging still shows a heart prize but awards the shuffled item.
-Both first-expert gallery rewards stay unchanged until tested. They contribute Rupees (20)
-when released; later expert wins keep the usual 30/70-rupee payouts.
+Market expert wins pay 30 rupees and Kakariko expert wins 70, including the first win. Clawshot's
+held first-expert-check experiment would add a new once-only prize; it is off under every setting.
 
 Merchant sale experiments (Medigoron, Granny, desert carpet) remain held. The Skulltula House's
 10-token swap passed, with the 20-token preview observed; that does not certify the later thresholds.

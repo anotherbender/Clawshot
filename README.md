@@ -97,16 +97,16 @@ may also reach Skulltulas without becoming chest-safe; fixed Nut/Stick upgrades 
 
 **Confirmed with Gift shuffle:** the first two Bombchu Bowling wins and both normal
 shooting-gallery prizes give the seed's rewards (`R10-MINIGAMES-CHILD-JABU`,
-`R10-MINIGAMES-ADULT`). Later wins give the game's usual rupees. The first expert gallery
-wins are the only minigame checks not shuffled yet; their tests have not run.
+`R10-MINIGAMES-ADULT`). Later wins give the game's usual rupees. Expert galleries stay unshuffled:
+their native rewards are repeatable wallet rupees (Market 30, Kakariko 70), not unique first prizes.
 
 **New with Gift shuffle:** the child Market Potion Shop bottle tutorial and Dampé's graveyard
 digging prize now give shuffled rewards. Both passed their in-game checks on 2026-11-10
 (`R10-MARKET-BOTTLE-FIX`, `R10-DIGGING`). The shop's corrected swap passed re-entry and shopping;
 Dampé still shows a heart prize but gives the shuffled item.
 
-First expert gallery rewards, merchant experiments and some Skulltula House rewards stay
-unchanged until their tests pass; the 10-token swap alone has been observed, not every threshold.
+Expert galleries, merchant experiments and some Skulltula House rewards stay unchanged;
+the 10-token swap alone has been observed, not every threshold.
 The Door of Time's earlier song-only and open modes passed a first door/sword-pull check.
 Both wait for Field-arrival clock state and Zelda/Impa's real send-off. The open-mode gate and
 later escape/moat order repair and immediate child-return clock clear passed on Longshot rc.7.

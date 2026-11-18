@@ -88,8 +88,28 @@ Final raw rows, process snapshots, cause classification and comparison will be r
 
 ## Shooting galleries — research only
 
-Native expert/advanced mode and prize findings are being traced against the active game flows.
-No expert check is released, no option is added, and both existing expert holds stay default-off.
+Both galleries have expert modes, but **neither has a native unique first-expert prize**.
+Every perfect expert win pays direct wallet rupees: Market (child) **30**, Kakariko (adult) **70**,
+including the first. No item actor, get-item scene or saved expert-win flag exists. Static data
+research only; no new played result is claimed.
+
+Native `Event/EventFlow/MiniGame_HitTarget.bfevfl.zs`: `RewardTalk` selects `Child_Reward` /
+`Adult_Reward`. Normal first prizes use saved `HrlCity_Get_BulletBag` / `Kakariko_Get_Quiver`
+flags and Medium/Large bag/quiver branches. After normal completion, `IsHardMode` routes
+Event202 (30) / Event599 (70) through `GetRupy_HitTarget` to Event597's direct rupee increase.
+Expert selection appears only after that gallery's normal prize; fees remain child10/adult30.
+Market rents a Slingshot; adult Kakariko requires Bow. Galleries close 20:00–06:00.
+`MiniGame_HitTarget_IsHardMode` is unsaved session state, not first-win persistence.
+
+Clawshot's two first-expert locations are an **artificial once-only-check experiment**, with
+new D22 saved flags and Rupees (20) pool contributions, already held by `keep_vanilla` under
+every setting. Normal prizes stay shuffled and played; expert 30/70 payouts stay unchanged.
+Existing round-10 held packet was not accepted for expert wins; no old packet is promoted.
+
+**Claude accepted this research on 2026-11-18: no unique prizes; expert galleries stay off.**
+No expert code is built, released or removed this round; no future release is promised in user docs.
+Detailed native nodes, census/patch/hold references and packet caveats:
+`E:/OOTRemake/work/r18-chests/gallery/REPORT.md` (read-only probe scripts beside it).
 
 ## Acceptance and handoff
 
@@ -104,4 +124,26 @@ Authoritative commands, process snapshots and results will be external under `wo
 Issue read and claimed by comment before edits. Existing world metadata already maps the native
 forty-token source to `Bombchus (20)` and `Item_BombchuBundle_Large`, but explicitly holds it pending
 controlled play. Implementation, regression coverage, second sweep and main control are on top of the
-merge delivery only. Candidate/control are built, **not played**, until Kareem checks them on rc.7.
+merge delivery only. Any built candidate/control remains **not played** until Kareem checks it on rc.7.
+
+### Authorized diagnostic fixture preparation
+
+Claude explicitly authorized scanning `work/save-backups` read-only, then a token-count-only
+test-copy edit if no natural ≥40/unclaimed source exists (2026-11-18, current conversation).
+`scan_reward40_saves.py`: **2487** progress files read, **2385** unclaimed40, **zero** natural
+≥40/unclaimed40 matches. No placement/spoiler files were opened.
+
+Chosen natural backup: `work/save-backups/2026-11-09_1022-main-adult-first/save/`
+`5a3c9e1f0b7d24680000000000000001/slot_01` (adult just after first sword pull).
+It has 15 tokens, Hammer unowned, and the native 10/20/30/40 reward flags unset.
+Copied only that slot plus account/options to `work/r18-chests/reward40-fixture`.
+The original progress file is additionally backed up in the fixture as
+`progress.sav.before-token-edit`.
+
+The **only** changed value is Int section2, `PouchData.Item_Token_Gold.StockNum`,
+key **0x04735978**, **15 → 40**, value offset **89588**. Exactly byte89588 differs;
+all other bytes, caption files and original source remain identical. Native threshold40 and
+every completion/ownership/story field are untouched. Proof: `prepare_fixture.py` output and
+`reward40-fixture.json`. This is declared diagnostic inventory setup, not a naturally earned
+forty-token playthrough. Candidate and main control will each start from identical isolated copies.
+The corrected nested-rc.7 launcher template was re-read after Claude's fix.
