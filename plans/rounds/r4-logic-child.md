@@ -18,7 +18,7 @@ or exit in two files, a stale `was`, `new` on an existing exit, unknown tables a
 
 ## Item 2: the Deku Tree (`remake/child_deku_tree.toml`)
 
-Evidence: Kareem's round 3 seed 3 report (`00-roadmap.md`, "Round 3 result"); Nintendo Life, "Great Deku Tree
+Evidence: Kareem's round 3 seed 3 report ([roadmap index](../00-roadmap.md) plus [Round 3](r3-overview.md), "Round 3 result"); Nintendo Life, "Great Deku Tree
 walkthrough" (Switch 2, 2026-11-05,
 https://www.nintendolife.com/guides/zelda-ocarina-of-time-great-deku-tree-walkthrough-switch-2); the placement files
 (`InsideTheDekuTree_Static`/`_Dynamic`, listed by `E:/OOTRemake/work/r4-logic-child/actors.py`; output

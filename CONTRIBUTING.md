@@ -54,6 +54,8 @@ and paste the UI's error text without attachments. If uncertain, ask on Discord 
    That file is the shared authority for game-data safety, read-only dumps, oracle checks,
    determinism, stable IDs, sourced logic, dependency licences and failure diagnosis.
    Do not restate or replace those contracts in a new agent-specific workflow.
+   Maintainers' round agents also read the [roadmap index](plans/00-roadmap.md) plus their round's linked
+   `plans/rounds/r<N>-overview.md` and their own track file; outside contributors need not join that workflow.
 3. Use a branch and a small, single-topic PR. Explain the problem, evidence, change and remaining
    limits. Discuss product/default/logic-policy changes with the maintainers; do not silently
    change them or add unrelated refactors. Include affected docs and meaningful regression coverage.

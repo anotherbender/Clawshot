@@ -6,14 +6,14 @@ You do not need anything here to play a seed or to contribute; start with the re
 
 | File or folder | What it is |
 |---|---|
-| `00-roadmap.md` | Milestones and every round of work, with results |
+| `00-roadmap.md` | Roadmap index: milestones, standing backlog and one status/link per round; read it plus your round's file |
 | `01-architecture.md` | How the generator is put together |
 | `02-orchestration.md` | How the maintainers run and review parallel agent rounds |
 | `03-game-data.md` | What was learned about the remake's data, numbered by section |
 | `04-world-format.md` | The logic data format and the remake's overrides |
 | `decisions.md` | Decisions, with who proposed each |
 | `playtest/` | In-game questions and the answers from play |
-| `rounds/` | One file per agent track: what it built and how it was checked |
+| `rounds/` | `r<N>-overview.md`: round brief and outcome; `r<N>-<track>.md`: each track's implementation, evidence and handoff |
 
 Paths such as `E:\OOTRemake\...` and names in these notes are from the maintainers' machines. Nothing here is
 generated from the game: no game files, decoded data or seeds are kept in the repository.

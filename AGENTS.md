@@ -2,8 +2,8 @@
 
 These rules apply to every coding agent, and every person, changing this repository. Read this file, then
 `README.md`, `CONTRIBUTING.md` and `plans/01-architecture.md`, before changing anything. The plan for the area you
-are touching is the spec, and `plans/00-roadmap.md` says where things stand. If code and plan disagree, stop and say
-so rather than picking one.
+are touching is the spec. Read the roadmap index (`plans/00-roadmap.md`) plus your round's file
+(`plans/rounds/r<N>-overview.md`) for scope and status. If code and plan disagree, stop and say so rather than picking one.
 
 Product calls (what gets shuffled, settings, what a seed must guarantee) belong to the maintainers: put the question
 in your pull request or issue instead of deciding it.
@@ -62,9 +62,9 @@ for an agent in a maintainers' round, in its round file.
 ## Maintainers' rounds
 
 The maintainers run several agents in parallel rounds (one worktree and branch each, a round file, review and merge
-by a reviewer). An agent started in a round also follows "Rules for agents in a round" in
-`plans/02-orchestration.md`. Nobody needs those to contribute. `plans/` holds the maintainers' working notes and the
-evidence the logic data cites; the paths and names in it are from their machines.
+by a reviewer). An agent started in a round reads the roadmap index plus its round's overview and track file,
+then follows "Rules for agents in a round" in `plans/02-orchestration.md`. Nobody needs those to contribute.
+`plans/` holds the maintainers' working notes and the evidence the logic data cites; paths and names are from their machines.
 
 ## Commits
 

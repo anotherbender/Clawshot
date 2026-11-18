@@ -3,8 +3,8 @@
 This is the command-line and developer reference. Start with the [README](../README.md) or
 [seed-pack guide](seed-pack.md) to play. Status below distinguishes in-game observations from
 implementation tests; an enabled option is not proof that every combination has been played.
-Evidence: [recorded results](../plans/00-roadmap.md), [player answers](../plans/playtest/answers.md)
-and [decisions](../plans/decisions.md).
+Evidence: [the roadmap index](../plans/00-roadmap.md) plus the linked round files,
+[player answers](../plans/playtest/answers.md) and [decisions](../plans/decisions.md).
 
 ## Settings strings and reproducibility
 

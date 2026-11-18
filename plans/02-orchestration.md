@@ -8,13 +8,13 @@ skill). This file is the project's own version; where it differs from Overread, 
 | Who | Does |
 |---|---|
 | Kareem and his co-owner | Product calls (what gets shuffled, settings, what a seed guarantees), in-game checks, playtests. |
-| Claude (Hermes) | Plans each round in `00-roadmap.md`; sets up worktrees and the Bermuda thread; starts the omp agents in herdr panes and watches them; reviews each branch and merges it to `main`; runs the gates; records decisions in `decisions.md`; pushes `main` to GitHub after a round's review; opens Hookshot PRs from the `hiKareeem/Hookshot` fork (Kareem's standing OK for this project). Tells Kareem exactly what to test and when. |
+| Claude (Hermes) | Plans each round in `rounds/r<N>-overview.md` and adds its status/link to the `00-roadmap.md` index; sets up worktrees and the Bermuda thread; starts the omp agents in herdr panes and watches them; reviews each branch and merges it to `main`; runs the gates; records decisions in `decisions.md`; pushes `main` to GitHub after a round's review; opens Hookshot PRs from the `hiKareeem/Hookshot` fork (Kareem's standing OK for this project). Tells Kareem exactly what to test and when. |
 | omp agents | One track each, in its own worktree and branch; commit on the branch, write a round file, never merge, never push. |
 
 ## A round
 
-1. **Spec.** Claude writes the round into `00-roadmap.md`: tracks, what each owns (directories, files), numbered
-   items in merge order, the test that proves each. Producer items name their consumers.
+1. **Spec.** Claude writes `rounds/r<N>-overview.md` and links it from the `00-roadmap.md` index: tracks, what
+   each owns (directories, files), numbered items in merge order, the test that proves each. Producer items name their consumers.
 2. **Setup.** One worktree per track at `E:/OOTRemake/clawshot-r<N>/<track>` on branch `r<N>/<track>` (made by
    `E:/OOTRemake/tools/launch_hc.sh`), one for a Hookshot track at `E:/OOTRemake/hookshot-r<N>/<track>`. Bermuda
    thread `cs-r<N>` (`BERMUDA_THREAD_AGENT=claude ~/go/bin/bermuda thread new cs-r<N> --about "..."`).
@@ -48,9 +48,10 @@ These are the maintainers' own; a round prompt points here.)
 
 - Kareem owns the project, with a co-owner. Product calls are theirs: write the question into your round file, in
   **bold**, instead of deciding it.
+- Read **the roadmap index plus your round's file**: `plans/00-roadmap.md`, `plans/rounds/r<N>-overview.md`,
+  and your own `plans/rounds/r<N>-<track>.md` if it exists. The overview lists ownership; the track file records evidence.
 - One agent per track, each in its own git worktree and branch (`r<N>/<track>`), set up by Claude before you
-  start. The round's section in `plans/00-roadmap.md` lists what each track owns; don't edit another track's
-  files. The main checkout (`E:\OOTRemake\Clawshot`) only receives merges.
+  start. Don't edit another track's files. The main checkout (`E:\OOTRemake\Clawshot`) only receives merges.
 - **Don't merge.** Commit on your branch; Claude reviews it and merges it to `main`. Rebase on `main` only when
   Claude says it moved. Never push. Never `git stash` (all worktrees share one stash).
 - **Your round file** is `plans/rounds/r<N>-<track>.md`, yours alone: what you built, how it was checked (commands

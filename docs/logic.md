@@ -39,7 +39,7 @@ The same specification defines `n64_only` (not a remake check), `keep_vanilla` (
 shuffled), `vanilla_fixed` (a concrete tier), and `new = true` (a remake addition). Preserve those
 meanings in a port. Do not turn a held check into a randomized check just because it has a rule.
 The current acceptance boundary is in [settings](settings.md), with observations in
-`plans/playtest/answers.md` and completed results in `plans/00-roadmap.md`.
+`plans/playtest/answers.md` and the [roadmap index](../plans/00-roadmap.md) plus its linked round files.
 
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
@@ -133,7 +133,7 @@ Hashes at matching positions. Sources: `plans/04-world-format.md`, Overrides;
 For a tracker, preserve world keys for placements/rules and use `location_names.toml` for display.
 Do not allocate Archipelago network IDs from mutable array order; an eventual port needs an explicit
 stable mapping from these identities. That network-ID mapping is a port requirement, not an existing
-Clawshot feature (architecture: `plans/01-architecture.md`; current scope: `plans/00-roadmap.md`).
+Clawshot feature (architecture: `plans/01-architecture.md`; current scope: the roadmap index plus your round's file).
 
 ## Search and seed acceptance
 
@@ -218,7 +218,7 @@ Determinism requires the same source/world data, seed and effective settings. Te
 Python hash seeds; unordered placement iteration and timestamps are forbidden. A passing search is
 proof of **this model**, not of unplayed remake routes. The earlier Slingshot-room softlock exposed an
 N64/remake mismatch; player answers remain essential. Sources: `AGENTS.md` rule 4;
-`plans/04-world-format.md`, Generating a seed; `plans/00-roadmap.md`, recorded mini-seed result;
+`plans/04-world-format.md`, Generating a seed; [Round 3](../plans/rounds/r3-overview.md), recorded mini-seed result;
 `plans/playtest/answers.md`, DT01/DT02.
 
 ## Spoiler contract
@@ -262,7 +262,7 @@ that ownership state; a shuffled fixed reward remains its literal assignment.
 ## What a multiworld port still needs
 
 Clawshot currently generates a static RomFS mod, not a live multiworld client. Archipelago remains
-future scope (`plans/00-roadmap.md`; decision D8 in `plans/decisions.md`). Reusing the logic does not
+future scope ([roadmap index](../plans/00-roadmap.md), Milestones; decision D8 in `plans/decisions.md`). Reusing the logic does not
 automatically provide a playable multiworld integration.
 
 An integration would still need a stable network item/location mapping, check-completion reporting,

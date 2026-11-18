@@ -128,8 +128,8 @@ name/text and grant follow the selected tier, while the rising model stays the b
 Built and native-data-tested; the Longshot check is unplayed.
 Entrance shuffle and Archipelago are not supported.
 See [settings and restrictions](https://github.com/hiKareeem/Clawshot/blob/main/docs/settings.md) for the detailed reference.
-Evidence: [recorded results](https://github.com/hiKareeem/Clawshot/blob/main/plans/00-roadmap.md)
-and [playtest answers](https://github.com/hiKareeem/Clawshot/blob/main/plans/playtest/answers.md).
+Evidence: [the roadmap index](https://github.com/hiKareeem/Clawshot/blob/main/plans/00-roadmap.md)
+plus the linked round files, and [playtest answers](https://github.com/hiKareeem/Clawshot/blob/main/plans/playtest/answers.md).
 
 ### Known issues
 
@@ -237,6 +237,9 @@ Read [CONTRIBUTING.md](https://github.com/hiKareeem/Clawshot/blob/main/CONTRIBUT
 for licensing, source restrictions, checks and evidence to
 include. Start with a small, single-topic change, or discuss it on Discord. Do not submit game files
 or anything generated from them, including in issues and attachments.
+
+Agents in a maintainers' round read **the roadmap index plus their round's file**:
+[roadmap](plans/00-roadmap.md), its linked `plans/rounds/r<N>-overview.md`, and their track record.
 
 ## Credits and licence
 
