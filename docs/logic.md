@@ -146,7 +146,7 @@ pull prerequisites and adult checks, without assuming optional child errands. Fr
 both logic and native patches; do not copy the search assumption without that patch contract.
 Sources: `plans/04-world-format.md`, Ages; `src/clawshot/world/search.py`;
 `src/clawshot/data/world/remake/sheik.toml`; `plans/playtest/answers.md`, R9-FREE-TRAVEL and
-R10-FIRST-PULL-FIXED. Open-mode early return and preserved escape/moat rewards passed on rc.7; the new clock-state fixes remain unplayed. See [settings](settings.md).
+R10-FIRST-PULL-FIXED. Open-mode early return and preserved escape/moat rewards passed on rc.7; the clock-state fixes passed the v4/v5 play checks on rc.7 (2026-11-17). See [settings](settings.md).
 
 **No save warp (Round 16).** The remake autosaves room changes; an older manual save is not a logic escape.
 The Slingshot Room's entry now requires its existing usable Slingshot/Boomerang/Bow exit condition as well

@@ -307,7 +307,8 @@ counter until the real Impa send-off, recount there, and ignore calls after esca
 closed mode when shuffled songs allow stones before Zelda. The native courtyard Step01 reset remains;
 early-mode post-pull callbacks do not roll the completed Door quest back.
 Kareem passed the open-mode send-off gate, early-pull escape/moat order repair and immediate
-child-return clock clear on Longshot rc.7. The first-arrival lighting repair below awaits v5 play checks.
+child-return clock clear on Longshot rc.7. The first-arrival lighting repair below passed the v5 play checks
+on rc.7 (2026-11-17), with a Kaepora-skip new game showing the Field map and a moving sun.
 
 **For new seeds; no save-repair pass.** Both early modes read the
 arrival flag and the real send-off history. Kaepora fast start now preserves the skipped owl's
