@@ -7,10 +7,10 @@ get the same item). Each chest is an actor ``Hash`` in every file the census lis
 ``Dynamic.Drop__DropActor``, and loses its ``GetEventName`` when that override is tied to the vanilla item
 (``chest_events.toml``). A chest that keeps its item is left alone.
 
-With ``dungeon_items = "anywhere"`` a small key in a chest outside its dungeon's Banc area is a named key
-(:attr:`ChestChange.named_key`): the generic actor would credit the dungeon Link stands in, or nothing in the
-overworld, so the chest changes even when it already holds a small key, and ``clawshot.patch.keys`` binds a named
-grant to it (:attr:`ChestChange.key_event`). Missing small-chest map/compass/boss grants use the same bindings.
+With ``dungeon_items = "anywhere"`` small keys may leave their dungeon; ``all_anywhere`` also releases maps,
+compasses and boss keys. The generic actor would credit the standing dungeon or nothing in the overworld,
+so even a chest retaining the same generic actor needs a target-specific grant. ``clawshot.patch.keys``
+binds that grant and named pickup text. Missing own-dungeon small-chest grants use the same lifecycle.
 
 Chests only (D15): a shuffled location that is not a census chest (a Treasure Chest Game box, D17) stops the plan.
 """
@@ -53,11 +53,11 @@ class ChestChange:
     event: ChestEvent | None  # the GetEventName override this change removes
     kept_event: ChestEvent | None = None
     named_key: str | None = None
-    """A small key outside its dungeon (``anywhere`` only): the target's native ID (``key_targets``)."""
+    """An off-dungeon small key: the target's native ID (``key_targets``)."""
     key_event: str | None = None
     """The source-bound grant or story-comment cleanup's ``GetEventName``, written last."""
     dungeon_item: DungeonGrant | None = None
-    """A missing native grant: explicit ownership, native text and a played source lifecycle."""
+    """Explicit target ownership or a missing native grant, delivered through the source's chest lifecycle."""
 
     def __post_init__(self) -> None:
         where = f"{self.location} (chest {self.id})"
@@ -102,6 +102,8 @@ class ChestChange:
             out["dungeon_item"] = {"target": self.dungeon_item.target, "family": self.dungeon_item.family}
             if self.dungeon_item.native_boss:
                 out["dungeon_item"]["native_boss"] = True
+            if self.dungeon_item.named:
+                out["dungeon_item"]["named"] = True
         return out
 
 
@@ -182,10 +184,10 @@ def link(world: World, shuffled: Sequence[str], definitions: Sequence[Definition
 
 def restrict_event_openings(spec: dict, world: World, links: Links, events: Mapping[str, ChestEvent]) -> dict:
     """Exclude source-bound rewards before fill unless every physical copy supports their opening."""
-    keys = [
-        (name, TARGETS[info.dungeon].id)
+    dungeon_items = [
+        (name, DUNGEON_TARGETS[info.dungeon].id)
         for name, info in world.items.items()
-        if info.type == SMALL_KEY and info.dungeon in TARGETS
+        if info.type in {"SmallKey", "BossKey", "GanonBossKey", "Map", "Compass"} and info.dungeon in DUNGEON_TARGETS
     ]
     copies = [family for family in CHAINS if family in world.progressive]
     exclusions = {}
@@ -197,7 +199,7 @@ def restrict_event_openings(spec: dict, world: World, links: Links, events: Mapp
             if source_for(chest.actor, kept) is not None:
                 continue
             blocked.update(copies)
-            blocked.update(item for item, target in keys if chest.area != target)
+            blocked.update(item for item, target in dungeon_items if chest.area != target)
         if blocked != set(world.locations[name].excluded_items):
             exclusions[name] = sorted(blocked)
     if not exclusions:
@@ -234,8 +236,8 @@ def _named_key(seed: Seed, location: str, item: str, area: str | None) -> str | 
     lies outside its dungeon with no grant to credit it from there.
 
     A small key is named when it lies outside its target's area, judged by the physical Banc folder, as the game
-    credits it: the Spirit Temple's two hand chests stand in ``DesertColossus``, which credits no dungeon. Boss keys,
-    maps and compasses have no named grant; the fill keeps them in their dungeon's regions."""
+    credits it: the Spirit Temple's two hand chests stand in ``DesertColossus``, which credits no dungeon.
+    Other supported families are routed by ``dungeon_item`` only with the all-anywhere opt-in."""
     world = seed.world
     info = world.items[item]
     if info.dungeon is None:
@@ -243,6 +245,12 @@ def _named_key(seed: Seed, location: str, item: str, area: str | None) -> str | 
     target = TARGETS.get(info.dungeon) if info.type == SMALL_KEY else None
     if target is not None:
         return None if area == target.id else target.id
+    if (
+        seed.settings.dungeon_items == "all_anywhere"
+        and info.type in {"BossKey", "GanonBossKey", "Map", "Compass"}
+        and info.dungeon in DUNGEON_TARGETS
+    ):
+        return None
     if world.regions[world.locations[location].region].dungeon != info.dungeon:
         what = "small-key target" if info.type == SMALL_KEY else "named grant"
         raise PatchError(f"{location}: {item} lies outside {info.dungeon}, which has no {what}")
@@ -262,7 +270,7 @@ def make_plan(
     With ``anywhere`` a small key outside its dungeon's area is named (:func:`_named_key`).
     Other moved items retain native grants wherever present; small-chest map/compass/boss
     pickups and physical off-area destinations need source-bound dungeon credit."""
-    anywhere = seed.settings.dungeon_items == "anywhere"
+    anywhere = seed.settings.dungeon_items in {"anywhere", "all_anywhere"}
     changes, unchanged = [], []
     overrides = overrides or {}
     for name in seed.shuffled:
@@ -277,7 +285,14 @@ def make_plan(
         actor = overrides[name] if name in overrides else items.actor(item)
         for chest in links.chests[name]:
             named_key = _named_key(seed, name, item, chest.area) if anywhere else None
-            if chest.vanilla_item == actor and named_key is None and item not in CHAINS:
+            info = seed.world.items[item]
+            target = DUNGEON_TARGETS.get(info.dungeon)
+            off_area = (
+                target is not None
+                and target.id != chest.area
+                and info.type in {"SmallKey", "BossKey", "GanonBossKey", "Map", "Compass"}
+            )
+            if chest.vanilla_item == actor and not off_area and named_key is None and item not in CHAINS:
                 unchanged.append((name, chest.id))
                 continue
             event, kept_event = None, None
@@ -291,7 +306,6 @@ def make_plan(
                 if event.patch != REMOVE:
                     kept_event = event
                     event = None
-            info = seed.world.items[item]
             dungeon_item = None
             if named_key is None and info.type in {"SmallKey", "BossKey", "GanonBossKey", "Map", "Compass"}:
                 target = DUNGEON_TARGETS.get(info.dungeon)
@@ -304,7 +318,10 @@ def make_plan(
                     if target is None:
                         raise PatchError(f"{name}: no native dungeon-item target for {item}")
                     dungeon_item = DungeonGrant(
-                        target.id, family, native_boss=family == "BossKey" and target.id == chest.area
+                        target.id,
+                        family,
+                        named=off_area,
+                        native_boss=family == "BossKey" and target.id == chest.area,
                     )
                     if source_for(chest.actor, kept_event.name if kept_event else None) is None:
                         raise PatchError(f"{name}: no played dungeon-item opening contract for {chest.actor}")

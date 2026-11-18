@@ -11,9 +11,9 @@ help = "Choose where you want to find shuffled rewards. Point at a card to see w
 [dungeon_items]
 label = "Dungeon items"
 kind = "choice"
-choices = ["own_dungeon", "anywhere"]
+choices = ["own_dungeon", "anywhere", "all_anywhere"]
 group = "Items"
-help = "Choose whether small keys stay in their own dungeon or can be in chests anywhere. Boss keys, maps and compasses always stay in their own dungeon."
+help = "Choose whether dungeon items stay in their own dungeon or can be in chests anywhere. Small keys anywhere moves only small keys; boss keys, maps and compasses stay in their own dungeon. All dungeon items anywhere is experimental and moves all of them."
 [songs]
 label = "Song placement"
 kind = "choice"
@@ -138,6 +138,7 @@ Token = "Gold Skulltula tokens"
 [dungeon_items.labels]
 own_dungeon = "Own dungeon"
 anywhere = "Small keys anywhere"
+all_anywhere = "All dungeon items anywhere (experimental)"
 [songs.labels]
 song = "Song checks only"
 anywhere = "Anywhere supported"
@@ -182,6 +183,7 @@ Token = "Gold Skulltulas can give other rewards, and tokens can be found in shuf
 [dungeon_items.choice_help]
 own_dungeon = "Find a dungeon's keys, maps and compasses only inside that dungeon."
 anywhere = "Small keys can be in any shuffled chest, including other dungeons and the overworld. The pickup message names the key's dungeon (in English in every language). The game's key counters only show the dungeon you are in."
+all_anywhere = "Experimental, off by default: built, but not yet played in game. Small keys, boss keys (Ganon's Castle's too), maps and compasses can be in any shuffled chest, including other dungeons and the overworld. Both pickup messages name the target dungeon in English in every language. Other kinds of check never hold a dungeon item outside its own dungeon. Needs Chest shuffle."
 [songs.choice_help]
 song = "Find songs only at the usual song rewards."
 anywhere = "Songs can appear in the other places you shuffle. Song of Storms and Minuet of the Forest have been played after finding them in chests."

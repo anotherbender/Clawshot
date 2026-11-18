@@ -69,7 +69,7 @@ The [Tracker tab](docs/tracker.md) reads saved inventory and per-dungeon keys, w
 
 - **Shuffled now:** chests, shop shelves, NPC gifts and songs, one-time Deku Scrub sales.
 - **Optional:** boss Heart Containers, floor Heart Pieces, Gold Skulltulas (requires chests),
-  and small keys outside their own dungeon (opt-in **Small keys anywhere**; boss keys, maps and compasses never leave).
+  and small keys outside their own dungeon (opt-in **Small keys anywhere**). Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys; built, not yet played in game.
 - **Not shuffled yet:** cows, dungeon rewards, pots, crates and loose rupees.
 
 Choose the kinds you want. The UI starts with Recommended; the generator's Defaults shuffle chests
@@ -112,10 +112,11 @@ later escape/moat order repair and immediate child-return clock clear passed on 
 The first-arrival lighting repair awaits v5 play checks. For new seeds; no save-repair or older-seed compatibility guarantee.
 
 Cows, dungeon completion rewards, pots, crates and loose rupees are not shuffled.
-Of the dungeon items, only small keys can leave their dungeon, and only when you opt in:
-**Small keys anywhere** puts them in any shuffled chest, including other dungeons and the overworld.
-Boss keys, maps and compasses always stay in their own dungeon, and defaults and both presets keep
-every dungeon item home. A key found outside its dungeon names that dungeon in its pickup messages
+**Small keys anywhere** puts the dungeon chest keys in any supported shuffled chest,
+including other dungeons and the overworld. Experimental **All dungeon items anywhere**
+also releases maps, compasses and boss keys, including Ganon's Castle's boss key; that new
+mode is built and untested in game. Defaults and both presets keep every dungeon item home.
+A dungeon item found outside its dungeon names that dungeon in its pickup messages
 (English in every language); the game's key counters still show only the dungeon you are in. The
 played gates cover key chests in and out of dungeons, correct credit, door spending and reloads,
 plus presentation on a whole generated anywhere seed. Not every combination or a full

@@ -267,6 +267,13 @@ class _Compiler:
             return self.nodes[key]
         chart = self.chart(flow)
         old = self.old_chart(flow).events[index]
+        grant = self.grants[target]
+        if mode == "content" and grant.named and grant.family == "BossKey" and isinstance(old, evfl.ActionEvent):
+            actor = self.old_chart(flow).actors[old.actor]
+            if actor.name == "UISystemActor" and actor.actions[old.action] == "EventTriggerSetDisplayBossKey":
+                # This indicator belongs to the standing dungeon, not the remotely credited one.
+                self.nodes[key] = self.clone_node(flow, old.next, target, mode)
+                return self.nodes[key]
         if mode == "wrapper" and isinstance(old, evfl.ActionEvent):
             actor = self.old_chart(flow).actors[old.actor]
             if (
@@ -391,7 +398,7 @@ class _Compiler:
                 raise PatchError("unexpected pouch grant in named chest path")
             chart.events[index] = self.grant_event(event.name, target, event.next)
         elif flow == POUCH and actor.name == "SystemTextNPC" and operation == "EventTalk" and grant.named:
-            message, caption = key_text.labels(grant.target)
+            message, caption = key_text.labels(grant.target, grant.family)
             if params.get("MessageId") == "EventFlowMsg/Dm_SY_Get:GetMessage":
                 params["MessageId"] = message
             elif params.get("MessageId") == "EventFlowMsg/Dm_SY_Get:GetCaption":
@@ -591,5 +598,5 @@ def changes(romfs: str | Path, plan: Plan, *, prior_changes: Sequence[FileChange
             for change in plan.changes
         ],
     )
-    transforms.update(key_text.changes(romfs, [grant.target for grant in grants if grant.named]))
+    transforms.update(key_text.changes(romfs, [grant for grant in grants if grant.named]))
     return new_plan, transforms

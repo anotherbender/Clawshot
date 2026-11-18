@@ -5,7 +5,7 @@ import pytest
 from clawshot.formats import msbt, sarc, zsdic
 from clawshot.formats.msbt import Msbt, Tag
 from clawshot.patch import key_targets, key_text, text
-from clawshot.patch.key_targets import KeyTarget
+from clawshot.patch.key_targets import DungeonGrant, KeyTarget
 from clawshot.patch.plan import PatchError
 
 GET = "EventFlowMsg/Get.msbt"
@@ -224,3 +224,30 @@ def test_dump_every_language_gains_only_the_same_english_pairs(romfs):
     captions = [msbt.plain(parts) for label, parts in english.items() if label.endswith("_GetCaption")]
     assert len(set(mains)) == len(set(captions)) == len(ids)
     assert all(caption.startswith("Opens one locked door.\nDungeon: ") for caption in captions)
+
+
+def test_mixed_named_families_keep_distinct_labels_and_use_dump_names(targets, monkeypatch, tmp_path, zsdic_pack):
+    monkeypatch.setattr(key_text, "DUNGEON_TARGETS", targets)
+    nouns = {"SmallKey": "Tiny Key", "BossKey": "Great Key", "Map": "Chart", "Compass": "Needle"}
+    pouch = {f"Item_Dungeon_{family}_Name": [noun] for family, noun in nouns.items()}
+    romfs = write_romfs(
+        tmp_path,
+        zsdic_pack,
+        {"USen": archive(ENGLISH, pouch), "EUde": archive(FOREIGN, pouch)},
+    )
+    grants = [DungeonGrant("GroveTemple", family, named=True) for family in nouns]
+    changes = key_text.changes(romfs, [*grants, grants[0]])
+    for language in ("USen", "EUde"):
+        path = text.archive_path(language)
+        before = zsdic.Dictionaries.from_romfs(romfs).decompress(path, (romfs / path).read_bytes())
+        files = sarc.read(changes[path](before))
+        messages = msbt.read(files[key_text.GET_TEXT]).messages
+        for family, noun in nouns.items():
+            main, caption = map(message_label, key_text.labels("GroveTemple", family))
+            assert messages[main] == [f"{noun} (Grove Shrine)"]
+            assert "Dungeon: Grove Shrine" in msbt.plain(messages[caption])
+        assert {label: messages[label] for label in NATIVE_GET} == NATIVE_GET
+        assert others(files, key_text.GET_TEXT) == others(sarc.read(before), key_text.GET_TEXT)
+    assert key_text.changes(romfs, list(reversed(grants)))[text.archive_path("USen")](before) == changes[
+        text.archive_path("USen")
+    ](before)

@@ -23,9 +23,17 @@ from clawshot.world.model import World
 from clawshot.world.rules import ADULT, CHILD
 from clawshot.world.search import Search
 
-DUNGEON_ITEM_CHOICES = ("own_dungeon", "anywhere")
 SMALL_KEY = "SmallKey"
 """The item type ``anywhere`` lets out of its dungeon, into chests only."""
+RELEASED_DUNGEON_ITEM_TYPES: dict[str, frozenset[str]] = {
+    "own_dungeon": frozenset(),
+    "anywhere": frozenset({SMALL_KEY}),
+    "all_anywhere": frozenset({SMALL_KEY, "BossKey", "GanonBossKey", "Map", "Compass"}),
+}
+"""The dungeon item types each ``dungeon_items`` mode lets out of their dungeon, into chests only: a chest's
+source-bound grant credits their dungeon from elsewhere (``clawshot.patch.key_targets``). ``all_anywhere`` is
+experimental (built, not played). Key rings and silver rupees never leave."""
+DUNGEON_ITEM_CHOICES = tuple(RELEASED_DUNGEON_ITEM_TYPES)
 SHOP_ONLY_PREFIX = "Buy "
 """Bought goods (``Buy ...``: refills, ammo, Bombchus, bottle contents, hearts, magic jars) go only to shop shelves, in
 every seed, whatever the settings hold (Claude, 2026-11-14, Round 15 family table: no adapter this round). A shelf
@@ -78,8 +86,10 @@ class Settings:
     """What a seed shuffles. ``shuffle`` lists OoT Randomizer location types whose items are shuffled among
     themselves, or ``Token`` for the Gold Skulltulas (``clawshot.generate.tokens``, never the raw ``GS Token``);
     every other location keeps its vanilla item. ``dungeon_items`` keeps a dungeon's keys, maps and
-    compasses in that dungeon (``own_dungeon``) or also lets its small keys out, into any chest (``anywhere``; boss
-    keys, maps and compasses still stay). ``logic`` overrides logic settings from ``settings.toml``.
+    compasses in that dungeon (``own_dungeon``), also lets its small keys out, into any chest (``anywhere``; boss
+    keys, maps and compasses still stay), or lets all of them out, Ganon's Castle's boss key included, into any
+    chest (``all_anywhere``, experimental; needs ``Chest`` shuffled). ``logic`` overrides logic settings from
+    ``settings.toml``.
 
     ``areas`` and ``goal`` cut the world down to a slice (a playtest of a few areas): only the regions in those
     census areas (Banc folders) and the area-less start regions, with ``goal`` in place of the world's. Empty: the
@@ -142,6 +152,8 @@ class Settings:
             raise ValueError("logic must contain finite JSON values") from error
         if self.dungeon_items not in DUNGEON_ITEM_CHOICES:
             raise ValueError(f"dungeon_items must be one of {DUNGEON_ITEM_CHOICES}, not {self.dungeon_items!r}")
+        if self.dungeon_items == "all_anywhere" and "Chest" not in self.shuffle:
+            raise ValueError("dungeon_items 'all_anywhere' moves items only into shuffled chests: shuffle Chest")
         if self.goal is not None and not self.areas:
             raise ValueError("a goal is given only with the areas of a slice")
         if self.songs not in ("song", "anywhere"):
@@ -236,13 +248,12 @@ class Settings:
 
 
 def is_restricted(world: World, settings: Settings, item: str) -> bool:
-    """Whether ``item`` must stay in its own dungeon: every dungeon item with ``own_dungeon``; with ``anywhere``,
-    every one but the small keys, the only dungeon items a named grant can credit from elsewhere
-    (``clawshot.patch.key_targets``). Boss keys, maps and compasses stay in their dungeon in both modes."""
+    """Whether ``item`` must stay in its own dungeon: a dungeon item whose type its ``dungeon_items`` mode does not
+    release (:data:`RELEASED_DUNGEON_ITEM_TYPES`). With ``own_dungeon`` every one; with ``anywhere`` every one but
+    the small keys (boss keys, maps and compasses stay); with ``all_anywhere`` only the types no chest grant
+    credits (key rings, silver rupees)."""
     info = world.items[item]
-    if info.dungeon is None:
-        return False
-    return settings.dungeon_items == "own_dungeon" or info.type != SMALL_KEY
+    return info.dungeon is not None and info.type not in RELEASED_DUNGEON_ITEM_TYPES[settings.dungeon_items]
 
 
 def _in_dungeon_area(world: World, location: str, dungeon: str) -> bool:
@@ -290,7 +301,7 @@ def allowed(world: World, settings: Settings, location: str, item: str) -> bool:
     dungeon = world.items[item].dungeon
     if dungeon is None or _in_dungeon_area(world, location, dungeon):
         return True
-    # A small key outside its dungeon needs a named grant, which only a chest's binding can carry.
+    # A released dungeon item outside its dungeon needs a source-bound grant, which only a chest's binding can carry.
     return not is_restricted(world, settings, item) and location_type == "Chest"
 
 

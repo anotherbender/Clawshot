@@ -229,7 +229,12 @@ def test_every_target_and_family_event_name_fits_the_string64_parameter():
         for family in ITEMS
         if family != "SmallKey" or target.id in keyed
     ]
-    grants += [DungeonGrant(target, "SmallKey", named=True) for target in sorted(keyed)]
+    grants += [
+        DungeonGrant(target.id, family, named=True)
+        for target in DUNGEON_TARGETS.values()
+        for family in ITEMS
+        if family != "SmallKey" or target.id in keyed
+    ]
     grants += [DungeonGrant(target.id, "BossKey", native_boss=True) for target in DUNGEON_TARGETS.values()]
     bindings, _, new_rows, _, _ = compile_grants([(source, grant) for source in SOURCES for grant in grants])
     _, rows = key_sources()
@@ -310,3 +315,18 @@ def test_native_and_off_area_boss_bindings_do_not_share_a_grant_or_cross_credit(
     assert other.state["DungeonInfo.ForestTemple.IsGetBossKey"] is True
     assert other.state["DungeonInfo.InsideTheDekuTree.IsGetBossKey"] is False
     assert not [operation for operation in other.trace if operation.startswith("EventGetDungeon")]
+
+
+@pytest.mark.parametrize("source", CHESTS)
+@pytest.mark.parametrize("family", ["BossKey", "Map", "Compass"])
+def test_named_dungeon_reward_sets_only_target_ownership_and_names_it_without_local_indicator(source, family):
+    grant = DungeonGrant("ForestTemple", family, named=True)
+    run, event, _ = _bound(source, grant, ITEMS[family])
+    expected = _granted(run.state, grant)
+    run.event(event)
+    assert run.state == expected
+    assert run.messages == list(labels(grant.target, family))
+    assert run.windows == [ITEMS[family]]
+    assert run.pouch == []
+    assert run.boss_display is False
+    assert not [operation for operation in run.trace if operation.startswith("EventGetDungeon")]

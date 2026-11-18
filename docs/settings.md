@@ -363,9 +363,16 @@ dungeon or nothing.
 `--dungeon-items anywhere` (the UI choice **Small keys anywhere**) moves **small keys only**,
 into shuffled chests whose access and native opening contracts permit it, including other dungeons
 and the overworld. An off-dungeon key is delivered as a named chest grant; no other shuffled kind can grant one.
-Boss keys (Ganon's Castle included), maps and compasses stay in their own dungeon in both
-modes. With anywhere, the statue's two hand chests may hold a small key, named to its own
-dungeon, so it is not lost.
+The experimental `--dungeon-items all_anywhere` (UI: **All dungeon items anywhere**) also
+releases maps, compasses and boss keys, including Ganon's Castle's boss key, into supported
+shuffled chests. It is off in defaults and both presets. Source-bound grants write only the
+intended dungeon's saved ownership flag, never the standing dungeon's. Both pickup messages
+name the item and its target dungeon in English in every language. An off-area boss key
+does not animate the standing dungeon's boss-key indicator. This new mode is **built,
+untested in game**; it does not shuffle dungeon-completion rewards or change the bridge.
+
+In either anywhere mode, the statue's two hand chests may hold a named small key.
+Only `all_anywhere` allows named maps, compasses and boss keys there.
 
 Dungeon-item delivery uses the native grant where it already works: own-dungeon small keys
 in small chests and all four families in big chests. Moved small-chest maps and compasses
@@ -378,9 +385,9 @@ opening passed in-game. Boss-door reload persistence is untested: the arena prev
 Previously generated seeds can lose these three items from small chests. Rebuilding a mod
 does not re-award a chest already opened in an existing save.
 
-Every physical copy of a destination must support that named opening. The Hyrule Field heart-piece
-chest does not have a played named-key opening contract, so it cannot hold an off-dungeon small key.
-It remains shuffled for other eligible rewards; it has not been enabled by assuming it opens like another chest.
+Every physical copy of a destination must support its source-bound opening. The Hyrule Field
+heart-piece chest lacks that contract, so it cannot hold off-dungeon keys, maps or compasses.
+It remains shuffled for other eligible rewards; no new opening is assumed.
 
 A key found outside its dungeon names that dungeon in both pickup messages — for example
 "Small Key (Forest Temple)" and the caption "Opens one locked door." / "Dungeon: Forest Temple" —

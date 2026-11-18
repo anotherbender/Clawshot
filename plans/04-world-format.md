@@ -368,6 +368,18 @@ Gauntlets chest asks for 5 keys, and the vanilla child side holds 2. The all-che
 dungeon's small keys and a Slingshot from the start: vanilla's first Slingshot is self-locked by the no-save-warp
 entry policy. Separate regressions prove that refusal; generated seeds exercise normal key/escape-tool placement.
 
+**Dungeon-item placement modes (Round 17, #14).** `own_dungeon` retains physical Banc
+attribution. `anywhere` releases ordinary small keys only; `all_anywhere` also releases
+maps, compasses, boss keys and Ganon's boss key. Released items remain chest-only outside
+their own Banc, with every physical copy checked against the source-opening contract.
+The new mode normalizes `keysanity=true` metadata; no live remake rule reads it. Existing
+`anywhere` recipes retain their released metadata. The translated Fire non-keysanity
+shortcut is overridden by an unconditional eight-key requirement in the remake. Boss-door rules require each dungeon's
+specific boss key, so no completion-based shortcut is substituted. Source-bound event
+graphs write exactly `DungeonInfo.<target>.IsGetMap/IsGetCompass/IsGetBossKey`, even when
+the source chest's generic actor is unchanged. The default and presets stay own-dungeon.
+This new off-area family delivery has not yet been played; see `rounds/r17-dungeon-items.md`.
+
 **No-save-warp return certificate (Round 16 first slice).** Native data names `softlock_anchors` by age
 (child Link's House or Kokiri Forest, adult Temple of Time), `softlock_virtual_regions` for nonphysical
 spawn/song dispatchers, and the evidenced physical `softlock_verified_regions`. The first accepted slice

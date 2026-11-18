@@ -71,8 +71,9 @@ def main(argv: list[str] | None = None) -> int:
         "--dungeon-items",
         choices=DUNGEON_ITEM_CHOICES,
         help=(
-            "own_dungeon (default), or small keys in shuffled chests anywhere; "
-            "boss keys, maps and compasses always stay in their own dungeon"
+            "own_dungeon (default); anywhere: small keys in shuffled chests anywhere, boss keys, maps and compasses "
+            "stay in their own dungeon; all_anywhere (experimental, built but unplayed, needs Chest): small keys, "
+            "boss keys including Ganon's, maps and compasses in shuffled chests anywhere"
         ),
     )
     parser.add_argument(

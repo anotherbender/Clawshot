@@ -30,7 +30,8 @@ def world_spec(spec: Mapping[str, Any], settings: Settings) -> Mapping[str, Any]
 def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, World]:
     """The settings as a seed uses them, and the world they build.
 
-    With ``dungeon_items = "anywhere"`` the logic setting ``keysanity`` is set too, where the world has it.
+    With ``dungeon_items`` ``anywhere`` or ``all_anywhere`` the logic setting ``keysanity`` is set too, where the
+    world has it.
     ``open_forest`` and the legacy ``skip_mido`` rule flag derive from the same forest mode the overlay patches.
     With ``Token`` shuffled, Gold Skulltulas become Token checks held to their admitted reward families.
     Native setup also uses this compilation before its pool overrides are known. The UI checks return-kit
@@ -58,9 +59,13 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
             modes = spec["settings"].get(source, {})
             if source in spec["settings"]:
                 logic[target] = modes.get(settings.door_of_time, spec["settings"][target])
-    if settings.dungeon_items == "anywhere" and "keysanity" in spec.get("settings", {}):
+    # Preserve released anywhere recipes. Native keysanity is an inert flag after remake overrides;
+    # normalize that namespace only for the new mode, not existing small-key seed strings.
+    tables = ("settings", "flags") if settings.dungeon_items == "all_anywhere" else ("settings",)
+    has_keysanity = any("keysanity" in spec.get(table, {}) for table in tables)
+    if settings.dungeon_items in ("anywhere", "all_anywhere") and has_keysanity:
         if logic.get("keysanity") is False:
-            raise FillError("dungeon_items = 'anywhere' needs the logic setting keysanity = true")
+            raise FillError(f"dungeon_items = {settings.dungeon_items!r} needs the logic setting keysanity = true")
         logic["keysanity"] = True
     settings = replace(settings, logic=logic)
     if "Shop" in settings.shuffle:

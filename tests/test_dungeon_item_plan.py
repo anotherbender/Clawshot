@@ -17,9 +17,10 @@ from test_key_model import (
 )
 
 from clawshot.generate import Seed, Settings
+from clawshot.generate.fill import allowed
 from clawshot.patch import items as item_actors
 from clawshot.patch.key_targets import DungeonGrant
-from clawshot.patch.plan import PatchError, link, make_plan
+from clawshot.patch.plan import Links, PatchError, link, make_plan, restrict_event_openings
 from clawshot.patch.write import patch_tree
 from clawshot.world import build_world
 
@@ -86,3 +87,61 @@ def test_ganons_castle_boss_key_uses_the_boss_key_saved_field():
     (change,) = plan.changes
     assert change.dungeon_item == DungeonGrant("InsideGanonCastle", "BossKey", native_boss=True)
     assert change.dungeon_item.field == "DungeonInfo.InsideGanonCastle.IsGetBossKey"
+
+
+@pytest.mark.parametrize("kind", ["Obj_TBox_A_01", "Obj_TBox_A_02"])
+@pytest.mark.parametrize("item,family", [(FIRE_MAP, "Map"), (FIRE_COMPASS, "Compass"), (FIRE_BOSS_KEY, "BossKey")])
+def test_off_area_same_generic_actor_still_rebinds_to_the_target_dungeon(item, family, kind):
+    world = build_world(world_spec())
+    chest = replace(
+        next(c for c in CENSUS if c.id == 501),
+        actor=kind,
+        area="ForestTemple",
+        vanilla_item=TABLE.actor(item),
+    )
+    links = link(world, ["Fire Key Chest"], DEFINITIONS, [chest])
+    seed = Seed(
+        world,
+        1,
+        Settings(dungeon_items="all_anywhere"),
+        {"Fire Key Chest": item},
+        ["Fire Key Chest"],
+        [["Fire Key Chest"]],
+    )
+    plan = make_plan(seed, links, TABLE, EVENTS)
+    (change,) = plan.changes
+    assert change.dungeon_item == DungeonGrant("FireTemple", family, named=True)
+    assert change.named_key is None
+    assert plan.unchanged == []
+
+
+def test_all_anywhere_ganon_boss_key_is_credited_to_castle_not_source():
+    spec = world_spec()
+    item = "Boss Key (Ganons Castle)"
+    spec["items"][item] = {"type": "GanonBossKey"}
+    world = build_world(spec)
+    chest = replace(next(c for c in CENSUS if c.id == 501), vanilla_item="Item_Dungeon_BossKey")
+    links = link(world, ["Fire Key Chest"], DEFINITIONS, [chest])
+    seed = Seed(
+        world,
+        1,
+        Settings(dungeon_items="all_anywhere"),
+        {"Fire Key Chest": item},
+        ["Fire Key Chest"],
+        [["Fire Key Chest"]],
+    )
+    (change,) = make_plan(seed, links, item_actors.load(), EVENTS).changes
+    assert change.dungeon_item == DungeonGrant("InsideGanonCastle", "BossKey", named=True)
+
+
+@pytest.mark.parametrize("item", [FIRE_MAP, FIRE_COMPASS, FIRE_BOSS_KEY])
+def test_every_physical_copy_must_support_the_off_area_dungeon_grant(item):
+    spec = world_spec()
+    world = build_world(spec)
+    name = "Fire Key Chest"
+    supported = replace(next(c for c in CENSUS if c.id == 501), area="ForestTemple")
+    unsupported = replace(supported, id=9001, actor="Obj_TBox_A_01_memo11", event=None)
+    for copies, eligible in (([supported], True), ([supported, unsupported], False)):
+        native = build_world(restrict_event_openings(spec, world, Links({name: copies}, {}, []), EVENTS))
+        assert allowed(native, Settings(dungeon_items="all_anywhere"), name, item) is eligible
+        assert allowed(native, Settings(dungeon_items="all_anywhere"), name, "Rupees (5)")

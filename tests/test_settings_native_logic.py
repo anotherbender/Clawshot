@@ -63,6 +63,7 @@ def test_unpaired_access_override_is_refused_at_every_native_boundary(name, valu
         ({"logic": {"free_time_travel": True}}, "free_time_travel", True),
         ({"logic": {"age_return_guarantee": False}}, "age_return_guarantee", False),
         ({"dungeon_items": "anywhere", "logic": {"keysanity": True}}, "keysanity", True),
+        ({"dungeon_items": "all_anywhere"}, "keysanity", True),
         ({"forest": "closed_deku", "logic": {"open_forest": "closed_deku"}}, "open_forest", "closed_deku"),
         ({"forest": "open", "logic": {"open_forest": "open"}}, "open_forest", "open"),
         ({"forest": "open", "logic": {"skip_mido": True}}, "skip_mido", True),

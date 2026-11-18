@@ -53,7 +53,7 @@ DUNGEON_TARGETS = MappingProxyType(
 
 @dataclass(frozen=True, order=True)
 class DungeonGrant:
-    """A source-bound reward. Only off-dungeon small keys need replacement pickup text."""
+    """A source-bound reward. Off-dungeon pickups name their target in both get-window messages."""
 
     target: str
     family: str
@@ -64,7 +64,7 @@ class DungeonGrant:
     @property
     def id(self) -> str:
         if self.named:
-            return self.target
+            return self.target if self.family == "SmallKey" else f"Named{self.family}_{self.target}"
         family = "NativeBossKey" if self.native_boss else self.family
         return f"{family}_{self.target}"
 

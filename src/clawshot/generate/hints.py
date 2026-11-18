@@ -15,8 +15,8 @@ The kinds, their weights and Clawshot's wording are data (``data/hints.toml``); 
   collected (OoT Randomizer's ``can_reach_hint``): the stone never needs the item it points at. Hints naming no
   location (barren areas, junk) go on any stone; junk takes the unreadable stones first.
 - **Way of the Hero.** A shuffled location is required when the goal cannot be reached with its item withheld.
-  Restricted dungeon items (a dungeon's own keys, maps and compasses with ``dungeon_items = "own_dungeon"``) are
-  not hinted this way, as in OoT Randomizer.
+  Restricted dungeon items (those the chosen placement mode keeps in their own dungeon) are not hinted this
+  way, as in OoT Randomizer. Released small keys and boss keys remain eligible.
 - **Barren.** An area none of whose shuffled locations is required or holds a major item (progression, not a shop
   refill, Gold Skulltula token, heart, Bombchu pack or restricted dungeon item). Stricter than OoT Randomizer, which
   also calls an area barren when its major items are surplus copies.
