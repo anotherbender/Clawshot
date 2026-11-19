@@ -34,6 +34,61 @@ def test_rewards_are_exclusively_reward_slots(reward_world):
             assert allowed(world, settings, source, slot["item"])
 
 
+@pytest.mark.parametrize(
+    "gate,early_count",
+    [("has_stones(3)", 3), ("has_medallions(6)", 6), ("'Light Medallion'", 1)],
+)
+@pytest.mark.parametrize("seed", range(12))
+def test_reward_fill_cannot_put_its_required_ordinary_gift_behind_rewards(gate, early_count, seed):
+    from clawshot.generate import generate
+    from clawshot.world.search import Search
+
+    slots = catalog()["slots"]
+    stones = {"Kokiri Emerald", "Goron Ruby", "Zora Sapphire"}
+    items = {
+        slot["item"]: {"stone": slot["item"] in stones, "medallion": slot["item"] not in stones}
+        for slot in slots.values()
+    }
+    items.update({"Boomerang": {}, "Slingshot": {}})
+    names = [name for name, slot in slots.items() if slot["item"] in stones]
+    names += [name for name, slot in slots.items() if slot["item"] not in stones]
+    early = {name: "Boomerang" for name in names[:early_count]}
+    late = {name: "True" for name in names[early_count:]}
+    spec = {
+        "start": "Root",
+        "goal": "has_dungeon_rewards(9) and Boomerang and Slingshot",
+        "items": items,
+        "helpers": {},
+        "locations": {
+            **{name: {"type": "Boss", "vanilla": slot["item"]} for name, slot in slots.items()},
+            "Child Gift": {"type": "NPC", "vanilla": "Slingshot"},
+            "Adult Gift": {"type": "NPC", "vanilla": "Boomerang"},
+        },
+        "regions": [
+            {
+                "name": "Root",
+                "locations": {**early, "Child Gift": "True"},
+                "exits": {"Behind Reward Gate": gate},
+            },
+            {
+                "name": "Behind Reward Gate",
+                "locations": {**late, "Adult Gift": "True"},
+            },
+        ],
+    }
+    settings = Settings(
+        dungeon_rewards=True,
+        shuffle=("NPC",),
+        item_location_types={"Boomerang": ("NPC",), "Slingshot": ("NPC",)},
+    )
+    out = generate(spec, seed, settings, attempts=1)
+    assert out.placements["Child Gift"] == "Boomerang"
+    assert Counter(out.placements[name] for name in slots) == Counter(slot["item"] for slot in slots.values())
+    search = Search(out.world)
+    search.collect_spheres(out.placements)
+    assert out.world.goal(search.counts, "child", 1)
+
+
 def test_owned_door_is_separate_from_native_completion_readers(reward_world):
     _, world = reward_world
     all_rewards = Counter({slot["item"]: 1 for slot in catalog()["slots"].values()})

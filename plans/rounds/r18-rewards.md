@@ -84,7 +84,7 @@ use it as OOT_DUMP, keeping the shared round16 fixture unchanged.
 
 Reward/bridge and owned-stone Door implementations and isolated controls are built.
 Rebased MAIN FINAL focus and the aimed lesson integration fix are verified below.
-Door v2 played positive PASS; two-Stone refusal unplayed. Authorized order is D's running B+D gate → E → F. Sweep/full gate pending; no READY yet.
+Door v2 played positive PASS; two-Stone refusal unplayed. `ac4dd86` sweep FAILED (160 exhausted); full gate STOPPED, E lock released for F+G. Reward palette staging fix passes 55 focused tests and the aimed failed broad seed. New 300-seed sweep pending; final gate after F+G merge, no READY.
 
 ## Implementation and observed focused proof
 
@@ -617,3 +617,83 @@ either game, sweep/synthetic use outer parallelism 12 and
 `CLAWSHOT_WORKERS=12`; dump uses `-n 12` and `CLAWSHOT_WORKERS=4`. With either
 game running, that stage uses outer parallelism 4 (`-n 4` for pytest) and
 `CLAWSHOT_WORKERS=1`. No blanket one-worker cap or cross-stage cached check.
+
+## Rebased final verification after B+D main moved
+
+Claude reported B+D passed on `d3ce136b46991b009a8aa897e56903e98554e799`
+(synthetic 3528 passed/441 skipped; dump 438), merged and pushed as main.
+Per the new instruction, E stopped the obsolete `d2b3617` sweep, rotated
+its ownership token before cancellation, and **retained the same lock
+without a release/reacquire gap**. No old-head full gate was admitted;
+the old sweep and driver records are archived under
+`work/r18-rewards/obsolete-d2b3617/` and do not count toward readiness.
+
+`git rebase d3ce136b46991b009a8aa897e56903e98554e799` replayed all 12 E
+commits cleanly with no conflict. Frozen rebased verification head:
+**`ac4dd8602d43971ddedafa582e6034e7b5961342`**.
+
+Focused synthetic command: `uv run --with pytest-xdist pytest
+tests/test_dungeon_rewards.py tests/test_reward_bridge.py
+tests/test_reward_door.py tests/test_door_story.py
+tests/test_song_lessons.py -m 'not dump' -n 4 -q`, with
+`CLAWSHOT_WORKERS=1` and dump inputs unset. Actual stage-start process
+snapshot found a game running; **308 passed in 9.86 s**, exit 0.
+Receipts: `work/r18-rewards/rebased-focus.log` and
+`rebased-focus-results.json`.
+
+The retained-lock driver's 300-seed sweep completed but FAILED; its full gate
+was subsequently started separately, then stopped immediately on Claude's
+instruction. The results below supersede that attempted verification.
+
+## Failed sweep, released gate, reward palette repair
+
+Frozen `ac4dd8602d43971ddedafa582e6034e7b5961342` completed 300 seeds:
+
+| Recipe | Seeds | Exhausted |
+|---|---:|---:|
+| Broad | 200 | 146 |
+| Defaults | 50 | 0 |
+| Recommended | 50 | 14 |
+
+All 1600 printed failed fill attempts ended in `progression`; 1386/1460
+broad and 136/140 recommended attempts failed on a Spiritual Stone.
+The full gate was stopped as Claude instructed; E verified its token and
+released `gate.lock` for F+G. **No gate pass or READY is claimed.**
+No unchanged sweep rerun, retry increase or accepted-settings relaxation.
+
+Read-only hypothesis check, no dump generation: with all non-reward items
+assumed, zero or two Stones leave only Gohma, King Dodongo and Barinade
+reachable; all three open all nine reward sources. Thus normal closed-Door
+seeds must put the three Stones on the child bosses. The implementation was
+not a random-permutation check: `_fill_restrictive` already removes the
+current item from its assumed inventory. The bug was **stage ordering**:
+`allowed()` imposed a closed reward palette, but preparation never
+registered that palette. Earlier ordinary type-held stages assumed all
+unplaced Stones and could strand a child-boss prerequisite behind the Door.
+The later progression stage could not swap items out of those earlier stages.
+
+Repair: derive the reward palette with the existing restriction convention,
+then let `_fill_palettes` place it before ordinary type-held items. Its
+assumed base excludes the nine rewards; the normal restrictive search handles
+the remaining stage items and excludes the current reward. No new placer,
+retry constant, location, native patch or completion/ownership rule.
+Reward shuffle off returns the original settings unchanged.
+
+Proof: **55 passed** in the focused reward module, including 36 fully
+synthetic consumer cases (three-Stone, six-medallion and Light-only gates;
+12 seeds each; exactly one fill attempt). They verify the ordinary child
+prerequisite, nine-item permutation and independently searched full goal.
+An old-behavior ablation fails 14 of those cases; seed 0's Stone case passed
+and was not misreported as a counterexample. The initial synthetic fixture's
+missing top-level `locations` produced a printed KeyError and was corrected
+in the fixture, not hidden by a production fallback.
+Narrow ruff format/check both pass.
+
+Printed failed broad seed `18051000`, bridge nine rewards, now passes with
+normal beatability in **two attempts, 22 spheres, 27.25 s**; one aimed rerun
+after the cause-directed code change. Receipt:
+`work/r18-rewards/reward-palette-aimed.json`.
+
+Claude's latest order: F+G next; E's fixed 300-seed sweep must have **zero
+exhausted**. E's final integration gate waits for F+G to merge. The sweep
+will record the actual effective `Seed.settings`, not its pre-prepare input.

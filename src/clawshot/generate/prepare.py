@@ -74,9 +74,8 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
     spec = with_shop_prices(spec, settings.shuffle, settings.shop_prices, settings.cheap_deku_shield)
     settings = _hold_shop_goods(spec, settings)
     world = build_world(world_spec(spec, settings), settings.logic)
-    return key_families.restrict_settings(
-        world, restrict_settings(world, tokens.restrict_settings(world, settings))
-    ), world
+    settings = rewards.restrict_settings(world, tokens.restrict_settings(world, settings))
+    return key_families.restrict_settings(world, restrict_settings(world, settings)), world
 
 
 def _hold_shop_goods(spec: Mapping[str, Any], settings: Settings) -> Settings:

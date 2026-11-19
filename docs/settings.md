@@ -350,6 +350,8 @@ It shuffles the three Spiritual Stones and six medallions only among their nine 
 slots, including Rauru's Light Medallion on the first sword pull. Rewards cannot go
 to chests, gifts, shops or Skulltulas, and other items cannot occupy reward slots.
 The first pull still grants the sword and retains the native song/story sequence.
+Placement obeys reachability: in a normal closed-Door seed the three Stones must
+come from Gohma, King Dodongo and Barinade, in a seeded order, before adult rewards.
 
 With reward shuffle on, the **closed Door needs the three owned Spiritual Stones**,
 not child dungeon completions, plus its existing Ocarina of Time, learned Song of Time

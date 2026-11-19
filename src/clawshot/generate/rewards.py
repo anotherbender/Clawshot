@@ -2,12 +2,14 @@
 
 import tomllib
 from collections.abc import Mapping
+from dataclasses import replace
 from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from clawshot.generate.fill import Settings
+    from clawshot.world.model import World
 
 TYPE = "DungeonReward"
 
@@ -63,3 +65,16 @@ def prepare_spec(spec: Mapping[str, Any], settings: "Settings") -> Mapping[str, 
         "helpers": helpers,
         "settings": {**world_settings, "clawshot_bridge_count": settings.bridge_count},
     }
+
+
+def restrict_settings(world: "World", settings: "Settings") -> "Settings":
+    """Stage the closed reward palette before other held items can assume its rewards."""
+    if not settings.dungeon_rewards:
+        return settings
+    given = settings.location_type_items.get(TYPE)
+    palette = tuple(
+        name
+        for name, item in world.items.items()
+        if (item.stone or item.medallion) and (given is None or name in given)
+    )
+    return replace(settings, location_type_items={**settings.location_type_items, TYPE: palette})
