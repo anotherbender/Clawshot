@@ -1,14 +1,16 @@
 """Key families a seed's settings release from their native sources (Round 18, Track F; ``plans/rounds/r18-keys.md``,
 ``plans/rounds/r17-dungeon-items.md`` section 2).
 
-Two native floor-pickup key families leave their place only through settings, never a raw ``shuffle`` kind
+Native floor-pickup key families leave their place only through settings, never a raw ``shuffle`` kind
 (:func:`clawshot.generate.fill.key_source_types`):
 
-- the Bottom of the Well and Shadow Temple floor keys (:data:`FLOOR_SOURCES`), with ``dungeon_items`` ``anywhere`` or
-  ``all_anywhere`` and ``Chest`` shuffled (Kareem via Claude, 2026-11-17: the small-key setting includes them where
-  their sources can carry items). ``own_dungeon`` leaves them native. One source each; the remake's key counts stay;
+- the Bottom of the Well floor key (:data:`FLOOR_SOURCES`), with ``dungeon_items`` ``anywhere`` or
+  ``all_anywhere`` and ``Chest`` shuffled. ``own_dungeon`` leaves it native;
 - the four Gerudo Fortress jail keys (:data:`HIDEOUT_SOURCES`) with ``shuffle_hideout_keys`` (default off, needs
   ``Chest``; Kareem, 2026-11-18).
+
+The Shadow floor adapter is built, held until a natural pre-room save exists (Claude, Round 18).
+Its check remains ``Collectable`` with its native key under every setting.
 
 A seed:
 
@@ -59,11 +61,10 @@ HIDEOUT_KEY = "Small Key (Thieves Hideout)"
 FLOOR_SOURCES: Mapping[str, str] = MappingProxyType(
     {
         "Bottom of the Well Freestanding Key": "Small Key (Bottom of the Well)",
-        "Shadow Temple Freestanding Key": "Small Key (Shadow Temple)",
     }
 )
-"""Floor-key check -> its native key (census ``Obj_Dungeon_SmallKey`` Hashes 17649154319341333603, room 3, and
-12562389953863361839, room 13)."""
+"""Released floor-key check -> native key (Well census Hash 17649154319341333603, room 3).
+Shadow's built adapter is deliberately absent: no setting releases its source."""
 HIDEOUT_SOURCES: Mapping[str, str] = MappingProxyType(
     {f"Gerudo Fortress Jail Key 0{n}": f"Obj_Dungeon_SmallKey_GerudoFortress_0{n}" for n in range(1, 5)}
 )

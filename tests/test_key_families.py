@@ -53,9 +53,9 @@ def test_internal_key_source_types_cannot_be_used_to_bypass_settings(kind):
     [
         ("own_dungeon", False, 0, 0),
         ("own_dungeon", True, 0, 4),
-        ("anywhere", False, 2, 0),
-        ("anywhere", True, 2, 4),
-        ("all_anywhere", True, 2, 4),
+        ("anywhere", False, 1, 0),
+        ("anywhere", True, 1, 4),
+        ("all_anywhere", True, 1, 4),
     ],
 )
 def test_settings_release_exactly_one_check_per_native_source(spec, mode, hideout, floors, jails):
@@ -63,6 +63,10 @@ def test_settings_release_exactly_one_check_per_native_source(spec, mode, hideou
     shuffled = shuffled_locations(world, settings)
     assert len(set(shuffled) & families.FLOOR_SOURCES.keys()) == floors
     assert len(set(shuffled) & families.HIDEOUT_SOURCES.keys()) == jails
+    shadow = world.locations["Shadow Temple Freestanding Key"]
+    assert shadow.type == "Collectable"
+    assert shadow.vanilla == "Small Key (Shadow Temple)"
+    assert shadow.name not in shuffled
     native = [loc for loc in world.locations.values() if loc.vanilla == families.HIDEOUT_KEY and not loc.n64_only]
     assert {loc.name for loc in native} == set(families.HIDEOUT_SOURCES)
     assert "Hideout Gerudo Membership Card" not in shuffled
@@ -93,6 +97,7 @@ def test_native_source_palettes_and_remote_key_destinations_cannot_be_widened(sp
             "Bow",
             "Progressive Hookshot",
             families.HIDEOUT_KEY,
+            "Small Key (Shadow Temple)",
             *(set(families.FLOOR_SOURCES.values()) - {own_key}),
         ]:
             assert not allowed(world, settings, source, other)

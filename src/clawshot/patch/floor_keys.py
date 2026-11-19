@@ -3,6 +3,10 @@
 Each source keeps its native key, or holds the explicit :data:`PALETTE` reward on a key-shaped pickup that keeps the
 native key's whole source contract. Clean room: built from the player's dump and this repository only.
 
+Round 18 hold: only the Well source is admitted by ``generate.key_families``.
+Shadow is built, held until a natural pre-room save exists; its adapter remains available
+for isolated structural research, not seed options. Its native source stays unchanged.
+
 Native contract (build ``e0f3ccfa``, read-only research in ``work/r18-keys/floor`` and ``work/r17-dungeon-items``):
 
 - Both sources are the one placed ``Obj_Dungeon_SmallKey`` of their dungeon's static Banc. The pack is shared by both

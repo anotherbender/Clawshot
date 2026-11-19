@@ -391,11 +391,12 @@ dungeon or nothing.
 `--dungeon-items anywhere` (the UI choice **Small keys anywhere**) moves **small keys only**,
 into shuffled chests whose access and native opening contracts permit it, including other dungeons
 and the overworld. An off-dungeon key is delivered as a named chest grant; no other shuffled kind can grant one.
-Both release modes now include the Well and Shadow Temple floor keys and require Chest shuffle.
-Those floor sources keep their own key or give a red rupee; replacement pickups retain a key-shaped
-model and the native room retirement/reveal wiring. Other dungeons' keys, majors, hearts and shields
-are not floor-key rewards. These two new source adapters are **built, not played**; own-dungeon mode
-leaves their sources untouched.
+Both release modes include the Well floor key and require Chest shuffle.
+Its floor source keeps its own key or gives a red rupee; the replacement retains a key-shaped
+model and native room retirement wiring. Other dungeons' keys, majors, hearts and shields
+are not floor-key rewards. This source adapter is **built, not played**; own-dungeon mode
+leaves it untouched. The Shadow Temple floor key stays vanilla under every setting:
+**built, held until a natural pre-room save exists**. Its adapter is not admitted to generation.
 
 `--shuffle-hideout-keys` (UI: **Fortress jail keys (experimental)**) separately releases the four
 Fortress guard floor keys into supported shuffled chests. Default **off** in both presets;

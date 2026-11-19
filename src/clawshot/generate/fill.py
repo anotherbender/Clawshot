@@ -29,8 +29,8 @@ HIDEOUT_SMALL_KEY = "HideoutSmallKey"
 """The Gerudo Fortress jail keys' item type. No logic dungeon holds them: a chest grants one with named Fortress
 credit (``clawshot.patch.key_targets``), a jail source with its native key."""
 FLOOR_KEY_SOURCE = "KeyPickup"
-"""The Well and Shadow floor-key sources' location type in a seed whose small keys leave their dungeon into shuffled
-chests (``clawshot.generate.key_families``). Chosen by the settings, never a ``shuffle`` kind."""
+"""Released floor-key sources' location type, currently only the Well, when small keys leave their dungeon into
+shuffled chests (``clawshot.generate.key_families``). Chosen by settings, never a ``shuffle`` kind."""
 HIDEOUT_KEY_SOURCE = "HideoutKeyPickup"
 """The four Fortress jail-key sources' location type with ``shuffle_hideout_keys``. Never a ``shuffle`` kind."""
 HIDEOUT_KEY_DESTINATIONS = ("Chest", HIDEOUT_KEY_SOURCE)
@@ -99,7 +99,7 @@ class Settings:
     compasses in that dungeon (``own_dungeon``), also lets its small keys out, into any chest (``anywhere``; boss
     keys, maps and compasses still stay), or lets all of them out, Ganon's Castle's boss key included, into any
     chest (``all_anywhere``, experimental). Both release modes need ``Chest`` shuffled (Round 18: before, ``anywhere``
-    without it was accepted and moved nothing) and also shuffle the Well and Shadow floor keys' sources;
+    without it was accepted and moved nothing) and also shuffle the Well floor key's source; Shadow stays native.
     ``shuffle_hideout_keys`` (needs ``Chest``) shuffles the four Fortress jail keys' sources
     (``clawshot.generate.key_families``). ``logic`` overrides logic settings from ``settings.toml``.
 
@@ -166,7 +166,7 @@ class Settings:
         if self.dungeon_items not in DUNGEON_ITEM_CHOICES:
             raise ValueError(f"dungeon_items must be one of {DUNGEON_ITEM_CHOICES}, not {self.dungeon_items!r}")
         if self.dungeon_items != "own_dungeon" and "Chest" not in self.shuffle:
-            # Round 18: released keys, the Well/Shadow floor keys among them, leave their dungeon only into chests.
+            # Round 18: released keys, the Well floor key among them, leave their dungeon only into chests.
             raise ValueError(
                 f"dungeon_items {self.dungeon_items!r} moves keys only into shuffled chests: shuffle Chest"
             )
