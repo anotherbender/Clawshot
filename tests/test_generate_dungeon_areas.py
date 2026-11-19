@@ -213,15 +213,15 @@ def test_an_all_anywhere_seed_of_the_whole_world_keeps_foreign_dungeon_items_in_
     assert breaks_and_moves(seed)[0] == []
 
 
-def test_both_anywhere_modes_turn_keysanity_on_and_all_anywhere_needs_chests():
+def test_all_anywhere_enables_keysanity_and_both_anywhere_modes_require_chests():
     spec = dungeon_world()
     spec["settings"] = {**spec["settings"], "keysanity": False}
     assert generate(spec, 1, ALL).settings.logic == {"keysanity": True}
     with pytest.raises(FillError, match="'all_anywhere' needs the logic setting keysanity = true"):
         generate(spec, 1, Settings(dungeon_items="all_anywhere", logic={"keysanity": False}))
-    with pytest.raises(ValueError, match="only into shuffled chests: shuffle Chest"):
-        Settings(dungeon_items="all_anywhere", shuffle=("Freestanding",))
-    assert Settings(dungeon_items="anywhere", shuffle=("Freestanding",)).dungeon_items == "anywhere"  # as before
+    for mode in ("anywhere", "all_anywhere"):
+        with pytest.raises(ValueError):
+            Settings(dungeon_items=mode, shuffle=("Freestanding",))
     restored = Settings.from_string(ALL.to_string())
     assert restored == ALL and restored.to_string() != ANYWHERE.to_string()
 

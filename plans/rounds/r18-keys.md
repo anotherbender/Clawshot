@@ -49,8 +49,8 @@ Kareem requested both families, 2026-11-18:
   `Meet_FourCarpenter_ClearEvent`, the card grant and Spirit Step02. Card possession
   alone is not fortress clearance.
 
-All behavior changes are **built, not played** until Kareem accepts the matched
-candidate/control checks on Longshot rc.7. No READY claim yet.
+Kareem accepted the Well/Fortress v3 once-only checks on 2026-11-19 (check11, below).
+Shadow stays held. Historical staging checklists are not additional played claims.
 
 ## Built evidence
 
@@ -465,7 +465,7 @@ but preserve each native key's Large get type and require get events on repeat/f
 pickups, reusing `tokens.POLICY`. Match the source PouchActorInfo get type to its native
 Large value. All four source packs retain their own untouched reason10 writer; guard,
 rescue, door, source Hashes and remote-key writes are unchanged. Cost: Fortress rupees
-use the native get-event/window instead of silent collection. **Built, awaiting play.**
+use the native get-event/window instead of silent collection. **Check11 accepted this repair.**
 
 `OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run pytest
 tests/test_jail_keys.py -q` → **10 passed, 11.15 s**, including all four synthetic
@@ -476,7 +476,7 @@ Scoped Ruff formatting and lint pass. No sweep/full gate or lock taken.
 coffin open and both source Bools false; `120106-r18-well-cand-3` slots03/04 have
 124 rupees and both `BottomOfTheWell_Level_Room_03_Get_SmallKey`/`..._Get_Key` true.
 Its level listener observes Dead without the Fortress reason filter. Well source code
-stays unchanged; its short collected-return check is retained, not presumed played.
+stays unchanged; Kareem passed its short collected-return check in check11.
 
 New isolated once-v3 profiles copy only natural near-source slots, account/options
 and runtime controls byte-identically: Fortress cand-b-5 slot02 (13:02:57, Step01,
@@ -492,3 +492,62 @@ Stable source IDs remain authoritative; the played cell is carpenter016/key04, t
 middle central floor below the chain-link window. Placement-derived landmarks for
 all four cells and the exact native talk trace are in the external
 `work/r18-keys/fortress-played-findings.md`. No suffix-to-torch mapping is claimed.
+
+## Accepted play and corrected F+G gate — 2026-11-19
+
+Claude accepted frozen F `7bf18c3079` after Kareem's **check11 PLAYED PASS**:
+Fortress v3 gives +20 with rupee pickup text, disappears after leaving/returning
+and after Continue; Well v3 gives silent +20, disappears and does not return.
+This is the once-only scope actually reported, not a new claim that every old
+four-guard/card checklist step was played. Shadow remains vanilla and held.
+
+Per Claude's GO after E released its own lock, F rebased cleanly onto B+D main
+`d3ce136b46991b009a8aa897e56903e98554e799`, producing
+`d64f048131b70cf8b986ddb43106a303ef1f2b5b`. G rebased nine commits onto it and
+froze **`623c434acb7ae244096051e493d5240e456760c4`**. F fast-forwarded linearly
+to that stack; no merge, push, game launch or independent G gate.
+
+On that exact stack, native whole-generator sweep:
+
+| Profile | Seeds passed | Exhausted |
+|---|---:|---:|
+| Broad, Fortress keys on | 200 | 0 |
+| Defaults | 50 | 0 |
+| Recommended | 50 | 0 |
+
+Broad includes seeds `2306988613`, `12345` and `1..198`. Each seed runs native
+preparation, placement and beatability; no personal library/seed is read.
+Recipes, per-seed receipts and the first gate are retained under
+`E:/OOTRemake/work/r18-keys/stacked-gate-623c434acb7a/`.
+
+The first full gate printed **466 files already formatted**, Ruff **All checks
+passed**, then **3 failed, 3603 passed, 468 skipped** in synthetic tests; dump
+did not start. Printed failures were stale assertions: error prose for an
+unsupported Deku small-key target; obsolete “not yet played” UI prose; and
+Chest-off acceptance that F deliberately removed for released floor keys.
+Corrected those tests: preserve invalid-grant/no-input-mutation coverage,
+CLI/app settings replay/refusal coverage, and require Chest for both anywhere
+modes. At Claude's request, changed only the shared validation message to the
+plain choice-name sentences below; no validation condition or placement logic
+changed. Updated affected regexes. Scoped formatter: **5 files already formatted**;
+focused corrected consumers: **7 passed, 1.01 s**. Claude explicitly accepted
+the corrections and reuse of the original zero-exhaustion sweep.
+
+Before freezing the correction, actual isolated browser proof selected both
+anywhere modes with **Chests** off. The app displayed
+**“Small keys anywhere needs Chests set to Shuffled.”** and, for the other mode,
+**“All dungeon items anywhere needs Chests set to Shuffled.”** Each also showed
+**“Not applied — fix the setting before generating”**, without a crash or FillError.
+`docs/settings.md` already states both release modes require Chest shuffle.
+Screenshot: `E:/OOTRemake/work/r18-keys/chest-off-plain-message-ui.webp`.
+Only an empty external library and in-memory preferences were used; the proof
+tab/server were closed and its throwaway script removed.
+
+The corrected frozen head's format, lint, full synthetic and full native-dump
+commands/results are recorded in
+`E:/OOTRemake/work/r18-keys/corrected-fg-gate-proof.json`.
+That final receipt names the exact tested head and the separately retained
+original sweep head; only `status: passed` permits READY. Native dump uses
+the read-only RomFS/NUP and F's supplemented layered fixture above. No
+unchanged rerun and no second sweep. F releases only its matching lock token
+after posting the observed outcome.

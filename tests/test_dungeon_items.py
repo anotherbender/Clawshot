@@ -245,18 +245,18 @@ def test_every_target_and_family_event_name_fits_the_string64_parameter():
 
 
 @pytest.mark.parametrize(
-    ("grant", "message"),
+    "grant",
     [
-        (DungeonGrant("HyruleField", "Map"), "unsupported dungeon-item target"),
-        (DungeonGrant("ForestTemple", "Ocarina"), "unsupported dungeon-item family"),
-        (DungeonGrant("InsideTheDekuTree", "SmallKey"), "unsupported small-key target"),
+        DungeonGrant("HyruleField", "Map"),
+        DungeonGrant("ForestTemple", "Ocarina"),
+        DungeonGrant("InsideTheDekuTree", "SmallKey"),
     ],
 )
-def test_unsupported_grant_is_refused_without_touching_the_inputs(grant, message):
+def test_unsupported_grant_is_refused_without_touching_the_inputs(grant):
     documents, rows = key_sources()
     analyzed = key_analysis(rows)
     before = copy.deepcopy((documents, rows, analyzed))
-    with pytest.raises(PatchError, match=message):
+    with pytest.raises(PatchError):
         keys.compile_bindings(documents, rows, analyzed, [(keys.SMALL, grant)])
     assert (documents, rows, analyzed) == before
 

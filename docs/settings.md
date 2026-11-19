@@ -423,7 +423,7 @@ Both release modes include the Well floor key and require Chest shuffle.
 Its floor source keeps its own key or gives a red rupee; the replacement retains a key-shaped
 model and native room retirement wiring. Other dungeons' keys, majors, hearts and shields
 are not floor-key rewards. Kareem observed silent +20 rupees and uncollected recovery;
-post-pickup saves contain both native source flags. Collected re-entry is staged for confirmation.
+post-pickup saves contain both native source flags. Kareem passed collected re-entry on v3 (2026-11-19).
 Own-dungeon mode leaves it untouched. The Shadow Temple floor key stays vanilla under every setting:
 **built, held until a natural pre-room save exists**. Its adapter is not admitted to generation.
 
@@ -433,7 +433,7 @@ Fortress guard floor keys into supported shuffled chests. Default **off** in bot
 drop, staged event pickup and resting pickup remain one check. Replacement rewards are red rupees
 with the native key-shaped floor display and the key's get-event/window, not silent rupee collection.
 That completion writes the source's native once-only Bool; the initial silent candidate repeated
-after re-entry and is superseded. The repair is **built, awaiting re-check**. Chest keys credit only
+after re-entry and is superseded. Kareem passed v3 collection, re-entry and Continue (2026-11-19). Chest keys credit only
 Fortress inventory, not guard defeat, source collection, carpenter rescues or Spirit progress.
 Talk to the Valley carpenter boss and answer Yes before the jailed carpenters. Free all four and
 receive the captain's unchanged card (D39); the card alone does not clear guards.

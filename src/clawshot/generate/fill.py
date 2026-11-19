@@ -168,9 +168,8 @@ class Settings:
             raise ValueError(f"dungeon_items must be one of {DUNGEON_ITEM_CHOICES}, not {self.dungeon_items!r}")
         if self.dungeon_items != "own_dungeon" and "Chest" not in self.shuffle:
             # Round 18: released keys, the Well floor key among them, leave their dungeon only into chests.
-            raise ValueError(
-                f"dungeon_items {self.dungeon_items!r} moves keys only into shuffled chests: shuffle Chest"
-            )
+            choice = "Small keys anywhere" if self.dungeon_items == "anywhere" else "All dungeon items anywhere"
+            raise ValueError(f"{choice} needs Chests set to Shuffled.")
         if sources := sorted(set(self.shuffle) & {FLOOR_KEY_SOURCE, HIDEOUT_KEY_SOURCE}):
             raise ValueError(
                 f"{sources} are not shuffle kinds: floor keys follow dungeon_items, jail keys shuffle_hideout_keys"

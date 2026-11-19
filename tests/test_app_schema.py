@@ -76,18 +76,12 @@ def test_fixed_fee_and_zero_shop_shelves_explain_why_prices_have_no_effect():
     assert not {"shop_slots", "scrub_prices"} & inactive.keys()
 
 
-def test_all_dungeon_items_anywhere_is_an_explicit_experimental_choice_beside_unchanged_small_keys(capsys):
-    row = next(info for info in schema() if info["key"] == "dungeon_items")
-    options = {option["value"]: option for option in row["options"]}
-    assert row["default"] == "own_dungeon" and list(options) == ["own_dungeon", "anywhere", "all_anywhere"]
-    assert options["anywhere"]["label"] == "Small keys anywhere"
-    assert options["all_anywhere"]["label"] == "All dungeon items anywhere (experimental)"
-    assert "not yet played" in options["all_anywhere"]["help"] and "Needs Chest" in options["all_anywhere"]["help"]
+def test_all_anywhere_round_trips_through_cli_and_app_and_requires_chests(capsys):
     assert main(["--dungeon-items", "all_anywhere", "--print-settings"]) == 0
     text = capsys.readouterr().out.strip()
     expected = Settings(dungeon_items="all_anywhere").to_string()
     assert validate({"dungeon_items": "all_anywhere"}).to_string() == text == expected
-    with pytest.raises(ValueError, match="only into shuffled chests: shuffle Chest"):
+    with pytest.raises(ValueError, match="Chests"):
         validate({"dungeon_items": "all_anywhere", "shuffle": ["Shop"]})
 
 

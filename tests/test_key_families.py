@@ -36,7 +36,7 @@ def test_jail_setting_roundtrips_and_cli_explicit_off_overrides_it(capsys):
 
 @pytest.mark.parametrize("mode", ["anywhere", "all_anywhere"])
 def test_moving_keys_without_a_named_chest_destination_is_refused(mode):
-    with pytest.raises(ValueError, match="shuffle Chest"):
+    with pytest.raises(ValueError, match="Chests"):
         Settings(shuffle=("Gift",), dungeon_items=mode)
     with pytest.raises(ValueError, match="shuffle Chest"):
         Settings(shuffle=("Gift",), shuffle_hideout_keys=True)
