@@ -232,3 +232,14 @@ rewards9. Preparation uses the real native gift/floor/shop/chest policy and pool
 then the production fill and beatability oracle. No safety restriction is removed.
 External receipts: `E:/OOTRemake/work/r18-rewards/sweep-results.json` and
 `sweep-rows.jsonl`. They will identify the actual tested head and exhausted counts.
+
+## Revised gate order — Claude, 2026-11-19
+
+- Automatic main-change watcher cancelled; its obsolete external script removed.
+- Main advancing is **not** authorization to rebase or acquire `gate.lock`.
+- Wait for Claude's explicit **MAIN FINAL** thread post after A and D merge, then
+  rebase onto that main, rerun focused checks and follow the assigned lock order
+  for the required sweep and one full gate. Until then, non-lock work only.
+- Existing receipts and staged controls describe their recorded heads, not the
+  future MAIN FINAL. Sweep, full gate and READY remain pending; no played result
+  is claimed.
