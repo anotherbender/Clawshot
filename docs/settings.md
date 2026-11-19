@@ -225,6 +225,13 @@ digging rewards and Deku Scrub purchases exclude both instruments before fill, i
 placements. Chests and direct story grants remain allowed; Ocarina of Time also has its separately
 played Skulltula pickup. The show-item crash is not established to be age-specific.
 
+Ocarinas remain separate fixed items, **not progressive copies**. Newly generated seeds keep the
+native Fairy Ocarina inventory grant, but preserve the selected Ocarina of Time when Time is already
+owned, in either age. Fairy-then-Time stays native. This prevents issue #34's lower-item selection
+overwrite without changing placements, stock, ownership flags or source completion. Built; the paired
+child/adult play check is pending. Existing seed folders/saves are not retroactively repaired, Fairy
+remains child-only, and this is not a no-instrument song-lesson bypass.
+
 ### Cross-age equipment receipts
 
 Age restrictions govern **use**, not ownership. There is no blanket matching-age placement rule.

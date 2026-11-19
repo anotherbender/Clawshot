@@ -215,6 +215,13 @@ and Iron Boots chest rewards are given before their lessons, so those reward rul
 This is a logic safeguard, not a fix for walking into an automatic scene without an instrument.
 Track G owns scene safety. Native sources and fail-first proof: [Round 18 logic](../plans/rounds/r18-logic.md).
 
+The fixed `Ocarina` alias MAX-combines Fairy tier1 and Time tier2; it is not a count of two progressive
+copies. Issue #34 showed that a later Fairy receipt can overwrite the native selected instrument while
+logic retains tier2. New outputs preserve Time selection after the genuine Fairy grant when Time is
+owned; stock, `IsGet`, source flags and the age rules remain native. The implementation awaits its paired
+play check. Older outputs can still violate this active-instrument invariant; owning Time historically
+does not by itself prove that an older save currently selects it.
+
 The independent adult-return proof retains compulsory child story events using the same
 count-cap test as items; optional history is excluded. Both early-door construction bounds include
 `Met Child Zelda` and `Field Owl Arrival`; the closed kit retains its native inventory/story minimum.

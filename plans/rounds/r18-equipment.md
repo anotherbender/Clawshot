@@ -152,3 +152,50 @@ The shield presentation patch adds/modifies **no SwitchEvent**. Actual candidate
 Existing regression assertions already use correct polarity: `tests/test_child_sword.py::run` selects `0 if answer else 1`; the owned/unowned, saved/default, native and repeated-travel tests assert consumer-visible equipment/ownership under both write-visibility models. `tests/test_scrubs.py::guard_destination` uses the same polarity and tests all27 empty/hidden/visible offer combinations through both entrances. `tests/test_scrub_shields.py::run` maps equipped/held/equal to0, otherwise1, with missing cases returning; native-dump tests exercise the actual helper and its two-edge-only delta. No interpreter repair was needed.
 
 Urgent read-only assertions independently checked the actual staged three sword and six-per-flow scrub guard case tables, the r17 main-control tables, every otherwise unchanged native equipment switch and every native shield-presentation switch. All passed. The initial native printer encountered ReturnEvent without params; after printing that exception, only its formatting was corrected to use getattr. No source, save, launcher, mod or test changed; no game was started, no gate rerun.
+
+## Issue34 implementation — r18/ocarina
+
+Claude decision, 2026-11-19: target0.2.3; branch from main `d3ce136`. **Non-demoting Fairy receipt, not progressive.** Every native Fairy add still runs: preserve stock, IsGet, get flags, cleanup and once writes. If Time is already in the pouch, keep `PlayerStatus.EquipOcarina` on Time. Fairy→Time stays native. This supersedes the read-only report's proposed lower-add suppression; that proposal would not satisfy the accepted stock/IsGet contract.
+
+The private issue/log remain external. Complete diagnosis: `work/r18-issue34/findings.md`; no stranger paths or usernames copied. Child Time→Fairy selection is the issue's report. Adult exact-order behavior is still a native-code inference, pending the requested main control; Kareem's earlier adult-Fairy Minuet freeze is separate ground truth.
+
+### Native refresh proof
+
+Native Ocarina grant dispatch `0x011116d4..0x01111704` invokes the equipment setter even with direct equip disabled. Setter `0x00a7b084..0x00a7b12c` writes incoming canonical actor to PlayerStatus member `0x527936b8`, the saved String64 `PlayerStatus.EquipOcarina` (`0xb72cd3fc`). Reader `0x00a76650` reads that selector and its OcarinaTypeValue, Fairy1/Time2.
+
+The live refresh gap is now closed by additional disassembly, not by the sync action's name:
+
+- `UISystemActor.EventTriggerSyncPlayerEquipmentAndPouch` execute `0x02951f50` calls `0x00f201b0` with flag0.
+- `0x00f201b0` reapplies equipment slots13 (`0x00f2025c`) and16 (`0x00f202b0`) among the native slots.
+- Inside `0x02df6c80`, `0x02df71c8..0x02df71f4` maps **both13/16 explicitly to EquipOcarina**. Therefore this sync includes the instrument, not just wearable armour.
+- The helper commits the selector with the already-preloaded `GameSystemActor.EventWait` frame1 **before** sync reads it. Native precedent: GetPouchContent Event61's frame1 before autosave. No new actor, saved flag or scratch field.
+
+This establishes the native mechanism; the staged pickup, held-model and adult-song result remains required.
+
+### Implementation and route coverage
+
+`patch/ocarina.py` composes last, after source gifts, named/progressive chest helpers and bag guards. It never changes a grant's actor, quantity, direct-equip/get/message flags or incoming edges. It inserts only a receipt continuation, then resumes that action's original next node. A shared `GetPouchContent:ClawshotOcarinaKeepTime` checks current Time pouch ownership, sets the selector to Time, waits one native frame and calls native equipment sync.
+
+Argument-driven adds classify the genuine just-received actor through the existing `UI_MessageTargetActorName` identity; their native IsSetMessageTargetActorName=true is validated. Literal Fairy adds need no scratch query. Saria's movie has no GameDataActor: it calls the shared helper rather than adding an actor to the movie.
+
+- GetPouchContent Event0 covers small/big chests and ordinary admitted direct/song/cutscene wrappers.
+- Dm_SY_GetInEvent's three positive argument-driven adds retain their own original continuations; unsafe ocarina hand-over exclusions remain in force.
+- Native Saria Dm_Kokiri_0155/Event68 is covered when still Fairy, even unshuffled.
+- Dm_MelodyGet_Time/Event70 and every earlier-transformed event file are inspected after gift rewrites, so Fairy moved into a direct Time/other admitted source is covered too.
+- Non-Fairy rewards, zero/removals and first Fairy without Time keep native inventory/equipment behavior. A historical Time IsGet without stock cannot fabricate ownership. Native Dream's NecessaryActor refund is not an admitted Fairy source; its message-identity-false path is not guessed from a stale UI field.
+- Source flag/cleanup continuation runs only after restoration; native autosave therefore observes the corrected selector.
+
+### Switch semantics and logic
+
+| Added switch | Case0 true/held | Case1 false/absent | Native example |
+|---|---|---|---|
+| IsFairy, on an argument-driven receipt | Shared post-Fairy helper | Original continuation | ReplaceEquipment Event14 string equality0→matching Deku ownership check,1→next comparison |
+| KeepTimeOwned, Time pouch query | Set Time→frame1→sync | Return to original continuation | ReplaceEquipment Event12 pouch0→preserve/wait,1→clear |
+
+Regression interpreters explicitly use0-if-true, and compare actual native grant side effects/parameters with the candidate while checking live selection after sync. They cover both immediate and frame-buffered explicit GameData writes.
+
+**No placement change; no sweep.** The new transform is appended after `generate` and plan selection. It changes neither pool/admission, alias/counters, logic, RNG nor item identity. Ocarinas stay fixed Fairy/Time, the current MAX Ocarina tier and adult tier2 rule stay; this repair restores their assumed monotonicity. It is not a new start item, progressive chain, adult-Fairy permission, scene bypass or old-save repair. Public output changes and thus belongs to the maintainer's0.2.3 version bump.
+
+### Verification and packet receipts
+
+Focused request completed, real `OOT_ROMFS`, workers1, no lock: **363 passed in254.20s** across `test_ocarina*`, `test_child_sword`, `test_scrub_shields`, `test_scrubs*`, `test_bags`, `test_getitem*`, `test_gifts*` and `test_census_gifts`. Scoped Ruff format completed (3 formatted,1 unchanged); scoped lint passed. No failed/repeated test run. Full gate remains held until F+G release; no shared lock taken. Existing played sword/shield packets untouched. The short issue34 packet is being staged from independent source/save copies; its exact receipt follows.

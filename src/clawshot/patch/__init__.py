@@ -222,7 +222,7 @@ def make_seed(
         *reward_bridge.build(romfs, mode=settings.bridge, count=settings.bridge_count),
     )
     plan = make_plan(out, links, table, chest_events.load(), overrides=custom.actors)
-    from clawshot.patch import keys, progressive, progressive_bonus
+    from clawshot.patch import keys, ocarina, progressive, progressive_bonus
 
     # Darunia's source flag and forward-only Fire step precede Event127's bonus wrapper, which keeps its next.
     changes += (darunia.changes(),)
@@ -232,6 +232,7 @@ def make_seed(
     changes += (key_changes,)
     plan, progressive_changes = progressive.changes(romfs, plan, prior_changes=changes)
     changes += (progressive_changes, bags.changes(romfs))
+    changes += (ocarina.changes(romfs, prior_changes=changes),)
     return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files, token_rows)
 
 
