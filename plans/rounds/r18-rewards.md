@@ -458,3 +458,74 @@ Door/bridge flow code and all staged diagnostic mod bytes are unchanged.
 B and D passed Kareem's play. Their stack, gated by cs18d, now goes immediately
 after cs18g, followed by cs18f, then cs18e. E waits for cs18d's READY and F's
 completed turn before taking `gate.lock`. No automatic runner or lock acquisition.
+
+## Natural post-send-off owned-Door discriminator — Claude's revised steer
+
+The proposed New Game replay was superseded: preserve the real send-off, but
+do not spend Kareem's time repeating Talon, Zelda or Impa. Use a natural
+post-send-off save with fewer than three owned Stones and child completions,
+then acquire the missing kit from actual chests; drop the check if none exists.
+
+Reused the existing 72-slot natural-name scan rather than scanning the same
+2487 backups again. **23 slots qualify** (15 with one Stone/one child completion,
+8 with two/two). Selected earliest `2026-11-07_1630/slot_01`, child in Goron City.
+Fresh read and copied profile match the original progress SHA256
+`ddda83d54c31961dc2ca0da79fb46307e72cadcddd7ba17745c108b52fd6ac85`.
+Mido's blocker is already false. Natural source values:
+
+| Input | Source |
+|---|---|
+| A `HyruleField_ArriveEntrance` | true |
+| S real `Dm_HrlField_0020` send-off | true |
+| B `HrlField_HasEnteredFirstTime_Adult` | false |
+| ENV `HyruleField_ChangeENV` | false |
+| Owned Stones / child completions | Emerald only / Deku only |
+| Fire / Water quest | `DodongoCavernOpne` / `Ready` (both incomplete) |
+| Door / escape / moat | Step02 closed / unplayed / unplayed |
+| Time ocarina / Time song | absent / absent |
+
+No source clock, inventory, flag, position, quest or age edits. Saved flags do
+not certify the live clock. Four ordinary Mido chest Hashes are absent from the
+source's collected-key list; the checklist still requires actual chest
+availability as the first runtime observation, never a repair if already open.
+The Kokiri Sword chest is unnecessary because this source already owns Emerald.
+
+Built from frozen **ea50018295450f035ed8367fe546d9309e7aa4f8**, seed **180520**,
+closed Door, rewards on, forest open and free time travel on for the requested
+early round trip. Four fixed diagnostic bonus grants:
+Mido Top Left Time ocarina, Top Right Time song, Bottom Left Ruby, Bottom Right
+Sapphire. Production's reward-only admission stays unchanged; the normal nine
+reward slots retain their permutation. The bonus checks exist in the world
+before the **normal full-goal fill and beatability proof**; the same production
+chest planner writes their physical actors afterward.
+
+Observed: **183 shuffled locations, 21 spheres, 130 files**, all four chest
+actors read back correctly in both child/adult Banc copies, nine-slot reward
+permutation asserted, original/copy files hash-equal. Romfs digest
+`51389848b2bc60a38a3ce1250e36c8bc63ee9a08ad6a27092fdd37d104bc3d72`.
+This certifies the full-seed model, not an entire randomized playthrough on this
+old save. Explicit diagnostic pins are not encoded by a public settings string.
+
+Two setup failures were printed and corrected before any successful fill:
+`free_time_travel` belongs in `Settings.logic`, not the constructor's keywords;
+the always-progressive pool requires Chest shuffle, not `shuffle=()`.
+The aimed build then passed in **83.29 s**. No production change, lock or full
+gate; exactly one successful seed built.
+
+Packet: `E:/OOTRemake/work/r18-rewards/door-owned-natural-v1/`.
+Launcher: `ingame/Test - owned Door - natural candidate.bat`.
+`packet-proof.json`, `source-proof.json`, `build-chest-pool.log` and
+`launcher-dryrun.json` retain receipts. Actual launcher dry-run selects Longshot
+rc.7, its own unchanged save copy and one mod; no game launch. The isolated
+`read_state.py` was exercised and printed the original ownership/quest/clock
+state with no `mods:` lines yet (unplayed, not a loading pass).
+
+Candidate route: teleport to Forest entrance, obtain four missing items,
+teleport to Market entrance, walk to Temple, play Time song, observe opening
+with Fire/Water incomplete; pull/return child once and observe no premature
+escape/moat or Door re-close. **7–9 minutes estimated/unmeasured, cap 10**.
+Optional **+2 minutes** is worthwhile with entrance teleports: leave Sapphire
+shut, show two-Stone refusal, retrieve it, then show three-Stone admission.
+No Talon/Zelda/Impa replay, controls, fake save or dungeon-completion shortcut.
+The later completion-triggered escape/moat remains outside this short check.
+Launcher posted to `cs-r18` at 11:47. **Built, not played; Claude boot-checks.**
