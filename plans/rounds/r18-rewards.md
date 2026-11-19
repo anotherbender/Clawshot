@@ -153,47 +153,21 @@ without this feature: seventeen native resources, byte-identical decompressed in
 Control digest: `2626b64c0e721f5f845cc254a30d4eabc0f99411d83f23d8a5b20768bd9cd3a8`.
 Exact candidate digests and paths are in external `stage-proof.json`.
 
-### Checklist for Claude to boot-check, then Kareem to play on Longshot rc.7
+### PRIMARY checklist — candidate unknowns only, at most 20 minutes
 
-Use only these launchers, one mod each; `HOS_FS_OVERLAY` is unset. Debug **Teleport
-and clock only**. Do not use inventory, quest, age, noclip or collection cheats.
-Stop on a mismatch; retain the isolated profile and log, never repair a failure.
-For each candidate capture `mods: <file> <- <path>` for the named flow/module and the
-actual inventory/result. Native scene models alone are not an acquisition oracle.
+Current play instructions:
+`E:/OOTRemake/work/r18-rewards/CHECKLIST.md`.
+Three short numbered checks use two existing candidate launchers: Rauru grants
+Fire without Light and persists; that newly acquired Fire is below the two-medal
+bridge threshold; the separate Light-only natural profile meets threshold one
+before the late story. Estimated 11–18 minutes, unmeasured, hard stop at 20.
+Runtime overlay lines and actual inventory/result are required, not scene models.
 
-1. **First pull — 5–8 min per arm.** `Test - first-pull - medals 2 - control.bat`,
-   then its `candidate.bat`. Continue the sole original child snapshot, approach the
-   open pedestal and pull normally. Control: Light Medallion; candidate:
-   **Fire Medallion, no Light Medallion**, plus the native Master Sword and song/story
-   continuation. Source emblem remains Light in both. Inspect owned items, Save and
-   Continue; re-enter the Temple. No second reward or skipped native first-arrival
-   scene. Loaded resource: `Dm_SageRoom_0005.bfevfl.zs`.
-2. **N−1 / N boundary — 2–4 min per arm.** `Test - one-medallion - medals 2 -
-   candidate.bat`: continue, Teleport to adult castle approach, walk across both
-   native contact areas. One owned Light medal is below two: **no bridge**.
-   Separately run `... medals 1 - control.bat` (same natural profile, vanilla
-   bridge: **no bridge**) and `... medals 1 - candidate.bat`: exactly one meets one,
-   so the native rainbow scene/bridge must appear without Light Arrows or the
-   Shadow/Spirit awakenings. Leave/re-enter, Save and Continue: bridge remains.
-   Loaded resource: `Logic/GanonCastle_Level_Field_00_Prefab_14ba.logic.module.ainb`.
-3. **Adult reward and completion separation — 8–15 min per arm.** `Test -
-   forest-warp - medals 2 - control.bat`, then `candidate.bat`. Continue the natural
-   pre-warp Forest snapshot; enter the real blue warp (fight Phantom Ganon if the
-   snapshot is before his last phase; estimate includes that). Control grants Forest;
-   candidate grants **Shadow**, with Forest medal still absent. Native sage scene,
-   forest restoration, Prelude and normal return-to-child pedestal must still work.
-   Save/Continue and re-enter: no second medal. Candidate now owns Light+Shadow:
-   castle approach must open at two, despite Spirit awakening and Light Arrows absent;
-   control's vanilla bridge must remain closed. Loaded reward:
-   `Dm_Awake_Forest_Get.110.bfevfl.zs`. Use normal native travel, not an age cheat.
-4. **Inside boundary — additional 5–10 min, candidate only.** After the early bridge,
-   enter normally. With no Light Arrows, ordinary arrows must not clear a trial core;
-   no trial-clear Bool/count is pre-cleared by the bridge. Do not spend time finishing
-   the castle. This checks that early entry is not a trial skip.
-
-Total short packet, including both controls: **35–65 minutes**, plus 5–10 minutes
-for the optional inside boundary. This does **not** include a new child dungeon run
-or naturally completing the two late sages; neither is hidden inside a short estimate.
+Claude's play-time steer drops every control and vanilla-equivalent observation
+from the current request. No vanilla first pull, Door D1/D2, trials or clock
+detour. Forest's changed reward/completion reader remains a separate unknown,
+not an extra hidden 8–15 minutes in PRIMARY. No rebuild, save edit or launcher
+change; original staging provenance above remains historical evidence.
 
 ## Frozen implementation checks and design handoff
 
