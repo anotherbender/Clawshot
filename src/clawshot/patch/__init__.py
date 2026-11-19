@@ -196,7 +196,7 @@ def make_seed(
         from clawshot.patch.age import changes as age_changes
 
         changes += (age_changes(out.placements, free_time_travel=True),)
-    from clawshot.patch import dampe_safety, door, equipment, reward_bridge, start_items, story_dialogue
+    from clawshot.patch import dampe_safety, door, equipment, mido_schedule, reward_bridge, start_items, story_dialogue
 
     changes += (
         door.changes(out.placements, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
@@ -221,6 +221,9 @@ def make_seed(
         *door.build(romfs, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
         *reward_bridge.build(romfs, mode=settings.bridge, count=settings.bridge_count),
     )
+    kept_mido = settings.forest != "open"
+    changes += (mido_schedule.changes(kept=kept_mido),)
+    fast_files += tuple(mido_schedule.build(romfs, kept=kept_mido))
     plan = make_plan(out, links, table, chest_events.load(), overrides=custom.actors)
     from clawshot.patch import keys, ocarina, progressive, progressive_bonus
 

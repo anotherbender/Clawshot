@@ -293,6 +293,13 @@ option has in-game evidence with Mido still blocking (R6-CLOSEDDEKU). Mido skip 
 have recorded in-game results. Legacy `--skip mido` aliases `--forest open`; conflicting explicit
 forest choices are refused. Forest flags compose with gift save flags.
 
+With Mido kept, his post-Zelda schedule waits until his saved wall blocker has actually cleared.
+This preserves the native sword-and-shield conversation after an early castle visit instead of moving
+him beyond a still-closed wall ([#35](https://github.com/hiKareeem/Clawshot/issues/35)).
+Only that completed-castle schedule is guarded; open/Mido-skipped mode is unchanged.
+The repair is **unplayed** pending the candidate/control check in
+[`r18-mido.md`](../plans/rounds/r18-mido.md). Do not regenerate a played seed or reset story quests to repair it.
+
 The opening-movie skip is on by default. It removes the movie entirely, not just its skip-button
 restriction; Navi waking Link and normal new-game initialization still run. Movie removal
 **passed Kareem's new-game check on 2026-11-12**. `--skip intro saria deku_tree kaepora`
