@@ -31,7 +31,7 @@ def test_bottle_access_uses_the_selected_reward_not_a_fixed_early_bottle(shuffle
     assert search.can_access(world.locations["Bottle-dependent probe"], "child") is not gift_shuffle
 
 
-def test_releasing_two_gifts_does_not_release_other_experiments():
+def test_other_gift_experiments_stay_vanilla():
     _, world = prepare(load_spec(), Settings(shuffle=gifts.GIFT_TYPES))
     selected = set(shuffled_locations(world, Settings(shuffle=gifts.GIFT_TYPES)))
     assert set(RELEASED) <= selected
@@ -40,7 +40,14 @@ def test_releasing_two_gifts_does_not_release_other_experiments():
         "GC Medigoron",
         "Wasteland Bombchu Salesman",
         "Kak Granny Buy Blue Potion",
-        "Kak 40 Gold Skulltula Reward",
     ):
         assert name not in selected, name
         assert world.locations[name].keep_vanilla, name
+
+
+@pytest.mark.parametrize("shuffle", [("Chest",), ("Chest", *gifts.GIFT_TYPES)])
+def test_forty_token_reward_contributes_twenty_bombchus_only_with_gifts(shuffle):
+    settings, world = prepare(load_spec(), Settings(shuffle=shuffle))
+    name = "Kak 40 Gold Skulltula Reward"
+    assert world.locations[name].vanilla == "Bombchus (20)"
+    assert (name in shuffled_locations(world, settings)) is ("NPC" in shuffle)

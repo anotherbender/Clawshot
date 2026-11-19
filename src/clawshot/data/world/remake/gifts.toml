@@ -49,7 +49,6 @@ source = "cs13b, build e0f3ccfa: SubEvent_GetSwordBigGoron_Step10 shows EyeDrop 
 
 [locations."Kak 40 Gold Skulltula Reward"]
 vanilla = "Bombchus (20)"
-keep_vanilla = "Round 8: native twenty-Bombchu reward; controlled swap awaits Kareem's result"
 source = "cs8d, build e0f3ccfa: GatheringTokenGold/Event200 grants Item_BombchuBundle_Large; PouchActorInfo BundleActorNum=20; saved GetReward40 Bool. plans/03-game-data.md section 35"
 
 [locations."Kak 100 Gold Skulltula Reward"]

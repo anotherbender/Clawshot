@@ -199,10 +199,30 @@ posted on `cs-r18` without a post-gate commit, preserving the exact tested merge
 
 ## Issue #11 — separate play-held layer
 
-Issue read and claimed by comment before edits. Existing world metadata already maps the native
-forty-token source to `Bombchus (20)` and `Item_BombchuBundle_Large`, but explicitly holds it pending
-controlled play. Implementation, regression coverage, second sweep and main control are on top of the
-merge delivery only. Any built candidate/control remains **not played** until Kareem checks it on rc.7.
+Merge stack **`e241a857048db995aaba7ae23b7ee52ac15fb92e`** passed its sole full gate:
+format449, lint clean, **3467 synthetic passed / 378 skipped**, **375 dump passed**.
+Claude merged it to main on 2026-11-19. This issue layer is directly on that exact merge head.
+
+Issue read and claimed by comment before edits. The original N64 contribution was ten
+Bombchus, but the existing remake override already supplies **Bombchus (20)** and its actor
+**`Item_BombchuBundle_Large`**. The remaining cause was the explicit round-8 `keep_vanilla`
+hold, which excluded forty tokens from production gift selection regardless of assignment.
+This layer removes only that stale hold, preserving the twenty-item contribution and actor.
+Without `Gift`, the native bundle remains unchanged. No threshold, collected flag, other
+reward, new option, runtime hook, item weighting or fill algorithm is changed.
+
+Regression proof: **47 passed in 99.53 s**, covering `test_gifts.py`, `test_gifts_release.py`,
+`test_gifts_dump.py` and `test_gifts_rewards_dump.py` against the real dump. New checks cover
+Gift-on/off selection and the twenty-Bombchu pool contribution; production native eligibility
+then a controlled Hammer transform inverse-equals the entire original flow after restoring
+**only Event200 `TakenRewardActor`**. Thus threshold40, GetReward40, other rewards/repeats
+and saved-flag layout stay native. Scoped Ruff format/check pass for both changed test files.
+Receipt: `work/r18-chests/reward40-focused.log`.
+
+**Claude's latest steer (2026-11-19): issue #11's full gate runs only after Kareem's play
+result.** Until then this is built, not played, and must remain a separate **play-held** head.
+The production-pool sweep and isolated candidate/control packet are prepared before handoff;
+neither that sweep nor the merge stack's earlier gate is claimed as an issue-11 full gate.
 
 ### Authorized diagnostic fixture preparation
 

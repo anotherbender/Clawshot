@@ -304,3 +304,41 @@ def test_dump_gift_shuffle_moves_great_fairies_through_their_new_flags(romfs):
             out = transforms[s.file](dicts.decompress(s.file, (romfs / s.file).read_bytes()))
             event = next(e for e in evfl.read(out).flowchart.events if e.name == s.event)
             assert event.params[s.param] == actor, s.id
+
+
+@pytest.mark.dump
+def test_dump_forty_token_reward_uses_native_bundle_and_preserves_threshold_and_collected_flag(romfs):
+    from clawshot.generate import Settings, prepare
+    from clawshot.generate.fill import shuffled_locations
+    from clawshot.patch import items
+    from clawshot.world import load_spec
+
+    name = "Kak 40 Gold Skulltula Reward"
+    path = "Event/EventFlow/GatheringTokenGold.bfevfl.zs"
+    spec, settings, _ = gifts.seed_setup(romfs, load_spec(), Settings(shuffle=("Chest", gifts.SHUFFLE)))
+    _, world = prepare(spec, settings)
+    assert name in shuffled_locations(world, settings)
+    assert world.locations[name].vanilla == "Bombchus (20)"
+    actors = items.load()
+    assert actors.actor(world.locations[name].vanilla) == "Item_BombchuBundle_Large"
+    # Isolate this source; unrelated gifts have their own once-gate normalization.
+    step = gifts.seed_step(
+        [name],
+        scan_gifts(romfs),
+        definitions.load(),
+        gifts.load(),
+        actors,
+        {name: world.locations[name].vanilla},
+        {"GatheringTokenGold": path},
+    )
+    transforms = step({name: "Megaton Hammer"})
+    assert GAME_DATA_LIST not in transforms
+    dicts = zsdic.Dictionaries.from_romfs(romfs)
+    original = dicts.decompress(path, (romfs / path).read_bytes())
+    before, after = evfl.read(original), evfl.read(transforms[path](original))
+    native = next(event for event in before.flowchart.events if event.name == "Event200")
+    changed = next(event for event in after.flowchart.events if event.name == "Event200")
+    assert native.params["TakenRewardActor"] == "Item_BombchuBundle_Large"
+    assert changed.params["TakenRewardActor"] == "Item_Hammer"
+    changed.params["TakenRewardActor"] = native.params["TakenRewardActor"]
+    assert before == after  # Includes all thresholds, completion writes, repeats and other rewards.

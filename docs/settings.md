@@ -175,8 +175,12 @@ held first-expert-check experiment would add a new once-only prize; it is off un
 
 Merchant sale experiments (Medigoron, Granny, desert carpet) remain held. The Skulltula House's
 10-token swap passed, with the 20-token preview observed; that does not certify the later thresholds.
-The corrected 40-token reward remains held. The Weird Egg, Zelda's Letter and the adult trading items
-stay at their native checks. All fourteen share one trade inventory cell that shows a single owned item,
+With `Gift`, the 40-token reward contributes **Bombchus (20)** to the pool and gives its
+assigned item, using the native forty-token threshold and collected flag. Without `Gift`,
+it stays the native twenty-Bombchu bundle. This correction is built, not yet played;
+its candidate and main control await the round-18 in-game check.
+The Weird Egg, Zelda's Letter and the adult trading items stay at their native checks.
+All fourteen share one trade inventory cell that shows a single owned item,
 adult items first (a child sees an owned adult item instead of the Cucco Talon must be shown), and every
 adult trade hand-in shows the item the previous native trade gave, as the logic assumes. Biggoron's
 final sword reward is still shuffled behind the native Claim Check.
