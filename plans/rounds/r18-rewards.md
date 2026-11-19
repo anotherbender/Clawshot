@@ -84,7 +84,7 @@ use it as OOT_DUMP, keeping the shared round16 fixture unchanged.
 
 Reward/bridge and owned-stone Door implementations and isolated controls are built.
 Rebased MAIN FINAL focus and the aimed lesson integration fix are verified below.
-Sweep/full gate wait for D READY and F's completed turn; order is G → D (B+D) → F → E. No READY claim.
+Door v2 played positive PASS; two-Stone refusal unplayed. Authorized order is D's running B+D gate → E → F. Sweep/full gate pending; no READY yet.
 
 ## Implementation and observed focused proof
 
@@ -590,3 +590,25 @@ boot, full gate, lock, inventory/clock/quest/age edits or reset chests.
 Posted the full launcher and plain landmarks to `cs-r18` at **12:56**.
 Checklist retains Door opening, early adult/child round trip, persistence and
 optional two-Stone refusal; target 8–10 minutes, hard stop 10. **Built/unplayed.**
+
+## Door v2 PLAYED PASS; final gate authorized after D
+
+Claude relayed Kareem's result: the kit was collected from the two Dodongo
+alcoves and the two graves. With all three Stones owned, the Door opened
+while Dodongo and Jabu were not done, stayed open, and no castle escape/moat
+scene played. **Owned-Stone Door positive PLAYED PASS.** The optional
+two-Stone refusal was **NOT played**; do not count it as a game pass.
+No additional round-trip/persistence result is inferred beyond that report.
+
+The real v2 `longshot_log.txt` independently supplies `mods: ... <- ...`
+lines for DoorOfTime, GameDataList, the Dodongo Dynamic/Static and Graveyard
+Child Dynamic/Static Banc files, and all four Field modules. Retained in
+`work/r18-rewards/door-owned-natural-v2/played-load-proof.json`. This is
+loading evidence plus Kareem's reported result, not an agent-run game.
+
+Latest order supersedes the prior wait for F: **D's running B+D gate → E → F**,
+because F's fix still needs play. Claude authorized E to take the lock when
+D releases it, complete one full gate on the frozen code, and post READY
+with its exact head; docs-only commits after the code are permitted.
+The outstanding settings sweep stays serialized with E's gate. No rebase or
+production change; all workers will stay at one while Kareem is playing.
