@@ -48,8 +48,12 @@ External logs: `work/r18-issue35/mido-{red,focused}.log`. No game result or plac
 
 Packet staged at `E:/OOTRemake/work/r18-mido/ingame/CHECKLIST.md`, approximately ten minutes, plain
 landmarks and two template-derived CRLF launchers: `01-main-control.bat`, then `02-candidate.bat`.
-Both actual CLI dry runs passed without launching the game and initialized identical isolated saves.
-Claude must boot-check; Kareem plays. No new runtime result is claimed.
+Initial CLI dry runs initialized identical isolated saves without launching the game, but incorrectly
+resolved Hookshot. Claude corrected both launchers using the nested Longshot finder from the
+r18-issue34 packet and reports corrected dry runs resolve **Longshot rc.7**. All play checks and future
+packets use that Longshot template, with `longshot_log.txt`; the original launcher proof is historical
+save-identity evidence, not rc.7 proof. Claude's boot check is in progress; Kareem plays. No runtime
+pass is claimed.
 
 Control is the **public generated overlay from d3ce136** preserved by the failing regression; candidate
 is the corresponding passing public overlay from implementation `421ef418389c9348d5bd89e25a41a8f298928ff4`.
