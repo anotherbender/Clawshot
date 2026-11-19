@@ -149,10 +149,7 @@ def opening_without_movie(data: bytes) -> bytes:
 FLOW_EDITS: dict[str, tuple[str, Callable[[bytes], bytes]]] = {
     "opening_without_movie": (OPENING_FLOW, opening_without_movie),
     "deku_tree_after_mido": (mido.FLOW, mido.complete_deku_meeting),
-    **{
-        f"kaepora_{scene.flow}": (scene.path, partial(owl_skips.omit_lines, scene=scene))
-        for scene in owl_skips.SCENES
-    },
+    **{f"kaepora_{scene.flow}": (scene.path, partial(owl_skips.omit_lines, scene=scene)) for scene in owl_skips.SCENES},
 }
 
 

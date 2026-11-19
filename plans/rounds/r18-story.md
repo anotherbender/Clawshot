@@ -302,3 +302,11 @@ The exact frozen head, stage outputs/counts and result are recorded privately in
 passed and all10 identity pairs pass. Gameplay remains unplayed. Post the observed result, release our
 lock, then rebuild the short packet from the gated head as Claude ordered; its final manifest/hash proof
 is `packet-gated-proof.json`. A missing/failed proof never means READY.
+
+### Final-main formatting correction
+
+The first gate at `a9b57078` stopped at format, before lint or either test suite: Ruff required the
+`FLOW_EDITS` Kaepora comprehension in `gamedata.py` on one line (457 other files already formatted).
+G applied exactly that printed layout correction. The original ten pairs passed, but G chooses a new
+exact-head proof after this commit rather than relabelling that receipt. Original receipts/outputs are
+preserved separately; this is a cause-fixed rerun, not an unchanged retry. No gameplay claim changes.
