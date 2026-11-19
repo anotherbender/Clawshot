@@ -1,7 +1,7 @@
 # Round 18 Track G — story flows (cs18g)
 
 Agent/model: `openai-codex/gpt-6.1-sol`; branch `r18/story`; starting main `2ba2f9a`.
-Status: implementation frozen at `580927e66a`; **built, not played**. No game launched; no played seed opened or save changed.
+Status: native guard corrections built; **not READY, not played**. No game launched; no current seed opened or backup edited.
 
 ## Requested scope and provenance
 
@@ -14,8 +14,9 @@ to Track E. Intake read from the private round directory; no played seed content
 
 `patch/song_learning.py` applies independently of Gift shuffle and fast-start choices. Shared
 `Dm_SY_Ocarina:LearningOcarinaFollowExample` still binds the performer. It then tests
-`IsGet.Item_Ocarina_Fairy` / `IsGet.Item_Ocarina_Time`: either owned takes the untouched native fork; neither goes
-to its native return join. The entire interactive fork is bypassed, **not just the note-input leaf**: leaving
+`IsGet.Item_Ocarina_Time`: owned takes the untouched native fork at either age. Fairy Ocarina ownership counts
+only when `Sequence_IsChildhood` is true; otherwise it takes the native return join. The entire interactive
+fork is bypassed, **not just the note-input leaf**: leaving
 its parallel free-playing pose running could itself hang. The demonstration, automatic song performance,
 message cleanup, native/shared grant and the caller's actual (possibly shuffled) grant remain unchanged.
 
@@ -23,8 +24,8 @@ Native evidence, build `e0f3ccfa`: entry setup `Event175` (index178) originally 
 join `Event37` (index10). Bypassed actions are only learning input, empty dialogue, player look lock and
 free-playing pose; the transform refuses any other effect/branch in that region. No GameData write or grant
 is bypassed. The shared entry is called by all twelve song families (Sun has two calls), not Scarecrow's
-free-form learning. Every native event/index and entry remains; only the setup's next and two appended ownership
-queries differ. Automatic-play grants remain subject to the existing Gift-shuffle suppression, unchanged.
+free-form learning. Every native event/index and entry remains; only the setup's next and three appended
+ownership/age queries differ. Automatic-play grants remain subject to existing Gift-shuffle suppression, unchanged.
 
 ## Optional story speech
 
@@ -150,3 +151,28 @@ No gate acquisition, paired generation or full gate is authorized until Claude p
 Tracks A/D merge and assigns lock order. Then rebase onto that final main, rerun focused checks, perform the
 previously authorized ten on/off pairs and one full gate. Non-lock work only meanwhile.
 Implementation/packet commits remain `580927e66a` / `6b88c3c9fa`; **not READY** before those checks complete.
+
+## 2026-11-19 native guard corrections
+
+Fixture research found two errors before any full gate or play claim:
+
+- Native Bool/pouch queries return **0=true/held, 1=false/absent** (`plans/03-game-data.md`, native query conventions).
+  Initial song/race guards and their synthetic interpreters all inverted this convention. Initial positive
+  test counts therefore did not prove the intended branch semantics. Both production guards and interpreters
+  now use the native convention; both-tools race admission is covered as well as either-tool/absent cases.
+- Fairy Ocarina is child-only (`plans/04-world-format.md`, section37). A Fairy-only adult is a no-usable-ocarina
+  lesson case, even though its ownership/stock are true/1. The shared guard now checks age usability.
+  The new regression printed `child=False, Fairy owned, expected_input=False` against the old guard and failed;
+  the corrected eight-way age/ownership matrix passes.
+
+After both corrections, `OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run pytest
+tests/test_song_learning.py tests/test_dampe_safety.py -q`: **18 passed in0.61s**, including native readback/
+unchanged-event/surface-anchor oracles. Four-file Ruff format/check pass after correcting one reported format
+layout. No unchanged pytest rerun. This is still built, not played; it is not the full gate.
+
+Old candidate `580927e66a` is withdrawn and its launcher removed. Its stored files remain only historical
+research evidence, never the new short-packet source. Actual-main control `2ba2f9a` remains valid.
+Claude now authorizes selecting earliest qualifying slots under `work/save-backups` read-only with
+`clawshot.save`; copy only one slot plus account/options per isolated profile. Never use the current seed or
+edit a backup. A single declared test-copy value edit is permitted only if no natural slot satisfies the case.
+Natural source predicates, paths/dates and short per-check estimates are being recorded for the replacement packet.

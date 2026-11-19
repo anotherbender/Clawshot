@@ -38,7 +38,8 @@ def actions(fc, entry, owned):
     while index != evfl.NONE:
         event = fc.events[index]
         if isinstance(event, evfl.SwitchEvent):
-            index = dict(event.cases)[int(event.params["Actor"] in owned)]
+            # Native pouch query results: held=0, absent=1.
+            index = dict(event.cases)[0 if event.params["Actor"] in owned else 1]
         else:
             out.append((fc.actors[event.actor].actions[event.action], event.params))
             index = event.next
@@ -46,7 +47,7 @@ def actions(fc, entry, owned):
 
 
 @pytest.mark.parametrize("entry", dampe_safety.ENTRIES)
-@pytest.mark.parametrize("owned", [set(), {"Item_Hookshot"}, {"Item_Longshot"}])
+@pytest.mark.parametrize("owned", [set(), {"Item_Hookshot"}, {"Item_Longshot"}, {"Item_Hookshot", "Item_Longshot"}])
 def test_start_or_refusal_always_has_a_safe_destination(entry, owned):
     fc = evfl.read(dampe_safety.patch(evfl.write(race()))).flowchart
     trace = actions(fc, entry, owned)

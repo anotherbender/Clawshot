@@ -1,6 +1,6 @@
-"""Never wait for unplayable shoulder notes when a song lesson has no ocarina.
+"""Never wait for unplayable shoulder notes when a song lesson has no usable ocarina.
 
-Only the shared interactive follow-example fork is bypassed without an ocarina.
+Only the shared interactive follow-example fork is bypassed without an age-usable ocarina.
 Demonstration, automatic performance, song grants and caller story continuations remain native.
 Evidence: plans/rounds/r18-story.md; build e0f3ccfa.
 """
@@ -31,7 +31,7 @@ def patch(data: bytes) -> bytes:
     if fc.events[fork.join].next != evfl.NONE:
         raise PatchError(f"song learning: unexpected follow-example return {fc.events[fork.join]!r}")
     # Do not bypass only the input leaf: its parallel free-playing pose would
-    # still be waiting for completion. No branch of this fork runs without an instrument.
+    # still be waiting for completion. No branch runs without an age-usable instrument.
     presentation = {
         "EventWaitOcarinaInputForLearning",
         "EventTalk",
@@ -47,22 +47,30 @@ def patch(data: bytes) -> bytes:
             raise PatchError(f"song learning: unexpected interactive branch {event!r}")
     game_data = next(i for i, actor in enumerate(fc.actors) if actor.name == "GameDataActor")
     query = fc.actors[game_data].queries.index("EventQueryIsGameDataBool")
+    # Native Bool queries return 0 for true and 1 for false, not Python bool integers.
     tail = len(fc.events)
     fc.events.extend(
         [
             evfl.SwitchEvent(
-                "ClawshotFairyOcarinaLearning",
-                game_data,
-                query,
-                [(0, tail + 1), (1, fork_index)],
-                {"GameDataName": "IsGet.Item_Ocarina_Fairy", "Index": -1},
-            ),
-            evfl.SwitchEvent(
                 "ClawshotTimeOcarinaLearning",
                 game_data,
                 query,
-                [(0, fork.join), (1, fork_index)],
+                [(0, fork_index), (1, tail + 1)],
                 {"GameDataName": "IsGet.Item_Ocarina_Time", "Index": -1},
+            ),
+            evfl.SwitchEvent(
+                "ClawshotFairyOcarinaLearning",
+                game_data,
+                query,
+                [(0, tail + 2), (1, fork.join)],
+                {"GameDataName": "IsGet.Item_Ocarina_Fairy", "Index": -1},
+            ),
+            evfl.SwitchEvent(
+                "ClawshotChildOcarinaLearning",
+                game_data,
+                query,
+                [(0, fork_index), (1, fork.join)],
+                {"GameDataName": "Sequence_IsChildhood", "Index": -1},
             ),
         ]
     )

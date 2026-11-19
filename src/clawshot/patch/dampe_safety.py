@@ -26,6 +26,7 @@ def patch(data: bytes) -> bytes:
         raise PatchError("Dampe safety: already patched")
     pouch = next(i for i, actor in enumerate(fc.actors) if actor.name == "PouchSystemActor")
     query = fc.actors[pouch].queries.index("EventQueryIsExistInPouch")
+    # Native pouch queries return 0 when held and 1 when absent.
     # These donors are native race reset actions, not a new transition protocol.
     fade_out = deepcopy(by_name["Event92"])
     warp = deepcopy(by_name["Event90"])
@@ -65,14 +66,14 @@ def patch(data: bytes) -> bytes:
                     f"ClawshotDampeHookshot{name}",
                     pouch,
                     query,
-                    [(0, gate + 1), (1, original)],
+                    [(0, original), (1, gate + 1)],
                     {"Actor": "Item_Hookshot", "Num": 1},
                 ),
                 evfl.SwitchEvent(
                     f"ClawshotDampeLongshot{name}",
                     pouch,
                     query,
-                    [(0, tail), (1, original)],
+                    [(0, original), (1, tail)],
                     {"Actor": "Item_Longshot", "Num": 1},
                 ),
             ]

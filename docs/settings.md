@@ -243,7 +243,8 @@ native grants and admission rules, not a claim that every item/age pair has been
 The [round18 audit](../plans/rounds/r18-equipment.md) separates played results, native-data evidence
 and unverified boundaries. Wrong-age item-bar precautions remain [below](#hints-models-and-age-warnings).
 
-Song lessons bypass their interactive repeat-the-notes segment when neither ocarina is owned.
+Song lessons bypass their interactive repeat-the-notes segment without an age-usable ocarina:
+Ocarina of Time works at either age; Fairy Ocarina counts only for child Link.
 The teacher's demonstration, automatic performance, actual song/shuffled reward and story continuation remain.
 This prevents the played no-ocarina shoulder-note softlock; the new scene change itself awaits play acceptance.
 

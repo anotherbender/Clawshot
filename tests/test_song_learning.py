@@ -39,7 +39,8 @@ def input_fork(fc, owned):
     while index != evfl.NONE:
         event = fc.events[index]
         if isinstance(event, evfl.SwitchEvent):
-            index = dict(event.cases)[int(event.params["GameDataName"] in owned)]
+            # Native Bool query results: true=0, false=1.
+            index = dict(event.cases)[0 if event.params["GameDataName"] in owned else 1]
         elif isinstance(event, evfl.ForkEvent):
             return True
         else:
@@ -47,10 +48,23 @@ def input_fork(fc, owned):
     return False
 
 
-@pytest.mark.parametrize("owned", [set(), {"IsGet.Item_Ocarina_Fairy"}, {"IsGet.Item_Ocarina_Time"}])
-def test_learning_never_starts_input_or_parallel_pose_without_an_instrument(owned):
+@pytest.mark.parametrize(
+    ("child", "owned", "expected"),
+    [
+        (True, set(), False),
+        (False, set(), False),
+        (True, {"IsGet.Item_Ocarina_Fairy"}, True),
+        (False, {"IsGet.Item_Ocarina_Fairy"}, False),
+        (True, {"IsGet.Item_Ocarina_Time"}, True),
+        (False, {"IsGet.Item_Ocarina_Time"}, True),
+        (True, {"IsGet.Item_Ocarina_Fairy", "IsGet.Item_Ocarina_Time"}, True),
+        (False, {"IsGet.Item_Ocarina_Fairy", "IsGet.Item_Ocarina_Time"}, True),
+    ],
+)
+def test_learning_never_starts_input_or_parallel_pose_without_an_instrument(child, owned, expected):
     fc = evfl.read(song_learning.patch(evfl.write(lesson()))).flowchart
-    assert input_fork(fc, owned) is bool(owned)
+    flags = owned | ({"Sequence_IsChildhood"} if child else set())
+    assert input_fork(fc, flags) is expected, {"child": child, "owned": owned, "expected_input": expected}
 
 
 @pytest.mark.dump
@@ -79,4 +93,6 @@ def test_native_learning_bypasses_only_presentation_and_preserves_all_other_entr
     assert after == expected
     assert input_fork(after.flowchart, set()) is False
     assert input_fork(after.flowchart, {"IsGet.Item_Ocarina_Time"}) is True
+    assert input_fork(after.flowchart, {"IsGet.Item_Ocarina_Fairy"}) is False
+    assert input_fork(after.flowchart, {"IsGet.Item_Ocarina_Fairy", "Sequence_IsChildhood"}) is True
     assert after.flowchart.events[fork.join] == fc.events[fork.join]
