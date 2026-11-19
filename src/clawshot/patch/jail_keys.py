@@ -1,9 +1,9 @@
 """Retarget a scripted key pickup without changing its source lifecycle or key-shaped display.
 
 The source's actor file name, root AI, physics, animations and event performer remain
-native. Its canonical inventory identity and pouch semantics come from the reward.
-Per-source pouch members prevent different rewards sharing one resource path. This
-is built evidence only; source retirement and get presentation still require play.
+native. Its reward identity grants rupees, but its native large-get completion is
+retained: the root writes its collected Bool only for PickedUp (death reason 10),
+not the rupee's silent fade-delete. Per-source pouch members keep this policy local.
 """
 
 import copy
@@ -15,7 +15,7 @@ from clawshot.formats import byml, evfl, sarc, zsdic
 from clawshot.patch import actor_packs
 from clawshot.patch.actor_packs import actor_member, component_ref, reference, work_path
 from clawshot.patch.plan import PatchError
-from clawshot.patch.tokens import ACTOR_INFO, POUCH_ACTOR_INFO, POUCH_DEFAULT, canonical, pouch_grant
+from clawshot.patch.tokens import ACTOR_INFO, POLICY, POUCH_ACTOR_INFO, POUCH_DEFAULT, canonical, pouch_grant
 from clawshot.patch.write import FileChanges
 
 BANC = "Banc/GerudoFortress/GerudoFortress_Adult_Static.bcett.byml.zs"
@@ -126,7 +126,13 @@ def retarget_pack(data: bytes, actor: str, donor_actor: str, donor_pack: Mapping
     source_pouch = actor_packs.resolve_node([pack], reference(before["PouchContentRef"]), builtin=POUCH_DEFAULT)
     if source_pouch.get("PouchActor") != work_path(actor_member("Item_Dungeon_SmallKey")):
         raise PatchError(f"{actor}: expected the native key pouch, got {source_pouch!r}")
+    if source_pouch.get("GetType") is None or source_pouch.get("PlayGetEventManyTimes") is not True:
+        raise PatchError(f"{actor}: missing native repeatable get completion: {source_pouch!r}")
     pouch = actor_packs.resolve_node([donor_pack], reference(donor["PouchContentRef"]), builtin=POUCH_DEFAULT)
+    # Silent rupees fade-delete without PickedUp, bypassing this key's reason-10
+    # collected write. Keep its get completion, not its key-specific inventory grant.
+    pouch.update(POLICY)
+    pouch["GetType"] = source_pouch["GetType"]
     if grant := pouch_grant(pouch, donor):
         pouch["PouchActor"] = grant
     member = f"Component/PouchContentParam/Clawshot_{actor}.game__component__PouchContentParam.bgyml"
@@ -180,7 +186,11 @@ def registry_changes(romfs: str | Path, assignments: Mapping[str, str]) -> FileC
                     ),
                 }
             else:
-                new = {**copy.deepcopy(reward), "__RowId": source}
+                new = {
+                    **copy.deepcopy(reward),
+                    "__RowId": source,
+                    "PouchGetType": old["PouchGetType"],
+                }
             edits[source] = (old, new)
         changes[path] = _registry_transform(path, edits)
     return changes

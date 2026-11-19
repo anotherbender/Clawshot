@@ -11,6 +11,7 @@ from clawshot.patch.actor_packs import actor_member, component_ref, reference, w
 from clawshot.patch.plan import PatchError, Plan
 from clawshot.patch.tokens import ACTOR_INFO, POUCH_ACTOR_INFO, POUCH_DEFAULT, canonical
 from clawshot.patch.write import write
+from clawshot.save import murmur3_32
 
 KEY_IDENTITY = "ActorSystem/ActorName/Item_Dungeon_SmallKey.engine__actor__ActorName.bgyml"
 REWARD_IDENTITY = "ActorSystem/ActorName/Obj_Rupee_Red.engine__actor__ActorName.bgyml"
@@ -22,9 +23,21 @@ def synthetic_pack(actor, *, reward=False):
     identity = REWARD_IDENTITY if reward else KEY_IDENTITY
     pouch = REWARD_POUCH if reward else KEY_POUCH
     fields = (
-        {"IsBundle": True, "BundleActorNum": byml.I32(20), "DefaultAutoGet": True, "IsPlayGetEventPouchMax": True}
+        {
+            "IsBundle": True,
+            "BundleActorNum": byml.I32(20),
+            "GetType": byml.U32(murmur3_32(b"Small")),
+            "DefaultAutoGet": True,
+            "PlayGetEventManyTimes": False,
+            "IsPlayGetEventPouchMax": False,
+        }
         if reward
-        else {"PouchActor": work_path(actor_member("Item_Dungeon_SmallKey")), "SpecialDeal": byml.U32(17)}
+        else {
+            "PouchActor": work_path(actor_member("Item_Dungeon_SmallKey")),
+            "SpecialDeal": byml.U32(17),
+            "GetType": byml.U32(murmur3_32(b"Large")),
+            "PlayGetEventManyTimes": True,
+        }
     )
     return {
         actor_member(actor): byml.write(
@@ -45,8 +58,8 @@ def synthetic_pack(actor, *, reward=False):
     }
 
 
-def test_reward_identity_does_not_change_key_retirement_or_shared_pouch():
-    actor = next(iter(jail_keys.SOURCE_IDS))
+@pytest.mark.parametrize("actor", sorted(jail_keys.SOURCE_IDS))
+def test_reward_keeps_native_pickup_completion_for_every_jail_identity(actor):
     source = synthetic_pack(actor)
     donor = synthetic_pack(jail_keys.DONOR, reward=True)
     changed = sarc.read(jail_keys.retarget_pack(sarc.write(source), actor, jail_keys.DONOR, donor))
@@ -60,6 +73,10 @@ def test_reward_identity_does_not_change_key_retirement_or_shared_pouch():
             assert changed[path] == data
     pouch = actor_packs.resolve_node([changed], reference(components["PouchContentRef"]), builtin=POUCH_DEFAULT)
     assert pouch["IsBundle"] is True and pouch["BundleActorNum"] == 20
+    # Small/silent pickup skips the native reason-10 collected write, so the
+    # resting reward reappears; repeated and full-wallet gets must complete too.
+    assert pouch["GetType"] == murmur3_32(b"Large")
+    assert all(pouch[name] is True for name in ("DefaultAutoGet", "PlayGetEventManyTimes", "IsPlayGetEventPouchMax"))
     assert "SpecialDeal" not in pouch and "PouchActor" not in pouch
     assert KEY_POUCH in changed and changed[KEY_POUCH] == source[KEY_POUCH]
     with pytest.raises(PatchError, match="native small-key identity"):
@@ -126,6 +143,10 @@ def test_native_jail_adapters_only_change_reward_packs_and_identity_tables(romfs
         before = actor_packs.resolve([original], actor_member(actor))[0]["Components"]
         after = actor_packs.resolve([changed], actor_member(actor))[0]["Components"]
         assert canonical(after) == jail_keys.DONOR
+        pouch = actor_packs.resolve_node([changed], reference(after["PouchContentRef"]), builtin=POUCH_DEFAULT)
+        assert pouch["GetType"] == murmur3_32(b"Large")
+        assert pouch["BundleActorNum"] == 20
+        assert all(pouch[name] is True for name in ("PlayGetEventManyTimes", "IsPlayGetEventPouchMax"))
         for component in set(before) - {"ActorNameRef", "PouchContentRef"}:
             assert after[component] == before[component]
         assert all(changed[name] == data for name, data in original.items() if name != actor_member(actor))
@@ -149,7 +170,7 @@ def test_native_jail_adapters_only_change_reward_packs_and_identity_tables(romfs
                 inverse["InstanceHeapSize"] = before["InstanceHeapSize"]
                 assert byml.same(inverse, before)
             else:
-                assert byml.same(after, {**donor, "__RowId": before["__RowId"]})
+                assert byml.same(after, {**donor, "__RowId": before["__RowId"], "PouchGetType": before["PouchGetType"]})
     out = tmp_path / "key-mod"
     write(Plan([], [], []), romfs, out, extra_changes=(delivery.changes,))
     table = rstb.read(dictionaries.decompress(rstb.TABLE_PATH, (out / "romfs" / rstb.TABLE_PATH).read_bytes()))

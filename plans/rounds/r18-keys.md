@@ -441,3 +441,54 @@ otherwise mask.
 tests/test_key_bindings.py::test_fortress_named_grants_only_credit_inventory_not_guard_or_rescue_state -q`
 → **3 passed, 0.45 s**. Scoped format check **1 file already formatted**; scoped
 Ruff **All checks passed**. No gameplay/source/packet change was needed.
+
+## Played correction and once-only repair — 2026-11-19
+
+Kareem's matched natural main control reproduced the archery/post-release line before
+the Valley introduction. `SageOfSpirit=Ready` applies only the boss's challenge schedule;
+boss `Npc_Hylia_012_Adult/Event121` sets Step01, which activates the jailed schedules.
+Fresh native EventSetting decoding resolves carpenter016's Step01 default talk through
+`SageOfSpirit/Event37` to `GerudoFortress_MiddleBossAppear_04`. Guard-destroyed016 or
+`IsGet_SmallKey_GerudoFortress.SmallKey04` instead selects Event77's imprisoned/unlocked
+talk. Held/found/once inventory is not a talk predicate. Kareem then **passed** boss Yes,
+pre-rescue talk, guard appearance and DMT-key cell opening on the candidate.
+
+**Supersedes the earlier broad pickup/retirement claim:** Kareem collected the Fortress
+replacement for 20 rupees, left without opening the cell and collected another 20 after
+returning. Its native source Bool had not been written. The root AI's Leave path writes
+`IsGet_SmallKey_GerudoFortress.SmallKey0x` only for `QueryDeathIsDead` reason10/PickedUp.
+The donor's Small/silent get grants and fade-deletes without the get-demo death request.
+Preserving the graph bytes was therefore not sufficient to preserve its trigger.
+
+Repair proposed by cs18f: keep the reward's rupee identity/bundle/category and key model,
+but preserve each native key's Large get type and require get events on repeat/full-pouch
+pickups, reusing `tokens.POLICY`. Match the source PouchActorInfo get type to its native
+Large value. All four source packs retain their own untouched reason10 writer; guard,
+rescue, door, source Hashes and remote-key writes are unchanged. Cost: Fortress rupees
+use the native get-event/window instead of silent collection. **Built, awaiting play.**
+
+`OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run pytest
+tests/test_jail_keys.py -q` → **10 passed, 11.15 s**, including all four synthetic
+completion-policy cases and actual-dump pack/registry/writer inverse checks.
+Scoped Ruff formatting and lint pass. No sweep/full gate or lock taken.
+
+**Well does persist:** `2026-11-19_120040-r18-well-cand-2` slots03/04 have 104 rupees,
+coffin open and both source Bools false; `120106-r18-well-cand-3` slots03/04 have
+124 rupees and both `BottomOfTheWell_Level_Room_03_Get_SmallKey`/`..._Get_Key` true.
+Its level listener observes Dead without the Fortress reason filter. Well source code
+stays unchanged; its short collected-return check is retained, not presumed played.
+
+New isolated once-v3 profiles copy only natural near-source slots, account/options
+and runtime controls byte-identically: Fortress cand-b-5 slot02 (13:02:57, Step01,
+guard016 defeated, source uncollected, cell not rescued), Well cand-2 slot03 (12:00:30,
+coffin already open, source uncollected). No flag, age, currency or inventory edits.
+Selection and copy proofs: `work/r18-keys/fixtures/once-only-v3/`.
+The external packet checklist budgets three minutes Fortress and two Well, includes
+boss Yes explicitly as already completed in that Fortress save, and forbids opening
+the cell during the collect/leave/return test. No extra known-vanilla controls.
+
+Earlier one-torch directions were an unverified inherited N64 label and are withdrawn.
+Stable source IDs remain authoritative; the played cell is carpenter016/key04, the
+middle central floor below the chain-link window. Placement-derived landmarks for
+all four cells and the exact native talk trace are in the external
+`work/r18-keys/fortress-played-findings.md`. No suffix-to-torch mapping is claimed.

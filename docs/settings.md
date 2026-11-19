@@ -394,17 +394,21 @@ and the overworld. An off-dungeon key is delivered as a named chest grant; no ot
 Both release modes include the Well floor key and require Chest shuffle.
 Its floor source keeps its own key or gives a red rupee; the replacement retains a key-shaped
 model and native room retirement wiring. Other dungeons' keys, majors, hearts and shields
-are not floor-key rewards. This source adapter is **built, not played**; own-dungeon mode
-leaves it untouched. The Shadow Temple floor key stays vanilla under every setting:
+are not floor-key rewards. Kareem observed silent +20 rupees and uncollected recovery;
+post-pickup saves contain both native source flags. Collected re-entry is staged for confirmation.
+Own-dungeon mode leaves it untouched. The Shadow Temple floor key stays vanilla under every setting:
 **built, held until a natural pre-room save exists**. Its adapter is not admitted to generation.
 
 `--shuffle-hideout-keys` (UI: **Fortress jail keys (experimental)**) separately releases the four
 Fortress guard floor keys into supported shuffled chests. Default **off** in both presets;
 `--no-shuffle-hideout-keys` overrides a settings string. Chest shuffle is required. Each guard's
 drop, staged event pickup and resting pickup remain one check. Replacement rewards are red rupees
-with the native key-shaped floor display. Chest keys credit only Fortress inventory, not guard defeat,
-source collection, carpenter rescues or Spirit progress. Free all four carpenters and receive the
-captain's unchanged card (D39); the card alone does not clear guards. **Built, not played.**
+with the native key-shaped floor display and the key's get-event/window, not silent rupee collection.
+That completion writes the source's native once-only Bool; the initial silent candidate repeated
+after re-entry and is superseded. The repair is **built, awaiting re-check**. Chest keys credit only
+Fortress inventory, not guard defeat, source collection, carpenter rescues or Spirit progress.
+Talk to the Valley carpenter boss and answer Yes before the jailed carpenters. Free all four and
+receive the captain's unchanged card (D39); the card alone does not clear guards.
 
 The four jail sources use stable native actor/Hash identities, not a guessed torch-room match.
 Until that correspondence is verified, logic conservatively requires access to all four guard
