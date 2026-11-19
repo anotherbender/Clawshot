@@ -112,6 +112,11 @@ swap-capable progression stage*, preserving native-display order and seeded ties
 it into an early batch (the existing mixed sword/Token regression forbids that), weaken holds,
 weight Token share, increase retries or special-case Bottle. No fill change this round.
 
+**Claude accepted the attribution on 2026-11-19 and deferred this ordering proposal to round 19.**
+Round 19 should measure the proposal against the preserved identical cohorts and the combined
+production recipes, retaining the mixed sword/Token regression. No ordering implementation,
+new experiment, retry increase or fill-policy change belongs to this round.
+
 Full method, paired comparisons, every error and source hashes:
 `E:/OOTRemake/work/r18-chests/attribution/REPORT.md`;
 immutable raw `attribution/raw/attribution-400.json` and `.rows.jsonl`.
@@ -144,10 +149,17 @@ Detailed native nodes, census/patch/hold references and packet caveats:
 
 ## Acceptance and handoff
 
-The supplied broad recipe uses `all_anywhere`, a reported broken path on initial main. Its sweep
-must wait for Track C's merge rather than rerun that known failure unchanged. Then this track rebases
-onto current main and runs 200 broad + 50 Defaults + 50 Recommended under the lock, zero exhausted,
-followed by focused tests and one exact-head format/lint/full synthetic/full dump gate.
+Claude's revised sequence (2026-11-19): wait for cs18a's explicit **`A FROZEN <head>`**,
+then rebase this merge-only head (played chest admissions and attribution/research docs,
+**without issue #11**) onto that frozen A head. Rerun focused A/D tests before taking the lock.
+Under `gate.lock`, run **200 broad + 50 Defaults + 50 Recommended**, zero exhausted,
+covering the combined **A+D** stack, then **one** exact-stack-head format/lint/full
+synthetic/full dump gate. Post **READY (merge)** with that stack head only after all pass.
+Issue #11 follows on top as a separate **READY (play-held)** head.
+
+The old C-on-main automatic runner `bg_8` was cancelled before any rebase, generation,
+sweep or gate acquisition; it must not race the new stack sequence. Attribution was its
+only predecessor heavy run. No replacement automatic main-triggered runner is active.
 Authoritative commands, process snapshots and results will be external under `work/r18-chests/`.
 
 ## Issue #11 — separate play-held layer
