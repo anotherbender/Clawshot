@@ -141,3 +141,12 @@ If the native warp/fade refusal fails in play, replace it with the documented fi
 Candidate/main manifests, source archive, file hashes, launcher logs, packet delta proof and all scripts remain
 private under `work/r18-story/`. The control deliberately stays on pre-fix main; Track C's fill-only fix does not
 change these diagnostic flows. Final gate/head/readiness will be pinned separately after current-main rebase.
+
+## 2026-11-19 gate hold
+
+Claude's new order supersedes the automatic main-change trigger: runner `bg_11` was cancelled while its recorded
+state was still `waiting_for_fill_on_main`; it had not acquired the gate lock or run the paired proof.
+No gate acquisition, paired generation or full gate is authorized until Claude posts **MAIN FINAL** after
+Tracks A/D merge and assigns lock order. Then rebase onto that final main, rerun focused checks, perform the
+previously authorized ten on/off pairs and one full gate. Non-lock work only meanwhile.
+Implementation/packet commits remain `580927e66a` / `6b88c3c9fa`; **not READY** before those checks complete.
