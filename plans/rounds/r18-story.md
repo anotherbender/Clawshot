@@ -310,3 +310,46 @@ The first gate at `a9b57078` stopped at format, before lint or either test suite
 G applied exactly that printed layout correction. The original ten pairs passed, but G chooses a new
 exact-head proof after this commit rather than relabelling that receipt. Original receipts/outputs are
 preserved separately; this is a cause-fixed rerun, not an unchanged retry. No gameplay claim changes.
+
+## Final observed receipt and play-held handoff
+
+**Gated code head: `b79ff5a27efcf9652eb7096e7ea5536556a54b00`; MAIN FINAL base:
+`e241a857048db995aaba7ae23b7ee52ac15fb92e`.** This final receipt is documentation only;
+the packet and gate remain pinned to that tested code head.
+
+- Corrected-head focused checks: **143 passed**.
+- Corrected-head ten actual on/off pairs: **10 passed** (five broad, five Recommended).
+  Placements identical; spoiler bytes identical after normalizing only the declared story option/CS1
+  provenance. Raw spoilers deliberately differ. Only the five speech flows and their size entries differ
+  in generated romfs; replay provenance remains honest.
+- Complete gate: Ruff format **458 files already formatted**, Ruff check passed;
+  synthetic **3486 passed,396 skipped**; real dump **393 passed**.
+  Synthetic began without a game (`-n12`, workers12); dump detected Longshot and used
+  **`-n4`, `CLAWSHOT_WORKERS=1`**, as Claude instructed. No unchanged rerun occurred.
+- **READY (play-held)** posted13:06, then our matching lock token released13:06:08.
+  `ready-receipt.json`, `final-lock-release.json`, `final-gate-proof.json`, `final-pairs-run.json`
+  and `pair-proof.json` are under `E:/OOTRemake/work/r18-story/`. No further G lock acquisition.
+
+After release, G rebuilt **both variants from those pinned heads**, not from the obsolete pre-final
+control. Final packet: **`E:/OOTRemake/work/r18-story/ingame/gated/CHECKLIST.md`**, with all launchers beside
+it. Both canonical mods contain35 files; identical file sets, exactly16 changed G flows plus the resource
+size table. `Dm_Kokiri_0145` is absent. **22 isolated case/variant cmd dry runs passed, rc.7**.
+Archive slot/account/options hashes remained unchanged; each case has one copied slot and one mod.
+`packet-gated-proof.json` and `fixtures/packet-gated-input.json` contain exact paths, source dates/values,
+hashes, source heads and copy-edit proof. The reporter now reads only these gated users; actual CLI smoke
+checks covered Minuet, optional Longshot and the unedited child no-ocarina route. Those three smoke reports
+contained no mod-load lines and explicitly left acceptance unassessed. Actual builder provenance confirms
+main-control imports the archived final-main source and candidate imports the gated worktree source.
+Superseded `ingame/current/` launchers were moved intact to `archived-pre-final-launchers/`; the old quick
+checklist now points only to the gated packet.
+
+There are11 case pairs, not a claimed sub20min total. The short primary subset is estimated12–20min
+**only when reusing Kareem's existing trap repro rather than finishing the main-control race again**.
+The natural no-ocarina child route is the disclosed longer exception (20–30min **per variant**).
+Its source is unedited; the invalid Door-only priming fixture is not published. The only newly edited
+copy remains optional Longshot stock0→1 (only byte86700), still inventory-inconsistent and invalid unless
+the main control first proves usable Longshot/admission. Source ancestry warnings remain in the checklist.
+
+**Gameplay remains unplayed.** Claude boot-checks; Kareem supplies loaded-file proof plus actual outcome
+and Save/Continue persistence. No game was launched by G. Saria's bridge skip remains deferred to r19;
+the intended0150 timeline/0155 grant target is recorded, no0145 replacement or blind timeline wrapper.
