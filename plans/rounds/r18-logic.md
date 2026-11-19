@@ -207,11 +207,14 @@ inventory sphere with the production certificate and retains raw whole-world dia
 ## Verification and handoff
 
 All four logic items are implemented with fail-first proof; native boundary handoff and complete residual
-question ledger are above. Remaining acceptance: rebase onto main's Track C fill fix, locked 200 broad + 50
-Defaults + 50 Recommended sweep, then current-main rebase/focused proof and one exact-head full gate.
+question ledger are above. Claude's updated stack plan (2026-11-19): wait for `MAIN MOVED` with the C+H
+head, rebase onto that exact stack, rerun focused tests, then hold `gate.lock` for only the 200 broad + 50
+Defaults + 50 Recommended sweep. Release the lock and post `A FROZEN <head>` with sweep counts.
+Track D stacks on the frozen head and runs the single combined full gate; Track A does not run a full gate.
+The audit questions wait for Kareem and do not block this handoff.
 The broad recipe is the unmodified CS1 in `work/r18-fill/settings.txt` (`dungeon_items=all_anywhere`).
 Canonical `make_seed` preparation is captured immediately before `generate`, including native Gift expansion,
 chest identity/event restrictions and floor palettes; sweep workers then run that actual prepared generator.
 No generated mod, player seed or save is read/written. Logs/receipts are external under `work/r18-logic/`.
 No new working-set resource is needed: this track changes logic and synthetic tests only.
-No READY claim yet; final handoff requires every receipt to pass. No separate play-held behavior patch is in scope.
+No frozen-head claim yet; the sweep receipt is still pending. No separate play-held behavior patch is in scope.
