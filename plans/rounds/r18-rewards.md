@@ -84,7 +84,7 @@ use it as OOT_DUMP, keeping the shared round16 fixture unchanged.
 
 Reward/bridge and owned-stone Door implementations and isolated controls are built.
 Rebased MAIN FINAL focus and the aimed lesson integration fix are verified below.
-Door v2 played positive PASS; two-Stone refusal unplayed. `ac4dd86` sweep FAILED (160 exhausted); full gate STOPPED, E lock released for F+G. Reward palette staging fix passes 55 focused tests and the aimed failed broad seed. New 300-seed sweep pending; final gate after F+G merge, no READY.
+Door v2 played positive PASS; two-Stone refusal unplayed. `ac4dd86` sweep FAILED (160 exhausted); gate STOPPED and E lock released for F+G. Fix `ab209705`: 55 focused tests pass; non-counting early broad60 + Recommended20 both zero exhausted. Counting 300/full gate await rebase onto F+G's merged main. No READY.
 
 ## Implementation and observed focused proof
 
@@ -694,6 +694,39 @@ normal beatability in **two attempts, 22 spheres, 27.25 s**; one aimed rerun
 after the cause-directed code change. Receipt:
 `work/r18-rewards/reward-palette-aimed.json`.
 
-Claude's latest order: F+G next; E's fixed 300-seed sweep must have **zero
-exhausted**. E's final integration gate waits for F+G to merge. The sweep
-will record the actual effective `Seed.settings`, not its pre-prepare input.
+Claude's latest order: F+G holds the gate and changes key placements.
+The **counting** 300-seed zero-exhausted sweep and one full gate must both
+run after E rebases onto F+G's merged main and freezes that new head.
+No old-head counting sweep is queued. Sweep rows now record actual effective
+`Seed.settings`, not their pre-prepare inputs.
+
+For early signal only, Claude separately authorized **60 broad + 20
+Recommended**, without a lock, on the current fixed head
+`ab20970590617e270d2723817f0f7ee1ae850774`. Outer and internal workers are
+capped at four, reduced to one if Longshot/Hookshot runs at that recipe's
+stage start. The early sample omits the already-proved aimed `18051000`
+smoke; all three bridge modes are sampled. Results must report exhausted
+counts and mean fill attempts across **all** seeds (including exhausted
+attempts), and are **NON-COUNTING**. Completed results follow.
+
+## Authorized early signal completed — NON-COUNTING
+
+Source head **`ab20970590617e270d2723817f0f7ee1ae850774`**.
+No lock acquired or touched. Both recipe-start snapshots found no game;
+outer parallelism four, `CLAWSHOT_WORKERS=4`.
+
+| Recipe | Seeds | Exhausted | Mean attempts, all seeds | Maximum attempts |
+|---|---:|---:|---:|---:|
+| Broad | 60 | 0 | 1.1166667 (67/60) | 3 |
+| Recommended | 20 | 0 | 1.0 | 1 |
+
+Broad took 199.95 s, Recommended 63.67 s. Every seed completed normal
+full-goal beatability and the nine-reward permutation assertion. Receipts:
+`work/r18-rewards/early-palette-ab209705/results.json`, `broad-rows.jsonl`,
+`recommended-rows.jsonl`; driver log `early-palette-signal.log`.
+Exhausted counts and mean attempts posted to `cs-r18` at 15:18.
+
+This is an early signal only, **not the counting 300 or a gate pass**.
+No retry limit increased. F+G changes key placements, so E must rebase onto
+their merged main, freeze the new head, then run the counting 300 with zero
+exhausted and one full gate. **Not READY; no old-head counting run queued.**
