@@ -84,7 +84,7 @@ use it as OOT_DUMP, keeping the shared round16 fixture unchanged.
 
 Reward/bridge and owned-stone Door implementations and isolated controls are built.
 Rebased MAIN FINAL focus and the aimed lesson integration fix are verified below.
-Sweep/full gate wait for Claude's message after cs18f READY; E is third. No READY claim.
+Sweep/full gate wait for D READY and F's completed turn; order is G → D (B+D) → F → E. No READY claim.
 
 ## Implementation and observed focused proof
 
@@ -478,3 +478,9 @@ New test-file format/lint passed. Receipt:
 
 Only the two logic clauses and their test/docs changed after the rebase failure;
 Door/bridge flow code and all staged diagnostic mod bytes are unchanged.
+
+### Lock-order update — Claude
+
+B and D passed Kareem's play. Their stack, gated by cs18d, now goes immediately
+after cs18g, followed by cs18f, then cs18e. E waits for cs18d's READY and F's
+completed turn before taking `gate.lock`. No automatic runner or lock acquisition.
