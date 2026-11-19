@@ -83,8 +83,8 @@ use it as OOT_DUMP, keeping the shared round16 fixture unchanged.
 ## Work status
 
 Reward/bridge and owned-stone Door implementations and isolated controls are built.
-Door follow-up focused proof passed (722 tests, real dump supplied). Required sweep
-and full gate wait for explicit MAIN FINAL and assigned lock order. No READY claim.
+Rebased MAIN FINAL focus and the aimed lesson integration fix are verified below.
+Sweep/full gate wait for Claude's message after cs18f READY; E is third. No READY claim.
 
 ## Implementation and observed focused proof
 
@@ -434,3 +434,47 @@ and strict bridge-step boundary outcomes. Targeted command with
 `OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run pytest <that-node> -q`
 → **1 passed, 0.92 s**; new test file format/lint passed. Earlier **722 passed**
 remain valid: this follow-up changes only tests and this evidence, not source or mods.
+
+## MAIN FINAL rebase and lesson integration
+
+Claude authorized rebase onto **e241a85**, third in lock order after G and F.
+Clean rebase produced `430918afe59c6083a4f77950a4868ceae7682680`.
+No lock acquisition until Claude's message after cs18f READY.
+
+The rebased focused command added `test_app_schema.py` and
+`test_settings_native_logic.py` to the previous Door/reward/#32 consumers:
+**1528 passed, 1 failed**, 393.61 s. Printed failure:
+Prelude now requires `is_adult and Defeat Phantom Ganon and Ocarina and
+(is_child or (Ocarina,2))`; the old test supplied only Forest completion.
+Updated the contract assertion to retain MAIN FINAL's adult Time-ocarina gate,
+and made the medallion-only refusal include a usable instrument so it tests the
+ownership/completion distinction rather than accidentally missing another input.
+
+Printing the other prepared lesson rules exposed a real integration bug: E's
+completion replacements erased MAIN FINAL's age-usable instrument condition for
+Nocturne and the moat Time-song lesson, in both reward and count-only modes.
+Restored that clause in the two data rules, with `song_lessons.toml` provenance.
+The pre-lesson moat **item** stays instrument-free, as the native grant precedes
+the lesson. Added reward-only, count-only and combined-option regressions; no
+native flow, module, staged mod or save changes.
+
+Current working-set coverage is **1285 required, zero missing** in E's existing
+private layered fixture (`main-final-working-set.json`). Reward-vanilla Door
+overlays were compared again against actual MAIN FINAL
+`e241a857048db995aaba7ae23b7ee52ac15fb92e`: closed, song-only and open are byte-identical
+(`door-off-main-final-proof-v1/proof.json`). Both checks used the rebased head above.
+
+Aimed post-fix command:
+`OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run pytest
+tests/test_dungeon_rewards.py tests/test_song_lessons.py
+tests/test_r18_logic_returns.py tests/test_app_schema.py
+tests/test_settings_native_logic.py
+tests/test_reward_door.py::test_dump_a_reward_seed_ships_the_owned_door_with_its_story_and_stage -q`
+→ **919 passed, 213.35 s**. This covers the changed rules, every baseline lesson,
+return construction, app/settings validation and a real native reward seed. The
+1528 other rebased focused passes remain recorded above; no unchanged rerun.
+New test-file format/lint passed. Receipt:
+`work/r18-rewards/main-final-lesson-fix-focus.log`.
+
+Only the two logic clauses and their test/docs changed after the rebase failure;
+Door/bridge flow code and all staged diagnostic mod bytes are unchanged.

@@ -359,6 +359,8 @@ Boss deaths, blue warps, sage scenes, world restoration, carpenters/card and rev
 time travel remain completion-driven. Prelude follows Forest completion; Light Arrows
 follow the Shadow and Spirit awakening scenes, not their medallions. Logic matches
 these separate ownership and completion predicates.
+Song lessons still require an age-usable ocarina even when their rewards are shuffled.
+The moat item precedes its Time-song lesson, so the item check itself needs no instrument.
 The native animated emblem in each sage/stone scene remains its source symbol;
 the acquisition window, owned reward and Zelda Notes target follow the shuffled item.
 

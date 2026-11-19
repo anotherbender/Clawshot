@@ -57,8 +57,35 @@ def test_owned_door_is_separate_from_native_completion_readers(reward_world):
     last_sages = Counter({"Defeat Bongo Bongo": 1, "Defeat Twinrova": 1})
     assert lacs(last_sages, "adult", 1)
     prelude = world.locations["Sheik at Temple"].rule
-    assert not prelude(all_rewards, "adult", 1)
-    assert prelude(Counter({"Defeat Phantom Ganon": 1}), "adult", 1)
+    assert not prelude(all_rewards + Counter({"Ocarina": 2}), "adult", 1)
+    assert not prelude(Counter({"Defeat Phantom Ganon": 1, "Ocarina": 1}), "adult", 1)
+    assert prelude(Counter({"Defeat Phantom Ganon": 1, "Ocarina": 2}), "adult", 1)
+
+
+@pytest.mark.parametrize(
+    "settings",
+    [
+        Settings(dungeon_rewards=True),
+        Settings(bridge="stones", bridge_count=3),
+        Settings(dungeon_rewards=True, bridge="rewards", bridge_count=9),
+    ],
+    ids=["rewards", "count-only", "both"],
+)
+def test_completion_overrides_retain_age_usable_song_lessons(settings):
+    _, world = prepare(load_spec(), settings)
+    child = Counter({"Defeat King Dodongo": 1, "Defeat Barinade": 1, "Met Child Zelda": 1})
+    assert world.locations["HF Ocarina of Time Item"].rule(child, "child", 1)
+    time_lesson = world.locations["Song from Ocarina of Time"].rule
+    assert not time_lesson(child, "child", 1)
+    assert time_lesson(child + Counter({"Ocarina": 1}), "child", 1)
+    assert not time_lesson(child + Counter({"Ocarina": 2}), "adult", 1)
+    nocturne = world.locations["Sheik in Kakariko"].rule
+    sages = Counter({"Defeat Phantom Ganon": 1, "Defeat Volvagia": 1, "Defeat Morpha": 1})
+    assert not nocturne(sages, "adult", 1)
+    assert not nocturne(sages + Counter({"Ocarina": 1}), "adult", 1)
+    assert nocturne(sages + Counter({"Ocarina": 2}), "adult", 1)
+    medals = Counter({"Forest Medallion": 1, "Fire Medallion": 1, "Water Medallion": 1, "Ocarina": 2})
+    assert not nocturne(medals, "adult", 1)
 
 
 def test_bridge_story_is_not_light_arrow_ownership(reward_world):
