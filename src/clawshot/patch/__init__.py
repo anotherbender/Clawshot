@@ -192,13 +192,12 @@ def make_seed(
         from clawshot.patch.age import changes as age_changes
 
         changes += (age_changes(out.placements, free_time_travel=True),)
-    from clawshot.patch import dampe_safety, door, equipment, song_learning, start_items, story_dialogue
+    from clawshot.patch import dampe_safety, door, equipment, start_items, story_dialogue
 
     changes += (
         door.changes(out.placements, mode=settings.door_of_time),
         start_items.changes(),
         equipment.changes(),
-        song_learning.changes(),
         dampe_safety.changes(),
         story_dialogue.changes(enabled=settings.skippable_story),
     )

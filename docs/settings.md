@@ -243,10 +243,10 @@ native grants and admission rules, not a claim that every item/age pair has been
 The [round18 audit](../plans/rounds/r18-equipment.md) separates played results, native-data evidence
 and unverified boundaries. Wrong-age item-bar precautions remain [below](#hints-models-and-age-warnings).
 
-Song lessons bypass their interactive repeat-the-notes segment without an age-usable ocarina:
-Ocarina of Time works at either age; Fairy Ocarina counts only for child Link.
-The teacher's demonstration, automatic performance, actual song/shuffled reward and story continuation remain.
-This prevents the played no-ocarina shoulder-note softlock; the new scene change itself awaits play acceptance.
+Lessons retain main's native ocarina sequence. Round18's attempted no-usable-ocarina bypass was withdrawn
+after Kareem's adult/Fairy-only Minuet check froze following the demonstration (2026-11-19).
+This includes every child/Impa and adult bypass; the physical fix is deferred to round19.
+Logic requires an age-usable ocarina for lessons: Fairy as child only, Ocarina of Time at either age.
 
 ## Shops and scrub prices
 
@@ -295,7 +295,10 @@ selects fast-start skips; `--skip` alone disables them. These are separate from 
 It enables the native skip button during non-choice Talon wake-up, child Zelda and Impa speech.
 Encounters and choices still play; item grants and flag writes are outside the skippable regions.
 Saria's bridge gift and first-pull Rauru/Sheik are unchanged. `--no-skippable-story` disables it; CS1 stores the choice.
-Built and native-data-tested, **not yet played**.
+Talon's candidate was accepted by Kareem (2026-11-19): mostly skippable, some speech remains unskippable.
+Zelda's two dialogues and Impa speech remain **unplayed**, default-off opt-ins.
+EXPERIMENTAL: Zelda's two dialogue skips are unplayed and require the optional story dialogue setting.
+EXPERIMENTAL: Impa's speech and send-off skips are unplayed and require the optional story dialogue setting.
 
 The Kaepora skip also marks the skipped first-field panorama complete, ending its native
 music-suppression window. The previous preset could leave Hyrule Field silent during the day.
@@ -309,12 +312,17 @@ still awaits in-game verification; existing saved visit state is not migrated.
 
 With Kaepora skipped, later castle/Field/river/woods owl speech is also omitted while each scene's
 map banner and flags still run. Summit and Lake Hylia flight offers/flights remain available.
-These additional omissions are built/native-data-tested, not yet played.
+Castle arrival passed Kareem's candidate check (2026-11-19): short stop/fly-away remains, no speech,
+banner/map/Malon preserved. Other added owl scenes/flight offers are **unplayed**; all require the
+default-off `kaepora` fast-start selection, including under Recommended.
+EXPERIMENTAL: Field owl speech skips are unplayed and require the optional Kaepora skip.
+EXPERIMENTAL: Summit owl offer changes are unplayed and require the optional Kaepora skip.
+EXPERIMENTAL: Lake flight owl offer changes are unplayed and require the optional Kaepora skip.
 
 Every new seed also refuses to start Dampé's race without an owned Hookshot or Longshot.
-The refusal fades and returns Link to the existing Kakariko-side Graveyard surface spawn,
-because merely refusing below the one-way descent would still trap him. Both prizes remain shuffled.
-This admission/return change is built/native-data-tested, not yet played.
+Kareem accepted the no-tool candidate (2026-11-19): no race, fade out/in at the **same spot before Dampé**,
+normal control, and the existing warp back up remains usable. The intended surface return was **not**
+observed; no further behavior change was requested. Both prizes remain shuffled.
 
 Every new seed enables the D-pad HUD shortcuts from the start, independently of fast-start
 choices (including `--skip` with no selections): **Navi, Ocarina, Boots and Masks**.

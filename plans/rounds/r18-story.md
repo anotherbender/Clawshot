@@ -353,3 +353,65 @@ the main control first proves usable Longshot/admission. Source ancestry warning
 **Gameplay remains unplayed.** Claude boot-checks; Kareem supplies loaded-file proof plus actual outcome
 and Save/Continue persistence. No game was launched by G. Saria's bridge skip remains deferred to r19;
 the intended0150 timeline/0155 grant target is recorded, no0145 replacement or blind timeline wrapper.
+
+## Check12 played decision — supersedes the earlier play hold
+
+Claude relayed Kareem's **candidate-only** check12 on2026-11-19. Minuet failed: demonstration,
+Link raises/lowers the Fairy Ocarina, then freeze. The screenshot confirms the Fairy prop; a child pose/model
+is an inference, not an established diagnosis. Native Minuet `Event107` (`C08-Ocarina-Hold`,
+`IsWaitEnd=true`) precedes `Event9` calling the patched `LearningOcarinaFollowExample`, inside caller
+parallel choreography. The old guard therefore did not cover the preceding Link pose or the whole sequence.
+This does not identify the exact stalled instruction. No safe one-step fix was established.
+
+G chose withdrawal within Claude's20min limit (investigation started14:36:56, decision posted14:42).
+Claude explicitly accepted: **every no-usable-ocarina lesson bypass is removed**, child/Impa included.
+The production hook, entire `song_learning.py` and its obsolete tests are deleted; active private packet
+helpers no longer import it. Track A's age-usable lesson logic is unchanged. Physical safety moves to r19;
+no Minuet-only recheck candidate is built. Existing played profiles/mods/logs stay intact as historical evidence.
+
+Kareem accepted Dampé: **no race, fade out/in at the same spot before Dampé**, normal control and a usable
+existing warp back up. The intended surface destination was not observed; Claude says no further work.
+No Dampé code changed. Talon accepted with some speech still unskippable; castle owl accepted with a short
+stop/fly-away but no speech, with banner/map/Malon preserved. No control play or extra persistence check
+is inferred from this report.
+
+### Remaining G activation and coverage
+
+Actual `Settings()` and Recommended both have `fast_start=["intro"]`, `skippable_story=false`;
+`kaepora.default=false`. Thus the owl additions are **not default-on**.
+
+| Flow or group | Activation | Played status |
+|---|---|---|
+| `MiniGame_DampeRace` | Unconditional, all seeds | Accepted as observed above |
+| Talon `Dm_HrlCastle_0020.110` | Default-off `skippable_story` | Accepted, partial speech skipping |
+| Zelda `Dm_HrlCastle_0035/0050` | Default-off `skippable_story` | Unplayed, EXPERIMENTAL |
+| Impa `Dm_MelodyGet_Zelda`, send-off `Dm_HrlField_0020` | Default-off `skippable_story` | Unplayed |
+| Castle owl `Dm_HrlCastle_0000` | Default-off `kaepora` fast start | Accepted |
+| Field owls `Dm_HrlField_0030/0040/0050` | Default-off `kaepora` | Unplayed, EXPERIMENTAL |
+| Later Woods/Zora owls `Dm_LostWood_0000`, `Dm_ZoraRiver_0000/0005` | Default-off `kaepora` | Unplayed |
+| Summit/Lake NPC offers `Npc_Kaepora_DeathMountainTrail`, `Npc_Kaepora_LakeHylia` | Default-off `kaepora` | Unplayed, EXPERIMENTAL; flight timelines unchanged |
+| No-usable-ocarina lesson bypasses | Removed, not an option | Failed Minuet; all deferred |
+
+`docs/settings.md` gives Zelda, Field, summit and Lake flight separate plain EXPERIMENTAL lines as Claude
+requested. No unplayed default-on G flow remains.
+
+### Focused verification and literal byte proof
+
+Scoped Ruff format/check passed. Focused logic, story, race, owl, Kaepora and settings checks:
+**105 passed in5.31s**, `-n4`, `CLAWSHOT_WORKERS=1`, with native romfs enabled. No full gate or sweep
+was started, no game launched, no rebase, no lock acquisition.
+
+Read-only comparison imported archived **main `d3ce136`** and current G code separately, composing identical
+diagnostic shuffled Impa/Epona and Forest/Storms rewards. **All14 effective compressed lesson files are
+byte-identical with story dialogue OFF**, independent of inventory; this includes usable-ocarina lessons.
+With story dialogue explicitly ON, shared `Dm_SY_Ocarina`, Minuet and every other lesson file remain
+byte-identical; **only `Dm_MelodyGet_Zelda` differs for the intentional optional speech wrappers**.
+Do not describe that opt-in whole Impa file as byte-identical. No instrument/playback bypass remains.
+Hash records and actual import paths: `E:/OOTRemake/work/r18-story/check12/lesson-byte-proof.json`,
+`main-lesson-bytes.json`, `candidate-lesson-bytes.json`. No game assets were written for this proof.
+
+**G changes no placements.** After E merges/releases, F rebases on the new main and G stacks on F.
+The resulting head gets **one** full gate; broad sweep only if either track changes placements.
+Claude confirmed that **F drives** (F's14:45 post); G will stack on F's rebased frozen head and send
+the exact stacked head to F. Neither takes the lock before E releases. This withdrawal head is frozen
+for handoff, not falsely covered by the earlier `b79ff5a27e` gate.
