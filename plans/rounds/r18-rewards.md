@@ -84,7 +84,7 @@ use it as OOT_DUMP, keeping the shared round16 fixture unchanged.
 
 Reward/bridge and owned-stone Door implementations and isolated controls are built.
 Rebased MAIN FINAL focus and the aimed lesson integration fix are verified below.
-Door v2 played positive PASS; two-Stone refusal unplayed. `ac4dd86` sweep FAILED (160 exhausted); gate STOPPED and E lock released for F+G. Fix `ab209705`: 55 focused tests pass; non-counting early broad60 + Recommended20 both zero exhausted. Counting 300/full gate await rebase onto F+G's merged main. No READY.
+**READY** — tested head `3a33864d0eeca8c1a490dfaa25d17dd51bf9cf9c`, rebased onto merged F+G `8fadebf`. Counting **300/300, zero exhausted**; one full format/lint/synthetic/dump gate passes (**3768 passed/489 skipped**, **486 dump passed**). E token lock released. Door v2 positive played PASS; two-Stone refusal and other unplayed coverage remain play-held.
 
 ## Implementation and observed focused proof
 
@@ -730,3 +730,96 @@ This is an early signal only, **not the counting 300 or a gate pass**.
 No retry limit increased. F+G changes key placements, so E must rebase onto
 their merged main, freeze the new head, then run the counting 300 with zero
 exhausted and one full gate. **Not READY; no old-head counting run queued.**
+
+## Final F+G merged integration and frozen counting run
+
+Claude supplied pushed main **`8fadebf16b4087f735da2738d116645e47de3a7d`**
+and authorized the free lock. E acquired it once, retained it through rebase
+and focus, and adopted the same token for final verification.
+
+Rebase replayed all 14 E commits. The first commit had the seven reported
+conflicts plus `patch/__init__.py` and `test_pack_nup_dump.py`; the owned-Door
+commit conflicted again in patch composition, and the reward-staging repair
+conflicted again in `generate/prepare.py`. All were composed, not resolved
+by taking whole files:
+
+- Keep F's jail setting/default/CLI, Chest requirement and key source types;
+  add E's reward/bridge options and reward shuffle type alongside them.
+- Compose `rewards.prepare_spec` and `key_families.prepare_spec`.
+- Compose token/reward/progressive restrictions, then retain F's outer
+  `key_families.restrict_settings`; it copies and augments the same palette
+  dictionary instead of losing `DungeonReward`. The existing palette fill
+  still precedes ordinary type-held progression.
+- Keep G's Dampe safety/story-dialogue patches, add E's owned-Door arguments
+  and bridge changes, and retain both F's and E's dump resource modes.
+
+Integrated frozen verification head:
+**`3a33864d0eeca8c1a490dfaa25d17dd51bf9cf9c`**.
+Focused synthetic E reward/bridge/Door/story/lesson suites plus F key-family,
+floor/jail/model/binding/text and fill/gifts-fill/age-fill suites:
+**487 passed in 18.25 s**, exit 0. No game at stage start:
+`-n 12`, `CLAWSHOT_WORKERS=12`. Receipt:
+`work/r18-rewards/focused-fg-integration.json` and `.log`.
+Scoped formatting of four resolved Python files and lint both pass.
+
+The private `work/rounds/r18/fg-rewards-layered-dump` clones F's completed
+fixture and adds only E's bridge module and nine actor packs from the
+read-only RomFS. **All 1292 current working-set inputs present**, none missing;
+fixture/original digests equal. F's fixture, the original dump, all game
+folders and played outputs are unchanged. Receipt `fg-fixture-proof.json`.
+
+The counting run is **200 broad + 50 Defaults + 50 Recommended**. Broad
+keeps all-anywhere dungeon items and explicitly enables Fortress jail keys,
+so it exercises the newly composed key/reward palettes. Presets retain
+their own F key defaults. All three recipes enable E rewards and closed
+Door, cycling the three count-bridge modes with their maximum counts.
+The driver rechecks game processes separately at sweep/synthetic/dump
+stage starts, stops without a full gate on any exhausted seed, and
+otherwise performs **one** full format/lint/synthetic/dump gate. Receipts
+go to `work/r18-rewards/counting-3a33864d0eec/`; no earlier-head evidence is
+substituted. The actual counting and one full gate both passed, recorded below.
+
+## READY — final counting and one full gate passed
+
+**Exact tested code head: `3a33864d0eeca8c1a490dfaa25d17dd51bf9cf9c`.**
+Based on pushed F+G main `8fadebf16b4087f735da2738d116645e47de3a7d`.
+This receipt is docs-only after that frozen head; no post-gate code change.
+
+| Counting recipe | Passed | Exhausted | Maximum attempts |
+|---|---:|---:|---:|
+| Broad, all-anywhere + Fortress keys + E options | 200 | 0 | 3 |
+| Defaults + E options | 50 | 0 | 1 |
+| Recommended + E options | 50 | 0 | 1 |
+
+Normal fill/beatability and nine-reward permutation checks ran for every
+seed. Counting sweep exited 0 in 380.97 s. No retry increase or seed
+substitution, no old-head/early-signal evidence reused.
+
+One full gate on that same frozen head, all exit 0:
+
+| Stage | Command | Observed result |
+|---|---|---|
+| Format | `uv run ruff format --check` | passed |
+| Lint | `uv run ruff check` | passed |
+| Synthetic | `uv run --with pytest-xdist pytest -n 12` | 3768 passed, 489 skipped, 36 warnings; 256.06 s |
+| Native dump | `uv run --with pytest-xdist pytest -m dump -n 12` | 486 passed, 36 warnings; 1455.07 s |
+
+Fresh game-process checks were false independently at sweep, synthetic and
+dump starts. Sweep/synthetic used outer 12 / `CLAWSHOT_WORKERS=12`; dump
+used `-n 12` / `CLAWSHOT_WORKERS=4`. Native dump used the read-only original
+RomFS/NUP plus E's complete combined F+G/reward fixture. The retained E lock
+was released only after both counting and the full gate passed, matching
+token `236d0f6179144d2b9a81766532c79e96`. No game launched.
+
+Receipts under `work/r18-rewards/counting-3a33864d0eec/`:
+`sweep-results.json`, `sweep-rows.jsonl`, `gate-results.json`,
+`serialized-results.json`, per-stage logs and driver logs.
+Top-level driver transcript: `work/r18-rewards/counting-integrated-run.log`.
+Gate logs retain all 36 warnings. Skipped coverage in the synthetic run is
+not misrepresented as a pass.
+
+**READY, with remaining in-game coverage play-held.** Default-off feature
+status unchanged. Door v2's positive owned-Stone opening, stayed-open
+state and no premature escape/moat remain Kareem's reported played pass
+with retained native loading evidence. Optional two-Stone refusal was
+**not played**; no broader randomized-playthrough claim is made.
