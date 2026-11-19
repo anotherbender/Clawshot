@@ -34,14 +34,24 @@ def test_rewards_are_exclusively_reward_slots(reward_world):
             assert allowed(world, settings, source, slot["item"])
 
 
-def test_shuffled_rewards_do_not_unlock_completion_gates(reward_world):
+def test_owned_door_is_separate_from_native_completion_readers(reward_world):
     _, world = reward_world
     all_rewards = Counter({slot["item"]: 1 for slot in catalog()["slots"].values()})
     door = next(edge.rule for edge in world.regions["Temple of Time"].exits if edge.target == "Beyond Door of Time")
     kit = Counter({"Ocarina": 2, "Song of Time": 1, "Met Child Zelda": 1})
-    assert not door(kit + all_rewards, "child", 1)
+    assert door(kit + all_rewards, "child", 1)
     completed = Counter({f"Defeat {boss}": 1 for boss in ("Queen Gohma", "King Dodongo", "Barinade")})
-    assert door(kit + completed, "child", 1)
+    assert not door(kit + completed, "child", 1)
+    assert not door(kit + Counter({"Kokiri Emerald": 3}), "child", 1)
+    for missing in kit:
+        without = kit.copy()
+        del without[missing]
+        assert not door(without + all_rewards, "child", 1), missing
+    assert not door(Counter({"Ocarina": 1, "Song of Time": 1, "Met Child Zelda": 1}) + all_rewards, "child", 1)
+    moat_completed = Counter({"Defeat King Dodongo": 1, "Defeat Barinade": 1})
+    for name in ("HF Ocarina of Time Item", "Song from Ocarina of Time"):
+        assert not world.locations[name].rule(kit + all_rewards, "child", 1), name
+        assert world.locations[name].rule(kit + moat_completed, "child", 1), name
     lacs = world.locations["ToT Light Arrows Cutscene"].rule
     assert not lacs(all_rewards, "adult", 1)
     last_sages = Counter({"Defeat Bongo Bongo": 1, "Defeat Twinrova": 1})
@@ -63,13 +73,14 @@ def test_bridge_story_is_not_light_arrow_ownership(reward_world):
             assert not event.rule(Counter(), "adult", 1), event.name
 
 
-def test_return_guarantee_remembers_only_mandatory_closed_door_completions(reward_world):
+def test_return_guarantee_remembers_owned_stones_not_optional_completions(reward_world):
     from clawshot.generate.fill import return_guarantee_conflict
 
     settings, world = reward_world
     inventory = world.settings["age_return_fill_inventory"]
-    for boss in ("Queen Gohma", "King Dodongo", "Barinade"):
-        assert inventory[f"Defeat {boss}"] == 1
+    door = next(edge.rule for edge in world.regions["Temple of Time"].exits if edge.target == "Beyond Door of Time")
+    assert door(inventory, "child", 1), inventory
+    assert not any(name.startswith("Defeat ") for name in inventory), inventory
     assert return_guarantee_conflict(world, settings) is None
     _, early = prepare(load_spec(), Settings(dungeon_rewards=True, door_of_time="open"))
     assert not any(name.startswith("Defeat ") for name in early.settings["age_return_fill_inventory"])

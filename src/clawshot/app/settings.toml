@@ -24,7 +24,7 @@ enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests 
 label = "Dungeon reward shuffle (experimental)"
 kind = "boolean"
 group = "Items"
-help = "Off by default. Shuffle the three stones and six medallions only among their nine reward slots, including Rauru on the first sword pull. Bosses, blue warps, sage scenes, world restoration, the closed Door and Light Arrow story still follow completion. Built, not played."
+help = "Off by default. Shuffle the three stones and six medallions among their nine reward slots, including Rauru. The closed Door requires three owned stones, Ocarina of Time, learned Song of Time and Impa's real send-off. Blue warps, sage scenes, restoration, Prelude and Light Arrow story still follow native completion. Built, not played."
 [bridge]
 label = "Ganon's Castle bridge (experimental)"
 kind = "choice"

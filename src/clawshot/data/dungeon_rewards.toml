@@ -1,5 +1,5 @@
 # Identifiers only; native grant sites from r17-dungeon-items.md section 3.
-# Completion readers remain native (Claude, accepting Kareem's r18 table, 2026-11-18).
+# Completion readers remain native except the reward-on closed Door (Kareem, 2026-11-19).
 [slots."ToT Reward from Rauru"]
 item = "Light Medallion"
 actor = "Item_Medal_Light"
@@ -63,13 +63,19 @@ notes = "Event47"
 # Applied when either reward shuffle or a count bridge is enabled; never rewrite translated data.
 [completion.helpers.has_all_stones]
 rule = "'Defeat Queen Gohma' and 'Defeat King Dodongo' and 'Defeat Barinade'"
-source = "r18-rewards.md: native Door and moat readers follow completed child quests, not reward ownership; Claude 2026-11-18"
+source = "r18-rewards.md: native moat/escape readers follow completed child quests, not reward ownership; Claude 2026-11-18. Closed Door has its own ownership override, Kareem 2026-11-19"
 [completion.locations."ToT Light Arrows Cutscene"]
 rule = "is_adult and 'Defeat Bongo Bongo' and 'Defeat Twinrova'"
 source = "AllSage Event25/26 read Shadow/Spirit awakening histories; EscapeDungeon completes those scenes after the bosses; r17-dungeon-items.md section 3"
+[completion.locations."HF Ocarina of Time Item"]
+rule = "is_child and 'Defeat King Dodongo' and 'Defeat Barinade' and 'Met Child Zelda'"
+source = "DoorOfTime Event38/39/56 count Fire/Water completion only; existing round16 escape/moat readiness retains those quests and real send-off, not Forest or reward stock; r16-time.md"
+[completion.locations."Song from Ocarina of Time"]
+rule = "is_child and 'Defeat King Dodongo' and 'Defeat Barinade' and 'Met Child Zelda'"
+source = "Same native escape/moat source as the Ocarina pickup; round16 #32, r16-time.md; reward ownership never collects this source"
 
-# A closed-door pull necessarily completed these quests. The adult-return construction
-# starts beyond that pull and must not forget its mandatory child story state.
+# With rewards vanilla, a closed-door pull necessarily completed these quests.
+# Ownership-mode pulls instead carry only the three required stones (door table below).
 [completion.closed_pull_inventory]
 "Defeat Queen Gohma" = 1
 "Defeat King Dodongo" = 1
@@ -77,6 +83,16 @@ source = "AllSage Event25/26 read Shadow/Spirit awakening histories; EscapeDunge
 [completion.locations."Sheik in Kakariko"]
 rule = "is_adult and 'Defeat Phantom Ganon' and 'Defeat Volvagia' and 'Defeat Morpha'"
 source = "Native sage quest completion, not shuffled medals; r18-rewards.md reader table"
+
+[door]
+region = "Temple of Time"
+exit = "Beyond Door of Time"
+rule = "can_play(Song_of_Time) and has_stones(3) and (Ocarina, 2) and 'Met Child Zelda'"
+source = "Kareem via Claude, 2026-11-19: closed Door with shuffled rewards needs three owned Spiritual Stones, Time ocarina, learned Time song and existing real send-off; other completion readers stay native; r18-rewards.md"
+[door.closed_pull_inventory]
+"Kokiri Emerald" = 1
+"Goron Ruby" = 1
+"Zora Sapphire" = 1
 
 [bridge.vanilla]
 rule = "'Defeat Bongo Bongo' and 'Defeat Twinrova' and 'Clawshot Light Arrow Story'"

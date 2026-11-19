@@ -2,7 +2,7 @@
 
 Branch `r18/rewards`, base `2ba2f9a`; model `openai-codex/gpt-6.1-sol`.
 Research and staged output: `E:/OOTRemake/work/r18-rewards/`. Dump read-only.
-No game started; no player seed or save opened. All behavior remains unplayed.
+No game started; backups are read-only, and no current player seed or original save is modified. All behavior remains unplayed.
 
 ## Reader table — posted before implementation
 
@@ -19,8 +19,8 @@ disassembled native code. Native inventory/menu consumers still need that audit.
 | Reader / exact site | Actual state checked | Contract for this build |
 |---|---|---|
 | Inventory/get windows, reward pouch actors | Nine separate `PouchData.Item_Stone_*.StockNum` / `Item_Medal_*` and `IsGet.*`; ordinary nonconsumable KeyItems | Follow the shuffled reward; never grant the displaced vanilla reward as well. |
-| Door of Time `DoorOfTime/Event38,39,56` | Fire/Water stone **quest completion**, not owned stones; `DoorOfTime_GetStoneCount` counts remaining quests | Preserve completion unless maintainers explicitly select ownership. Open/song-only modes retain their existing send-off/clock contract. Logic must stop treating shuffled stones as a completion proxy. |
-| Door/altar scene | DoorOfTime stages, `Market_Child_TimeTempleDoor_Opened`, melody/clock/history guards | Stay story-driven; never complete a stone quest by finding its reward. |
+| Door stone counter `DoorOfTime/Event38,39,56` | Fire/Water stone **quest completion**, not owned stones; `DoorOfTime_GetStoneCount` counts remaining quests | Preserve completion for escape/moat ordering. This counter is not the shuffled closed Door's eligibility reader. |
+| Closed Door opening `DoorOfTime/Event60` and altar reaction | Native quest-stage gate plus opened/melody/history guards | With shuffled rewards, require three owned stones, Time ocarina, learned Time song and real send-off. Retain native scene/once latch; never complete a stone quest by finding its reward. With vanilla rewards, main-exact. Open/song-only retain #32. |
 | Blue warps: `Dm_SY_BancChange_EscapeDungeon` | Child/adult quest completion, first-clear routing; adult completion writes Event199/40/41/73/141 | Stay completion-driven. Boss kill, heart pickup, warp and reward grant are distinct operations. |
 | Sage count: EscapeDungeon Event249/251/252/253/267 | `AllSage_AwakeSageCount -= 1` after sage routes | Stay completed-sage count, not owned medal count. |
 | Prelude/return pedestal: `Market_Adult_Prefab_edc2`, `_89da` | `SageOfForest_IsCompleted_Exp` | Stay Forest completion; free-time-travel remains separate. Forest medal ownership does not unlock Prelude or pretend Phantom Ganon died. |
@@ -37,14 +37,15 @@ disassembled native code. Native inventory/menu consumers still need that audit.
 | Gerudo captain/carpenters/card | Four rescues and native captain scene; Spirit Step02, not Spirit medal or card stock | Preserve D39 and every rescue/guard state; reward shuffle does not write them. |
 | Reward cutscene models, Ruto display, Zelda Notes requests | Fixed source scene actors/instances; separate from grant | Review presentation separately. Native sage/story scene remains; actual get window and acquisition must name the shuffled reward honestly. |
 
-**Accepted by Claude, 2026-11-18:** keep every completion reader native, including
-the closed Door. Ownership drives only the explicit bridge count. Reward-on logic
-must use the three child dungeon completions for the closed Door and Shadow/Spirit
-awakenings for LACS. No new Door flow transform is added by Track E.
+**Initial acceptance, 2026-11-18 (superseded for the closed Door):** Claude kept all
+completion readers native pending Kareem's morning ownership decision.
 
-**Open question for Kareem (morning): should the closed Door follow owned stones
-instead?** This round deliberately retains completion; changing that is a separate
-product decision, not a consequence of moving the three reward actors.
+**Kareem's decision, relayed by Claude 2026-11-19:** with reward shuffle on, the
+closed Door needs the three **owned** shuffled Spiritual Stones plus the existing
+Ocarina of Time, learned Song of Time and real send-off. Track E owns the Door flow.
+The former open question is resolved. Other completion readers, including LACS
+awakenings, restoration, Prelude and escape/moat, stay completion-driven. Preserve
+every round16 #32 behavior; reward-vanilla output stays main-exact.
 ### Bridge / Light Arrows dispute
 
 Native data does **not** check Shadow+Spirit medallion ownership to start Light Arrows.
@@ -81,9 +82,9 @@ use it as OOT_DUMP, keeping the shared round16 fixture unchanged.
 
 ## Work status
 
-Reader contract accepted; reward/bridge implementation, Master Sword design and
-isolated controls are built. Focused proof passed; required sweep and full gate
-remain pending the Track C fill fix on current local main. No READY claim yet.
+Reward/bridge and owned-stone Door implementations and isolated controls are built.
+Door follow-up focused proof passed (722 tests, real dump supplied). Required sweep
+and full gate wait for explicit MAIN FINAL and assigned lock order. No READY claim.
 
 ## Implementation and observed focused proof
 
@@ -96,12 +97,12 @@ remain pending the Track C fill fix on current local main. No READY claim yet.
   enabled. Reward locations are a closed `DungeonReward` palette in both directions;
   advanced item/type restrictions cannot release rewards or admit ordinary items there.
   The explicit bridge uses unique ownership built-ins, not completion counts.
-- First native-generation attempt printed a real construction error: the closed-door
-  adult-return bound forgot the three mandatory child completions after replacing its
-  stone proxy. Printed search state: Forest defeat true, adult pedestal unreachable
-  because the Door rule lacked Gohma/Barinade completion. Added those **necessarily
-  completed before a closed-door pull** events to its data-bound minimum inventory,
-  never to early doors or native saved flags. The aimed rebuild passed.
+- Historical construction fix before the 2026-11-19 Door decision: the completion-gated
+  closed-door adult-return bound forgot mandatory child completions. Printed search
+  values identified the missing events; adding them made the aimed rebuild pass.
+  The ownership decision supersedes that reward-on minimum: it now carries only
+  the three necessarily owned stones, not assumed child completions. Vanilla-reward
+  completion-based preparation and every early-door kit remain unchanged.
 - Native seed `180501`, reward shuffle on, default other options: nine-slot
   permutation generated, beatability **27 spheres**, **118 written resources**.
   This is the track's own output, not a player seed. No play claim.
@@ -243,3 +244,142 @@ External receipts: `E:/OOTRemake/work/r18-rewards/sweep-results.json` and
 - Existing receipts and staged controls describe their recorded heads, not the
   future MAIN FINAL. Sweep, full gate and READY remain pending; no played result
   is claimed.
+
+## Owned-stone closed Door follow-up — Kareem via Claude, 2026-11-19
+
+- The rule is data in `dungeon_rewards.toml`: the reward-on closed exit uses three
+  distinct owned stones, Time ocarina, learned Time song and the real send-off.
+  The native completion helper remains in use for escape/moat sources; LACS,
+  restoration and Prelude remain completion-driven.
+- `DoorOfTime/Event60` reads the existing unsaved altar **invalid** predicate with
+  its false branch. That predicate is `not(all three owned stones and Time ocarina
+  and learned Time song and real send-off) or opened`. The ordinary play,
+  recommended-melody check, scene history, opening scene, latch and Step06 stay.
+  Six native saved Bool inputs were printed and checked in build e0f3ccfa; no
+  inventory, quest completion, send-off history or saved default is fabricated.
+- The native trace exposed why changing only Event60 would be unsafe: this Door
+  can open before the escape/moat. Late unguarded count writes could regress
+  Step06/Complete, while exact-Step03/04 Field readers could strand both sources.
+  Reward-on closed therefore reuses the **existing #32** nine forward-only guards
+  and four Field story modules, with their native completion/history predicates.
+  It does not use open mode's physical-door module or ungated pedestal.
+- Rewards off still selects the original main transforms and modules in every
+  Door mode. Open and song-only are unchanged even with reward shuffle on.
+- With a closed Door and a nine-slot-only reward pool, a beatable first pull must
+  find all three stones in the three child reward slots; adult slots and Rauru are
+  beyond that pull. This follows from the selected gate and pool, not an extra
+  restriction or a relaxed fill guarantee.
+
+### Door output/UI proof and natural controls
+
+Reward-vanilla **Door overlays** were generated from actual main `05823385d9` and
+the candidate working source: every output path and byte matches for closed
+(4 resources), song-only (11) and open (13), including each size table. Receipt:
+`work/r18-rewards/door-off-main-proof-v1/proof.json`. This is a Door-output
+comparison, not a whole-seed comparison or a full gate.
+
+Actual isolated browser Settings smoke: updated help renders with owned stones,
+Time ocarina/song and the real send-off; selecting On sets reward shuffle true and
+changes the settings string. Screenshot `work/r18-rewards/owned-door-help.webp`.
+The empty-library service/tab were closed; no personal preferences or seed library used.
+
+The Door scan decoded **72 slots in 12 natural-name families**, read-only, with
+before/after hashes; 564 excluded families were not opened. Family provenance is
+name-based, not independently certified gameplay history. Full input ledger:
+`work/r18-rewards/door/door-save-scan.json`.
+
+All candidate paths below are relative to `E:/OOTRemake/work/save-backups/`, ending
+in `/save/5a3c9e1f0b7d24680000000000000001/<slot>/progress.sav`.
+Every row is child, Door closed, opening/first-pull scenes unplayed, three owned
+stones (stock 1 each), real send-off played, child castle and all three child
+quests Complete, A=true, B=false and ENV=false.
+
+| Backup family / slot | File date, 2026-11-09 | Door step | Time ocarina / learned Time song | Escape / moat played | Selection |
+|---|---|---|---|---|---|
+| `2026-11-09_0954-main-after-jabu` / `slot_01` | 09:54:59.759 | Step03 | false / false | false / false | **D2**, earliest continuity candidate |
+| `2026-11-09_0954-main-after-jabu` / `slot_03` | 09:54:59.765 | Step03 | false / false | false / false | later, unused |
+| `2026-11-09_0954-main-after-jabu` / `slot_05` | 09:54:59.781 | Step03 | false / false | false / false | later, unused |
+| `2026-11-09_0954-main-after-jabu` / `slot_04` | 09:54:59.818 | Step03 | false / false | false / false | later, unused |
+| `2026-11-09_1022-main-adult-first` / `slot_03` | 10:22:06.360 | Step03 | false / false | false / false | later, unused |
+| `2026-11-09_1022-main-adult-first` / `slot_05` | 10:22:06.362 | Step03 | false / false | false / false | later, unused |
+| `2026-11-09_1022-main-adult-first` / `slot_00` | 10:22:06.363 | Step05 | true / true | true / true | **D1**, only positive candidate |
+
+Selected progress SHA-256:
+D1 `847c8216d06558a0037043769a95a7c77c32bc8c2f705702e9b1ac473fedd82b`;
+D2 `8820e1dec52cb39894361fa7a6874a7ef9b4cd5ad16a2b3778a2d6e15dc77e48`.
+Each arm has only its chosen slot plus account/options in an isolated user profile;
+all copied files match their originals. No inventory, quest, age or history edits.
+
+Packet: `work/r18-rewards/door/CHECKLIST.md`, four launchers under its `ingame/`.
+This is a **Door-only diagnostic**, not a generated reward seed: Rauru and other
+reward grants remain vanilla. Candidate uses the reward-on closed Door transform;
+actual main `05823385d9` control keeps main's closed repair, with native identity
+copies for candidate-only paths. Both arms write the same eleven resources.
+Four launcher dry runs exited 0 against rc.7; this is not a boot or play pass.
+
+- **D1:** child just inside Market gate; both arms must open once with the Time
+  ocarina/song, grant nothing at the Door, retain the latch through leave/re-entry
+  and Save & Continue, and never replay. **5–8 min per arm**.
+- **D2:** child in Zora's Domain before escape/moat; both arms must retain native
+  escape, both moat rewards, no airwall loss, then once-only Door opening and reload.
+  **10–15 min per arm**.
+- Optional adult first pull / real walk to Field / #32 clock and Sun's Song:
+  **5–8 min per arm**. Do not debug-set the clock during these checks.
+- Total Door packet **30–46 min**, plus **10–16 min** optional, unmeasured in game.
+  Require each runtime's own mods-load lines and the observations; no agent starts it.
+
+**Dropped, no natural state:** playable fewer-than-three-stones refusal, learned-song
+but missing-send-off/Time-ocarina refusal, main-opens/candidate-refuses discriminator,
+and early pull followed by a late escape/moat. Do not fabricate these states. D1's
+natural ownership and completion agree, so it cannot distinguish the two gates;
+D2 proves only native-order continuity if played. Distinguishing/late-order cases
+remain offline coverage, not played acceptance.
+
+Additional non-lock proof: eleven scenarios executed against the transformed native
+Door flow and its written GameData: owned-three without child completion opens;
+each missing stone, missing Time ocarina/song/send-off, completion without ownership,
+opened latch, played scene and wrong melody refuse; successful replay is inert.
+Only the native opened latch and Door Step06 were written, never child quests.
+The first harness omitted the explicit opened=False primitive; the strict evaluator
+printed missing hash `1920740541`, identified as the opened Bool. Adding that
+missing harness input made the aimed run pass; production code was not changed.
+
+Read-only source check confirms `IsGet.Item_Melody_SunSong=true` in **both** D1
+and D2 selected saves, so their optional Sun's Song observation has its prerequisite.
+The reward-on moat logic also retains #32's **Fire/Water completion only**, not a
+new Forest-completion or owned-stones condition.
+
+End-to-end, non-lock CLI smoke:
+`CLAWSHOT_WORKERS=1 uv run python -m clawshot --romfs E:/Games/Hookshot/romfs
+--seed 180519 --dungeon-rewards --bridge medallions --bridge-count 6
+--out E:/OOTRemake/work/r18-rewards/owned-door-seed-180519`
+completed: **177 shuffled locations, 20 spheres, 123 files**, including the four
+Field story modules. Beatability passed before writing; no game was launched.
+Log: `work/r18-rewards/owned-door-seed-smoke.log`.
+
+Scoped Ruff initially printed two whitespace diffs and one test-only SIM401;
+applied those exact fixes (including `flows.get(path, game)`). All five changed
+Python files then passed format and lint. Removed default-vs-explicit-false
+tautologies from the new tests; actual-main byte identity is the external proof above.
+
+### Final focused Door verification
+
+`OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run pytest
+tests/test_reward_door.py tests/test_dungeon_rewards.py tests/test_door.py
+tests/test_door_story.py tests/test_door_stage.py tests/test_door_dump.py
+tests/test_clock_environment.py tests/test_clock_transitions.py
+tests/test_reward_bridge.py tests/test_story_steps_darunia.py
+tests/test_story_steps_fire.py tests/test_story_steps_darunia_dump.py -q`
+→ **722 passed, 3 existing parametrization deprecation warnings, 249.81 s**.
+No skipped native coverage in this focused command. It exercises ownership versus
+completion, Ocarina/song/send-off refusal, recommendation and once-only guards,
+forward-only late writers, escape/moat and native physical-door continuity, inverse
+flow/GameData/module masks, shared Darunia consumers and a real `make_seed` path.
+Log: `work/r18-rewards/owned-door-focused.log`. This is not the held full gate.
+
+The formatter changed only the Door function-signature line wrapping after packet
+staging. A fresh build from final source SHA-256
+`1d230ac11525225d64b548c55623ecdeddb84195d96a9c93af232b1a85ec846c`
+matches **all eleven staged candidate files byte for byte**; no launcher, profile
+or staged mod needed replacement. Receipt:
+`work/r18-rewards/door/formatter-output-proof.json`.

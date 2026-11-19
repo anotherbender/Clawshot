@@ -37,20 +37,25 @@ def prepare_spec(spec: Mapping[str, Any], settings: "Settings") -> Mapping[str, 
     helpers["can_build_rainbow_bridge"] = data["bridge"][settings.bridge]
     regions = []
     story = data["story_event"]
+    owned_door = data["door"] if settings.dungeon_rewards and settings.door_of_time == "closed" else None
     world_settings = dict(spec.get("settings", {}))
     if settings.door_of_time == "closed":
         inventory = world_settings.get("age_return_fill_inventory")
         if inventory is not None:
-            world_settings["age_return_fill_inventory"] = {**inventory, **completion["closed_pull_inventory"]}
+            required = owned_door["closed_pull_inventory"] if owned_door else completion["closed_pull_inventory"]
+            world_settings["age_return_fill_inventory"] = {**inventory, **required}
     for region in spec["regions"]:
         rules = dict(region.get("locations", {}))
         for name, rule in completion.get("locations", {}).items():
             if name in rules:
                 rules[name] = rule
         events = dict(region.get("events", {}))
+        exits = dict(region.get("exits", {}))
+        if owned_door and region["name"] == owned_door["region"] and owned_door["exit"] in exits:
+            exits[owned_door["exit"]] = {"rule": owned_door["rule"], "source": owned_door["source"]}
         if region["name"] == story["region"]:
             events[story["name"]] = {"rule": story["rule"], "source": story["source"]}
-        regions.append({**region, "locations": rules, "events": events})
+        regions.append({**region, "locations": rules, "events": events, "exits": exits})
     return {
         **spec,
         "locations": locations,

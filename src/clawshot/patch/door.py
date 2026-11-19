@@ -1,8 +1,9 @@
-"""Door of Time: native closed; both early modes wait for the Field clock (the owl arrival and Impa's send-off).
+"""Door of Time: native closed, or an owned-stone closed gate with dungeon rewards shuffled.
 
 No stone quest, inventory grant, saved default/history or first-adult scene is forged.
 Early modes keep the escape/moat sources available after first pull; late callbacks cannot
-undo Complete. The pre-send-off courtyard reset stays native. Audit: plans/rounds/r16-time.md.
+undo Complete. Both early modes still wait for the Field clock and Impa's real send-off.
+The pre-send-off courtyard reset stays native. Audit: plans/rounds/r16-time.md.
 """
 
 import argparse
@@ -32,6 +33,15 @@ OPENED = "Market_Child_TimeTempleDoor_Opened"
 REACTION = "Market_Child_TimeTempleDoor_OcarinaReacts"
 TIME_SONG = "IsGet.Item_Melody_TimeSong"
 SENDOFF = "HavePlayedEvent.Dm_HrlField_0020"
+TIME_OCARINA = "IsGet.Item_Ocarina_Time"
+_OWNED_REQUIREMENTS = (
+    "IsGet.Item_Stone_Forest",
+    "IsGet.Item_Stone_Fire",
+    "IsGet.Item_Stone_Water",
+    TIME_OCARINA,
+    TIME_SONG,
+    SENDOFF,
+)
 _STORY_CHANGES = door_story.changes()
 _ORDER_CHANGES = door_story.changes(early=False)
 
@@ -55,6 +65,59 @@ def _altar_reaction(data: bytes, values: list[list[byml.U64]]) -> bytes:
     if (difference := byml.difference(document.root, byml.read(result))) is not None:
         raise PatchError(f"early door: written GameData does not read back: {difference}")
     return result
+
+
+def _owned_stone_reaction(data: bytes) -> bytes:
+    """Invalidate the altar reaction until owned stones, native instrument/song and the real send-off."""
+    values = []
+    for index, name in enumerate(_OWNED_REQUIREMENTS):
+        values.append([byml.U64(0), byml.U64(key(name))])
+        if index:
+            values.append([byml.U64(3)])
+    values.extend(
+        [
+            [byml.U64(5)],
+            [byml.U64(0), byml.U64(key(OPENED))],
+            [byml.U64(4)],
+        ]
+    )
+    return _altar_reaction(data, values)
+
+
+def _owned_stone_flow(data: bytes) -> bytes:
+    """Replace only the opening's quest-stage gate; all counter, scene and travel paths stay native."""
+    document = evfl.read(data)
+    fc = document.flowchart
+    if fc is None or fc.name != "DoorOfTime":
+        raise PatchError("owned-stone door: expected DoorOfTime flowchart")
+    events = {event.name: (index, event) for index, event in enumerate(fc.events)}
+    if any(name not in events for name in ("Event60", "Event69")):
+        raise PatchError("owned-stone door: missing native opening gate")
+    _, gate = events["Event60"]
+    opened_index, opened = events["Event69"]
+    if (
+        not isinstance(gate, evfl.SwitchEvent)
+        or fc.actors[gate.actor].name != "GameDataActor"
+        or fc.actors[gate.actor].queries[gate.query] != "EventQueryIsGameDataBoolExp"
+        or gate.params != {"GameDataName": "DoorOfTime_IsAfter_Step04_Exp"}
+        or gate.cases != [(0, opened_index)]
+        or not isinstance(opened, evfl.SwitchEvent)
+        or fc.actors[opened.actor].name != "GameDataActor"
+        or fc.actors[opened.actor].queries[opened.query] != "EventQueryIsGameDataBool"
+        or opened.params != {"GameDataName": OPENED, "Index": -1}
+    ):
+        raise PatchError(f"owned-stone door: changed native opening gate: {gate!r}, {opened!r}")
+    # REACTION is the native *invalid* predicate: false permits the ordinary learned-song/play/once chain.
+    gate.params = {"GameDataName": REACTION}
+    gate.cases = [(1, opened_index)]
+    result = evfl.write(document)
+    if evfl.read(result) != document:
+        raise PatchError("owned-stone door: written flow does not read back")
+    return result
+
+
+def _owned_stone_story(data: bytes) -> bytes:
+    return _STORY_CHANGES[FLOW](_owned_stone_flow(data))
 
 
 def song_reaction(data: bytes) -> bytes:
@@ -183,28 +246,36 @@ def open_pedestal(data: bytes) -> bytes:
     return result
 
 
-def changes(_placements: Mapping[str, str], *, mode: str = "closed") -> FileChanges:
+def changes(_placements: Mapping[str, str], *, mode: str = "closed", dungeon_rewards: bool = False) -> FileChanges:
     if mode not in MODES:
         raise PatchError(f"unknown door_of_time mode {mode!r}")
     if mode == "closed":
+        if dungeon_rewards:
+            return {**_STORY_CHANGES, FLOW: _owned_stone_story, GAME_DATA_LIST: _owned_stone_reaction}
         return dict(_ORDER_CHANGES)
     if mode == "song_only":
         return {**_STORY_CHANGES, FLOW: _song_story, GAME_DATA_LIST: song_reaction}
     return {**_STORY_CHANGES, PLACEMENT: open_pedestal, GAME_DATA_LIST: open_reaction}
 
 
-def build(romfs: str | Path, *, mode: str = "closed") -> list[BuiltFile]:
-    """Early modes: the story stage's modules; open also the Temple door module, which opens on the clock gate."""
+def build(romfs: str | Path, *, mode: str = "closed", dungeon_rewards: bool = False) -> list[BuiltFile]:
+    """Keep escape/moat checks after an early pull; only open mode replaces the physical door's clock gate."""
     if mode not in MODES:
         raise PatchError(f"unknown door_of_time mode {mode!r}")
-    if mode == "closed":
+    if mode == "closed" and not dungeon_rewards:
         return []
     return door_stage.build(romfs, gate=mode == "open")
 
 
-def write(romfs: str | Path, out: str | Path, *, mode: str = "closed") -> list[WrittenFile]:
+def write(
+    romfs: str | Path, out: str | Path, *, mode: str = "closed", dungeon_rewards: bool = False
+) -> list[WrittenFile]:
     return write_patch(
-        Plan([], [], []), romfs, out, extra_changes=[changes({}, mode=mode)], fast_start_files=build(romfs, mode=mode)
+        Plan([], [], []),
+        romfs,
+        out,
+        extra_changes=[changes({}, mode=mode, dungeon_rewards=dungeon_rewards)],
+        fast_start_files=build(romfs, mode=mode, dungeon_rewards=dungeon_rewards),
     )
 
 

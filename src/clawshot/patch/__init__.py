@@ -199,7 +199,7 @@ def make_seed(
     from clawshot.patch import dampe_safety, door, equipment, reward_bridge, start_items, story_dialogue
 
     changes += (
-        door.changes(out.placements, mode=settings.door_of_time),
+        door.changes(out.placements, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
         start_items.changes(),
         equipment.changes(),
         dampe_safety.changes(),
@@ -218,7 +218,7 @@ def make_seed(
     ]
     changes += (text.sheik_hint_changes(romfs, hookshot_locations),)
     fast_files = (
-        *door.build(romfs, mode=settings.door_of_time),
+        *door.build(romfs, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
         *reward_bridge.build(romfs, mode=settings.bridge, count=settings.bridge_count),
     )
     plan = make_plan(out, links, table, chest_events.load(), overrides=custom.actors)

@@ -351,11 +351,14 @@ slots, including Rauru's Light Medallion on the first sword pull. Rewards cannot
 to chests, gifts, shops or Skulltulas, and other items cannot occupy reward slots.
 The first pull still grants the sword and retains the native song/story sequence.
 
-Native boss deaths, blue warps, sage scenes, world restoration, carpenters/card and
-time travel remain completion-driven. In particular, the closed Door follows the
-three child dungeon completions, not the shuffled stones. Prelude follows Forest
-completion; Light Arrows follow the Shadow and Spirit awakening scenes, not their
-medallions. Logic uses those same completion predicates with reward shuffle on.
+With reward shuffle on, the **closed Door needs the three owned Spiritual Stones**,
+not child dungeon completions, plus its existing Ocarina of Time, learned Song of Time
+and real Impa send-off requirements. Open and song-only keep their existing clock/send-off
+gates. An early opening cannot strand the later native escape or moat rewards.
+Boss deaths, blue warps, sage scenes, world restoration, carpenters/card and reverse
+time travel remain completion-driven. Prelude follows Forest completion; Light Arrows
+follow the Shadow and Spirit awakening scenes, not their medallions. Logic matches
+these separate ownership and completion predicates.
 The native animated emblem in each sage/stone scene remains its source symbol;
 the acquisition window, owned reward and Zelda Notes target follow the shuffled item.
 
@@ -375,7 +378,7 @@ Maintainer reader table and controls: [Round 18 rewards](../plans/rounds/r18-rew
 
 | Option | Requirement / effect |
 |---|---|
-| `--door-of-time closed` | Default, native: meet Zelda and Impa at the child castle, complete the three Spiritual Stones, then obtain the Ocarina of Time and playable Song of Time. |
+| `--door-of-time closed` | Default: meet Zelda and Impa, then Ocarina of Time and playable Song of Time. With vanilla rewards, keep the native completed-stone route. With reward shuffle, require all three **owned** Spiritual Stones instead; finding stones never completes their dungeons. |
 | `--door-of-time song_only` | Field-arrival clock state and Impa's real field send-off, then either child ocarina and the learned Song of Time. No stones needed to open the Door. |
 | `--door-of-time open` | The Door waits for Field-arrival clock state and Impa's real field send-off, then opens without songs or stones; the first-pull pedestal has no extra item gate. |
 | `--logic free_time_travel=true` | Experimental, default off: adult return before Forest completion. The app's **Free time travel (experimental)** switch is the same override. |
