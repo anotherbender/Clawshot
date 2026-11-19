@@ -611,4 +611,9 @@ because F's fix still needs play. Claude authorized E to take the lock when
 D releases it, complete one full gate on the frozen code, and post READY
 with its exact head; docs-only commits after the code are permitted.
 The outstanding settings sweep stays serialized with E's gate. No rebase or
-production change; all workers will stay at one while Kareem is playing.
+production change. Claude subsequently corrected the concurrency policy: at
+each stage start, freshly check for `longshot.exe` or `hookshot.exe`. Without
+either game, sweep/synthetic use outer parallelism 12 and
+`CLAWSHOT_WORKERS=12`; dump uses `-n 12` and `CLAWSHOT_WORKERS=4`. With either
+game running, that stage uses outer parallelism 4 (`-n 4` for pytest) and
+`CLAWSHOT_WORKERS=1`. No blanket one-worker cap or cross-stage cached check.
