@@ -46,10 +46,43 @@ External logs: `work/r18-issue35/mido-{red,focused}.log`. No game result or plac
 
 ## Play packet
 
-Candidate and base-main control, approximately ten minutes. Prefer an existing natural pre-clear child save with Zelda met and the saved wall still true. Only if none exists, Claude permits one documented edit on a natural early save: `Step_Goto_HyruleCastle=Complete`, identically in both arms. No inventory/position/other quest edits. Original saves and game outputs remain read-only.
+Packet staged at `E:/OOTRemake/work/r18-mido/ingame/CHECKLIST.md`, approximately ten minutes, plain
+landmarks and two template-derived CRLF launchers: `01-main-control.bat`, then `02-candidate.bat`.
+Both actual CLI dry runs passed without launching the game and initialized identical isolated saves.
+Claude must boot-check; Kareem plays. No new runtime result is claimed.
 
-Check control's absent/relocated Mido plus wall; candidate's gate-position Mido; equipment refusal; sword+shield native talk; wall clearance, tree-mouth access and reload. Packet must name plain landmarks in `CHECKLIST.md`. Agents do not launch the game; Claude boot-checks and Kareem plays.
+Control is the **public generated overlay from d3ce136** preserved by the failing regression; candidate
+is the corresponding passing public overlay from implementation `421ef418389c9348d5bd89e25a41a8f298928ff4`.
+Both are Chest-only seed 35 / bridge-only / four fast-start skips. All **178 placements are identical**;
+only the child schedule, the one unsaved GameData expression and its RSTB allocation differ.
+`work/r18-mido/overlay-proof.json` checks every resource and the exact inverse GameData/RSTB delta.
+
+No already-castle-complete natural pre-clear fixture was found in the selected research inventory.
+Final source is the natural r13 native-Mido sword-only snapshot `2026-11-12_113925-r13-faststart-native-6`.
+The **only** final-fixture mutation is `Step_Goto_HyruleCastle Ready -> Complete`, four bytes
+92996–92999. Saved blocker true; child; early meeting Step02; mouth/seen-0070 false; sword naturally owned,
+no shield; **21 rupees**. Full parent comparison verifies unchanged inventory, position, all other
+entries/key sets, version, size and auxiliary files. Fixture SHA256:
+`d15a7402ef0905271f38cce69ff25754af1bc97f701613ddb8d5b2fc4b2a745a`.
+Both arms copy `work/r18-mido/fixture/v2-save` unchanged; `final-fixture-proof.json` and
+`launcher-proof.json` record this. The first both-equipped fixture was superseded, never launched:
+the final check does not depend on an unproved ability to unequip an owned item.
+
+Fixture history is r13 seed 7, not the test overlays' seed 35. This is an explicitly bounded Mido
+mechanism experiment: **no chest/randomized checks**. Prove sword-only refusal, buy the fixed unshuffled
+10-rupee Deku Shield, equip the pair, then prove physical crossing/open mouth/reload. The original
+save's bridge remains closed; that is outside this gate check. No inventory, position, Zelda-history
+or other quest edit is concealed. No Slingshot or Gohma play is needed.
+
+Control must reproduce the absent/relocated guard plus invisible wall. Candidate must retain Mido at
+the passage, finish the refusal, clear only after the equipped pair, and leave the wall cleared after
+reload; his later post-clear relocation is expected. Loading proof must include the candidate's loose
+child AIScheduleParam and GameDataList. Runtime repair and existing-save healing remain **PLAY-HELD**.
 
 ## Gate queue
 
-No lock acquisition before the combined F+G owner releases it and our assigned turn. Focused checks first; full gate queued behind F and G. No sweep is needed for this non-placement change. Not READY; runtime repair unplayed.
+No lock acquisition before the combined F+G owner releases it and our assigned turn. Implementation
+`421ef418389c9348d5bd89e25a41a8f298928ff4` is frozen; this later packet receipt changes documentation only.
+Focused checks passed; one full gate is queued behind F and G, not started. The manual-only helper
+`work/r18-mido/gate.py` refuses an occupied lock and never watches or rebases main. No sweep is needed
+for this non-placement change. No READY claim: full gate pending and runtime repair unplayed.
