@@ -162,6 +162,41 @@ sweep or gate acquisition; it must not race the new stack sequence. Attribution 
 only predecessor heavy run. No replacement automatic main-triggered runner is active.
 Authoritative commands, process snapshots and results will be external under `work/r18-chests/`.
 
+### Frozen A+D acceptance
+
+Rebased cleanly onto **A FROZEN `537e5df9d849e0d7f5eed89dddb38ba191786fb9`**
+(A on C+H `0582338`). Issue #11 is absent from this merge stack. Combined focused command:
+
+`CLAWSHOT_WORKERS=4 uv run pytest tests/test_world_chest_hunt.py
+ tests/test_r18_logic_returns.py tests/test_song_lessons.py
+ tests/test_world_data.py::test_all_other_vanilla_checks_with_keys_and_an_escape_tool -q --tb=short`
+
+**160 passed in 47.20 s**, before taking `gate.lock`; neither game runtime was running.
+Receipt: `work/r18-chests/stack-focused.log`. The read-only A-FROZEN event receiver completed
+without running any rebase/generation itself and was removed after delivery.
+
+Combined native-prepared sweep:
+`uv run python E:/OOTRemake/work/r18-chests/sweep.py --label merge-sweep`.
+Authoritative rows, recipe strings, process snapshots and shuffled-pool stock assertions:
+`E:/OOTRemake/work/r18-chests/merge-sweep/results.json`; console `merge-sweep.log`.
+Sweep completed **300/300**, **zero exhausted**, 09:47:31–10:02:00; four workers and
+neither runtime present at every recipe start. Exact source head:
+`cfee2c8bd28f513a4d6edd22ce832269d2ae99e5`. Broad includes both reported seeds
+`2306988613` and `12345`; every accepted seed passed beatability and shuffled-stock equality.
+
+| Recipe | Accepted | Production attempts | First-attempt failures | Exhausted |
+|---|---:|---:|---:|---:|
+| Broad `all_anywhere` | 200 | 253 | 43 | 0 |
+| Defaults | 50 | 50 | 0 | 0 |
+| Recommended | 50 | 52 | 2 | 0 |
+
+This receipt-only commit freezes the stack for its **sole full gate**; source is unchanged
+from the completed sweep and 160-test focus. The authoritative exact-head gate ledger is
+`E:/OOTRemake/work/r18-chests/merge-gate/results.json`, with format/lint/synthetic/dump
+logs alongside. The ledger records its actual head, process snapshots, worker counts, exit
+codes and timestamps; **READY (merge) requires all four exits zero**. Gate outcome is
+posted on `cs-r18` without a post-gate commit, preserving the exact tested merge head.
+
 ## Issue #11 — separate play-held layer
 
 Issue read and claimed by comment before edits. Existing world metadata already maps the native
