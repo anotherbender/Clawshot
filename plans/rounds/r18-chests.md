@@ -245,3 +245,77 @@ every completion/ownership/story field are untouched. Proof: `prepare_fixture.py
 `reward40-fixture.json`. This is declared diagnostic inventory setup, not a naturally earned
 forty-token playthrough. Candidate and main control will each start from identical isolated copies.
 The corrected nested-rc.7 launcher template was re-read after Claude's fix.
+
+### Staged issue-11 check
+
+Implementation commit: **`cc6ac1adae42f111d903b1261fa7cf5f34a71879`**, directly on merged
+`e241a85704`. Both diagnostic packets were rebuilt from their actual source trees:
+
+- Control: main **`e241a85704`**, `Test - reward40-control-e241.bat`; production selection
+  excludes forty tokens, so intended Hammer assignment still emits the native Large20 actor.
+- Candidate: **`cc6ac1adae`**, `Test - reward40-candidate.bat`; production selection admits
+  the source, emits Hammer and updates the forty-token preview in sixteen language archives.
+  One flow plus sixteen archives; no GameDataList or size-table change is required.
+
+Both live under **`E:/OOTRemake/work/r18-chests/ingame/`**. Builder metadata:
+`reward40-control-e241.json`, `reward40-candidate.json`. The production writer reparsed every
+emitted flow/message archive; restoring only Event200's actor inverse-equals the native flow.
+This is controlled diagnostic **180411**, not a generated seed or a claim of played behavior.
+
+Fresh corrected-template launchers were run through actual `cmd.exe` with
+`CLAWSHOT_DRY_RUN=1`: both exit0 and resolve **Longshot rc.7**, each with its own one-mod
+path and user profile. Complete copied save trees (account, options, caption, progress) are
+byte-identical to the authorized fixture. Both start adult, **40 tokens, GetReward40=false,
+Hammer=false, Bombchus=0**. No game was started. Receipt:
+`work/r18-chests/reward40-dryruns-corrected.log`; the save inspector was also launched and
+reported those two initial states.
+
+First dry-run harness proof used the wrong fixture `/save` suffix; printed expected-empty
+versus actual four-file keys identified the error. The fixture is already an account root.
+Corrected only the proof's root comparison and reran once; no save or launcher fix was needed.
+The original failed harness output is retained as `reward40-dryruns.log`.
+
+**Claude boot-checks; Kareem plays; estimate 12–18 minutes plus shader warm-up.**
+Checklist: **`E:/OOTRemake/work/r18-chests/ingame/CHECKLIST.md`**. Control first must give
+twenty Bombchus, not Hammer; candidate must preview/grant/use Hammer, not add Bombchus.
+Re-enter, save, quit and Continue: no second forty-token grant, Hammer persists. Collect both
+runtime `mods: Event/EventFlow/GatheringTokenGold.bfevfl.zs <- <this packet>` lines and run
+`inspect_reward40.py --require-played` for the native collected flag and Hammer ownership.
+Only Debug Teleport and clock; no live inventory, era or completion edits.
+
+Issue-11 production-pool sweep receipt:
+`E:/OOTRemake/work/r18-chests/reward40-sweep/results.json` and `reward40-sweep.log`.
+Full issue-11 gate remains **explicitly held until Kareem's play result**, not silently
+substituted by the merge head's earlier gate.
+
+**Lock-order correction (Claude, 2026-11-19):** D took the issue-11 sweep lock ahead of the
+agreed **G → F → E** order. Claude explicitly permits the already-running sweep to finish
+and release its owned lock. **No further D lock acquisition until G, F and E have each posted
+READY.** The issue-11 full gate additionally requires Kareem's play result; both conditions
+must be satisfied. No automatic D heavy runner is queued. This is a scheduling violation,
+not an exemption from the shared-lock order.
+
+### Play-held acceptance receipt
+
+Production-pool sweep on exact implementation **`cc6ac1adae42f111d903b1261fa7cf5f34a71879`**
+completed **300/300**, **zero exhausted**, 10:35:23–10:55:03 (1181.19 s).
+Every accepted seed passed beatability and shuffled-stock equality; broad again includes
+`2306988613` and `12345`. Complete recipe strings and rows are in the receipt linked above.
+
+| Recipe | Accepted | Production attempts | First-attempt failures | Exhausted | Workers |
+|---|---:|---:|---:|---:|---:|
+| Broad `all_anywhere` | 200 | 208 | 8 | 0 | 4 |
+| Defaults | 50 | 50 | 0 | 0 | 4 |
+| Recommended | 50 | 52 | 2 | 0 | 1 |
+
+Broad/Defaults stage-start checks found no runtime. Recommended detected `longshot.exe`
+and reduced to **one worker**. Owned `gate.lock` released after the sweep; absence was
+observed and the G-slot handoff posted at 10:55. No other D heavy job is queued.
+
+**READY (play-held)** means engineering/staging complete, **not played and not full-gated**:
+47 focused synthetic/native tests, scoped Ruff and both actual launcher dry-runs pass;
+all 300 sweep seeds accepted. The final receipt commit changes only this round file;
+packet and swept source remain `cc6ac1adae`. **Do not merge issue #11 until Kareem's
+control/candidate result and its later full gate pass.** That gate may not acquire the lock
+before G, F and E each post READY. No game was started, no runtime folder written, no
+live save or played seed opened, no merge/push/version bump performed by this track.
