@@ -217,4 +217,36 @@ Canonical `make_seed` preparation is captured immediately before `generate`, inc
 chest identity/event restrictions and floor palettes; sweep workers then run that actual prepared generator.
 No generated mod, player seed or save is read/written. Logs/receipts are external under `work/r18-logic/`.
 No new working-set resource is needed: this track changes logic and synthetic tests only.
-No frozen-head claim yet; the sweep receipt is still pending. No separate play-held behavior patch is in scope.
+No separate play-held behavior patch is in scope.
+
+### Final sweep receipt (2026-11-19)
+
+Rebased onto Claude's announced C+H stack `0582338`. Sweep-tested head:
+`2c166405760d92dc86cc8af20e338ddfce7eed0d`. The frozen handoff adds only this documentation receipt.
+
+Focused proof after rebase: **93 passed in 22.55 s**, using:
+
+```sh
+CLAWSHOT_WORKERS=1 uv run pytest tests/test_r18_logic_returns.py tests/test_song_lessons.py \
+  tests/test_world_data.py::test_all_other_vanilla_checks_with_keys_and_an_escape_tool -q --tb=short
+```
+
+Locked native-prepared sweep: **4 workers, 1028.313 s**. Seed numbers were 180000–180199 for Broad and
+180000–180049 separately for Defaults and Recommended. Rejected attempts below are ordinary generator
+retries (`attempts - accepted`), not exhausted seeds.
+
+| Recipe | Accepted seeds | Attempts | Rejected attempts | Exhausted seeds |
+|---|---:|---:|---:|---:|
+| Broad, unmodified CS1 | 200 | 314 | 114 | 0 |
+| Defaults | 50 | 50 | 0 | 0 |
+| Recommended | 50 | 51 | 1 | 0 |
+
+All seeds passed the production verified-region certificate and the independent sphere audit restricted
+to the same native verified scope. Raw whole-world diagnostics remain separate from that acceptance
+scope and retain the unresolved audit questions above. The runner released its own `gate.lock` in `finally`;
+the post-run receipt confirmed `GATE_LOCK_EXISTS False`.
+
+External receipts under `E:/OOTRemake/work/r18-logic/`: `rebased-focused.log`, `sweep-final.log`,
+`sweep-results.json`, `sweep-rows.jsonl`, `sweep-preparation.json`; runner `run_sweep.py`.
+No full gate was run by Track A. Track D owns the combined-stack sweep and sole full gate before merge.
+Logic is frozen for the `A FROZEN <head>` handoff; audit questions wait for Kareem.
