@@ -529,3 +529,64 @@ shut, show two-Stone refusal, retrieve it, then show three-Stone admission.
 No Talon/Zelda/Impa replay, controls, fake save or dungeon-completion shortcut.
 The later completion-triggered escape/moat remains outside this short check.
 Launcher posted to `cs-r18` at 11:47. **Built, not played; Claude boot-checks.**
+
+## Door v1 BLOCKED in play → verified closed-chest v2
+
+Claude relayed Kareem's played result: Mido's four chests were already open in
+the exact natural source, so no kit could be acquired. **V1 is BLOCKED, not a
+Door feature pass.** Do not rerun it. Its 23 matching saves were only
+story/inventory candidates, not certified usable kit fixtures.
+
+Cause: E read absence from the raw Bool64 collection list, which does **not**
+certify a chest's open state. Track F's `fixtures/jail_chests.py:36` uses the
+actual named Bool: `save.flag("IsTreasureBoxOpen.<actor Hash>")`. E now requires
+explicit **false**, never None or missing-key absence. Kareem's observation is
+the repro; no Mido recheck was run. V1's played output/profile remain untouched.
+
+Same original `2026-11-07_1630/slot_01` and full SHA recorded above. Source has
+native Bracelet, Kokiri Sword, Fairy Ocarina, Sun's Song and Zelda's Letter;
+**no Bomb Bag or Bombchus**, so Track F's adult bomb-dependent DMT/GC/DMC
+collection route cannot simply be copied. Selected four child-capable sites:
+
+| Actual named open Bool suffix | Raw Bool | Child access without kit | Grant |
+|---|---|---|---|
+| `8291119063305855945` | 0 / false | true | Time ocarina |
+| `8607798771661947511` | 0 / false | true | Time song |
+| `16912540161937823130` | 0 / false | true | Goron Ruby |
+| `9622128545943056087` | 0 / false | true | Zora Sapphire |
+
+All names are `IsTreasureBoxOpen.<suffix>`. Their 32-bit flag keys and raw
+values are in v2 `source-proof.json`; the copied candidate's separate
+`staged-state.json` prints all four false as well. A child-only Search uses only
+actual source-owned prerequisites, no kit or adult finds. The first grave
+probe printed false access because the fresh-start search had not inherited
+the source's already-achieved Time Flows event. Printing counts showed the
+missing event; supplying it from the already-verified natural A/S/B/ENV
+predicate makes all four reachable. No source flag or production logic edit.
+
+Plain landmarks: the two cracked-wall alcoves on the **west side of Dodongo's
+first giant-skull hall**, by the sealed central door: **north** Time ocarina,
+**south** Time song. Nearby native Bomb Flowers plus the owned Bracelet
+provide access, with no Bomb Bag. Then Kakariko Graveyard at night (native
+Sun's Song is owned): standing at the Royal Tomb entrance facing out over the
+graveyard, nearest row of seven graves, **fourth from right, unmarked ReDead
+grave** Ruby; **leftmost / seventh from right, enemy-free grave** Sapphire.
+Native Kokiri Sword handles the ReDead; Sun's Song may stun it.
+
+New packet, never an in-place rebuild:
+`E:/OOTRemake/work/r18-rewards/door-owned-natural-v2/`.
+Launcher: `ingame/Test - owned Door - natural candidate v2.bat`.
+Same seed 180520, settings and frozen production source as v1; build HEAD
+**d023843e0fa9008f8554d3446890b3003a608911** is only v1 evidence docs after
+the frozen production base ea50018295. Full-goal fill and beatability pass:
+**183 shuffled locations, 21 spheres, 124 resources**, 137.66 s. Nine-slot
+reward permutation and four physical chest actors read back correctly.
+Digest `3073cf48c8a381b3d199468ff32e24460394e91d9dd75147d18957693ca47686`.
+
+Actual launcher dry-run passes on rc.7 with only the new v2 mod/user. Original
+and copied save hashes remain identical; read-only v2 helper prints closed
+chests, natural A/S=true B/ENV=false and no runtime `mods:` lines yet. No game
+boot, full gate, lock, inventory/clock/quest/age edits or reset chests.
+Posted the full launcher and plain landmarks to `cs-r18` at **12:56**.
+Checklist retains Door opening, early adult/child round trip, persistence and
+optional two-Stone refusal; target 8–10 minutes, hard stop 10. **Built/unplayed.**
