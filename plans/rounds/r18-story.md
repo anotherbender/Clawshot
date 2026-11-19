@@ -1,7 +1,7 @@
 # Round 18 Track G — story flows (cs18g)
 
 Agent/model: `openai-codex/gpt-6.1-sol`; branch `r18/story`; starting main `2ba2f9a`.
-Status: native guard corrections built; **not READY, not played**. No game launched; no current seed opened or backup edited.
+Status: built, unplayed. Exact-head release status is governed by `final-gate-proof.json` and the release criterion below.
 
 ## Requested scope and provenance
 
@@ -114,7 +114,7 @@ settings provenance must be explicitly accounted for. No unrelated output delta 
 
 Research scripts and decoded ledgers stay in `E:/OOTRemake/work/r18-story/`, never in this repository.
 
-## Combined staged controls
+## Initial packet (withdrawn; historical evidence)
 
 Packet: `E:/OOTRemake/work/r18-story/ingame/STORY-CHECKLIST.md`. Two template-derived rc.7 launchers:
 `Test - story-main-control.bat` and `Test - story-candidate.bat`. Each has exactly its own diagnostic mod, no
@@ -198,3 +198,107 @@ After narrowing: real-dump story/settings/app focus **38 passed in10.51s**; chan
 Ruff format/check. Actual CLI help now lists Talon/Zelda/Impa only. Isolated actual browser UI showed default
 Off, the revised help explicitly excluding Saria's bridge gift, and native On updated the switch and CS1.
 The isolated server/tab were stopped; no player seed root or game process was opened.
+
+## Pre-final packet and selected save provenance
+
+Pre-final entry: `E:/OOTRemake/work/r18-story/ingame/QUICK-CHECKLIST.md`. Its selected archives below remain
+the inputs for the required final-head rebuild; **do not boot the old packet in place of that rebuild**.
+Old launchers were removed/checklists archived; old test users were not overwritten/deleted.
+Pre-final candidate source `48dcae826b`, control `2ba2f9a507`:35 files each, exactly16 flow differences plus
+the size table (`packet-v3-delta-proof.json`); no `Dm_Kokiri_0145`. Saria remains outside round18.
+
+Read-only scan:2487 archived progress files/643 distinct contents. Player-seed-labelled backups and contradictory
+story state were excluded from selection. For child cases, identical contents use their earliest backup-directory
+copy, then candidates sort by original file mtime/path. The short-start predicate (caption/nearby native stage)
+is explicit in `fixtures/child-selection.json`; fresh Kokiri starts do not masquerade as close castle fixtures.
+Adult ordering is earliest file mtime then path. Both source date and backup-label date are retained.
+`fixtures/packet-current-input.json` pins selected input flags/int/enum/hash values; no missing flag is treated as false.
+
+In the following table paths are below `E:/OOTRemake/work/save-backups/`; `U` means the literal directory
+`5a3c9e1f0b7d24680000000000000001`. Dates are original progress-file local mtimes, not the backup label.
+`H(X)` abbreviates `HavePlayedEvent.Dm_X`; item pairs mean `IsGet.Item_*` / `PouchData.Item_*.StockNum`.
+
+| Check | Exact selected archive slot | Progress date/time | Required input values |
+|---|---|---|---|
+| Minuet/no usable adult instrument; no-tool Dampé; Longshot-only diagnostic | `2026-11-17_155416-r16-time-walk-songonly-v4-9/U/slot_02` | `2026-11-17T15:54:03-05:00` | Adult; H(TimeTemple_0065)=true; Master Sword owned; Fairy=true/1, Time=false/0; H(MelodyGet_Forest)=false; Storm Song unowned; adult Mido blocker=true. Hookshot=false/0, Longshot=false/0; race Ready, treasure None, clear count0; both prize named Bools=false. |
+| Talon | `2026-11-13_133739-r14-story-courtyard-saria-next-7/U/slot_03` | `2026-11-13T13:37:35` | Child, Castle grounds, Weird Egg1/Cucco0; Goto Step03; Talon_AfterWakeUp=false; H(HrlCastle_0020/0035/0050)=false; Letter unowned; Door NotReady; lesson/send-off unplayed; Epona Song unowned. Fairy=true/1, Time=false/0. |
+| Both Zelda dialogues | `2026-11-13_134002-r14-story-courtyard-saria-next-9/U/slot_05` | `2026-11-13T13:39:54` | Child, Castle grounds; Goto Step04; Door NotReady; H(HrlCastle_0035/0050)=false; Letter=false/0. |
+| Owned-Fairy Impa speech/lesson/send-off | `2026-11-13_134414-r14-story-courtyard-saria-next-11/U/slot_01` | `2026-11-13T13:44:05` | Child, courtyard exit; Goto Complete; Door Step01; Letter=true/1; Fairy=true/1, Time=false/0; lesson/send-off false; Epona Song unowned. |
+| Castle owl/banner/map | `2026-11-13_133630-r14-story-courtyard-saria-next-5/U/slot_02` | `2026-11-13T13:36:22` | Child, Market; H(HrlCastle_0000)=false; IsVisitLocation.HyruleCastle=false; Goto Step02_01; Door NotReady. |
+| Kakariko/Lake approach owls | `2026-11-11_122357-r12-keygate1-8/U/slot_04` | `2026-11-11T12:23:52` | Child, Field-adjacent; Door NotReady (before Zelda); H(HrlField_0030/0050)=false; Lake visit=false; Castle owl/visit=false. First Field0010 may still play. |
+| Summit flight | `2026-11-13_084401-longshot-transferred/slot_03` | `2026-11-13T08:44:01` | Child, Kakariko; Din's Fire=true/1; bombs9; Get_StoneOfFire Complete (gate passed); summit Talk_Event1/2/46=false; H(DeathMtTrail_0030/0035)=false. No new inventory edit needed. |
+| Lake NPC offer/flight | `2026-11-13_140428-r14-story-escape-ready-next-2/U/slot_00` | `2026-11-13T14:04:22` | Child, Field-adjacent; Goto Complete; Lake visit=true/from-valley=true; H(TimeTemple_0086)=false; H(LakeHrl_0010/0011)=false; JustBeforeTalk=false. |
+| Unedited bridge-to-Impa no-ocarina route (long) | `2026-11-13_132832-r14-story-music-next-2/U/slot_00` | `2026-11-13T13:28:28` | Child; Fairy=false/0, Time=false/0; lesson/send-off/Epona Song unplayed/unowned; no Letter/Zelda history; Door NotReady. Unedited natural route only; not a short courtyard fixture. |
+
+The adult source's first pull, age, ocarina stock and untouched race happened in play, but it is **not pristine**:
+its r16 ancestor had Sun/Time song ownership flags added before its played song-only Door opening.
+That inherited setup is disclosed, not called an untouched vanilla route. No new copy edits for negative
+adult checks; no fake age or first-pull history. Minuet needs teleport past native adult Mido; presentation
+coverage only. The old source already had a Fairy Ocarina; its adult unusability is the relevant test.
+
+Only the optional Longshot case retains a new single-value test-copy edit (identical in both variants):
+
+- **Longshot-only:** no natural Longshot-only save exists (0; all48 holders also have Hookshot).
+  `PouchData.Item_Longshot.StockNum` Int **0→1**, value offset86700; only byte86700 changes.
+  `IsGet.Item_Longshot` remains false: inventory-inconsistent, explicitly diagnostic. Native control must
+  establish a usable Longshot/admission first; otherwise invalid fixture, never a patch pass.
+- **No-ocarina Impa:** exact native Door=Step01, no usable instrument, unplayed lesson/send-off/Epona and
+  metadata yielded **0 eligible natural matches** among185 cached distinct no-ocarina children.
+  Receipt: `fixtures/impa-native-step01-absence.json`. A considered Door-only priming copy changed
+  NotReady (`0x57b849f0`)→Step01 (`0xeb62add9`) at93156–93159, but was **withdrawn**: it does not remove
+  the physical Talon/courtyard barriers. It is not a valid short fixture and its launchers were removed.
+  The unedited bridge source remains available for the full native route, **20–30min per variant,
+  unmeasured**, not claimed under20min. No second flag/item edit or fake courtyard teleport is hidden.
+
+Pre-final `fixtures/packet-final-input-staging-proof.json` records22 actual cmd dry runs exit0, rc.7.
+Two were the subsequently withdrawn priming attempt, not current acceptance cases. Source hashes stayed
+unchanged; one slot plus account/options only, captions/metadata equal, declared copy edits isolated.
+The read-only reporter confirmed initial enum/stock values, not an in-game result. No game launched.
+
+Fixed-destination metadata in rc.7 `longshot.exe` (read-only file offsets484729176–484731522) names
+HyruleCastle→HyruleCastle_Entrance, SacredForestMeadow→OutsideOfForestTemple,
+DeathMountainTrail→MountainTrail_KakarikoSide. Arbitrary coordinate/courtyard teleports are not assumed.
+Minuet uses the supported Meadow destination then walks into its sensor; summit requires the normal climb.
+Short pair estimates remain unmeasured: Talon4–8, Zelda10–16, owned-Fairy Impa8–14, Minuet6–12,
+no-tool Dampé6–12, Castle owl4–8, Field owls10–18, summit12–20, Lake flight10–16, optional Longshot6–12.
+Use separate short sessions; no claim the complete matrix fits20min. The child no-ocarina natural route
+is the explicit longer exception, not silently shortened or called played.
+Every played pass still needs runtime loaded-file proof plus the actual outcome and persistence check.
+
+## Complete added-switch polarity ledger
+
+Claude's09:37 instruction requires native evidence and tests for every added switch.
+**B:** native `MiniGame_DampeRace/Event50`, `EventQueryIsGameDataBool(HaveTalked...Talk_Event6)`:
+case0→Event75 (repeat path), case1→Event49, which sets that same flag true for the first meeting.
+**P:** native `ReplaceEquipmentForEraChange/Event12`, `EventQueryIsExistInPouch(Weapon_Shield_Deku,1)`:
+case0→Event8 wait/preserve; case1→Event18 clears `PlayerStatus.AnotherEraEquipShield` to empty.
+Native race corroboration: Event18(Longshot)0→Event243/1→Event0; Event0(Hookshot)0→Event243/1→Event5 first intro.
+
+| Added switch | Case0 (true/held) | Case1 (false/absent) | Native ABI anchor |
+|---|---|---|---|
+| ClawshotTimeOcarinaLearning | Native input fork | Fairy query | B |
+| ClawshotFairyOcarinaLearning | Child query | Native return join | B |
+| ClawshotChildOcarinaLearning | Native input fork | Native return join | B |
+| ClawshotDampeHookshotMiniGame_DampeRace_Ready | Original Ready first action | Longshot Ready query | P |
+| ClawshotDampeLongshotMiniGame_DampeRace_Ready | Original Ready first action | Surface fade/warp return | P |
+| ClawshotDampeHookshotMiniGame_DampeRace_Start | Original Start first action | Longshot Start query | P |
+| ClawshotDampeLongshotMiniGame_DampeRace_Start | Original Start first action | Surface fade/warp return | P |
+
+No other switches are added: story speech adds only actions; owl rewrites preserve native query/case values
+and redirect only omitted speech edges. Existing native projection/unchanged-event oracles cover those.
+New real-dump tests `test_native_bool_query_result_codes_gate_age_usable_playback` and
+`test_native_pouch_result_codes_admit_either_tool_before_original_race_actions` assert B/P and exercise the
+patched native forks/entries with that ABI; **2 passed,18 deselected in0.43s**, scoped style clean.
+The eight age/ownership synthetic cases and eight race entry/tool combinations already passed after correction.
+These tests change no production code or packets beyond `48dcae826b`; pre-final staged bytes remain pinned to it.
+
+## Authorized final gate and release criterion
+
+Claude explicitly released **MAIN FINAL `e241a85`**, G first in lock order: rebase, rerun focus, then one
+owned lock across the ten-pair identity proof and one full gate. No automatic main-change watcher is used.
+The exact frozen head, stage outputs/counts and result are recorded privately in
+`E:/OOTRemake/work/r18-story/final-gate-proof.json`; pair details remain in `pair-proof.json`.
+**Release criterion, not a pre-test claim:** READY (play-held) only when that exact-head gate record says
+passed and all10 identity pairs pass. Gameplay remains unplayed. Post the observed result, release our
+lock, then rebuild the short packet from the gated head as Claude ordered; its final manifest/hash proof
+is `packet-gated-proof.json`. A missing/failed proof never means READY.

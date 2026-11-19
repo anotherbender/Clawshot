@@ -91,8 +91,25 @@ def test_native_learning_bypasses_only_presentation_and_preserves_all_other_entr
     expected.flowchart.events[fc.entry_point("LearningOcarinaFollowExample").main_event].next = len(fc.events)
     expected.flowchart.events.extend(after.flowchart.events[len(fc.events) :])
     assert after == expected
-    assert input_fork(after.flowchart, set()) is False
-    assert input_fork(after.flowchart, {"IsGet.Item_Ocarina_Time"}) is True
-    assert input_fork(after.flowchart, {"IsGet.Item_Ocarina_Fairy"}) is False
-    assert input_fork(after.flowchart, {"IsGet.Item_Ocarina_Fairy", "Sequence_IsChildhood"}) is True
     assert after.flowchart.events[fork.join] == fc.events[fork.join]
+
+
+@pytest.mark.dump
+def test_native_bool_query_result_codes_gate_age_usable_playback(romfs):
+    dictionaries = Dictionaries.from_romfs(romfs)
+    donor_path = "Event/EventFlow/MiniGame_DampeRace.bfevfl.zs"
+    donor = evfl.read(dictionaries.decompress(donor_path, (romfs / donor_path).read_bytes())).flowchart
+    query = next(event for event in donor.events if event.name == "Event50")
+    assert donor.actors[query.actor].queries[query.query] == "EventQueryIsGameDataBool"
+    setter = donor.events[dict(query.cases)[1]]
+    assert donor.actors[setter.actor].actions[setter.action] == "EventTriggerSetGameDataBool"
+    assert setter.params["GameDataName"] == query.params["GameDataName"]
+    assert setter.params["Value"] is True
+    assert donor.events[dict(query.cases)[0]].name == "Event75"
+    # The first-talk false branch sets the flag; the already-talked true branch does not.
+    native = dictionaries.decompress(song_learning.FLOW, (romfs / song_learning.FLOW).read_bytes())
+    patched = evfl.read(song_learning.patch(native)).flowchart
+    assert input_fork(patched, set()) is False
+    assert input_fork(patched, {"IsGet.Item_Ocarina_Time"}) is True
+    assert input_fork(patched, {"IsGet.Item_Ocarina_Fairy"}) is False
+    assert input_fork(patched, {"IsGet.Item_Ocarina_Fairy", "Sequence_IsChildhood"}) is True
