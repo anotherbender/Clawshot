@@ -51,6 +51,7 @@ from test_door_story import (
     DOOR,
     ESCAPED,
     FLOWS,
+    GUARDS,
     MODES,
     ORDERS,
     PATHS,
@@ -75,7 +76,7 @@ from test_door_story import (
 
 from clawshot.formats import byml, evfl, rstb, zsdic
 from clawshot.generate import Settings
-from clawshot.patch import darunia, door, make_seed
+from clawshot.patch import darunia, door, make_seed, reward_bridge
 from clawshot.patch.gamedata import GAME_DATA_LIST
 from clawshot.patch.plan import PatchError
 from clawshot.save import key
@@ -750,3 +751,66 @@ def test_dump_a_reward_seed_ships_the_owned_door_with_its_story_and_stage(romfs,
     escape |= {SENDOFF: True, ESCAPED: False}
     assert evaluate(rows, key(ESCAPE_READY), escape) is True
     assert evaluate(rows, key(ESCAPE_READY), {**escape, "Step_Get_StoneOfWater": "Ready"}) is False
+
+
+@pytest.mark.dump
+def test_dump_emitted_switch_polarity_matches_native_once_and_stone_counter_examples(romfs, native):
+    """Native Bool/history once gates and the remaining-stone counter anchor 0=true, 1=false.
+
+    Track E uses the false branch for eligibility and the false branch for a forward write;
+    the reused round16 guards use true to skip a backward write, never the other way round.
+    """
+    dictionaries, flows, game, _ = native
+    source = evfl.read(flows[DOOR]).flowchart
+    latch = source.events[index(source, "Event69")]
+    assert source.actors[latch.actor].queries[latch.query] == "EventQueryIsGameDataBool"
+    assert latch.params == {"GameDataName": OPENED, "Index": -1}
+    assert latch.cases == [(1, index(source, "Event58"))]  # false: unopened; true: end
+    assert source.events[index(source, "Event53")].params == {
+        "GameDataName": OPENED,
+        "Index": -1,
+        "Value": True,
+    }
+    history = source.events[index(source, "Event23")]
+    assert source.actors[history.actor].queries[history.query] == "EventQueryHavePlayedEvent"
+    assert history.params == {"EventName": "Dm_TimeTemple_0040"}
+    assert history.cases == [(0, index(source, "Event22")), (1, index(source, "Event141"))]
+    assert source.events[index(source, "Event22")].params["EventName"] == "Market_Child_Field_ChildToAdult"
+    # Both completed queries true (0,0): Step03 and zero remaining; both false (1,1): two remaining.
+    for name, targets in (
+        ("Event38", ((0, "Event39"), (1, "Event56"))),
+        ("Event39", ((0, "Event37"), (1, "Event147"))),
+        ("Event56", ((0, "Event148"), (1, "Event6"))),
+    ):
+        event = source.events[index(source, name)]
+        assert source.actors[event.actor].queries[event.query] == "EventQueryIsGameDataBoolExp"
+        assert event.cases == [(case, index(source, target)) for case, target in targets]
+    assert source.events[index(source, "Event4")].params["Value"] == 0
+    assert source.events[index(source, "Event6")].params["Value"] == 2
+
+    changes = reward_changes()
+    shipped = {path: evfl.read(changes[path](flows[path])).flowchart for path in STORY}
+    gate = shipped[DOOR].events[index(shipped[DOOR], "Event60")]
+    assert gate.params == {"GameDataName": REACTION}
+    assert gate.cases == [(1, index(shipped[DOOR], "Event69"))]  # invalid false: continue
+    for path, writer, step, tail in GUARDS:
+        fc = shipped[path]
+        guard = fc.events[index(fc, writer)]
+        moved = index(fc, f"ClawshotDoor{writer}Write")
+        assert guard.params == {"GameDataName": f"DoorOfTime_IsAfter_{step}_Exp"}
+        cases = [(1, moved)]
+        if tail is not None:
+            resume = "ClawshotClockArrival" if (path, writer) == (DOOR, "Event7") else tail
+            cases.insert(0, (0, index(fc, resume)))
+        assert guard.cases == cases
+
+    raw = dictionaries.decompress(reward_bridge.FLOW, (romfs / reward_bridge.FLOW).read_bytes())
+    fc = evfl.read(reward_bridge.light_arrow_story(raw)).flowchart
+    guard = fc.events[index(fc, "Event11")]
+    moved = index(fc, reward_bridge.MOVED)
+    assert guard.params == {"GameDataName": reward_bridge.PAST_STEP01}
+    assert guard.cases == [(1, moved)]  # past=true ends; false runs the native Step01 write
+    rows = indexed(byml.read(game))
+    for step, past in (("Ready", False), ("Step01", False), ("Step02", True), ("Complete", True)):
+        assert evaluate(rows, key(reward_bridge.PAST_STEP01), {"Step_Defeat_Ganon": step}) is past
+        assert dict(guard.cases).get(0 if past else 1, evfl.NONE) == (evfl.NONE if past else moved)

@@ -383,3 +383,54 @@ staging. A fresh build from final source SHA-256
 matches **all eleven staged candidate files byte for byte**; no launcher, profile
 or staged mod needed replacement. Receipt:
 `work/r18-rewards/door/formatter-output-proof.json`.
+
+## Switch polarity audit — Claude's 2026-11-19 steer
+
+**CORRECT: 0=true, 1=false.** No production or packet correction needed.
+Every switch rewritten by Track E uses `GameDataActor.EventQueryIsGameDataBoolExp`;
+none adds `EventQueryIsExistInPouch`. Reward grant swaps add no switches. The bridge
+module and Field modules read Bool outputs, not event-switch integer cases.
+
+Native examples in supported `DoorOfTime`:
+
+- **BoolExp:** Event38 tests Fire quest Complete; 0→Event39, 1→Event56. Water
+  completion at Event39/56 then yields 0 remaining (Event37→77→4) when both are
+  complete, or 2 remaining (Event6) when neither is complete. Native Event60's
+  strict after-Step04 true branch is also 0→Event69; false ends.
+- **Bool:** Event69 reads the saved opened latch. False **1**→Event58 continues
+  opening; true **0** has no case and ends. Event53 sets that same latch true.
+- **History:** Event23 reads `Dm_TimeTemple_0040`. Played **0**→Event22 invokes
+  repeat `Market_Child_Field_ChildToAdult`; unplayed **1**→Event141 starts first pull.
+  Event58 similarly uses unplayed **1**→Event28, already-played **0** ends.
+
+The following is the complete Track E rewrite/reuse list. Every row uses the
+BoolExp polarity demonstrated by native Event38/39/56 and Event60 above; missing
+case means the entry ends. The nine round16 writer guards are reused unchanged,
+including Event7's existing clock/recount continuation.
+
+| Flow / switch | Predicate | Case 0: true | Case 1: false |
+|---|---|---|---|
+| DoorOfTime / Event60 | altar reaction **invalid** | end; refuse | Event69; ordinary opening checks |
+| AllSage / Event11 | Defeat_Ganon strictly past Step01 | end; no rollback | ClawshotBridgeEvent11Write |
+| DoorOfTime / Event7 | Door strictly past Step02 | ClawshotClockArrival | ClawshotDoorEvent7Write |
+| DoorOfTime / Event147 | Door strictly past Step2_1 | Event5 | ClawshotDoorEvent147Write |
+| DoorOfTime / Event148 | Door strictly past Step2_2 | Event5 | ClawshotDoorEvent148Write |
+| DoorOfTime / Event37 | Door strictly past Step03 | Event77 | ClawshotDoorEvent37Write |
+| DoorOfTime / Event12 | Door strictly past Step04 | Event140 | ClawshotDoorEvent12Write |
+| DoorOfTime / Event14 | Door strictly past Step05 | Event171 | ClawshotDoorEvent14Write |
+| DoorOfTime / Event57 | Door strictly past Step06 | end | ClawshotDoorEvent57Write |
+| Dm_SY_Ocarina_SariaSong / Event172 | Door strictly past Srep2_1_1 | end | ClawshotDoorEvent172Write |
+| Npc_Hylia_Zelda_Child / Event42 | Door strictly past Srep2_1_1 | end | ClawshotDoorEvent42Write |
+
+Main's inherited send-off/count, arrival/environment, child-return and once/history
+switches retain their existing mappings. The reward-vanilla all-mode byte comparison
+and reward-on inverse oracle above cover those unchanged paths. No pouch-query
+polarity is guessed or introduced by this track.
+
+Added native assertion
+`test_reward_door.py::test_dump_emitted_switch_polarity_matches_native_once_and_stone_counter_examples`
+pins the native Bool/history/counter examples, all eleven emitted guard mappings
+and strict bridge-step boundary outcomes. Targeted command with
+`OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run pytest <that-node> -q`
+→ **1 passed, 0.92 s**; new test file format/lint passed. Earlier **722 passed**
+remain valid: this follow-up changes only tests and this evidence, not source or mods.
