@@ -399,3 +399,45 @@ library and in-memory preferences only; own browser/server closed and throwaway
 smoke scripts deleted. Targeted formatter: **4 files left unchanged**.
 The staged packet CLI now rejects `--kind shadow` with exit **2**, so it cannot
 accidentally recreate the withdrawn play packet.
+
+## Switch polarity receipt (Claude's 09:37 steer)
+
+**No F-authored Bool/pouch guard or new conditional algorithm.** Well/jail
+retargets add no switches. Fortress named grants reuse main's existing
+`add_grant_helper` and native-clone algorithm unchanged; the only new target is
+the three `DungeonInfo.GerudoFortress` inventory leaves.
+
+| Appended/reused switch | Cases | Evidence |
+|---|---|---|
+| `GetPouchContent/ClawshotKeyWasZero` | Int comparison: **0 less**, **1 equal**, **2 greater**. Comparing remaining keys with zero: 1→`ClawshotKeyOnce` then total/remaining increments; 0/2→increments directly. This is **not Bool polarity**. | Same helper on baseline `2ba2f9a`; native `GetPouchContent/Event10` compares its counter with 4: 0→Event19, 1/2→Event25. |
+| 52 native-cloned switches listed below | Every original case value, query and parameters preserved. Each case goes to the corresponding native successor cloned in the same mode; no 0/1 inversion is authored. | Native original with the same `EventN` in the same flow; complete per-switch case/target receipt outside repo. |
+| Pouch truth anchor (not added by F) | `ReplaceEquipmentForEraChange/Event12`, `Weapon_Shield_Deku`, Num=1: **0 held→Event8**, **1 absent→Event18**. | Read directly from the native flow; no new `EventQueryIsExistInPouch` or `EventQueryIsGameDataBool` node in F's emitted clone set. Bool comparisons retain **0=true, 1=false**. |
+
+Every emitted cloned switch has prefix `Clawshot_GerudoFortress_content_` and
+the following native event suffix (the original native switch is its example):
+
+- `Dm_SY_TreasureboxSmall` (31): `Event50`, `152`, `125`, `17`, `6`, `108`, `159`,
+  `116`, `198`, `197`, `21`, `30`, `54`, `33`, `48`, `47`, `57`, `118`, `101`,
+  `46`, `66`, `96`, `70`, `168`, `58`, `111`, `177`, `171`, `203`, `185`, `204`.
+- `GetPouchContent` (21): `Event67`, `86`, `79`, `99`, `85`, `78`, `60`, `56`, `4`,
+  `73`, `70`, `52`, `36`, `10`, `26`, `41`, `29`, `17`, `87`, `88`, `89`.
+
+Actual staged v2 candidate audit: **53 switches**, including the one reused
+integer helper. All copied queries/parameters/case values match the original
+native nodes. Full numeric case→successor maps and native counterparts:
+`E:/OOTRemake/work/r18-keys/switch-polarity-proof.json`; no decoded flow dump is
+vendored. The proof initially used the shorthand `ReplaceEquipment` as a file
+name; the printed missing path was resolved to actual
+`ReplaceEquipmentForEraChange.bfevfl.zs`, then the corrected proof passed.
+
+Expanded the existing consumer regression to first key, already-held keys and
+all-keys-spent states. It now asserts **after each pickup**, not only after four:
+the very first zero→one grant must immediately set the first-key flag; found and
+held counts grow independently; source, rescue, Spirit and other-dungeon state
+stay untouched. This catches a wrong equal-zero case that a later pickup could
+otherwise mask.
+
+`CLAWSHOT_WORKERS=1 uv run pytest
+tests/test_key_bindings.py::test_fortress_named_grants_only_credit_inventory_not_guard_or_rescue_state -q`
+→ **3 passed, 0.45 s**. Scoped format check **1 file already formatted**; scoped
+Ruff **All checks passed**. No gameplay/source/packet change was needed.

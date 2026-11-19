@@ -572,29 +572,30 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
     assert run.state["DungeonInfo.InsideTheDekuTree.SmallKeyNum"] == 0
 
 
-def test_fortress_named_grants_only_credit_inventory_not_guard_or_rescue_state():
+@pytest.mark.parametrize("remaining,total,once", [(0, 0, False), (2, 5, True), (0, 5, True)])
+def test_fortress_named_grants_only_credit_inventory_not_guard_or_rescue_state(remaining, total, once):
     request = (keys.SMALL, "GerudoFortress")
     bindings, documents, rows, analyzed, _ = _compile([request])
     run = KeyRun(documents, rows, analyzed)
     run.state.update(
         {
-            "DungeonInfo.GerudoFortress.SmallKeyNum": 0,
-            "DungeonInfo.GerudoFortress.SmallKeyTotalNum": 0,
-            "DungeonInfo.GerudoFortress.IsGetSmallKeyOnce": False,
+            "DungeonInfo.GerudoFortress.SmallKeyNum": remaining,
+            "DungeonInfo.GerudoFortress.SmallKeyTotalNum": total,
+            "DungeonInfo.GerudoFortress.IsGetSmallKeyOnce": once,
             "GerudoFortress_Meet_FourCarpenter_NumOfCarpenterHelped": 0,
             "Step_SageOfSpirit": "Step01",
             **{f"IsGet_SmallKey_GerudoFortress.SmallKey0{i}": False for i in range(1, 5)},
         }
     )
     before = run.state.copy()
-    for _ in range(4):
+    for granted in range(1, 5):
         run.event(bindings[request].event)
-    expected = {
-        **before,
-        "DungeonInfo.GerudoFortress.SmallKeyNum": 4,
-        "DungeonInfo.GerudoFortress.SmallKeyTotalNum": 4,
-        "DungeonInfo.GerudoFortress.IsGetSmallKeyOnce": True,
-    }
-    assert run.state == expected
+        expected = {
+            **before,
+            "DungeonInfo.GerudoFortress.SmallKeyNum": remaining + granted,
+            "DungeonInfo.GerudoFortress.SmallKeyTotalNum": total + granted,
+            "DungeonInfo.GerudoFortress.IsGetSmallKeyOnce": True,
+        }
+        assert run.state == expected
     assert run.messages[-2:] == list(labels("GerudoFortress"))
     assert "EventGetDungeonSmallKey" not in run.trace
