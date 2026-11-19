@@ -111,8 +111,44 @@ Root `E:/OOTRemake/work/r18-equipment/ingame/`; exact instructions/stop conditio
 
 ### Exact-head full gate
 
-This file is committed before the full gate so the tested head stays the head offered for merge. Final observed counts/head/timings/exits are recorded without further tracked edits in `work/r18-equipment/gate-results.json`, `gate-{format,lint,synthetic,dump}.log` and the cs-r18 handoff. **No READY until all four exits zero.**
+Implementation475c91b3ab was committed before the full gate; final observed counts/head/timings/exits are recorded in `work/r18-equipment/gate-results.json`, `gate-{format,lint,synthetic,dump}.log` and the cs-r18 handoff. All four exits were zero: format/lint clean, synthetic3380 passed/440 skipped, dump437 passed. The November19 switch audit below adds documentation only; no implementation, test or staged packet changed and no gate was rerun.
 
 `gate.py` rebases current main before acquiring r18 gate.lock, reruns focused checks on the rebased head, then serializes format, lint, synthetic and dump. Stage tasklist checks select synthetic -n12/workers12 and dump -n12/workers4 when closed, -n4/workers1 if either game runs. Exact commands: `uv run ruff format --check`; `uv run ruff check`; `uv run --with pytest-xdist pytest -n 12`; then `uv run --with pytest-xdist pytest -m dump -n 12`, with the round's exact RomFS/NUP/r16 OOT_DUMP. No suite deadline, no unchanged failure rerun, no foreign-lock removal.
 
 Remaining acceptance: **Kareem's staged play**, including Mirror auto-equip observation/question. No game start, merge, push or version bump by this track.
+
+## November19 urgent SwitchEvent audit — CORRECT
+
+Claude's09:37 semantics alert: Boolean/equality/ownership **case0=true/held, case1=false/absent**. Re-read the live read-only RomFS, current implementation, r17 implementation at2ba2f9a, and the actual staged sword main/candidate and all six shield main/candidate outputs. CORRECT posted09:39; no replacement packet needed. This certifies branch polarity, not gameplay acceptance.
+
+Native examples, all from `Event/EventFlow/<flow>.bfevfl.zs`:
+
+- **B:** `Enemy_Scrub_Business_Common` Event554 asks `IsGet.Item_DekuStick`:0→Event319 existing-bag check;1→Event555 first-container grant.
+- **S:** `ReplaceEquipmentForEraChange` Event14 compares the saved shield to Deku:0→Event12 Deku ownership check;1→Event17 Hylian comparison.
+- **P:** same flow Event12 asks `EventQueryIsExistInPouch(Weapon_Shield_Deku,1)`:0→Event8 wait, preserving equipment;1→Event18 clears the candidate. This is independent native pouch evidence, not an assumed Boolean alias.
+- **E:** scrub Event324/325/327 compare each offer to empty:0 advances to the next slot/return;1 enters CanBuy_Check.
+- **H:** scrub Event180 asks Slingshot IsGet:0→Event185 sets the offer-hidden argument false;1→Event184 sets it true. Thus an `Unopened` flag's true value means hidden here, despite the misleading name.
+
+Every added/retained guard, with native evidence for its query and interpretation:
+
+| Switch | Case0: true | Case1: false | Native example |
+|---|---|---|---|
+| Sword DefaultOwned (Bool) | Event11 native Kokiri default | Event13 skip default | B |
+| Sword Candidate (string equals Kokiri) | Sword Owned | Event13 preserve other weapon | S |
+| Sword Owned (Bool) | Event13 preserve owned sword | Sword Clear | B |
+| r17 Candidate, retained in main control (string equals Kokiri) | r17 Owned | Event0 preserve other weapon | S |
+| r17 Owned, retained in main control (pouch) | Event0 preserve held sword | Sword Clear | P |
+| Scrub OfferEmpty0 | OfferEmpty1 | OfferHidden0 | E |
+| Scrub OfferHidden0 | OfferEmpty1 | Event119 native shop UI | B, H |
+| Scrub OfferEmpty1 | OfferEmpty2 | OfferHidden1 | E |
+| Scrub OfferHidden1 | OfferEmpty2 | Event119 native shop UI | B, H |
+| Scrub OfferEmpty2 | Event395 native no-goods goodbye | OfferHidden2 | E |
+| Scrub OfferHidden2 | Event395 native no-goods goodbye | Event119 native shop UI | B, H |
+
+The sword's rewired **native** Event4 empty-string branch remains0→Event10 defaults,1→saved-candidate validation, matching native Event13's empty/default versus nonempty/validation split. Native Event10 IsChild remains0→Master default (outgoing child),1→Kokiri ownership guard (outgoing adult); the original native Event10 chooses those same era defaults. Every other native sword SwitchEvent is identical in the staged output.
+
+The shield presentation patch adds/modifies **no SwitchEvent**. Actual candidate outputs preserve every native switch structurally. Native Dm_SY_GetInEvent Event514(Hylian), Event537(Mirror) and Event509(Deku) each have only case1: advance to the next check, next check, and wait respectively. True/case0 has no case and returns. Native Event635(Master)→Event630(Biggoron)→wait uses the same false-only polling shape. The patch changes two ActionEvent successors only, bypassing the equipment prerequisite.
+
+Existing regression assertions already use correct polarity: `tests/test_child_sword.py::run` selects `0 if answer else 1`; the owned/unowned, saved/default, native and repeated-travel tests assert consumer-visible equipment/ownership under both write-visibility models. `tests/test_scrubs.py::guard_destination` uses the same polarity and tests all27 empty/hidden/visible offer combinations through both entrances. `tests/test_scrub_shields.py::run` maps equipped/held/equal to0, otherwise1, with missing cases returning; native-dump tests exercise the actual helper and its two-edge-only delta. No interpreter repair was needed.
+
+Urgent read-only assertions independently checked the actual staged three sword and six-per-flow scrub guard case tables, the r17 main-control tables, every otherwise unchanged native equipment switch and every native shield-presentation switch. All passed. The initial native printer encountered ReturnEvent without params; after printing that exception, only its formatting was corrected to use getattr. No source, save, launcher, mod or test changed; no game was started, no gate rerun.
