@@ -20,7 +20,6 @@ FLOWS = {
     "Dm_HrlCastle_0050": "Dm_HrlCastle_0050",
     "Dm_MelodyGet_Zelda": "Dm_MelodyGet_Zelda",
     "Dm_HrlField_0020": "Dm_HrlField_0020",
-    "Dm_Kokiri_0145": "Dm_Kokiri_0145",
 }
 TALK_ACTIONS = frozenset({"EventTalk", "EventTalkIgnoreSameTalkAS"})
 START = "EventTriggerSkipAcceptStart"

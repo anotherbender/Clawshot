@@ -44,7 +44,6 @@ edges still reach the original index, which now opens the region; no entry/subfl
 | Talon wake-up | `Dm_HrlCastle_0020.110` | Castle Step04, Malon disappearance, `Talon_AfterWakeUp`, progress UI and NPC talk-count action |
 | Zelda before/after movies | `Dm_HrlCastle_0035`, `Dm_HrlCastle_0050` | All choice menus/branches, `ThatsallTalk` writes, Letter grant and caller quest transitions |
 | Impa lesson / Field send-off | `Dm_MelodyGet_Zelda`, `Dm_HrlField_0020` | Lullaby/shuffled grant, note-count action, native send-off completion and caller clock repairs |
-| Saria farewell speech | `Dm_Kokiri_0145` | Native encounter/cuts and caller sequence; separate gift flow `Dm_Kokiri_0155` is untouched |
 
 Choices deliberately still require an answer; enabling skip does not silently pick one. Individual speech spans
 rather than an entire encounter are the skip unit. Runtime button/fade/parallel-animation behavior remains a
@@ -110,7 +109,7 @@ opening player seed roots. Actual CLI on/off replay returned the enabled CS1 and
 **Claude's 2026-11-18 steer supersedes the300-seed sweep:** no placement/logic change. Instead prove ten
 production on/off pairs (five broad, five Recommended), then one full gate. Exact raw spoiler identity cannot
 coexist with honest option/CS1 provenance; retain those fields and compare every other field byte-equivalently.
-Only the six story flows and their required resource-size entries may differ in RomFS; spoiler/play-note
+Only the five current story flows and their required resource-size entries may differ in RomFS; spoiler/play-note
 settings provenance must be explicitly accounted for. No unrelated output delta is accepted.
 
 Research scripts and decoded ledgers stay in `E:/OOTRemake/work/r18-story/`, never in this repository.
@@ -176,3 +175,26 @@ Claude now authorizes selecting earliest qualifying slots under `work/save-backu
 `clawshot.save`; copy only one slot plus account/options per isolated profile. Never use the current seed or
 edit a backup. A single declared test-copy value edit is permitted only if no natural slot satisfies the case.
 Natural source predicates, paths/dates and short per-check estimates are being recorded for the replacement packet.
+
+## Saria scope resolved by Claude, 2026-11-19
+
+Kareem meant the **bridge farewell**, not post-Gohma `Dm_Kokiri_0145`. The latter has been removed from the
+option; no post-Gohma change is shipped. The initial six-flow counts and old packet labels above are historical,
+not proof of the corrected five-flow scope.
+
+Native bridge evidence: `Dm_Kokiri_0150` is a timeline, with13 `VoicePlayActor.EventStartVoice` clips carrying
+`IsWaitEnd=true`, and no `EventTalk` actions. `Dm_Kokiri_0155` is its animated grant flow, also with no `EventTalk`;
+it includes the real pouch grant at Event68. The proved SkipAccept/SkipEnd implementation brackets linear
+non-choice Talk actions only. That proof does **not** establish safe native skipping of the bridge timeline/
+gift-animation sequence; blindly wrapping it could omit or reorder the grant/caller continuation.
+
+**Claude's explicit scope decision:** leave the bridge unchanged for round18; round19 replaces the whole
+sequence with standard item-get presentation, preserving the same Saria check and grant. This is not a claim
+that native timeline skipping is impossible. No unproved timeline skip or grant-suppressing workaround ships.
+CLI/app/docs now promise only Talon, child Zelda and Impa speech. Saria's bridge source may still exercise the
+existing shuffled Boomerang grant/no-ocarina path; it is not a round18 skip acceptance check.
+
+After narrowing: real-dump story/settings/app focus **38 passed in10.51s**; changed Python files pass scoped
+Ruff format/check. Actual CLI help now lists Talon/Zelda/Impa only. Isolated actual browser UI showed default
+Off, the revised help explicitly excluding Saria's bridge gift, and native On updated the switch and CS1.
+The isolated server/tab were stopped; no player seed root or game process was opened.

@@ -59,7 +59,7 @@ help = "Choose which opening scenes to skip. Skipped shortens the opening; Plays
 label = "Skippable story dialogue (experimental)"
 kind = "boolean"
 group = "World"
-help = "Off by default. Enable the skip button during non-choice Talon wake-up, child Zelda, Impa and Saria farewell speech. Encounters, choices, rewards and story flags remain. Built, not yet played; first-pull Rauru and Sheik are unchanged."
+help = "Off by default. Enable the skip button during non-choice Talon wake-up, child Zelda and Impa speech. Encounters, choices, rewards and story flags remain. Built, not yet played; Saria's bridge gift and first-pull Rauru/Sheik are unchanged."
 [shop_prices]
 label = "Shop prices"
 kind = "choice"

@@ -292,9 +292,9 @@ restriction; Navi waking Link and normal new-game initialization still run. Movi
 selects fast-start skips; `--skip` alone disables them. These are separate from shuffled kinds.
 
 `--skippable-story` is a separate default-off option (app: **Skippable story dialogue**).
-It enables the native skip button during non-choice Talon wake-up, child Zelda, Impa and Saria farewell
-speech. Encounters and choices still play; item grants and flag writes are outside the skippable regions.
-First-pull Rauru and Sheik are unchanged. `--no-skippable-story` disables it; CS1 stores the choice.
+It enables the native skip button during non-choice Talon wake-up, child Zelda and Impa speech.
+Encounters and choices still play; item grants and flag writes are outside the skippable regions.
+Saria's bridge gift and first-pull Rauru/Sheik are unchanged. `--no-skippable-story` disables it; CS1 stores the choice.
 Built and native-data-tested, **not yet played**.
 
 The Kaepora skip also marks the skipped first-field panorama complete, ending its native
