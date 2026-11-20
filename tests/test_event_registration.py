@@ -442,7 +442,8 @@ RECIPES: dict[str, tuple[int, Settings, dict]] = {
     "song_door": (1, Settings(shuffle=RECOMMENDED, door_of_time="song_only", forest="open", hints="mask"), {}),
     # Every shuffle kind and opt-in flow writer: released dungeon items and jail keys, dungeon rewards with the
     # owned-Stones Door, the shuffled Master Sword with free time travel, a reward bridge, every flow-editing fast
-    # start, and the runtime module's receive event and "your" get lines. Seed 24 also puts a shield on a scrub sale.
+    # start, Saria's opt-in farewell handoff, and the runtime module's receive event and "your" get lines.
+    # Seed 24 also puts a shield on a scrub sale.
     "broad": (
         24,
         Settings(
@@ -455,6 +456,7 @@ RECIPES: dict[str, tuple[int, Settings, dict]] = {
             bridge_count=6,
             logic={"free_time_travel": True},
             fast_start=("deku_tree", "intro", "kaepora", "saria"),
+            skip_saria_farewell=True,
             songs="anywhere",
             shop_prices="affordable",
             scrub_prices="fixed",
@@ -481,6 +483,7 @@ _EVERY_RECIPE = _modules(
     "keys",
     "ocarina",
     "progressive_bonus",
+    "scene_handoff",
     "scrubs",
 )
 _OPT_IN = _modules(
