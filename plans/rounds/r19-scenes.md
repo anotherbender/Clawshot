@@ -1,7 +1,7 @@
 # Round 19 Track scenes — cs19a
 
 Agent/model: `openai-codex/gpt-6.1-sol`; branch `r19/scenes`; base `d9deb65`.
-Status: staged, not played; corrected-head full gate pending after printed fixture/startup failures. Not READY.
+Status: **READY — play-held**. Automated gate and 300-seed sweep complete; staged gameplay checks remain unplayed.
 The round overview and this track file were absent at intake; the user brief supplies round scope.
 
 ## Mechanism proposed before broad edits
@@ -251,3 +251,44 @@ updates (cs19a, posted before editing), with production code unchanged:
 
 Revised oracle focus (shared Darunia/Fire synthetic consumers plus native meadow and production-order Door):
 **55 passed in118.63s**. The remaining exact-file-set/actor-pack contracts are included in the next native gate.
+
+## Final automated gate — READY, play-held
+
+Tested head: `8c8d90df5c934aa9505ef9bc1b8084c0c834ce76`, rebased onto current local main `d9deb65`.
+Required after-rebase focus: **55 passed in117.51s**. Production remains the packet's pinned `979e471c5e`;
+subsequent changes are synthetic/native test-contract repairs and this evidence record only.
+
+The owned full gate recorded no running Hookshot/Longshot at each phase. Format: **485 files pass**; lint: pass.
+Full synthetic invocation: **3828 passed,535 skipped,one startup error in261.68s**. The sole error was
+`test_ui_plan_has_one_mod_private_saves_and_unsets_overlay` at its existing20s join with validation still pending.
+Under the round's startup/load rule, that exact node passed alone **1/1 in1.04s** on the same head. The full
+invocation remains failed in its original receipt; no timeout or production code was changed.
+
+Full native invocation: **532 passed,zero skipped in1907.81s**, including native-root, NUP/cache-only and
+private layered-dump coverage. Pytest used12 workers with `CLAWSHOT_WORKERS=4`; isolated startup used1.
+
+Saria skip was enabled for all three sweep recipes; bounded fill behavior and beatability validation stayed enabled.
+
+| Recipe | Seeds | Exhausted/failed | Fill attempts |
+|---|---:|---:|---:|
+| Broad | 200 | 0 | 207 |
+| Defaults | 50 | 0 | 50 |
+| Recommended | 50 | 0 | 52 |
+
+The sweep used12 workers and330.906s of measured sweep time; its enclosing stage took363.469s.
+The gate reports `passed` and the owned lock was absent after completion. Receipts, including load/process
+snapshots and exact settings strings:
+
+- `E:/OOTRemake/work/r19-scenes/gate-8c8d90df5c/gate-results.json` — original format/lint/full synthetic.
+- `E:/OOTRemake/work/r19-scenes/gate-8c8d90df5c-resume/gate-results.json` — exact-node isolation, native and sweep.
+- The latter's `sweep/sweep-results.json`, `sweep-rows.jsonl` and `sweep-preparation.json`.
+
+Play handoff: `E:/OOTRemake/work/r19-scenes/ingame/CHECKLIST.md`, with six Longshot3.0.0 launchers for three
+candidate/control pairs: adult-Fairy Minuet, child-stock0 Impa and Saria farewell on. Candidate game bytes remain
+pinned to `979e471c5e`, controls to `d9deb65`; no production change occurred during fixture repairs. The checklist
+discloses the single Impa stock edit, archived-save ancestry, unmeasured per-pair estimates, required loaded-file
+lines, real reward stock, source histories, Save/Continue/re-entry and clean native continuation checks.
+
+**No game was launched by cs19a. READY means ready for the staged maintainer play, not gameplay acceptance.**
+Claude boot-checks; Kareem verifies visuals/control/persistence. Track A's instrument requirement stays unchanged.
+Other scene applicability and required evidence remain listed above, without implementing those broader skips.
