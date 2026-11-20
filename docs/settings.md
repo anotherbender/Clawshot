@@ -353,6 +353,25 @@ no Deku Tree talk with its mouth open. Reload also passed: after Continue, Mido'
 finished normally and the Deku Tree's mouth was open. Shuffled own-dungeon map/compass
 credit is a separate bug, not a failure of this map-access correction.
 
+## Scene handoffs (experimental)
+
+`--skip-saria-farewell` (app: **Skip Saria's bridge farewell**) is off by default.
+It skips both the bridge farewell movie and its animated gift, then gives that location's
+actual reward through the normal get window. It preserves the source's completion flags
+and native travel/lighting continuation. `--no-skip-saria-farewell` restores the native sequence.
+This is separate from fast start's Saria **opening** scene and from skippable dialogue.
+
+An always-on softlock guard replaces song lessons with a normal item get when the **active**
+ocarina cannot be used at Link's age: the selected instrument must have stock, with Fairy
+usable only by child Link and Time usable at either age. Historical ownership is insufficient.
+The native lesson remains when that selection is usable. Shuffled lessons give the placed
+reward, not an additional vanilla song; native quest, scene-history and once-only effects remain.
+The moat's item and Time-song reward are distinct and both survive its replacement.
+
+Both handoffs are **built, not played** pending their Longshot 3.0.0 candidate/control checks.
+Logic still conservatively requires an age-usable ocarina for lessons; this guard does not
+relax access rules or enable general Great Fairy/Rauru/story-scene skips.
+
 ## Dungeon rewards and Ganon's Castle bridge
 
 `--dungeon-rewards` (app: **Dungeon reward shuffle**) is experimental and off by default.

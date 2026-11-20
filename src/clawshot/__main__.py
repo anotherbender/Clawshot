@@ -145,6 +145,12 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help=argparse.SUPPRESS,
     )
+    parser.add_argument(
+        "--skip-saria-farewell",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="experimental: replace Saria's bridge farewell and gift animation with a plain item get (default off)",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -161,6 +167,7 @@ def main(argv: list[str] | None = None) -> int:
             ("goal", "goal"),
             ("skip", "fast_start"),
             ("skippable_story", "skippable_story"),
+            ("skip_saria_farewell", "skip_saria_farewell"),
             ("songs", "songs"),
             ("shop_prices", "shop_prices"),
             ("shop_slots", "shop_slots"),

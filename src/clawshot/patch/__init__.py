@@ -224,8 +224,11 @@ def make_seed(
     changes += (mido_schedule.changes(kept=kept_mido),)
     fast_files += tuple(mido_schedule.build(romfs, kept=kept_mido))
     plan = make_plan(out, links, table, chest_events.load(), overrides=custom.actors)
-    from clawshot.patch import keys, ocarina, progressive, progressive_bonus
+    from clawshot.patch import keys, ocarina, progressive, progressive_bonus, scene_handoff
 
+    handoff = scene_handoff.build(romfs, skip_saria_farewell=settings.skip_saria_farewell, prior_changes=changes)
+    changes += (handoff.changes,)
+    new_files.update(handoff.new_files)
     # Darunia's source flag and forward-only Fire step precede Event127's bonus wrapper, which keeps its next.
     changes += (darunia.changes(),)
     # Bonus guards and source-bound selections precede bag guards; unrelated native callers stay unchanged.

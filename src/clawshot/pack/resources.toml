@@ -23,7 +23,7 @@ files = [
 ]
 patterns = [
     "Banc/*/*.bcett.byml.zs", # census reads all placements
-    "Event/EventFlow/*.bfevfl.zs", # gift census and patched flows
+    "Event/EventFlow/*.bfevfl.zs", # gift census, scene handoff donors/callers and patched flows
     "Mals/*.Product.110.sarc.zs", # every language is patched
     "Pack/Actor/Shop_Board_Bundle_*.pack.zs",
 ]

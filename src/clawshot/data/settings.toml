@@ -23,6 +23,7 @@ bridge = "vanilla"
 bridge_count = 0 # explicit stones 0..3, medallions 0..6 or rewards 0..9; vanilla uses 0
 fast_start = ["intro"]
 skippable_story = false # reserved for old off-valued settings; enabling it is refused
+skip_saria_farewell = false # Round 19, Kareem: bridge timeline and animated grant become a plain item get
 songs = "song"
 shop_prices = "vanilla"
 shop_slots = 8 # Round 8: first N native shelf indices per ordinary shop; 0 keeps all contents vanilla

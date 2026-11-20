@@ -131,6 +131,7 @@ class Settings:
     fast_start: tuple[str, ...] = tuple(DEFAULTS["fast_start"])
     # Reserved for reading old off-valued settings; the enabled feature is withdrawn.
     skippable_story: bool = DEFAULTS["skippable_story"]
+    skip_saria_farewell: bool = DEFAULTS["skip_saria_farewell"]
     songs: str = DEFAULTS["songs"]
     shop_prices: str = DEFAULTS["shop_prices"]
     shop_slots: int = DEFAULTS["shop_slots"]
@@ -207,6 +208,8 @@ class Settings:
             raise ValueError("skippable_story must be a boolean")
         if self.skippable_story:
             raise ValueError("Skippable story dialogue isn't available yet")
+        if type(self.skip_saria_farewell) is not bool:
+            raise ValueError("skip_saria_farewell must be a boolean")
         if not isinstance(self.forest, str) or self.forest not in CATALOG["forest"]:
             raise ValueError("forest must be 'closed', 'closed_deku' or 'open'")
         if self.door_of_time not in ("closed", "song_only", "open"):
@@ -233,6 +236,7 @@ class Settings:
             "logic": {k: self.logic[k] for k in sorted(self.logic)},
             "fast_start": list(self.fast_start),
             "skippable_story": self.skippable_story,
+            "skip_saria_farewell": self.skip_saria_farewell,
             "songs": self.songs,
             "shop_prices": self.shop_prices,
             "shop_slots": self.shop_slots,

@@ -89,6 +89,11 @@ kind = "boolean"
 group = "World"
 hidden = true
 help = "Skippable story dialogue isn't available yet. The scene replacement is deferred to round 19."
+[skip_saria_farewell]
+label = "Skip Saria's bridge farewell (experimental)"
+kind = "boolean"
+group = "World"
+help = "Off by default. Skip the bridge farewell movie and gift animation, giving that location's actual item through the normal item-get window. Source completion and story flags remain. Separate from Saria's opening scene. Built, not yet played."
 [shop_prices]
 label = "Shop prices"
 kind = "choice"

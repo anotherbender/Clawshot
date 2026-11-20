@@ -1,0 +1,208 @@
+# Supported build e0f3ccfa. Identifiers only; source effects are read from the player's dump.
+# Plans/rounds/r19-scenes.md records the caller-boundary audit and unplayed limits.
+# before/after: flow/event retains one action; flow/@entry or flow/?event projects
+# native conditional state effects while omitting speech, poses, cameras and waits.
+# No song ownership is invented: grants are the effective Gift-patched source nodes.
+
+[[scene]]
+name = "forest"
+check = "Sheik in Forest"
+flow = "SageOfForest"
+entry = "ForestTemple_SageOfForest_MelodyGet"
+cut = "Event26"
+resume = "Event135" # native autosave
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Forest/Event22"]
+before = []
+after = ["Dm_MelodyGet_Forest/@C14", "AllSage/@MeetSheik_And_Gone"]
+histories = ["Dm_MelodyGet_Forest"]
+once = "HavePlayedEvent.Dm_MelodyGet_Forest"
+
+[[scene]]
+name = "fire"
+check = "Sheik in Crater"
+flow = "SageOfFire"
+entry = "SageOfFire_MelodyGetFire"
+cut = "Event184"
+resume = ""
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Fire/Event192"]
+before = []
+after = ["Dm_MelodyGet_Fire/@C17", "Dm_MelodyGet_Fire/@Navi_Reaction", "AllSage/@MeetSheik_And_Gone"]
+histories = ["Dm_MelodyGet_Fire"]
+once = "HavePlayedEvent.Dm_MelodyGet_Fire"
+
+[[scene]]
+name = "water"
+check = "Sheik in Ice Cavern"
+flow = "SageOfWater"
+entry = "IceCavern_WaterSerenade"
+cut = "Event127" # AFTER Event60's independent chest event returns; never omit the chest reward
+resume = "" # the projected native branch below retains both original Step04/Step05 outcomes
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Water/Event29"]
+before = []
+after = ["Dm_MelodyGet_Water/@C16", "AllSage/@MeetSheik_And_Gone", "SageOfWater/?Event127"]
+histories = ["Dm_MelodyGet_Water"]
+once = "HavePlayedEvent.Dm_MelodyGet_Water"
+
+[[scene]]
+name = "shadow"
+check = "Sheik in Kakariko"
+flow = "Dm_SY_BancChangeArrive"
+entry = "KakarikoVillage_MelodyGet_Shadow"
+cut = "Event68" # only Player participation precedes this; no source camera or instrument pose
+resume = "Event280" # timer cleanup, quest branch, NPC schedules and camera reset remain native
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Shadow/Event21"]
+before = []
+after = []
+histories = ["Dm_MelodyGet_Shadow"]
+once = "HavePlayedEvent.Dm_MelodyGet_Shadow"
+
+[[scene]]
+name = "shine"
+check = "Sheik at Temple"
+flow = "AllSage"
+entry = "Market_Adult_Field_GetLightPrelude"
+cut = "Event169"
+resume = "Event34"
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Shine/Event53"]
+before = ["AllSage/@MelodyOfShine"] # conditional DoorOfTime_AfterAwakeInpa, before receiving the placed song
+# C15 retains native conditional count and Market_Adult_GetLightPrelude, including C18.
+after = ["Dm_MelodyGet_Shine/@C15"]
+histories = ["Dm_MelodyGet_Shine"]
+once = "HavePlayedEvent.Dm_MelodyGet_Shine"
+
+[[scene]]
+name = "spirit"
+check = "Sheik at Colossus"
+flow = "Dm_MelodyGet_Spilit"
+entry = "EntryPoint0"
+cut = "Event210"
+resume = ""
+request = "Dm_MelodyGet_Spilit" # direct request: dispatch before creating this cinematic event context
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Spilit/Event17"]
+before = ["AllSage/@MelodyOfSpirit_02"]
+after = ["Dm_MelodyGet_Spilit/@C11", "AllSage/@MeetSheik_And_Gone"]
+histories = ["Dm_MelodyGet_Spilit"]
+once = "HavePlayedEvent.Dm_MelodyGet_Spilit"
+
+[[scene]]
+name = "impa"
+check = "Song from Impa"
+flow = "DoorOfTime"
+entry = "Step01_Npc_Hylia_Impa_Child_Talk"
+cut = "Event118"
+resume = "" # the actual NPC caller's post-lesson talk/send-off remains native
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Zelda/Event111"]
+before = []
+after = ["Dm_MelodyGet_Zelda/Event188"]
+histories = ["Dm_MelodyGet_Zelda"]
+once = "HavePlayedEvent.Dm_MelodyGet_Zelda"
+
+[[scene]]
+name = "epona"
+check = "Song from Malon"
+flow = "SubEvent_GetEponaSong"
+entry = "GetEponaSong_MelodyGet_Epona"
+cut = "Event3"
+resume = ""
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Epona/Event11"]
+before = []
+after = ["Dm_MelodyGet_Epona/Event81", "Dm_MelodyGet_Epona/Event82"]
+histories = ["Dm_MelodyGet_Epona"]
+once = "HavePlayedEvent.Dm_MelodyGet_Epona"
+
+[[scene]]
+name = "saria_song"
+check = "Song from Saria"
+flow = "SacredForestMeadow"
+entry = "SacredForestMeadow_Field_MelodyGet_Saria"
+cut = "Event1"
+resume = "Event3" # source-bound Fire quest callback and NPC talked flags remain native
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Saria/Event109"]
+before = []
+after = []
+histories = ["Dm_MelodyGet_Saria"]
+once = "HavePlayedEvent.Dm_MelodyGet_Saria"
+
+[[scene]]
+name = "sun"
+check = "Song from Royal Familys Tomb"
+flow = "GimmickFlow_RoyalFamilyTomb"
+entry = "CheckStone_To_MelodyGet_Sun"
+cut = "Event6"
+resume = "Event19" # native autosave; the outer monument caller retains RoyalFamilyTomb_MelodyGet_Clear
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Sun_03/Event34"]
+before = []
+# Preserve the native age/story/time branches, their selected scene histories and day/night toggle.
+# The projection records each omitted EventTransition but never starts those movies.
+after = ["GimmickFlow_RoyalFamilyTomb/@CheckStone_To_MelodyGet_Sun"]
+histories = []
+once = "HavePlayedEvent.Dm_MelodyGet_Sun_03"
+
+[[scene]]
+name = "time"
+check = "Song from Ocarina of Time"
+flow = "DoorOfTime"
+entry = "DoorOfTime_GetOcarinaOfTime"
+cut = "Event64"
+resume = ""
+condition = "no_ocarina"
+# These are distinct checks; both effective native rewards survive the early whole-scene replacement.
+grants = ["Dm_MelodyGet_Time/Event70", "Dm_MelodyGet_Time/Event4"]
+before = []
+after = ["Dm_MelodyGet_Time/Event280", "Dm_MelodyGet_Time/Event246", "DoorOfTime/@Dm_MelodyGet_Time_After"]
+histories = ["Dm_MelodyGet_Time"]
+once = "HavePlayedEvent.Dm_MelodyGet_Time"
+
+[[scene]]
+name = "storm"
+check = "Song from Windmill"
+flow = "Npc_Hylia_009_Adult"
+entry = "PlayStormSong_Adult"
+cut = "Event90"
+resume = ""
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Storm/Event29"]
+before = ["Dm_MelodyGet_Storm/Event3"]
+after = ["Npc_Hylia_009_Adult/Event80", "Npc_Hylia_009_Adult/Event84", "Npc_Hylia_009_Adult/Event86", "Npc_Hylia_009_Adult/Event87", "Npc_Hylia_009_Adult/Event97", "Npc_Hylia_009_Adult/Event85", "Npc_Hylia_009_Adult/Event88"]
+histories = ["Dm_MelodyGet_Storm"]
+once = "HavePlayedEvent.Dm_MelodyGet_Storm"
+
+[[scene]]
+name = "storm_back"
+check = "Song from Windmill"
+flow = "Npc_Hylia_009_Adult"
+entry = "PlayStormSong_Back_Adult"
+cut = "Event102"
+resume = ""
+condition = "no_ocarina"
+grants = ["Dm_MelodyGet_Storm/Event29"]
+before = ["Dm_MelodyGet_Storm/Event3"]
+after = ["Npc_Hylia_009_Adult/Event80", "Npc_Hylia_009_Adult/Event84", "Npc_Hylia_009_Adult/Event86", "Npc_Hylia_009_Adult/Event87", "Npc_Hylia_009_Adult/Event97", "Npc_Hylia_009_Adult/Event85", "Npc_Hylia_009_Adult/Event88"]
+histories = ["Dm_MelodyGet_Storm"]
+once = "HavePlayedEvent.Dm_MelodyGet_Storm"
+
+[[scene]]
+name = "saria_farewell"
+check = "LW Gift from Saria"
+flow = "Goto_HyruleCastle"
+entry = "KokiriForest_ArriveLostWood"
+cut = "Event56" # before drawn/rolling, camera, unequip, actor creation, warp and both scene transitions
+resume = "Event218" # effective native palette write and Field BancChange; compose after door transforms
+condition = "skip_saria_farewell"
+caller_before = ["Event2"] # retain the bound requester's native event bool, without waiting for/posing Saria
+# The grant is read after Gift rewrites, not hard-coded as Fairy Ocarina.
+grants = ["Dm_Kokiri_0155/Event68"]
+before = []
+after = ["Dm_Kokiri_0155/Event58"]
+histories = ["Dm_Kokiri_0150", "Dm_Kokiri_0155"]
+once = "HavePlayedEvent.Dm_Kokiri_0150"
