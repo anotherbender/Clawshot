@@ -1,0 +1,456 @@
+# The tracker's save-read cells -> the logic item names a seed's search counts (spec tracker-in-logic, D1-D4, D17,
+# D18; read by clawshot.tracker.logic). Cell ids are clawshot.tracker.state's. What each cell reads from the save,
+# and the evidence for it, is documented there; this file only says what a held cell is worth to the logic.
+#
+# A seed's world counts only progressive copies toward the native chains (world.toml [native_progressive],
+# `copies_only`), so tier cells grant copies of the chain item (clawshot.progressive.CHAINS): a held Longshot is two
+# Progressive Hookshot. Per logic item, the inventory takes the largest grant of any cell, never a sum.
+#
+# [cells.<id>] keys:
+#   item      one copy while the cell is held (songs: once learned).
+#   count     with `item`: as many copies as the cell's count (its stock).
+#   tiers     a tier cell's grants per held tier, lowest first: the highest held tier's table counts.
+#   acquired  D2: each grant also counts once the save's acquired-once flag (IsGet.<pouch name>, plans/03-game-data.md
+#             section 19) is set, even when the item has left the inventory (traded, sold, eaten, burnt). For a tier
+#             cell, every tier counts on its own (held now, or its own IsGet), not only the highest.
+#   requires  counts only while that other cell is held (a capacity upgrade is not the weapon, CHAINS' comment).
+
+# --- Upgrades and progressive chains (clawshot.progressive.CHAINS; owned pouch names = state.TIERS actors).
+[cells.hookshot]
+tiers = [{ "Progressive Hookshot" = 1 }, { "Progressive Hookshot" = 2 }]
+
+[cells.strength]
+tiers = [{ "Progressive Strength" = 1 }, { "Progressive Strength" = 2 }, { "Progressive Strength" = 3 }]
+
+[cells.scale]
+tiers = [{ "Progressive Scale" = 1 }, { "Progressive Scale" = 2 }]
+
+# The small (200) wallet is starting equipment, not a chain tier (CHAINS: "Progressive Wallet").
+[cells.wallet]
+tiers = [{}, { "Progressive Wallet" = 1 }, { "Progressive Wallet" = 2 }]
+
+[cells.bomb_bag]
+tiers = [{ "Progressive Bomb Bag" = 1 }, { "Progressive Bomb Bag" = 2 }, { "Progressive Bomb Bag" = 3 }]
+
+# Bow and Slingshot are the chains' first tiers; the Small quiver/bullet bag comes with them.
+[cells.bow]
+item = "Progressive Quiver"
+
+[cells.quiver]
+tiers = [{}, { "Progressive Quiver" = 2 }, { "Progressive Quiver" = 3 }]
+requires = "bow"
+
+[cells.slingshot]
+item = "Progressive Slingshot"
+
+[cells.bullet_bag]
+tiers = [{}, { "Progressive Slingshot" = 2 }, { "Progressive Slingshot" = 3 }]
+requires = "slingshot"
+
+[cells.magic]
+tiers = [{ "Progressive Magic" = 1 }, { "Progressive Magic" = 2 }]
+
+# Ocarina is not a native chain: its fixed tiers count in a seed's world (world.toml [progressive] "Ocarina").
+[cells.ocarina]
+tiers = [{ "Fairy Ocarina" = 1 }, { "Ocarina of Time" = 1 }]
+
+# --- Trade sequences and masks (D2: held now or ever acquired).
+[cells.child_trade]
+acquired = true
+tiers = [{ "Weird Egg" = 1 }, { "Chicken" = 1 }, { "Zeldas Letter" = 1 }]
+
+[cells.adult_trade]
+acquired = true
+tiers = [
+    { "Pocket Egg" = 1 },
+    { "Pocket Cucco" = 1 },
+    { "Cojiro" = 1 },
+    { "Odd Mushroom" = 1 },
+    { "Odd Potion" = 1 },
+    { "Poachers Saw" = 1 },
+    { "Broken Sword" = 1 },
+    { "Prescription" = 1 },
+    { "Eyeball Frog" = 1 },
+    { "Eyedrops" = 1 },
+    { "Claim Check" = 1 },
+]
+
+[cells.keaton_mask]
+item = "Keaton Mask"
+acquired = true
+
+[cells.skull_mask]
+item = "Skull Mask"
+acquired = true
+
+[cells.spooky_mask]
+item = "Spooky Mask"
+acquired = true
+
+[cells.bunny_hood]
+item = "Bunny Hood"
+acquired = true
+
+[cells.mask_of_truth]
+item = "Mask of Truth"
+acquired = true
+
+# --- Items.
+[cells.boomerang]
+item = "Boomerang"
+
+[cells.hammer]
+item = "Megaton Hammer"
+
+[cells.lens]
+item = "Lens of Truth"
+
+[cells.fire_arrows]
+item = "Fire Arrows"
+
+[cells.ice_arrows]
+item = "Ice Arrows"
+
+[cells.light_arrows]
+item = "Light Arrows"
+
+[cells.dins_fire]
+item = "Dins Fire"
+
+[cells.farores_wind]
+item = "Farores Wind"
+
+[cells.nayrus_love]
+item = "Nayrus Love"
+
+# found_bombchus reads any Bombchus item: once found, used chus still count (proposed by Claude, see the PR).
+[cells.bombchus]
+item = "Bombchus"
+acquired = true
+
+# can_plant_bean asks for (Magic_Bean, 10): the beans held now (planted ones are gone; D4: conservative).
+[cells.magic_beans]
+item = "Magic Bean"
+count = true
+
+# --- Equipment. Shields can be eaten or burnt (D2).
+[cells.kokiri_sword]
+item = "Kokiri Sword"
+
+[cells.giants_knife]
+item = "Giants Knife"
+
+[cells.biggoron_sword]
+item = "Biggoron Sword"
+
+[cells.deku_shield]
+item = "Deku Shield"
+acquired = true
+
+[cells.hylian_shield]
+item = "Hylian Shield"
+acquired = true
+
+[cells.mirror_shield]
+item = "Mirror Shield"
+acquired = true
+
+[cells.goron_tunic]
+item = "Goron Tunic"
+
+[cells.zora_tunic]
+item = "Zora Tunic"
+
+[cells.iron_boots]
+item = "Iron Boots"
+
+[cells.hover_boots]
+item = "Hover Boots"
+
+# --- Quest items.
+[cells.stone_of_agony]
+item = "Stone of Agony"
+
+[cells.gerudo_card]
+item = "Gerudo Membership Card"
+
+# --- Songs (held once learned: the save keeps IsGet only).
+[cells.zeldas_lullaby]
+item = "Zeldas Lullaby"
+
+[cells.eponas_song]
+item = "Eponas Song"
+
+[cells.sarias_song]
+item = "Sarias Song"
+
+[cells.suns_song]
+item = "Suns Song"
+
+[cells.song_of_time]
+item = "Song of Time"
+
+[cells.song_of_storms]
+item = "Song of Storms"
+
+[cells.minuet]
+item = "Minuet of Forest"
+
+[cells.bolero]
+item = "Bolero of Fire"
+
+[cells.serenade]
+item = "Serenade of Water"
+
+[cells.requiem]
+item = "Requiem of Spirit"
+
+[cells.nocturne]
+item = "Nocturne of Shadow"
+
+[cells.prelude]
+item = "Prelude of Light"
+
+[cells.scarecrows_song]
+item = "Scarecrow Song"
+
+# --- Spiritual stones and medallions.
+[cells.kokiri_emerald]
+item = "Kokiri Emerald"
+
+[cells.goron_ruby]
+item = "Goron Ruby"
+
+[cells.zora_sapphire]
+item = "Zora Sapphire"
+
+[cells.forest_medallion]
+item = "Forest Medallion"
+
+[cells.fire_medallion]
+item = "Fire Medallion"
+
+[cells.water_medallion]
+item = "Water Medallion"
+
+[cells.shadow_medallion]
+item = "Shadow Medallion"
+
+[cells.spirit_medallion]
+item = "Spirit Medallion"
+
+[cells.light_medallion]
+item = "Light Medallion"
+
+# Bottles follow has_bottle (D18; world/rules.py): each owned slot without the letter is one `bottle`; a slot holding
+# Ruto's Letter is one `letter`, never also a bottle. The letter also counts once its acquired-once flag is set (D2:
+# IsGet.<letter_actor>, a BOTTLE_ACTORS row of state.py).
+[bottles]
+bottle = "Bottle"
+letter = "Rutos Letter"
+letter_actor = "Item_Bottle_Letter"
+
+# Heart rules count pieces: Piece of Heart // 4 + 3 >= hearts (world/rules.py). The save's whole hearts
+# (state.hearts "containers") beyond the starting three are four pieces each; loose pieces are not counted, since
+# whether the saved piece count is the remainder or all found is not established (state.hearts).
+[hearts]
+item = "Piece of Heart"
+pieces_per_heart = 4
+starting_hearts = 3
+
+# The native token stock (state "tokens").
+[tokens]
+item = "Gold Skulltula Token"
+
+# Per world dungeon (seeds.DUNGEON_INFO): small keys are the found count, spent keys included (D3); the others
+# their saved flags. Names the world does not have (a Map's, a hideout boss key) are skipped.
+[dungeon_items]
+small_key = "Small Key ({dungeon})"
+boss_key = "Boss Key ({dungeon})"
+map = "Map ({dungeon})"
+compass = "Compass ({dungeon})"
+
+# Story steps the logic names that the save records (D17): a held flag counts as the event.
+[story."Field Owl Arrival"]
+flag = "HyruleField_ArriveEntrance"
+source = "data/world/remake/child_hyrule_castle.toml, event Time Flows: 'Field Owl Arrival' is saved HyruleField_ArriveEntrance (round16 clock predicate, work/r16-time/clock-full-predicate-findings.md); child_hyrule_field.toml: monotone, no event clears it."
+
+[story."Met Child Zelda"]
+flag = "HavePlayedEvent.Dm_HrlField_0020"
+source = "data/world/remake/child_hyrule_castle.toml, event Time Flows: 'Met Child Zelda' is HavePlayedEvent.Dm_HrlField_0020, Impa's send-off (round16 clock predicate); patch/door.py SENDOFF."
+
+# Consumables the save holds as a stock (PouchData.<actor>.StockNum). One held grants `item`, the name the logic
+# helper reads (data/world/helpers.toml: Sticks = Buy_Deku_Stick_1 or ..., Nuts = Buy_Deku_Nut_5 or ...); a bought
+# stick leaves no other record. Held now only: a new game sets IsGet.Item_DekuNut with no nut held (seen in the saves
+# of seed 212067047, maintainer's play, 2026-11-20), so the acquired-once flag is not having them. `label` names the
+# stock in unknown_items when the save lacks it.
+[stock.Item_DekuStick]
+item = "Buy Deku Stick (1)"
+label = "Deku Sticks"
+
+[stock.Item_DekuNut]
+item = "Buy Deku Nut (5)"
+label = "Deku Nuts"
+
+# Logic names the tracker does not take from the save, with why. The search derives events itself when their
+# region and rule are reached in logic; nothing here is ever counted as held.
+[unmapped]
+# Events: the search derives them from their region and rule.
+"Big Poe" = "event: the search derives it"
+"Blue Fire" = "event: the search derives it"
+"Bugs" = "event: the search derives it"
+"Deku Nut Drop" = "event: the search derives it"
+"Deku Shield Drop" = "event: the search derives it"
+"Deku Stick Drop" = "event: the search derives it"
+"Deliver Letter" = "event: the search derives it"
+"Epona" = "event: the search derives it"
+"Fairy" = "event: the search derives it"
+"Fish" = "event: the search derives it"
+"Fire Trial Clear" = "event: the search derives it"
+"Forest Trial Clear" = "event: the search derives it"
+"Light Trial Clear" = "event: the search derives it"
+"Shadow Trial Clear" = "event: the search derives it"
+"Spirit Trial Clear" = "event: the search derives it"
+"Water Trial Clear" = "event: the search derives it"
+"Sell Big Poe" = "event: the search derives it"
+"Time Travel" = "event: the search derives it"
+"Triforce" = "event: the search derives it"
+"Water Temple Clear" = "event: the search derives it"
+# Story steps the remake adds whose saved flag is not audited yet (D17).
+"Fire Temple Pillar Lowered" = "story step without an audited save flag: the search derives it"
+"HF Wetland Skullwalltula Defeated" = "story step without an audited save flag: the search derives it"
+"Ice Cavern End Chest Access" = "story step without an audited save flag: the search derives it"
+"Kak Gallery Normal Clear" = "story step without an audited save flag: the search derives it"
+"Malon Song Source Cleared" = "story step without an audited save flag: the search derives it"
+"Market Gallery Normal Clear" = "story step without an audited save flag: the search derives it"
+"Zora River Domain Arrival" = "story step without an audited save flag: the search derives it"
+"Time Flows" = "story step without an audited save flag: the search derives it from Met Child Zelda and Field Owl Arrival"
+# Native chains: a seed's world counts only the chain copies, which the tier cells grant; these are the chains'
+# fixed tiers and counters (world.toml [native_progressive]).
+"Adult Wallet" = "fixed chain tier: the wallet cell grants Progressive Wallet copies"
+"Giant Wallet" = "fixed chain tier: the wallet cell grants Progressive Wallet copies"
+"Bomb Bag" = "chain counter: the bomb_bag cell grants Progressive Bomb Bag copies"
+"Bomb Bag (30)" = "fixed chain tier: the bomb_bag cell grants Progressive Bomb Bag copies"
+"Bomb Bag (40)" = "fixed chain tier: the bomb_bag cell grants Progressive Bomb Bag copies"
+"Bow" = "chain counter: the bow and quiver cells grants Progressive Quiver copies"
+"Slingshot" = "chain counter: the slingshot and bullet_bag cells grants Progressive Slingshot copies"
+"Goron Bracelet" = "fixed chain tier: the strength cell grants Progressive Strength copies"
+"Silver Gauntlets" = "fixed chain tier: the strength cell grants Progressive Strength copies"
+"Golden Gauntlets" = "fixed chain tier: the strength cell grants Progressive Strength copies"
+"Progressive Strength Upgrade" = "chain counter: the strength cell grants Progressive Strength copies"
+"Silver Scale" = "fixed chain tier: the scale cell grants Progressive Scale copies"
+"Golden Scale" = "fixed chain tier: the scale cell grants Progressive Scale copies"
+"Hookshot" = "fixed chain tier: the hookshot cell grants Progressive Hookshot copies"
+"Longshot" = "fixed chain tier: the hookshot cell grants Progressive Hookshot copies"
+"Magic Meter" = "chain counter: the magic cell grants Progressive Magic copies"
+"Magic Meter (Single)" = "fixed chain tier: the magic cell grants Progressive Magic copies"
+"Magic Meter (Double)" = "fixed chain tier: the magic cell grants Progressive Magic copies"
+"Ocarina" = "tier counter: the ocarina cell grants Fairy Ocarina or Ocarina of Time, which raise it"
+# Pool variants of items another cell already grants.
+"Bombchus (5)" = "the bombchus cell grants Bombchus; found_bombchus reads any of them"
+"Bombchus (10)" = "the bombchus cell grants Bombchus; found_bombchus reads any of them"
+"Bombchus (20)" = "the bombchus cell grants Bombchus; found_bombchus reads any of them"
+"Bombchu Drop" = "the bombchus cell grants Bombchus; found_bombchus reads any of them"
+"Magic Bean Pack" = "the magic_beans cell grants the beans held as Magic Bean"
+"Heart Container" = "the save's whole hearts are granted as Piece of Heart, four per heart"
+"Piece of Heart (Treasure Chest Game)" = "the save's whole hearts are granted as Piece of Heart, four per heart"
+# Bottles: each owned slot is one Bottle (D18); what a bottle holds now is not mapped.
+"Bottle with Big Poe" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Bottle with Blue Fire" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Bottle with Blue Potion" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Bottle with Bugs" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Bottle with Fairy" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Bottle with Fish" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Bottle with Green Potion" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Bottle with Milk" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Bottle with Poe" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Bottle with Red Potion" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+"Blue Potion" = "bottle contents are not mapped: each owned slot is one Bottle (D18)"
+# Shop goods: a purchase leaves no saved record; what was bought shows in its own cell (deku_shield,
+# hylian_shield, goron_tunic, zora_tunic, bombchus, magic_beans).
+"Buy Blue Fire" = "shop goods: a purchase leaves no saved record"
+"Buy Bombchu (1)" = "shop goods: a purchase leaves no saved record"
+"Buy Bombchu (3)" = "shop goods: a purchase leaves no saved record"
+"Buy Bombchu (5)" = "shop goods: a purchase leaves no saved record"
+"Buy Bombchu (8)" = "shop goods: a purchase leaves no saved record"
+"Buy Bombchu (10)" = "shop goods: a purchase leaves no saved record"
+"Buy Bombchu (15)" = "shop goods: a purchase leaves no saved record"
+"Buy Bombchu (20)" = "shop goods: a purchase leaves no saved record"
+"Buy Bombchu (30)" = "shop goods: a purchase leaves no saved record"
+"Buy Bottle Bug" = "shop goods: a purchase leaves no saved record"
+"Buy Deku Nut (10)" = "held ones count as Buy Deku Nut (5) ([stock]); the helper needs only one name"
+"Buy Deku Shield" = "shop goods: a purchase leaves no saved record"
+"Buy Deku Stick (5)" = "held ones count as Buy Deku Stick (1) ([stock]); the helper needs only one name"
+"Buy Fairy's Spirit" = "shop goods: a purchase leaves no saved record"
+"Buy Fish" = "shop goods: a purchase leaves no saved record"
+"Buy Goron Tunic" = "shop goods: a purchase leaves no saved record"
+"Buy Hylian Shield" = "shop goods: a purchase leaves no saved record"
+"Buy Magic Bean" = "shop goods: a purchase leaves no saved record"
+"Buy Zora Tunic" = "shop goods: a purchase leaves no saved record"
+# No tracker cell reads these.
+"Blue Fire Arrows" = "no save field: not an item of the remake's pouch"
+"Ocarina A Button" = "a seed's starting item (world.start_items); no save field"
+"Ocarina C down Button" = "a seed's starting item (world.start_items); no save field"
+"Ocarina C left Button" = "a seed's starting item (world.start_items); no save field"
+"Ocarina C right Button" = "a seed's starting item (world.start_items); no save field"
+"Ocarina C up Button" = "a seed's starting item (world.start_items); no save field"
+"Triforce Piece" = "no save field the tracker reads"
+"Boss Key" = "a dungeon-less placeholder name; boss keys are read per dungeon"
+"Small Key" = "a dungeon-less placeholder name; small keys are read per dungeon"
+"Small Key (Treasure Chest Game)" = "no audited save field for the Treasure Chest Game's keys"
+"Small Key Ring (Treasure Chest Game)" = "no audited save field for the Treasure Chest Game's keys"
+# Key rings: a ring's keys count through the dungeon's found small-key count (D3).
+"Small Key Ring (Bottom of the Well)" = "a ring's keys count through the dungeon's found small-key count (D3)"
+"Small Key Ring (Fire Temple)" = "a ring's keys count through the dungeon's found small-key count (D3)"
+"Small Key Ring (Forest Temple)" = "a ring's keys count through the dungeon's found small-key count (D3)"
+"Small Key Ring (Ganons Castle)" = "a ring's keys count through the dungeon's found small-key count (D3)"
+"Small Key Ring (Gerudo Training Ground)" = "a ring's keys count through the dungeon's found small-key count (D3)"
+"Small Key Ring (Shadow Temple)" = "a ring's keys count through the dungeon's found small-key count (D3)"
+"Small Key Ring (Spirit Temple)" = "a ring's keys count through the dungeon's found small-key count (D3)"
+"Small Key Ring (Thieves Hideout)" = "a ring's keys count through the dungeon's found small-key count (D3)"
+"Small Key Ring (Water Temple)" = "a ring's keys count through the dungeon's found small-key count (D3)"
+# Silver rupees: no audited save field.
+"Silver Rupee (Bottom of the Well Basement)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Bottom of the Well Basement)" = "no audited save field for silver rupees"
+"Silver Rupee (Dodongos Cavern Staircase)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Dodongos Cavern Staircase)" = "no audited save field for silver rupees"
+"Silver Rupee (Ganons Castle Fire Trial)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Ganons Castle Fire Trial)" = "no audited save field for silver rupees"
+"Silver Rupee (Ganons Castle Forest Trial)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Ganons Castle Forest Trial)" = "no audited save field for silver rupees"
+"Silver Rupee (Ganons Castle Light Trial)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Ganons Castle Light Trial)" = "no audited save field for silver rupees"
+"Silver Rupee (Ganons Castle Shadow Trial)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Ganons Castle Shadow Trial)" = "no audited save field for silver rupees"
+"Silver Rupee (Ganons Castle Spirit Trial)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Ganons Castle Spirit Trial)" = "no audited save field for silver rupees"
+"Silver Rupee (Ganons Castle Water Trial)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Ganons Castle Water Trial)" = "no audited save field for silver rupees"
+"Silver Rupee (Gerudo Training Ground Lava)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Gerudo Training Ground Lava)" = "no audited save field for silver rupees"
+"Silver Rupee (Gerudo Training Ground Slopes)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Gerudo Training Ground Slopes)" = "no audited save field for silver rupees"
+"Silver Rupee (Gerudo Training Ground Water)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Gerudo Training Ground Water)" = "no audited save field for silver rupees"
+"Silver Rupee (Ice Cavern Push Block)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Ice Cavern Push Block)" = "no audited save field for silver rupees"
+"Silver Rupee (Ice Cavern Spinning Scythe)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Ice Cavern Spinning Scythe)" = "no audited save field for silver rupees"
+"Silver Rupee (Shadow Temple Huge Pit)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Shadow Temple Huge Pit)" = "no audited save field for silver rupees"
+"Silver Rupee (Shadow Temple Invisible Blades)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Shadow Temple Invisible Blades)" = "no audited save field for silver rupees"
+"Silver Rupee (Shadow Temple Invisible Spikes)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Shadow Temple Invisible Spikes)" = "no audited save field for silver rupees"
+"Silver Rupee (Shadow Temple Scythe Shortcut)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Shadow Temple Scythe Shortcut)" = "no audited save field for silver rupees"
+"Silver Rupee (Spirit Temple Adult Boulders)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Spirit Temple Adult Boulders)" = "no audited save field for silver rupees"
+"Silver Rupee (Spirit Temple Adult Climb)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Spirit Temple Adult Climb)" = "no audited save field for silver rupees"
+"Silver Rupee (Spirit Temple Child Early Torches)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Spirit Temple Child Early Torches)" = "no audited save field for silver rupees"
+"Silver Rupee (Spirit Temple Lobby and Lower Adult)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Spirit Temple Lobby and Lower Adult)" = "no audited save field for silver rupees"
+"Silver Rupee (Spirit Temple Sun Block)" = "no audited save field for silver rupees"
+"Silver Rupee Pouch (Spirit Temple Sun Block)" = "no audited save field for silver rupees"

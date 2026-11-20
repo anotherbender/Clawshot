@@ -157,6 +157,16 @@ class Seed:
     added_flags: tuple[tuple[str, ...], ...] = ()
     warnings: tuple[str, ...] = ()
 
+    @property
+    def settings_string(self) -> str | None:
+        """The spoiler's canonical settings string (the seed's effective settings), or None."""
+        return self.metadata.get("settings_string")
+
+    @property
+    def generator(self) -> str | None:
+        """The spoiler's ``generator`` (``clawshot <version>``), or None."""
+        return self.metadata.get("generator")
+
 
 def installed_version() -> str:
     try:

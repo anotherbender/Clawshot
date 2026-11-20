@@ -17,6 +17,8 @@ from pathlib import Path
 from typing import Any
 
 from clawshot import save as save_format
+from clawshot.tracker import logic as tracker_logic
+from clawshot.tracker import marks as tracker_marks
 from clawshot.tracker import state as tracker_state
 from clawshot.tracker.seeds import Seed, SeedError, load_seed
 
@@ -140,6 +142,13 @@ def read_complete(data: bytes) -> save_format.Save:
     return parsed
 
 
+def _marks_key(progress_path: str) -> str:
+    """The save folder holding a slot's folder (``<save>/<profile>/slot_NN/progress.sav`` -> ``<save>/<profile>``).
+    The remake writes each save to the next slot of that folder (seed 212067047, maintainer's play, 2026-11-20:
+    slots 05, 01, 00, 02, 03, 04 in six minutes), so a playthrough's marks belong to the folder, not to one slot."""
+    return str(Path(progress_path).parent.parent)
+
+
 class TrackerSession:
     """The UI's tracker: one seed, one save folder, the newest (or chosen) slot. Thread-safe.
 
@@ -150,13 +159,22 @@ class TrackerSession:
     Snapshot: ``status`` (``unconfigured``, ``error``, ``no_save_folder``, ``waiting``, ``ok``, ``stale``),
     ``state`` (``clawshot.tracker.state.build_state``'s dict, or None), ``slots`` (:func:`list_slots`),
     ``selected_slot`` (an id or None), ``save_folder``, ``seed_path``, ``show_locations``, ``revision`` (grows
-    whenever ``state`` changes) and ``warnings``."""
+    whenever ``state`` changes) and ``warnings``.
 
-    def __init__(self) -> None:
+    Manual marks (``clawshot.tracker.marks``) apply to the save folder of the last complete read (every slot in it,
+    :func:`_marks_key`): :meth:`mark` and
+    :meth:`clear_marks` change them, and a check the save now reads as collected or not loses its mark (D8)."""
+
+    def __init__(self, marks: tracker_marks.MarkStore | None = None) -> None:
         self._lock = threading.RLock()
+        self._mark_store = marks  # created on first use: tracker-marks.json beside the preferences
+        self._seed_id: str | None = None
+        self._parsed: save_format.Save | None = None  # the save behind _state, for rebuilding after a mark change
+        self._marks_folder: str | None = None  # its save folder: the marks' key (see _marks_key)
         self._configured = False
         self._seed_path: str | None = None
         self._seed: Seed | None = None
+        self._logic: tracker_logic.SeedLogic | None = None  # built once per loaded seed
         self._error: str | None = None
         self._folder: Path | None = None
         self._slot: str | int | None = None
@@ -179,9 +197,11 @@ class TrackerSession:
             self._seed_path = str(seed_path)
             self._slot = slot
             self._show = bool(show_locations)
-            self._state = self._read = self._bad = self._state_slot = None
+            self._state = self._read = self._bad = self._state_slot = self._logic = None
+            self._seed_id = self._parsed = self._marks_folder = None
             try:
                 self._seed = load_seed(seed_path)
+                self._seed_id = tracker_marks.seed_identity(self._seed)
                 self._error = None
             except (SeedError, OSError) as error:
                 self._seed, self._error = None, str(error)
@@ -212,11 +232,69 @@ class TrackerSession:
             self._state, self._state_slot = state, slot
             self._revision += 1
 
+    def _store(self) -> tracker_marks.MarkStore:
+        if self._mark_store is None:
+            self._mark_store = tracker_marks.MarkStore()
+        return self._mark_store
+
+    def _build(self, parsed: save_format.Save | None, marks_folder: str | None = None) -> dict[str, Any]:
+        if self._logic is None:
+            self._logic = tracker_logic.SeedLogic(tracker_logic.load_world(self._seed))
+        store = self._store() if marks_folder is not None else None
+        marked = store.marks(self._seed_id, marks_folder) if store is not None else frozenset()
+        state = tracker_state.build_state(
+            self._seed, parsed, show_locations=self._show, logic=self._logic, marks=marked
+        )
+        if store is not None:
+            confirmed = [
+                check["id"]
+                for area in state["areas"]
+                for check in area["checks"]
+                if check["id"] in marked and check["collected"] is not None
+            ]
+            if confirmed:
+                store.drop(self._seed_id, marks_folder, confirmed)
+            if store.warning:
+                state["warnings"].append(store.warning)
+        return state
+
+    def _marks_target(self) -> str:
+        """The save folder marks apply to; refuses when no seed and save slot are read."""
+        if self._seed is None or self._seed_id is None:
+            raise ValueError("Load a seed before marking checks.")
+        if self._marks_folder is None or self._parsed is None or self._state is None:
+            raise ValueError("Choose a save slot, and save in the game once, before marking checks.")
+        return self._marks_folder
+
+    def mark(self, check: str, marked: bool) -> dict[str, Any]:
+        """Mark a check whose save state is unknown as done by hand, or unmark it (D8)."""
+        with self._lock:
+            slot = self._marks_target()
+            entry = next(
+                (c for area in self._state["areas"] for c in area["checks"] if c["id"] == check),
+                None,
+            )
+            if entry is None:
+                raise ValueError(f"No check {check!r} in this seed.")
+            if entry["collected"] is not None:
+                raise ValueError(f"{entry['label']}: the save already says whether it is collected.")
+            self._store().set(self._seed_id, slot, check, marked)
+            self._set_state(self._build(self._parsed, slot), self._state_slot)
+            return self.snapshot()
+
+    def clear_marks(self) -> dict[str, Any]:
+        """Remove every mark of this seed and save folder."""
+        with self._lock:
+            slot = self._marks_target()
+            self._store().clear(self._seed_id, slot)
+            self._set_state(self._build(self._parsed, slot), self._state_slot)
+            return self.snapshot()
+
     def _no_save(self) -> None:
         """Show the seed with every save value unknown (built once, not on every poll)."""
         if self._state is None or self._state_slot is not None:
-            self._read = None
-            self._set_state(tracker_state.build_state(self._seed, None, show_locations=self._show), None)
+            self._read = self._parsed = self._marks_folder = None
+            self._set_state(self._build(None), None)
 
     def _poll(self) -> dict[str, Any]:
         if not self._configured:
@@ -260,7 +338,8 @@ class TrackerSession:
             self._bad = (signature, str(error))
             return self._stale(slots, chosen, str(error))
         self._read, self._bad = signature, None
-        self._set_state(tracker_state.build_state(self._seed, parsed, show_locations=self._show), chosen["id"])
+        self._parsed, self._marks_folder = parsed, _marks_key(chosen["path"])
+        self._set_state(self._build(parsed, self._marks_folder), chosen["id"])
         return self._base("ok", slots, chosen["id"], [])
 
     def _stale(self, slots: list[dict[str, Any]], chosen: dict[str, Any], why: str) -> dict[str, Any]:
