@@ -27,10 +27,11 @@ reviewed stack, not invented merge commits. Staging/receipt commits can follow i
 No runtime fork, game files, version bump, new retry limit or token weighting belongs to this documentation work.
 Defaults retain own-dungeon items, Fortress keys off, reward shuffle off and the vanilla bridge.
 
-## Played on Longshot rc.7 — Kareem, 2026-11-19
+## Played results — Kareem
 
 The following is Claude's supplied release intake, supplemented only by the corresponding track records.
-It is not agent-run gameplay and is not a claim that the later Longshot stable 3.0.0 was played.
+Initial checks used Longshot rc.7 on 2026-11-19. The owl checks and two-Stone refusal used
+**Longshot 3.0.0 stable on 2026-11-19/20**. It is not agent-run gameplay.
 
 | Change | Observed result | Coverage limit |
 |---|---|---|
@@ -42,11 +43,11 @@ It is not agent-run gameplay and is not a claim that the later Longshot stable 3
 | Fortress jail keys | After the Valley carpenter boss's Yes, the guard appears; one rescue and the repaired 20-rupee drop passed, once-only after return/Continue. | All four rescues, captain/card and Training Ground **UNPLAYED** with the option; keep it experimental. |
 | Dungeon rewards | First sword pull gives the shuffled reward. | Other boss rewards and a full shuffled playthrough remain unplayed. |
 | Medallion bridge | Stays closed below the configured count and opens at the count. | Stones/combined-count modes and late Light Arrow/trial order not newly played. |
-| Owned-Stones Door | Opens with all three Stones while Dodongo/Jabu are unfinished; stays open; no escape/moat scene. With only Emerald+Ruby, stays closed with no opening scene; saved state confirms both Stones and closed Door. | Not an escape/moat completion check or a full shuffled playthrough. |
+| Owned-Stones Door | On rc.7, opens with all three Stones while Dodongo/Jabu are unfinished; stays open; no escape/moat scene. On 3.0.0 stable, with only Emerald+Ruby, stays closed with no opening scene; saved state confirms both Stones and closed Door. | Not an escape/moat completion check or a full shuffled playthrough. |
 | Dampé, no Hookshot | Refuses the race; fades back in front of Dampé, normal control, existing warp back up usable. | Not a surface return; do not describe it as one. |
-| Castle owl | No speech; short stop/fly-away retained. | Experimental; not blanket acceptance of every owl scene. |
-| Field owls (Kakariko/Lake approach) | No speech; short look-and-fly-away works. | Experimental; only these encounters played. |
-| Summit/Lake travel owls | Short offer; flight works. | Experimental; not blanket acceptance of every owl route. |
+| Castle owl | On 3.0.0 stable, no speech; short stop/fly-away retained. | Experimental; not blanket acceptance of every owl scene. |
+| Field owls (Kakariko/Lake approach) | On 3.0.0 stable, no speech; short look-and-fly-away works. | Experimental; only these encounters played. |
+| Summit/Lake travel owls | On 3.0.0 stable, short offer; flight works. | Experimental; not blanket acceptance of every owl route. |
 | Ocarina (#34) | Fairy after Time keeps Time selected as child/adult; adult Sun's Song works and Time persists after Continue. Control's adult Sun's Song also works with Fairy. | Cosmetic downgrade **for Sun's Song** only; no broader adult-song or lesson-safety inference. |
 | Mido (#35) | Sword-only refusal, shield clears the passage, tree mouth open; reload retains the clear and normal late Mido position. | The fixture's declared castle-step edit is in the track record; not a complete early-Zelda playthrough. |
 

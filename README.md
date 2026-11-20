@@ -114,7 +114,7 @@ The 10- and 40-token reward swaps have been observed, not every threshold.
 The Door of Time's earlier song-only and open modes passed a first door/sword-pull check.
 Both wait for Field-arrival clock state and Zelda/Impa's real send-off. The open-mode gate and
 later escape/moat order repair and immediate child-return clock clear passed on Longshot rc.7.
-The first-arrival lighting repair passed on rc.7 on 2026-11-17. For new seeds; no save-repair or older-seed compatibility guarantee.
+The first-arrival lighting repair awaits v5 play checks. For new seeds; no save-repair or older-seed compatibility guarantee.
 
 Cows, pots, crates and loose rupees are not shuffled. Dungeon reward shuffle is a separate experimental option, off by default; it does not move rewards outside their nine slots.
 With reward shuffle on, the closed Door opened with all three Stones owned while Dodongo and Jabu were
@@ -137,7 +137,7 @@ playthrough has been played.
 All eight upgrade chains—Hookshot, strength, scale, wallet, bomb bag, quiver,
 slingshot bag and magic—are always progressive. Copies are chest-only; the get-item
 name/text and grant follow the selected tier, while the rising model stays the base.
-The eight chains have played Longshot checks; that is not every collection order or pickup combination.
+Built and native-data-tested; the Longshot check is unplayed.
 Entrance shuffle and Archipelago are not supported.
 See [settings and restrictions](https://github.com/hiKareeem/Clawshot/blob/main/docs/settings.md) for the detailed reference.
 Evidence: [the roadmap index](https://github.com/hiKareeem/Clawshot/blob/main/plans/00-roadmap.md)
@@ -145,9 +145,20 @@ plus the linked round files, and [playtest answers](https://github.com/hiKareeem
 
 ### Recent in-game checks
 
-Kareem played these on Longshot rc.7 on 2026-11-19:
+Kareem reported these played checks:
+
+**Longshot rc.7 (2026-11-19):**
 
 - **New seeds fix the free child sword on returning from adult.** Kareem passed the return check on Longshot rc.7.
+- **Mirror Shield scrub purchase (#33):** the adult purchase finishes instead of leaving Link in the get-item pose.
+- **40-token reward (#11):** the shuffled reward check passed; not every House threshold was played.
+- **Dungeon map/compass display:** the display check passed, not every source/target combination.
+- **Well floor key:** leaving it, recovering it and collecting it once passed; it stayed collected after
+  leaving/returning and Continue. Shadow's floor key stays vanilla.
+- **Reward shuffle's first pull:** the first sword pull gives the shuffled reward.
+- **Medallion-count bridge:** stays shut below the configured count and opens at the count.
+- **Owned-Stones Door:** opens with all three Stones while Dodongo/Jabu are unfinished, stays open,
+  and triggers no escape/moat scene.
 - **Taking the Fairy Ocarina after the Ocarina of Time keeps Time selected in new seeds.** Child and adult checks
   passed, including adult Sun's Song and Continue. Adult Sun's Song also worked with Fairy in the control;
   that does not establish every adult song or a safe no-ocarina lesson.
@@ -155,10 +166,16 @@ Kareem played these on Longshot rc.7 on 2026-11-19:
   stayed open after reloading in Kareem's check.
 - **Dampé will not start a race without Hookshot or Longshot.** The no-Hookshot check faded back in front of
   Dampé, with normal movement and the existing warp back up usable; it did not return Link to the surface.
-- **Owl skips remain experimental, but were played.** The castle owl and Field owls near Kakariko and the
-  Lake approach had no speech, with a short look/fly-away. Summit and Lake travel owls kept a short offer
-  and working flights.
-- **Story-dialogue skipping is not available yet.** It is withdrawn for 0.2.3.
+
+**Longshot 3.0.0 stable (2026-11-19/20):**
+
+- **Castle owl:** no speech, with a short fly-away retained. Owl skips remain experimental.
+- **Two-Stone Door refusal:** with Emerald and Ruby owned, the Door stays closed and no opening scene
+  plays; the saved state confirms both Stones and the closed Door.
+- **Field owls near Kakariko and the Lake approach:** no speech, with a short look-and-fly-away.
+- **Summit and Lake travel owls:** a short offer and working flights. These owl skips remain experimental.
+
+Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
 
 ### Known issues
 

@@ -8,8 +8,9 @@
 # One Fortress rescue and its once-only 20-rupee drop passed, not all four rescues,
 # the card or Training Ground. Fortress keys stay experimental; Shadow's floor key stays vanilla.
 # First-pull reward shuffle, medallion bridge below/at its count and the owned-three-Stones
-# Door passed, as did refusal with only Emerald and Ruby. Field/summit/Lake owl checks passed
-# but remain experimental. Story-dialogue skipping is withdrawn for 0.2.3.
+# Door passed. On Longshot 3.0.0 stable (2026-11-19/20), refusal with only Emerald and Ruby
+# and the Field/summit/Lake owl checks passed; owl skips remain experimental.
+# Story-dialogue skipping is withdrawn for 0.2.3.
 # Fairy after Time keeps Time selected. Adult Sun's Song also worked with Fairy in the
 # control; no broader adult-song permission or lesson-safety change follows from that check.
 # These are evidence notes only: defaults, pools and logic permissions are unchanged.

@@ -24,7 +24,7 @@ enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests 
 label = "Dungeon reward shuffle (experimental)"
 kind = "boolean"
 group = "Items"
-help = "Off by default. Shuffle the three stones and six medallions among their nine usual rewards, including Rauru. First-pull reward delivery passed. With this on, the closed Door opened with three owned stones before Dodongo/Jabu completion; two-Stone refusal is pending. Ocarina of Time, Song of Time and Impa's send-off are still needed. Boss completion still controls blue warps, sage scenes, restoration, Prelude and the Light Arrow story."
+help = "Off by default. Shuffle the three stones and six medallions among their nine usual rewards, including Rauru. First-pull reward delivery passed. With this on, the closed Door opened with three owned stones before Dodongo/Jabu completion. With only Emerald and Ruby owned, it stayed closed with no opening scene; the saved state confirmed the refusal. Ocarina of Time, Song of Time and Impa's send-off are still needed. Boss completion still controls blue warps, sage scenes, restoration, Prelude and the Light Arrow story."
 [bridge]
 label = "Ganon's Castle bridge (experimental)"
 kind = "choice"
@@ -231,14 +231,14 @@ closed = "Mido needs your sword and shield, and the forest bridge opens after Go
 closed_deku = "Open the forest bridge immediately. Mido still needs your sword and shield before you enter the Deku Tree, including after an early Zelda visit. The passage and tree mouth stayed open after reload in the repaired check."
 open = "Open the forest bridge immediately and let you past Mido without showing a sword and shield."
 [door_of_time.choice_help]
-closed = "Use the Spiritual Stones, Ocarina of Time and Song of Time after Impa's send-off. With dungeon reward shuffle, the three owned Stones replace the usual boss-completion requirement. That opening passed; refusal with two Stones is still pending."
+closed = "Use the Spiritual Stones, Ocarina of Time and Song of Time after Impa's send-off. With dungeon reward shuffle, the three owned Stones replace the usual boss-completion requirement. Opening with three Stones and refusal with only Emerald and Ruby both passed; the saved state confirmed the closed Door."
 song_only = "Meet Zelda and finish Impa's field send-off, then use the learned Song of Time and either ocarina, without stones. The escape and both moat rewards remain available after pulling early. That return/escape order was played in Open mode, not every Song-only combination."
 open = "The Door stays shut until you meet Zelda as a child and finish Impa's field send-off, then opens without stones, an ocarina or songs. The send-off gate, early return and preserved escape/moat rewards passed on Longshot rc.7. This prevents new clock freezes, not repairs an old save."
 [fast_start.choice_help]
 intro = "Remove the opening movie entirely. New-game setup and Navi waking Link still run. Movie removal passed a new-game check."
 saria = "Skip Saria's opening scene while keeping the forest visited so its pause map remains available. This does not give an item or change forest access."
 deku_tree = "Skip the Deku Tree's opening talk. With Mido kept, you must still equip your sword and shield and talk to him to clear the path."
-kaepora = "Skip the selected Kaepora introductions without changing routes or item requirements. The castle owl had no speech but kept a short fly-away in game. Added Field, summit and Lake flight checks are still pending."
+kaepora = "Experimental. Skip the selected Kaepora introductions without changing routes or item requirements. The castle owl kept a short fly-away without speech. On Longshot 3.0.0 stable, the Field owls near Kakariko and the Lake approach had no speech and a short look/fly-away; summit and Lake travel owls kept a short offer and working flights. Not every owl scene has been played."
 [shop_prices.choice_help]
 vanilla = "Keep the usual prices on the shop shelves you shuffle."
 affordable = "Pay 10 rupees for each shelf you shuffle. Other shelves keep their usual prices."

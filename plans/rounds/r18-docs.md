@@ -148,3 +148,34 @@ No version bump, game run, generation or full gates.
 
 Reran the focused command recorded above: **45 passed in 71.95 s**. No expectation changes
 were needed. No UI surface or executable behavior was changed by this documentation follow-up.
+
+## Review corrections after `3e31f160cb`
+
+Claude corrected the runtime attribution: owl checks and two-Stone refusal were played on
+**Longshot 3.0.0 stable, 2026-11-19/20**, not rc.7. README now splits the played list by
+runtime/date and explicitly names every requested check: Mirror Shield scrub #33, forty-token
+gift #11, map/compass display, Well floor pickup, first-pull reward, medallion-count bridge,
+three-owned-Stones opening and two-Stone refusal. The guide, outcome and generator evidence
+comments carry the corrected attribution too.
+
+Corrected the dungeon-reward help's stale pending refusal and its closed-Door choice help;
+owl help now records the played checks while retaining experimental status. No story-option
+fields were edited; cs18g still owns that withdrawal.
+
+Retracted both unsupported README upgrades instead of presenting synthetic/staged evidence
+as gameplay. Restored `d9deb65`'s exact progressive disclaimer: “Built and native-data-tested;
+the Longshot check is unplayed.” Restored its first-arrival lighting statement: “The first-arrival
+lighting repair awaits v5 play checks.” Removed the unsupported v5 pass from the settings guide
+as well. `r16-time.md:365–372` describes v5 control authorization/staging, not a v5 played result;
+the v4 P4 pass at `r16-time.md:330–335` does not establish that later ENV repair.
+No new played claim is substituted for either reverted statement.
+
+Real local UI smoke: **PASS** in Chrome headless. The dungeon-reward help displayed the
+actual updated schema text and saved-state refusal result, with no stale “pending”.
+Screenshot inspected: complete help visible without clipping. Empty external seed library,
+in-memory preferences, no DOM/app-state edits, game or generation; browser/server closed.
+Receipt and screenshot: `E:/OOTRemake/work/r18-docs/review-proof/`.
+The temporary `review_help_smoke.py` was removed after proof.
+
+Focused review rerun of the command above: **45 passed in 50.88 s**. No expectation changes
+were needed. No full gates or version bump.

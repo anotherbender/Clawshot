@@ -324,9 +324,9 @@ still awaits in-game verification; existing saved visit state is not migrated.
 
 The optional, default-off `kaepora` fast-start selection remains **experimental**, including under
 Recommended. It omits later owl speech while preserving scene flags and travel.
-Kareem played the castle arrival: no speech, a short stop/fly-away, with banner/map/Malon preserved.
-The Field owls near Kakariko and the Lake approach also passed: no speech, a short look-and-fly-away.
-The summit and Lake travel owls kept a short offer and working flights.
+On Longshot 3.0.0 stable (2026-11-19/20), Kareem played the castle arrival: no speech, a short
+stop/fly-away, with banner/map/Malon preserved. The Field owls near Kakariko and the Lake approach
+also passed: no speech, a short look-and-fly-away. The summit and Lake travel owls kept a short offer and working flights.
 These results do not cover every owl scene; later Woods/Zora owl additions remain unplayed.
 
 Every new seed also refuses to start Dampé's race without an owned Hookshot or Longshot.
@@ -387,8 +387,8 @@ With Gift shuffle, the native Light Arrow story still runs even if its gift move
 Kareem's Longshot rc.7 checks on 2026-11-19 confirmed the shuffled first-pull reward, a medallion-count
 bridge staying closed below its count and opening at the count, and the closed Door opening with all
 three Stones owned while Dodongo and Jabu were unfinished. The Door stayed open; no escape or moat
-scene played. With only Emerald and Ruby owned, the Door stayed closed and no opening scene played;
-the saved state confirmed both Stones and the closed Door.
+scene played. On Longshot 3.0.0 stable (2026-11-19/20), with only Emerald and Ruby owned, the Door
+stayed closed and no opening scene played; the saved state confirmed both Stones and the closed Door.
 Other shuffled boss rewards, stones/combined bridge counts, late story order and a full playthrough
 are not certified by those checks. Both options remain experimental.
 Detailed evidence: [dungeon rewards and bridge](../plans/rounds/r18-rewards.md).
@@ -413,8 +413,7 @@ counter until the real Impa send-off, recount there, and ignore calls after esca
 closed mode when shuffled songs allow stones before Zelda. The native courtyard Step01 reset remains;
 early-mode post-pull callbacks do not roll the completed Door quest back.
 Kareem passed the open-mode send-off gate, early-pull escape/moat order repair and immediate
-child-return clock clear on Longshot rc.7. The first-arrival lighting repair below passed the v5 play checks
-on rc.7 (2026-11-17), with a Kaepora-skip new game showing the Field map and a moving sun.
+child-return clock clear on Longshot rc.7. The first-arrival lighting repair below awaits v5 play checks.
 
 **For new seeds; no save-repair pass.** Both early modes read the
 arrival flag and the real send-off history. Kaepora fast start now preserves the skipped owl's
