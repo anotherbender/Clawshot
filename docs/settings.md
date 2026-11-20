@@ -369,10 +369,14 @@ scene-history and once-only effects remain. The moat's item and Time-song reward
 and both survive its replacement.
 
 Kareem passed the Minuet/Impa normal-get handoffs and Saria farewell skip on Longshot 3.0.0
-on 2026-11-20. The Minuet control also passed with adult Fairy; the corrected stock-only
-dispatch awaits its paired adult-Fairy/native and no-ocarina/skip check. Logic still
-conservatively requires **any** ocarina for lessons; this does not enable general Great
-Fairy/Rauru/story-scene skips or remove non-instrument prerequisites.
+on 2026-11-20. Both corrected Minuet v2 candidates also **PLAYED PASS**: adult Fairy keeps
+the real lesson without freezing; zero stock of both instruments skips it. Both give Boomerang
+with correct text, with saved ownership/source completion, no extra Minuet and unchanged ocarina stocks.
+Continue/re-entry was not reported. The native arm's override is inferred from its played lesson
+and saved shuffled reward; two expected file-load lines are absent for an unexplained logger gap.
+The [round record](../plans/rounds/r19-scenes.md#minuet-v2-played-pass-and-accepted-logger-gap)
+separates that inference from direct load evidence. Logic still conservatively requires **any**
+ocarina for lessons; general Great Fairy/Rauru/story skips and non-instrument prerequisites are unchanged.
 
 ## Dungeon rewards and Ganon's Castle bridge
 

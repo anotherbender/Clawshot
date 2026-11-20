@@ -1,7 +1,7 @@
 # Round 19 Track scenes — cs19a
 
 Agent/model: `openai-codex/gpt-6.1-sol`; branch `r19/scenes`; current code base `f5c679d` (original base `d9deb65`).
-Status: **GATE DONE; candidate boot checks PASS; gameplay pending**. Kareem plays the v2 candidates first; controls optional. READY awaits his play.
+Status: **READY (merge)**. Both Minuet v2 candidates **PLAYED PASS**; Claude accepts the native override inference with an unexplained logger gap. Continue/re-entry was not reported.
 The round overview and this track file were absent at intake; the user brief supplies round scope.
 
 ## Mechanism proposed before broad edits
@@ -427,3 +427,50 @@ Claude renamed the old played Minuet launchers under `work/r19-scenes/ingame` to
 The corrected code/packet remains pinned to `84e5b261`; no code, saves or mods changed here.
 **READY awaits Kareem's v2 play**, including native lesson with Fairy stock1 versus normal-get skip
 with both stocks0, correct reward/text, clean controls and persistence. No new gameplay pass is claimed.
+
+## Minuet v2 PLAYED PASS and accepted logger gap
+
+Kareem played v2 between14:10 and14:16 on2026-11-20. Claude relayed and accepted both candidates
+as **PLAYED PASS** before merge:
+
+| Candidate | Kareem's observation | Saved evidence |
+|---|---|---|
+| `fairy-native` | No freeze; real native lesson, then Boomerang with correct text. | Boomerang IsGet=true/stock1; Minuet unowned; source committed; Fairy stock1 and Time stock0 unchanged. |
+| `no-ocarina-skip` | No dialogue or lesson; immediate Boomerang with correct text. | Boomerang IsGet=true/stock1; Minuet unowned; source committed; both ocarina stocks0 unchanged. |
+
+**Continue/re-entry was not reported.** The committed source history and item stock are saved-state
+evidence, not a claim that the duplicate-prevention revisit step was observed.
+
+### Native-arm log discrepancy
+
+Claude's read-only inspector returned PASS for the no-ocarina arm. The Fairy arm's saved-state
+checks also passed; its aggregate FAIL was solely two missing load lines: `SageOfForest.bfevfl.zs`
+and `Dm_MelodyGet_Forest.bfevfl.zs`. Its log identifies the correct single candidate mod and isolated
+save root and includes the overridden GetPouchContent and both event registries. It contains six
+override messages, but no SageOfForest, Forest movie-flow or Clawshot_SceneGet load message.
+
+Read-only inspection of the actual packet establishes the intended native route:
+`SageOfForest:ForestTemple_SageOfForest_MelodyGet` keeps the native Event26 branch with Fairy stock1;
+its Event13 requests `Dm_MelodyGet_Forest`; that flow's Event22 calls
+`GetPouchContent:GetPouchContentByActorName` with the packet's Boomerang reward.
+Forest does **not** use the separate direct-scene admission dispatcher, and its registry still names
+the Forest movie flow. Neither shared GetPouchContent nor Dm_SY_Ocarina supplies an alternate literal
+Boomerang grant here. The mounted Longshot native Event22 still gives the vanilla Minuet actor;
+the packet's Event22 gives Boomerang.
+
+**Accepted inference (Claude):** the real native lesson plus saved Boomerang with Minuet unowned
+shows that the packet's Event22 override took effect. This is inference from the played result/save,
+**not a substitute claim that the two missing runtime lines were present**.
+The exact cause of the logger gap is unexplained; no alternate native flow or different reward route
+was established. The inspector's aggregate FAIL denotes incomplete requested load evidence here,
+not a failed played lesson or reward. Its missing checks were not deleted or silently relabelled PASS.
+
+Runtime logging was checked read-only against the shipped Longshot3.0.0 host source
+`toolchains/v3.0.0/LongshotBuilder/tools/host/mods.c`183–197 and the installed executable's
+`hos_mods_romfs` implementation at0x15cf198c0. Logging is once per indexed entry, with a200-entry bound;
+six messages do **not** establish exhaustion of that bound, so the cap is not offered as the explanation.
+These are runtime facts only; no GPL implementation is copied into Clawshot.
+
+The investigation did not modify saves, launchers, mods, packets or the inspector. Claude explicitly
+accepted documenting this inference and logger gap and requested a docs-only final READY head atop
+`b2fec2b4`. Gated/gameplay code remains `84e5b261`; no new gate, sweep or game launch was performed.
