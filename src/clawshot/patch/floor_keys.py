@@ -40,8 +40,8 @@ Palette: a reward must share the key's pickup mechanism (event performer ``Pouch
 shields use another performer, hearts ``PouchContentUtuwa``. A placed native key of the source's own dungeon changes
 nothing; any other item (another dungeon's key: the grant credits the standing dungeon) is refused.
 
-Built evidence only. Not yet seen in game: the Banc-placed new actor loading, its key-shaped display with red-rupee
-text and grant, the Well riddle/room clear and Shadow reveal with it, recovery and Save/Continue retirement.
+Well v3: Kareem observed silent +20, native collection flags and once-only re-entry (2026-11-19,
+``plans/rounds/r18-keys.md``). Shadow's new actor, reveal, recovery and Save/Continue retirement remain unplayed.
 """
 
 import copy
