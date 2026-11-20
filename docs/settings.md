@@ -444,10 +444,11 @@ maintainer decision ([round 19 sword](../plans/rounds/r19-sword.md)):
   logic has `free_time_travel=true`. `--print-settings` only encodes the string and does not check
   this requirement, so a printed string can still be refused when you generate.
 
-**Play-held after played failures.** The main control granted Light Medallion and Master Sword.
-Candidate v3's native-receipt repair passed the first pull without Master Sword and the return to
-child, but froze on the next child-to-adult pull. The repeat-arrival repair requires replay:
-three unowned pulls with real returns to child, then chest acquisition/equip and an owned pull.
+**Candidate v4 played pass, 2026-11-20.** Kareem completed the first pull without Master Sword,
+returned to child, then passed the second unowned pull that froze in v3. Zora's River chest granted
+and immediately equipped a usable Master Sword; the owned child/adult round trip also passed.
+Exactly two unowned pulls were played, not three; the maintainer accepted the repeated-path coverage.
+The main v4 control also passed. These checks do not certify a full playthrough or finale refusal.
 The pedestal remains silent; no item window is inserted into the scene. Design, deviation and
 evidence: [round 19 sword](../plans/rounds/r19-sword.md) and
 [round 18 Master Sword design](../plans/rounds/r18-master-sword-design.md).

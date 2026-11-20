@@ -1,7 +1,7 @@
 # Round 19 — sword (cs19c)
 
 Branch `r19/sword`, original base `d9deb65cedf841495ef3bbe2fb2d1083fa42bb43`; rebased onto release main `f5c679d532b688ea1a98a5ffb158a821454ce07d` after the v3 build.
-Model: `openai-codex/gpt-6.1-sol`. **NOT READY: v3 passed the first unowned pull and return to child, then froze on its second pull.** V4 repeat-arrival repair and registration coverage are under development; replay is required.
+Model: `openai-codex/gpt-6.1-sol`. **READY — candidate v4 PLAYED PASS**, Kareem2026-11-20,16:11–16:21; accepted by Claude. Two unowned pulls (including the former v3 freeze path), River chest acquisition/immediate equip/use, and owned child/adult round trip passed. No third unowned pull was played or claimed. Full integrated gate passed on `be5b0bf`; latest acceptance below supersedes earlier play holds.
 
 ## Contract and questions
 
@@ -156,8 +156,23 @@ One full gate on frozen **be5b0bf**: formatter **PASS**, lint **PASS**, syntheti
 
 ### Reported v4 boot / played control / cosmetic return
 
-Claude reported candidate boot **PASS**: Longshot3.0.0, crash0, mods_found1. This is boot evidence only. The candidate-v4 play profile has never been launched; Kareem's ordered candidate replay is queued on his list, **not passed**.
+Initial report before candidate play: Claude reported candidate boot **PASS**, Longshot3.0.0, crash0, mods_found1. At that report the candidate-v4 play profile had never been launched and replay was queued, not passed. This boot-only status is superseded by the played acceptance below.
 
 Kareem **PLAYED MAIN v4 CONTROL PASS**, relayed by Claude2026-11-20: profile `user-r19-sword-main-v4`, log ending14:55, before the handoff. Vanilla throughout, all cutscenes, Master Sword granted, real child return fine, then adult again with Master Sword. This resolves the earlier saved-state-only uncertainty: now an explicit played report, not an inference from extra slots. Preserve those saves; no repeat control needed. This does not certify candidate gameplay or River-chest presentation.
 
-Kareem also observed in v3 that an unowned Master blade is absent during the return-to-pedestal cutscene. **Expected cosmetic behavior**: `pose_transform("Dm_TimeTemple_0088", "Event35", "Event29")` deliberately skips unowned static sword creation while retaining the caller's native animation and real age transition. Owned/selected Master retains its native pose path. The external v4 checklist now says so explicitly; it does not excuse a freeze, failed age change, inventory mutation or a missing legitimately selected owned sword. No runtime change made for this cosmetic observation. **Candidate remains play-held pending its three unowned pulls, River find/equip, and owned pull.**
+Kareem also observed in v3 that an unowned Master blade is absent during the return-to-pedestal cutscene. **Expected cosmetic behavior**: `pose_transform("Dm_TimeTemple_0088", "Event35", "Event29")` deliberately skips unowned static sword creation while retaining the caller's native animation and real age transition. Owned/selected Master retains its native pose path. The external v4 checklist now says so explicitly; it does not excuse a freeze, failed age change, inventory mutation or a missing legitimately selected owned sword. No runtime change made for this cosmetic observation. Candidate was then play-held; the following acceptance supersedes that hold.
+
+## Final acceptance — candidate v4 PLAYED PASS / READY
+
+Kareem played candidate v4 **2026-11-20,16:11–16:21**, reported by Claude:
+
+- First pull: scenes completed and adult control **without Master Sword**.
+- Real return to child: no freeze, Kokiri Sword.
+- **Second unowned pull to adult passed**, covering the repeat path that froze in v3.
+- Zora's River chest gave Master Sword; it **equipped immediately and worked**.
+- Real pedestal return to child and back to adult with the owned sword: no issues.
+- Reported saved-state evidence agrees: unowned adult slots have `master_owned=false`, `equipped=''`; post-chest slots have `master_owned=1`, `equipped='Weapon_Sword_Master'`, `chest_open=true`.
+
+**Exactly two unowned pulls were played, not three.** Claude explicitly accepted this scope: the second exercises the failed v3 path and a third uses the same path. Third-pull coverage is a maintainer-accepted path-equivalence rationale, **not another observed pass**. No additional gameplay or test rerun was performed to confirm Kareem's report.
+
+This lifts the candidate play hold and makes the sword track **READY for Claude to merge**, with the earlier v4 main-control PLAYED PASS, candidate boot PASS and full integrated **be5b0bf** gate (4007 synthetic passes,749 dump passes; format/lint clean). This acceptance update is **docs only atop `029a60c13d`**; runtime, tests, diagnostic packet, saves and logs are unchanged. Experimental/default-off status and the documented Chest/free-travel prerequisites remain. No full-playthrough, finale-refusal, all-story-prop, additional reload or arbitrary destination-presentation claim is added.
