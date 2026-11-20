@@ -289,9 +289,9 @@ Own tab/server closed; empty external library and memory-only preferences used.
 The single full-gate receipt is
 `E:/OOTRemake/work/r19-keys/final-gate-proof.json`: it records the exact tested
 head/main, commands, tasklist/worker policy, per-stage logs/results and overall
-status. **Only `status=passed` on the handoff head permits READY.** No code or
-round-file change may follow that gate; the final thread post carries observed
-test totals and the same head. Gate commands:
+status. The receipt covers its exact tested head. Claude accepted that gate and
+authorized the subsequent string-only cleanup with focused settings/schema/help
+tests, not another full gate; see the superseding handoff decision below. Gate commands:
 
 ```sh
 uv run ruff format --check
@@ -308,5 +308,12 @@ At each stage start, tasklist is checked; a running `longshot.exe` or
 no supervisor deadline. No game has been launched.
 
 Any staged check remains **built, not played** until Kareem plays on
-**Longshot 3.0.0**, after Claude's boot-check. Intended handoff:
-**READY (play-held)** for the Fortress completion check; Shadow remains vanilla.
+**Longshot 3.0.0**, after Claude's boot-check.
+
+**Superseding handoff decision — Claude, 2026-11-20:** the gate on `d9d79a77`
+is accepted after the exact `[moved]` node passed 3/3 isolated and the native dump
+passed all 491 tests. The delta from `d9514c4` is help text, docs and a docstring,
+not behavior. The merge is **READY, not play-held**. Fortress four-rescue remains
+optional for Kareem and does not gate this merge; Shadow's floor key stays vanilla.
+Claude authorized the player-facing wording cleanup atop that head with only
+the settings/schema/help focused tests and no new full gate.

@@ -474,10 +474,8 @@ model and native room retirement wiring. Other dungeons' keys, majors, hearts an
 are not floor-key rewards. On Longshot rc.7 on 2026-11-19, Kareem left the Well replacement,
 recovered it, collected its silent +20 rupees, and confirmed it stayed collected after leaving,
 returning and Continue. This proves the checked Well pickup, not every scripted floor key.
-Own-dungeon mode leaves it untouched. The Shadow Temple floor key stays vanilla under every setting:
-**built, held until a natural pre-room save exists**. Its adapter is not admitted to generation.
-Per the round-19 maintainer decision, wait for Kareem's own playthrough, not a dedicated preparation run.
-The save search and rejected entrance-route preparation are recorded in `plans/rounds/r19-keys.md`.
+Own-dungeon mode leaves it untouched. The Shadow Temple floor key stays in its usual place
+under every setting until it has been tested in game; see `plans/rounds/r19-keys.md`.
 
 `--shuffle-hideout-keys` (UI: **Fortress jail keys (experimental)**) separately releases the four
 Fortress guard floor keys into supported shuffled chests. Default **off** in both presets;
