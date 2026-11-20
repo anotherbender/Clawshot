@@ -1,8 +1,8 @@
 # Round 19 — Tokens (cs19d)
 
-Agent `openai-codex/gpt-6.1-sol`; branch `r19/tokens`; base main `d9deb65`.
+Agent `openai-codex/gpt-6.1-sol`; branch `r19/tokens`; original base `d9deb65`, rebased onto release main `f5c679d`.
 Issue #12: opt-in progression at the first 100-token House reward; default stays junk.
-All new game behavior is **built, not played** until Kareem's paired Longshot 3.0.0 check.
+Kareem **PLAYED #12: PASS**, reported by Claude on 2026-11-20: control repeated Gold200; candidate gave Hammer at100, then Gold200. Original automated evidence below remains built-only.
 No game launched, user seed/save modified, runtime folder written, version bumped, merge or push.
 
 ## Prerequisite: the missing three
@@ -202,3 +202,40 @@ Do not append a post-gate commit: keep the merge head exactly the gated head. Cl
 rebase/re-gate if main moves before merge. Remaining acceptance is **only Claude's boot
 check and Kareem's Longshot 3.0.0 paired play checklist**. Natural100 collection, child
 age and every possible reward family are not newly played by this packet.
+
+## 2026-11-20 — release-main refresh
+
+Claude announced **MAIN MOVED `d9deb65` → `f5c679d`**, and explicitly requested one new
+exact-head gate after rebasing. `git rebase f5c679d` replayed all three track commits
+without conflict. Main's removal of the offered story setting remains intact; the reserved
+off-valued serialization field remains, and true is refused at validation. No story option
+was restored. Release version0.2.3 remains main's version; this track did not bump it.
+
+Main's only `generate/fill.py` changes are its reserved-field comment and rejection of
+`skippable_story = true`; **no placement/fill algorithm, pool preparation or world logic
+changed**. All five previously swept canonical CS1 recipes validate on the rebased code and
+have story=false. Therefore the400-seed acceptance above remains applicable; **no new sweep**
+is run under Claude's conditional instruction. No source/test edits were needed for rebase.
+
+Focused command: `OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run pytest`
+`tests/test_house100.py tests/test_settings_house100.py tests/test_settings.py`
+`tests/test_app_schema.py tests/test_world_token_routes.py -q --tb=short`.
+**103 passed in171.42s**. Receipt: `work/r19-tokens/rebase-f5c679d-focused.log`.
+
+After focused success, freeze this documentation refresh before the newly authorized full
+gate. Reuse `work/r19-tokens/gate.py`, preserving old gate evidence in `gate/` and writing
+new exact-head commands, stage-start tasklists/load samples and results into
+**`work/r19-tokens/gate-f5c679d/`**. Same four full checks, shared r19 lock, runtime-sensitive
+worker limits, supported read-only RomFS/NUP/combined dump, no supervisor deadline.
+Do not change the head after the gate. Final observed counts/head belong in external
+`work/r19-tokens/READY.md` and the `cs-r19` handoff.
+
+The original gate's synthetic result was3829pass502skip plus one20s listener-start setup
+timeout; that exact node subsequently passed serial in1.22s under the lock. Original
+exit1 is retained, not described as a first-pass green suite. Dump499 passed. Details and
+the isolation-time (not historical failure-time) load sample remain in `gate/`.
+
+**Gameplay hold cleared by the maintainer's report**, not an agent rerun: control repeating
+gold rupee; candidate Hammer at100 then gold rupee, PASS. This native packet behavior was
+not changed by the release rebase. No separate played-save inspector result is asserted.
+Claude still schedules merge only after0.2.3 publication. No merge/push/game launch here.
