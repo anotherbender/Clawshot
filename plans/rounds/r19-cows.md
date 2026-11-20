@@ -9,11 +9,12 @@ documented `d9deb65` source, not newly generated 0.2.3 seeds. No settings files
 were changed or withdrawn story fields restored. Claude's research-only
 full-gate/lock exemption remains applicable; no gate or sweep was run on rebase.
 
-**READY (play-held), research only: silent v2 staged below.** Kareem played the
-v1 control (milk only); v1 candidate froze during its added get, before rupees.
-V2 is built, not played. No cow locations, option, logic, fill, production patch
-or version change. Only this research record enters the branch. Scripts, decoded
-research, profiles and mods stay outside the repository under
+**STOPPED: research-only handoff for r20.** V1 control gave milk; v1 candidate
+froze. Kareem then played v2: milk only, no +20, no crash/freeze. No post-milk
+Save was made, so the Bool remains unknown. No speculative v3 is staged.
+No cow locations, option, logic, fill, production patch or version change.
+Only this research record enters the branch.
+Scripts, decoded research, profiles and mods stay outside the repository under
 `E:/OOTRemake/work/r19-cows/`. The agent started no game, opened no player seed
 and wrote no original save, dump or runtime folder.
 
@@ -22,6 +23,57 @@ it will not merge as a game-behavior implementation. Focused tests and paired
 staging only. No sweep is applicable: no locations, destinations, logic or fill
 changed. No `.nup` working-set/resource-list change; production input reads and
 output are unchanged.
+
+## Final outcome: v2 played, path localized statically, cause unresolved
+
+Kareem played `Cows v2 - candidate.bat` at **11:13–11:16**. **Milk only, no +20,
+no crash/freeze.** Its log proves `Animal_Cow`, GameDataList and RSTB served from
+`cow-persistence-candidate-silent-v2`; relevant lines **12–13, 75, 83, 1983**.
+It contains no event/node execution trace identifying the branch or action.
+He did not Save after milking; Claude reports slot_05 unchanged since 11-13.
+The original missing key therefore says nothing about the in-memory Bool.
+
+**Exact static source trace, supported native data:**
+
+1. Impa's child placement is `Animal_Cow`, Hash `3581309213670406493`.
+   In `Animal_Cow.pack.zs`,
+   `GameParameter/ReplaceEventParam/Animal_Cow.game__ocarina__ReplaceEventParam.bgyml`
+   selects `Animal_Cow_GiveMilk` for the ocarina interaction.
+2. `RSDB/EventSetting.Product.111` maps that event to `Animal_Cow:GiveMilk`.
+   Event72 calls `Cow_GiveMilk`, passing `Animal_Cow_PushToBottleMilk`.
+   Its recommended-Epona branch reaches Event3's native `EventTransition`.
+3. That EventSetting maps to `Animal_Cow:PushToBottleMilk`, not a Link-house or
+   Gerudo entry. Event141 queries `BottleItem=-1`; the successful bottle case
+   is **0**. The following equipped-mask alternatives converge on Event6,
+   which continues to Event20, then Event4's native milk subflow.
+   No-mask specifically takes false cases through Event25/31/32/33/34/35/36/38
+   before Event6. The other bottle case ends without milk.
+4. V2's **sole modified edge is Event20 → appended gate → Event4**. False flag
+   gives the native wallet action, sets the Bool, then Event4; true flag goes
+   straight to Event4. Candidate readback confirms that edge and false-default
+   saved row. Thus the static data does **not** support claiming that a day or
+   bottle variant bypasses the probe while reaching this ordinary milk call.
+5. The two other milk calls are Event74 (`PushToBottleMilk_LinkHouse`) and
+   Event114 (Gerudo/shared LinkHouse0 routes). Neither belongs to the ordinary
+   actor's registered ocarina entry. No runtime node trace establishes that
+   either ran on the played attempt; resource loading alone cannot do so.
+
+Reproduction: external `trace_cow_path.py` → `cow-path-proof.json`,
+`cow-path-trace.log`, plus printed candidate Event20/appended nodes/Bool row.
+The native registry, actor pack and EVFL were read directly; no game launched.
+The earlier static executor entered the probe **assuming false**, so it did
+not establish what the new-key query actually returns at runtime. Whether the
+gate skipped, the action had no effect, or the runtime used another route remains
+unresolved without a post-milk Save or node-level execution evidence.
+
+**Claude's stop condition applies:** the failure cannot be localized to a
+specific runtime branch/action from the available evidence. No guessed third
+packet, new get window, borrowed native flag or unrelated save mutation is made.
+Cows remains research-only for r20; saved-Bool persistence is **not proven**.
+V1/v2 mods, launchers, profiles and logs are preserved. The retained v2 checklist
+now says **SAVE IMMEDIATELY AFTER THE FIRST MILK, EVEN IF NO +20 APPEARS** and
+retain inspector output even on a failed expectation. It is not a request to
+replay unchanged v2. No further play is requested in this handoff.
 
 ## Played v1 failure and silent v2 replacement (2026-11-20)
 
@@ -52,8 +104,8 @@ Read-only evidence:
   Its contribution to the played freeze is unproved. V2 removes the new call
   entirely rather than attempting another item-get wrapper.
 
-**Current boot-check packet:** `E:/OOTRemake/work/r19-cows/v2/ingame/`.
-Use `Cows v2 - main-control.bat`, then `Cows v2 - candidate.bat` in that directory.
+**Historical v2 packet (played: milk only, no +20):** `E:/OOTRemake/work/r19-cows/v2/ingame/`.
+Historical launchers are `Cows v2 - main-control.bat` and `Cows v2 - candidate.bat`; no replay is requested.
 Checklist: `v2/ingame/CHECKLIST.md`, Longshot 3.0.0; same one-cow first/repeat/
 Save/Continue acceptance, estimate **8–12 minutes both arms / 4–6 candidate**.
 The original v1 mods, launchers, frozen log and profiles are unchanged.
@@ -87,14 +139,15 @@ Inspector now defaults to v2; `--packet v1` explicitly inspects historical v1.
 After first milk, Save and run:
 `uv run python E:/OOTRemake/work/r19-cows/check_save.py candidate --packet v2 --expect true`;
 repeat after Continue and third milking. Expect silent +20 and milk first,
-milk only second, milk only after Continue. No in-game v2 result, saved true
-value or persistence pass is claimed. No full gate/lock: research-only exemption
-still applies; the earlier 41-test receipt is historical, not a new test run.
+milk only second, milk only after Continue. Those were staging expectations;
+the later played v2 no-credit result is recorded above. No saved true value or
+persistence pass is claimed. Research-only full-gate/lock exemption still applies.
 
 Claude later confirmed the “crashed, then froze” report used OLD v1 (11:05 log),
 not v2; v2 was never launched. To disambiguate, he renamed v1 launchers
 `OLD v1 (froze) - ...bat` and v2 launchers `Cows v2 - ...bat`. Both external
-checklists now use those names. V2 remains **unplayed**, not a failed v2 check.
+checklists use those names. At that correction v2 was unplayed; the later
+11:13–11:16 v2 result is recorded above and must not be confused with v1.
 
 ## Public reference and scope decision
 
@@ -257,10 +310,11 @@ a static graph simulation is not the persistence proof.
 
 ## Handoff / next decision
 
-The **v2** launcher paths and checklist are posted on `cs-r19` for Claude's
-boot-check. The repository handoff is documentation only; neither external
-diagnostic is an ordinary seed patch. V1's item-get failure is played evidence;
-v2 saved-key persistence remains play-held. A passing check resolves only
-prerequisite (a). Cow shuffle remains held until independent physical identities,
-regions/ages/access rules, per-cow routing, item delivery and the required
-200 broad + 50 Defaults + 50 Recommended sweep are implemented and verified.
+**Research-only r20 handoff; no further play requested.** V1 froze during its
+extra get; v2 gave milk without the diagnostic rupees. Static native tracing
+puts the v2 probe on the ordinary cow's milk path, but no execution trace or
+post-milk Save localizes its runtime failure. Claude's stop condition applies:
+no speculative v3. Both packets remain evidence, not ordinary seed patches.
+Saved-Bool persistence and per-cow once-only grants are unproved. The retained
+checklist explicitly requires SAVE immediately after first milk, even without
+the visible signal, and retaining the inspector's observed value on failure.
