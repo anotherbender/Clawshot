@@ -823,3 +823,56 @@ status unchanged. Door v2's positive owned-Stone opening, stayed-open
 state and no premature escape/moat remain Kareem's reported played pass
 with retained native loading evidence. Optional two-Stone refusal was
 **not played**; no broader randomized-playthrough claim is made.
+
+## Tonight's two-Stone refusal packet — built, unplayed
+
+Claude requested the remaining boundary check after E was merged. Read only
+83 slots in the 14 specified `2026-11-19_1319*`–`1336*` played door-v2
+snapshots; three met the complete predicate. Selected the latest eligible:
+`2026-11-19_132317-r18-door-v2-10`, its natural child grave save.
+
+Actual pouch stocks **Emerald 1 / Ruby 1 / Sapphire 0 / Time ocarina 1**;
+Time song learned Bool true. All first three v2 kit chests are already open;
+Sapphire's named `IsTreasureBoxOpen.9622128545943056087` is **false**.
+Door is `Step02`, opened and opening-scene Bools false. Natural A/S true,
+B/ENV false; real send-off complete, Deku complete, Dodongo/Jabu incomplete.
+Source `progress.sav` SHA256:
+`541d84da516de3799b3e93fe78d62859f6eab7d1697f2519ffc59b6d20952c2e`.
+
+One fresh isolated user holds only that slot. Progress, caption, account
+and options copy byte-identically; existing control settings copy unchanged.
+**No save edits, original-save writes, game launch or old v2 profile reuse.**
+
+Claude superseded the original final-main/rc.7 hold: rc.7 was removed when
+Kareem installed stable **Longshot 3.0.0**; use the nested launcher finder,
+and build immediately from current approved main
+**`2d9ddefa2c16d5205f6a52d29a98d6c62c4b22b9`**. The delayed ocarina/Mido
+merge is not required for this check, as Claude explicitly confirmed.
+
+Built one seed **180520**, unchanged v2 Door settings and four fixed bonus
+pins, with normal nine-slot reward permutation and full-goal beatability:
+**26 spheres, 183 shuffled locations, 128 resources**. All four pins read
+back to their correct physical chest actors; Sapphire remains
+`Item_Stone_Water` in the child/adult Graveyard Static copies. Source and
+isolated save bytes remained unchanged through build and launcher dry-run.
+
+Actual native `cmd.exe` dry-run exits 0, resolves installed
+`builds/stable/v3.0.0/bin/longshot.exe`, and selects only this mod and user:
+
+`E:/OOTRemake/work/r18-rewards/door-two-stone-refusal/ingame/Test-two-Stone-refusal.bat`
+
+Primary **three-minute target, unmeasured, after Continue**: leave the
+nearby Sapphire chest unopened; teleport to ordinary Market entrance, walk
+into the Temple, play recognized Song of Time at the altar. Door must
+stay closed with no opening scene; normal movement/control must return,
+**no hang**. Optional Sapphire/return/opening is about 2–3 extra minutes,
+outside the primary target. No extra control, dungeon clear, sword pull,
+age round trip or persistence replay.
+
+Packet root `work/r18-rewards/door-two-stone-refusal/` contains the short
+checklist, fixture scan/copy proof, packet/readback proof, dry-run proof and
+exercised `read_state.py`. Staged state has two Stones, closed Door and
+grave, and no runtime loading lines yet. Launcher and route posted to
+`cs-r18` at 20:33. **BUILT, NOT PLAYED**; Claude boot-checks before Kareem.
+Tonight's refusal is not counted as a pass until native load proof plus
+Kareem's actual recognized-song/closed-Door/no-hang result are reported.
