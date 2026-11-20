@@ -21,7 +21,9 @@ was = "can_use(Bow) or can_use(Slingshot)"
 source = "Banc room 0: one Bow eye-switch chest (east, 2436665354602612279) and one Lens-only Obj_TBox_GlassTruth_A_01 (west, 11182647876438515984); the name pairing is unconfirmed, so this chest asks for both, as Lobby Left Chest does."
 
 [exits."Gerudo Training Ground Lobby"."Gerudo Training Ground Lava Room Front"]
-rule = "here(has_explosives and (is_adult or Kokiri_Sword)) and can_use(Goron_Tunic)"
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword, the Kokiri
+# Sword the child's; it folds to the rule before while shuffle_master_sword is false.
+rule = "here(has_explosives and (adult_sword or (is_child and Kokiri_Sword))) and can_use(Goron_Tunic)"
 was = "here(has_explosives and (is_adult or Kokiri_Sword))"
 source = "EG section 2: after the Beamos room the lava room needs the Goron Tunic for heat resistance; ZC: wear the Goron Tunic in the lava rooms or the heat drains hearts. The remake's heat damage: https://www.ign.com/wikis/ocarina-of-time-remake/Biggest_Changes_and_Differences (Link Reacts to Temperature)."
 

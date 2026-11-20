@@ -41,7 +41,9 @@ was = "is_adult or Sticks or Slingshot or Bombs or Kokiri_Sword"
 source = "the upper Lizalfos lead to the Bomb Bag ledge (exit Upper Lizalfos -> Bomb Bag Ledge), not to the bridge: the bombable wall is between (WallCrack 13202633467597206724)"
 
 [exits."Dodongos Cavern Upper Lizalfos"."Dodongos Cavern Bomb Bag Ledge"]
-rule = "(is_adult or Sticks or Slingshot or Bombs or Kokiri_Sword) and (can_use(Slingshot) or can_use(Bow))"
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword, child
+# weapons the child's; it folds to the rule before while shuffle_master_sword is false.
+rule = "(adult_sword or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs) and (can_use(Slingshot) or can_use(Bow))"
 new = true
 source = "OoT Randomizer's rule for leaving the upper Lizalfos (Dodongos Cavern.json:136, defeat the pair), plus the double eye-switch passage: Nintendo Life, IGN and QuestFern shoot one eye, cross, then the second eye through a window before the fire returns; data: room 17 holds two Obj_EyeSwitch_A_05 with LimitTime 10 and two Obj_DodongoCave_FireWall_A_01. The Slingshot (child) or Bow (adult) is already needed one room before (Before Upper Lizalfos -> Upper Lizalfos)"
 

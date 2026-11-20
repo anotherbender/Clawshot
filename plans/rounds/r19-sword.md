@@ -1,0 +1,178 @@
+# Round 19 — sword (cs19c)
+
+Branch `r19/sword`, original base `d9deb65cedf841495ef3bbe2fb2d1083fa42bb43`; rebased onto release main `f5c679d532b688ea1a98a5ffb158a821454ce07d` after the v3 build.
+Model: `openai-codex/gpt-6.1-sol`. **READY — candidate v4 PLAYED PASS**, Kareem2026-11-20,16:11–16:21; accepted by Claude. Two unowned pulls (including the former v3 freeze path), River chest acquisition/immediate equip/use, and owned child/adult round trip passed. No third unowned pull was played or claimed. Full integrated gate passed on `be5b0bf`; latest acceptance below supersedes earlier play holds.
+
+## Contract and questions
+
+Follow `r18-master-sword-design.md`: optional default-off Master Sword shuffle; pedestal remains a real age transition and its first-pull item is separate from Rauru's reward. No sword ownership fabricated by era swaps or cinematic props. Adult combat logic requires a real blade, with native alternate weapons retained. Finale admission requires owned Master Sword before irreversible entry.
+
+**Proposed validation boundary (cs19c): require existing `free_time_travel=true` and Chest shuffle when Master Sword shuffle is enabled, rather than silently enabling free travel or implementing a new post-pull guarantee policy. Awaiting maintainer response on cs-r19; unsupported combinations will have a clear error.**
+
+Round-19 overview/track files were absent at start; this track record is newly created. No roadmap edit. Research, generated files, saves and logs only under `E:/OOTRemake/work/r19-sword/`. Source dump and all original saves remain read-only. No game launch, merge, push or version bump.
+
+## Implementation and evidence
+
+Implementation commit `418780a970c35dd6fb9e6e8338dc3320782cfec2`. Built behavior is not played until Kareem runs staged Longshot 3.0.0 checks with main controls. Gate and sweep receipts pin source heads externally; no READY claim before completion.
+
+### Runtime design / explicit refinements
+
+- `patch/master_sword.py` composes **after** the round-18 `equipment` transform. It guards the adult default, saved incoming blade and outgoing cinematic stash. Each actual adult candidate is checked independently; an owned Biggoron/Giant/BrokenGiant is not rejected merely because Master is missing. Guards require canonical `IsGet` **and positive saved StockNum**, not an equipped model or a stale get-history bit. The native pre-swap one-frame wait and child/shield handling stay.
+- Live GameData inspection confirmed Bool/Int rows for all four canonical `Weapon_Sword_{Master,Biggoron,Giant,BrokenGiant}` identities; no corresponding `Item_Sword_*` saved ownership rows. Int comparison pins reuse the existing progressive-magic convention: equal0 / less1 / greater2. Bool/equipment equality uses true0 / false1.
+- **Original v2 mechanism, superseded after played failure below:** first-pull `DoorOfTime/Event115` called ordinary `GetPouchContentByActorName`. The180-frame wait did **not** make this a normal visible/UI-safe context: it is still the white-faded boot handoff before the age write. Native first-pull history, age/story chain, Rauru and Door completion must remain.
+- **Refinement to design9.2:** do not create an unowned temporary cinematic blade at all. `0070`/`0088` keep a genuinely selected/owned Master pose but skip force-and-poll setup for any other selected weapon, preserving a chosen alternate rather than relying on unverified cleanup. `0085`'s native large-blade exclusions remain; its dynamic Master request additionally requires real ownership. This movie has no GameDataActor, so a registered SubFlowSwitch calls the shared ownership-return entry in the already-used era flow instead of adding a movie actor. Animations/travel remain; visual/runtime acceptance is held.
+- AllSage/Event175 and Dm_SY_BancChangeArrive/Event37 get additive selected-and-owned-only prop guards. Lacs/scenes explicitly left these actions to sword on cs-r19; their entry-local changes must compose. No native story action/flag is replaced by a fake grant.
+- Finale guard precedes first Ganondorf admission's native GameSafety/temporary-save chain (`Event170` non-dream pin before Event43), and also guards Ganon admission (`Event771` non-dream pin before Event727). Missing Master returns to real exterior StartPos `GanonCastleEntrance` (Hash16478939697790907191), GameBancInfo `GanonCastle`; no quest/inventory writer on refusal. Dream temporary-inventory branches remain native. Native source/destination proved, **not played**.
+
+### Private fixtures and early evidence
+
+- `E:/OOTRemake/work/rounds/r19/sword-layered-dump`: copied the provided read-only combined layered fixture and added only `Pack/Actor/Weapon_Sword_Master.pack.zs` (31321 bytes) from read-only RomFS. Original fixture/dump untouched. Explicit pack manifest entry and option-on cache parity rows added.
+- Natural first-pull profile: `work/save-backups/2026-11-09_1022-main-adult-first/save/5a3c9e1f0b7d24680000000000000001/slot_02`; source progress SHA256 `a4afee4dea4b428c1ce77d421042c080593fd6de1f2f5711656bde5fa0d80fa5`. Direct reader proof: child=true, Door Step06, `_0040`/Rauru/Sheik histories=false, Master IsGet=false/stock0, exact pinned River chest `IsTreasureBoxOpen.8838426083116998768=false`. No save edit.
+- Main control archived from actual `d9deb65`; candidate archived from `418780a970`. Both v2 diagnostic packets built13 matching resource paths through their respective writers, same pinned River Master chest and existing free-travel patch. Candidate pedestal gives20 rupees; control keeps native first-pull grant. `packet-{main,candidate}-proof.json` records each resource hash; `packet-paired-proof.json` proves matching path sets, untouched profile hashes and both real cmd dry runs exit0 resolving Longshot 3.0.0 stable, one mod, overlay unset, CRLF/no Hookshot launcher. Earlier non-v2 main packet is withdrawn and never played. `report_play.py` read both isolated copies: child=true, Master=false/stock0, current Kokiri/other-era empty, first pull=false, exact pinned chest=false. No boot/play.
+- First builder attempt timed out during whole-census scanning, before any packet existed. Printed load: CPU100%, Defender67% process CPU. Cause-directed change scans only the pinned River Banc files; scoped control built successfully. No unchanged timeout rerun.
+- One premature runtime pytest attempt failed **collection** because the in-flight logic slice's `generate/swords.py` did not yet exist. No tests executed, no pass claimed; rerun only after integration.
+- Checklist: `work/r19-sword/ingame/CHECKLIST.md`, **Longshot3.0.0**, estimated35–55min (unmeasured), main native grant; candidate no-sword first pull; unowned real-pedestal round trip; chest find/manual equip; owned round trip and reload. Claude boot-checks; Kareem plays. Script reads only isolated v2 profiles. No suitable natural swordless finale state is fabricated; short packet does not certify finale or all story prop scenes.
+
+`--print-settings` remains serialization-only for the free-travel dependency; app validation and generation enforce it. Chest/type validation is immediate. Existing defaults and off CS1 omit the new field.
+
+### Logic and completed focused proof
+
+The on-only pedestal source uses `generate/swords.py`; Master is held to Chest, the pedestal to ordinary actor-backed Items (no progressive copy/tier, named dungeon credit, Token, shop refill or Master itself). It uses fill's existing ordered palette/held-item stages, not a new late hold. `SWORD_PEDESTAL_SOURCE` is the shared internal kind. Off, the adapter returns its input unchanged and the serialized setting is absent. Disagreeing derived logic and sliced worlds without the pedestal are refused.
+
+`adult_sword` requires Master or durable Biggoron when on; child-only weapon alternatives are explicitly age-gated. Mixed stun/kill helpers preserve their named sword-free alternatives. Explicit boss strikes, Dark Link and the final entrance are covered. Existing override owners are edited in place, keeping original `was`; translated files remain untouched. **Deviation from r18's counterfactual:** Giant's Knife cannot certify indefinite progression because its break is unmodelled; runtime still preserves a genuinely owned knife. Dormant unverified glitch branches remain unavailable rather than newly admitted.
+
+Native room follow-through (`room-fights.json`, `chest-gates.json`, `room-predicates.json`) replaced two guessed N64 constraints: Forest Map's module has only its ordinary treasure box, and the Light Trial key is a glass chest in room13 without an enemy binding. Neither now acquires a fabricated sword gate. The actual Forest Floormaster and Shadow Map/Compass bind enemy counters and treasure-appearance modules, so their clearance helpers are required only on. Bow/Stalfos, Hover/Dead Hand, GTG Wolfos/Torch Slug/Keese and Shadow after-wind Gibdo bindings support the other guarded fights. GTG's third heavy-block glass chest is behind the already-guarded Wolfos room; the fourth is an unshuffled trap. Shadow Invisible Spikes has no native chest (existing r4 override). Ordinary Light Trial chests and the Wind Hint glass chest have no enemy-counter/chest binding in the examined Banc data; no new defeat gate is invented from their names. These are native-data facts/conservative clearance predicates, **not played combat certification**.
+
+- Native/runtime/settings/child-repair focus: **217 passed in35.99s**. First run printed the interpreter's missing native `EventQueryIsEventSkipedMostRecent` case after80 passes; model corrected, native non-skipped dream path then passed. No production retry/timeout added.
+- Logic/settings/naming focus after native corrections: **64 passed in25.54s**. Earlier off-equivalence failure printed Forest Map requiring a Blue Bubble stunner while native old rule was True; all added constraints now explicitly fold off, and the unsupported Map assumption was removed after native audit.
+- Actual CLI option-on seed190007: **179 shuffled checks,31 spheres,116 resources written**, external `smoke-defaults/`. First smoke correctly failed the new internal source's old generic preflight; counting the implemented source fixed it. This is file/solver proof, not game play.
+- Actual isolated browser: default Off, attempted On without free travel showed the explicit refusal; enabling real Free time travel produced valid On/CS1. Visual `ui-sword-on.webp`; tab/server closed. Discovery was redirected to this track's empty seed root, never personal seeds.
+- Scoped formatter changes applied through anchored edits. Scoped lint printed import ordering and one comparison style warning; both fixed from those exact diagnostics. Full format/lint remain part of the gate.
+
+No game started. No save was edited. No version change.
+
+### Mandatory option-on sweep — passed
+
+Source `418780a970c35dd6fb9e6e8338dc3320782cfec2`, atomic owned `gate.lock`, no supervisor deadline. Canonical production `make_seed` preparation (including native Gift/key/source admission) captured immediately before generation, not a copied legacy setup. Seeds190000 onward per cohort; broad recipe from `E:/OOTRemake/work/r18-fill/settings.txt`. All three turn Master Sword shuffle on **and explicitly enable its required free-time-travel prerequisite**; no other recipe change. Tasklist checked at each cohort start: no game,12 workers throughout. Total387.484s.
+
+| Recipe | Accepted | Exhausted | Fill attempts | Maximum attempts |
+| --- | ---: | ---: | ---: | ---: |
+| Broad | 200 | 0 | 211 | 2 |
+| Defaults + option/prerequisite | 50 | 0 | 50 | 1 |
+| Recommended + option/prerequisite | 50 | 0 | 53 | 2 |
+
+Every accepted seed passed generation's goal/beatability oracle, contained exactly one Master Sword in a Chest and included the shuffled pedestal. No retry-bound increase or fill-algorithm change. Exact effective CS1 recipes, every per-seed result and wall times: external `sweep-results.json` / `sweep-rows.jsonl`. Lock released by its owner. This proves solver acceptance, not in-game swordless combat.
+
+### Exact-head gate / final handoff protocol
+
+This evidence-only commit freezes the merge candidate; runtime/data remain the swept and staged `418780a970` implementation. **After this commit**, `work/r19-sword/gate.py` rebases current local main, runs the focused native/runtime/logic/settings/child-repair set, acquires its own atomic gate lock and executes exactly one full gate on the frozen HEAD:
+
+1. `uv run ruff format --check`.
+2. `uv run ruff check`.
+3. `CLAWSHOT_WORKERS=12 uv run --with pytest-xdist pytest -n 12`, dump environment unset.
+4. `CLAWSHOT_WORKERS=4 uv run --with pytest-xdist pytest -m dump -n 12`, real `OOT_ROMFS` / `OOT_NUP` and private `OOT_DUMP=E:/OOTRemake/work/rounds/r19/sword-layered-dump`.
+
+At every stage start a running Longshot/Hookshot reduces pytest to4 and CLAWSHOT_WORKERS to1. CPU/Defender load evidence precedes suites. No supervisor deadline. `gate-results.json` is the authoritative exact source HEAD, main HEAD, commands, exits and times; `gate-{focused,format,lint,synthetic,dump}.log` retains output. Final cs-r19 handoff reports actual outcomes/commits only after completion; no source edit after that gate. If main moves before merge, rebase and re-gate per round rule.
+
+**Acceptance left for morning:** Claude boot-checks the paired Longshot 3.0.0 launchers; Kareem plays the control and candidate checklist (35–55min unmeasured), retaining runtime load lines plus first-pull, found/equipped, unowned and owned real-age-round-trip and Save/Continue results. No full playthrough, story-prop animation, arbitrary destination presentation or finale refusal is certified by the short packet. Product validation boundary above remains explicit for maintainer review. Target readiness kind is **READY (play-held)**, never a played/merge-ready claim.
+
+## 2026-11-20 played failure and native handoff repair
+
+Kareem **played** the main control: Light Medallion and Master Sword as expected. Candidate v2 **froze**, white screen after the sword-pull movie and before Ganondorf/Rauru/Sheik. This withdraws READY; the original full gate is not a gate for this repair. No agent reran the game to confirm his report.
+
+Evidence: `work/r19-sword/ingame/user-r19-sword-candidate-v2/longshot_log.txt` proves the actual DoorOfTime and ReplaceEquipmentForEraChange mod loads (2529–2530); last map handoff is `SageRoom (child)` (4798), with no subsequent adult/Rauru handoff. Copied snapshot `work/save-backups/2026-11-20_095745-r19-r19-sword-candidate-v2-1/.../slot_02/progress.sav` has child=true, Master=false/stock0, pull/Rauru/Sheik histories=false and Door Step06. **That persisted snapshot is pre-completion state, not a live suspended VM/event stack.**
+
+Native trace: `SageRoom_MeetGanondorf` → Event94 (`Dm_TimeTemple_0040`, FadeInTypeEventEnd2) → Event186 (180 frames) → Event115 (atomic pouch receipt) → Event98 (era equipment) → Event103 (child=false) → Event144 (adult SageRoom/Rauru boot reservation). V2 replaced the atomic receipt with a dialog-bearing subflow. Its real `GetPouchContentByActorName` immediately enters `GetPouchContent`: get-window setup/dialog occur **before** its pouch-add action. **[INFERENCE]** The new dialog wait under the retained white fade is the freeze mechanism; the log/localized graph support it, but no runtime event-stack trace is available. No evidence supports deleting/changing the native continuation or inventing a sword actor.
+
+Repair preserves the native Event115 **ActionEvent and next edge**, changing only its Actor to the placed reward and `IsEquipDIrect` to false. `IsGetEvent=false`, Num1 and message target remain native. No added dialog, scene, fade, timer, temporary sword or saved flag; age/cutscene continuations unchanged.
+
+**Explicit deviation from r18 design9.1 / v2:** the pedestal reward is credited by the native nonblocking receipt **without a separate get window**. The standard get subflow at this exact boundary was not lifecycle-safe; this is not a silent skip of a stuck dialog or a timeout. The chest-found Master Sword's real window remains part of replay acceptance. Public settings help and v3 checklist state the changed presentation. No READY/feature-complete/play-success claim from this repair.
+
+The old source-wiring assertion was replaced with a real-native first-pull execution regression. It follows the source, actual era transform and age/reservation effects; resolves any inserted native get subflows (so the v2 window setup fails the no-UI handoff contract), checks placed-item credit, unchanged Master ownership, owned/unowned equipment, both write-visibility models and no repeat reward. Focused runtime/child tests: **205 passed in30.11s**. Scoped `ruff format --check` and `ruff check`: passed. No fill, logic, settings or resource-list change; no full gate/sweep rerun for this boot-check request.
+
+V2 mods, played profiles/logs and provided snapshot are preserved. Fresh v3 profiles start from the same untouched natural pre-pull Nov9 save, not an edited/repaired frozen save. Candidate rebuild/real-cmd dry-run receipts and exact source commit are recorded externally as `packet-*-v3-proof.json` and `packet-paired-v3-proof.json`; control resources must match the played main control. **NOT READY until replayed.**
+
+### V3 built and posted for boot-check (not READY)
+
+Repair commit/source `4ab3cc5b4c9bbdf4aec5605170a0dce43d75dacc`; fresh paired launchers are `work/r19-sword/ingame/Test - sword candidate v3.bat` and `Test - sword main v3.bat`. Current `ingame/CHECKLIST.md` is v3; the old checklist is preserved as `CHECKLIST-v2-failed.md`. Both real cmd dry runs exit0 and resolve **Longshot 3.0.0** stable, one mod, overlay unset. Each has13 resources and an independent untouched Nov9 profile with the original SHA256, Master=false/stock0 and the pinned chest's named Bool=false. Fresh main's resource hash map equals the played main control's; candidate differs from failed v2 only in DoorOfTime and its resource-size table. Proof: `packet-paired-v3-proof.json`. No agent boot/play.
+
+**Claude's product steer:** prefer a visible normal window after the scene, but explicitly allow a silent v3 if that is not safe this round. Inspected cs19a's played `scene_handoff.py`: it dispatches a separately registered ordinary FlowchartEvent with no animation resources. It does not simply insert a get subflow later in the old movie. Native adult return here still chains `AllSage/Market_Adult_AllSage_Start` → `_0050` (fade2) → `_0055` (fade0) → player warp → three quest steps. A deferred presentation would need its own audited ordinary-event boundary/registration and must **not grant the already credited item twice**. V3 takes the approved silent fallback, rather than add another unplayed transition to this repair. No separate pedestal window, even after adult control; stated in public settings help and the checklist.
+
+Boot-check/replay estimate: **25–40min candidate**, optional fresh native control8–12min, unmeasured. Existing played control remains valid because the new control resources match. Priority is first-pull handoff through Rauru/Sheik to adult control without Master, then real unowned age round trip, chest get/manual equip, owned age round trip and Save/Continue. `report_play.py --revision v3` reads only the new profiles. V2 failure evidence remains untouched. **NOT READY until replayed; no fresh full-gate claim.**
+
+### MAIN MOVED / release rebase
+
+Rebased the four sword commits onto `f5c679d` as directed. Two conflicts resolved: app settings retain main's played dungeon-reward help plus the sword switch; patch pipeline keeps main's withdrawn-story import/removal and the sword hook. Main's hidden/reserved off-valued story compatibility remains, enabled story is refused; no withdrawn feature is restored. Observed current validation: Broad recipe and Defaults have `skippable_story=False`; `Settings(skippable_story=True)` raises `Skippable story dialogue isn't available yet`.
+
+Inspected `d9deb65..f5c679d` in generate/fill.py, generate/prepare.py and world data: the only fill-module delta is the reserved-field comment and enabled-story validation refusal. No placement algorithm, pool, source selection, world rule or goal changed. Per the rebase steer, no new sweep; prior300/300 cohorts had story off and remain applicable.
+
+V3's archived packet source/hash receipts remain truthful (pre-rebase repair `4ab3cc5b4c`); its native-receipt mechanism is unchanged by this rebase. **After this evidence commit**, rerun focused native/runtime/logic/settings/child tests, then ONE full gate under the owned lock on that exact rebased HEAD. Fresh receipts/logs go under `work/r19-sword/gate-f5c679d/`, preserving the original gate and its withdrawn readiness. Passing this new gate will still **not** mean READY: v3 boot-check and Kareem replay remain required.
+
+## 2026-11-20 v3 played repeat-pull failure / approved v4
+
+Kareem played v3 at14:17–14:24. B.1 first pull **PASS**: all scenes completed, adult control, Master absent; saved adult slots have Master=false/stock0, equipped empty, other-era Kokiri, first_pull=true. Real return to child **PASS** and saved in slot03: child/Kokiri, Master=false, first_pull=true. Second child→adult pull **FROZE white**; window closed14:24. River chest was not reached. This is a different failure from the fixed first-pull receipt; no agent reran it.
+
+Read-only trace accepted by Claude before edits/build: non-first `DoorOfTime_Draw` → `Market_Child_Field_ChildToAdult` → native era swap → adult Banc reservation → `Dm_TimeTemple_0085`. V3 log9549 proves the0085 mod loaded;9620 proves adult Market load.0088 did not load in this run. Snapshots `2026-11-20_141734/...`, `_142208/...` and `_142237/...` distinguish pre-pull, adult and saved child states.
+
+Primary cause hypothesis: the unowned repeat pull reaches C01 Event5 `EquipDynamicFromPouch` → Event19 `WaitCreationFinishedEquipment` without a valid Master Sword request. The initial create guard did not cover that later restore/wait path. Old coverage executed `other` only and treated creation waits as plain effects. The exact suspended runtime node remains unlogged; v4's in-game replay is still required.
+
+Secondary, **unproven** registration risk: v3's external ownership helper in the white-faded `other` cut is absent from0085's `GameAnalyzedEventInfo.SubFlowList` (which declares only `Common_Camera_Pln`). The helper is declared in the parent age event, not this movie. This mismatch is not proof of a freeze: R10-MARKET-BOTTLE-FIX explicitly played repeat Talk/shop/Save/Continue successfully despite analogous missing declarations. Claude corrected the causal claim on2026-11-20; keep registration as a precautionary guard, not an established runtime prerequisite.
+
+Claude approved v4: no added calls; local native selected-Master predicates after era's canonical ownership validation; skip both create/wait and later cleanup/restore/wait for the unarmed case, retain native owned path and all fade/camera/animation. `era_transform`'s now-unused branch-return helper is removed. No new movie actor, item window, saved flag, retry or timer.
+
+0085's native vocabulary has only the player's equip predicate, not a canonical stock query. V4 reuses that exact actor/query at the create boundary and after C01's native300-frame wait, **before** its sword-state/restore chain. Valid repeat arrivals have already passed the era guard's IsGet+positiveStock check; no selected Master is therefore the unarmed case. Owned Master retains the original native actions; large-blade exclusions remain native.
+
+The superseded0d05a626 gate retained focus268PASS, format/lintPASS and the original synthetic3944PASS533SKIP plus one20s startup error. Exact `[extra-mod]` isolated **3/3 PASS** under own lock at workers1 (4.921s,2.438s,9.406s command times). Dump started n4/workers1 with the game running and was **cancelled** for the newly approved v4 source change. Partial dump/three isolated logs retained; own job stopped and owned lock released, `LOCK RELEASED` posted14:32. **Not a completed full gate.**
+
+V3 launchers archived as `OLD v3 (2nd pull froze) - Test - sword candidate v3.bat` and `OLD v3 - Test - sword main v3.bat`; played users/mods/logs/snapshots preserved. V4 must start fresh, with checklist order: first pull → child → second pull → child → third pull → River chest/equip → child → owned pull. Separate full-cut coverage for0085/0088 and a generic registration oracle over all Clawshot-modified flows are required before the v4 boot-check handoff. **NOT READY until replayed.**
+
+### V4 native slice verified
+
+Focused `test_master_sword.py`, `test_child_sword.py` and new `test_master_sword_cuts.py`: **415 passed in43.84s**, explicit subprocess exit0, all four source/test hashes unchanged during execution. `v4-native-focus.log`, `.xml` and `v4-native-focus-result.json` retain the result. An earlier harness invocation returned only partial dots without summary/exit; no pass was claimed. Process inspection found no live pytest and Windows recorded no Python application crash. A fault-enabled, unbuffered wrapper added durable per-node output, JUnit and explicit exit capture; no production/test timeout changed.
+
+The210 new native-cut cases cover all four0085 entries and all three0088 entries; owned/unowned, stale ownership/candidates, large blades and both live-actor/selected-string query interpretations. Inputs pass the actual era transform first. Frame-stepped fork/local-subflow execution requires a valid creation request at each creation wait; the native unarmed C01/whole0085 counterfactual fails at Event19, proving the oracle is not a no-op. Owned safe paths match native action/cut/state outcomes; other paths retain native fade/camera/animation effects without unsafe sword requests. Scope and model inferences are in the test, not a claim about an observed runtime stack.
+
+Scoped formatter/lint for the runtime and both native-test files passed. Generic registration coverage now also passes separately: **14 passed in184.13s**, explicit exit0 and test/gifts/sword hashes unchanged, `v4-registration-focus.log/.xml` and `v4-registration-focus-result.json`. Ten synthetic guards, native calibration and three real production recipes exercise all21 current flow-writer modules: defaults21 modified flows, song-only Door61, broad90 (including sword and receive event). Only inherited native debt and the exact played Market bottle allowance are accepted; other new gaps fail. Scoped formatter/lint for the new guard passed. V4 candidate is built from `66b5b7e691fa50bf901d434e07624335c530e795`; control from actual-main `333be05d555180e9887e6ffbaf353ce790e588b6`. Both13-resource packets' real cmd dry runs PASS Longshot 3.0.0 stable, one mod/overlay unset; hashes and exact original-slot chest/ownership proof are in `packet-paired-v4-proof.json`. These are code/packet proofs, not gameplay certification.
+
+The first v4 packet verifier printed five files in main's user profile instead of its assumed one: native progress already existed there. Read-only inspection found adult/child progressed saves, while the original `slot_02` remained byte-identical to the baseline. Those extra saves are user-owned and were preserved; the verifier now checks the exact manifest-derived fixture slot, not an incidental profile file count. Candidate still has its single untouched pre-pull slot. Cause-directed verifier rerun passed; no save or mod reset. This does not substitute a saved-state inference for a human play report.
+
+Canonical checklist is now the ordered v4 three-unowned-pull then chest/owned-pull check; v3 instructions archived alongside failed v3 launchers. Claude later announced main `7ef678b` (startup fixture/publish extraction): integrate it before a future full gate, not a local timeout change. Current v4 packet source remains accurately pinned above; no extra full gate/sweep is claimed for v4.
+
+### Registration guard: played exception, no Market bottle change
+
+Claude directed preserving `gifts._market_bottle` exactly as shipped. `plans/playtest/answers.md` **R10-MARKET-BOTTLE-FIX**, Kareem2026-11-10: decline, accept, leave/re-enter, TALK AGAIN, SHOP and Save/Continue, “All checks out, no issues.” `test_event_registration.py` therefore has ONE `PLAYED_MARKET_BOTTLE_ALLOWANCE`: the eight specific tutorial-entry call sites plus `DisplayShop`/`Dm_SY_ShopGet` on its analyzed row. No blanket gifts/flow exemption; other newly introduced gaps still fail. Native source debt remains separate. Test descriptions/errors call these suspected risks, not proven freeze causes. No Market bottle production code was edited.
+
+The optional `7ef678b` integration was attempted, its three additive conflicts resolved, then the merge operation aborted because the documented selective-commit interface cannot complete an in-progress merge under this session's commit-only policy. Pre-existing sword/guard/notes work was preserved. **Do not claim main is integrated**: `66b5b7e691` remains the runtime source for the v4 packet. Integrate repaired main before any future full gate; no full gate has started as part of this boot-check handoff.
+
+Claude's ordered integration direction: **post the v4 boot pair first**, then rebase onto `7ef678b` as with the earlier `f5c679d` rebase, then run the full gate on the rebased head. Packet runtime source remains valid/pinned. If rebase cannot proceed under tool policy, report it for Claude's main-repo integration fallback; never claim an unrun integrated gate.
+
+V4 boot pair/checklist posted to cs-r19 at15:31, after415 native and14 structural passes; no game started. Post-handoff `git rebase 7ef678b` stopped at1/7 replaying `c6b0cd2` on the same three additive conflicts (settings docs, CLI help, settings serialization). The permitted selective-commit API documents no in-progress-rebase commits; the earlier staging/continue method is forbidden by this session's commit policy. Rebase aborted, preserving committed sword/guard work. Claude's offered main-repo integration fallback requested explicitly. **No rebased-head full gate run, no lock acquired, no integrated pass claimed.** Await the integrated head before that gate; the pinned v4 runtime packet is unchanged and remains play-held.
+
+### Integrated head: full gate PASS / LOCK RELEASED
+
+Claude resolved the three additive conflicts in `r19/sword-int`, included the notes-only child, and posted `be5b0bf21f113c26699ee165939ab1bfd2915dfb`. Sword fast-forwarded with `git merge --ff-only r19/sword-int`; this supersedes the integration blockage above. Claude reported1191 focused passes and Ruff clean; those checks were not redundantly repeated before the required full gate.
+
+One full gate on frozen **be5b0bf**: formatter **PASS**, lint **PASS**, synthetic **4007 passed,752 skipped** in271.79s, dump **749 passed** in1852.43s. Both pytest invocations emitted36 warnings (retained in logs); no failure, retry or waiver. No game at each stage start: synthetic n12/workers12, dump n12/workers4. All four stage exits0; no source/head change during the gate. Driver removed its own lease; **LOCK RELEASED** posted to cs-r19 at16:11. Evidence: `E:/OOTRemake/work/r19-sword/gate-v4-be5b0bf21f11/{gate-results.json,gate-format.log,gate-lint.log,gate-synthetic.log,gate-dump.log}`. No game launched by this agent.
+
+### Reported v4 boot / played control / cosmetic return
+
+Initial report before candidate play: Claude reported candidate boot **PASS**, Longshot3.0.0, crash0, mods_found1. At that report the candidate-v4 play profile had never been launched and replay was queued, not passed. This boot-only status is superseded by the played acceptance below.
+
+Kareem **PLAYED MAIN v4 CONTROL PASS**, relayed by Claude2026-11-20: profile `user-r19-sword-main-v4`, log ending14:55, before the handoff. Vanilla throughout, all cutscenes, Master Sword granted, real child return fine, then adult again with Master Sword. This resolves the earlier saved-state-only uncertainty: now an explicit played report, not an inference from extra slots. Preserve those saves; no repeat control needed. This does not certify candidate gameplay or River-chest presentation.
+
+Kareem also observed in v3 that an unowned Master blade is absent during the return-to-pedestal cutscene. **Expected cosmetic behavior**: `pose_transform("Dm_TimeTemple_0088", "Event35", "Event29")` deliberately skips unowned static sword creation while retaining the caller's native animation and real age transition. Owned/selected Master retains its native pose path. The external v4 checklist now says so explicitly; it does not excuse a freeze, failed age change, inventory mutation or a missing legitimately selected owned sword. No runtime change made for this cosmetic observation. Candidate was then play-held; the following acceptance supersedes that hold.
+
+## Final acceptance — candidate v4 PLAYED PASS / READY
+
+Kareem played candidate v4 **2026-11-20,16:11–16:21**, reported by Claude:
+
+- First pull: scenes completed and adult control **without Master Sword**.
+- Real return to child: no freeze, Kokiri Sword.
+- **Second unowned pull to adult passed**, covering the repeat path that froze in v3.
+- Zora's River chest gave Master Sword; it **equipped immediately and worked**.
+- Real pedestal return to child and back to adult with the owned sword: no issues.
+- Reported saved-state evidence agrees: unowned adult slots have `master_owned=false`, `equipped=''`; post-chest slots have `master_owned=1`, `equipped='Weapon_Sword_Master'`, `chest_open=true`.
+
+**Exactly two unowned pulls were played, not three.** Claude explicitly accepted this scope: the second exercises the failed v3 path and a third uses the same path. Third-pull coverage is a maintainer-accepted path-equivalence rationale, **not another observed pass**. No additional gameplay or test rerun was performed to confirm Kareem's report.
+
+This lifts the candidate play hold and makes the sword track **READY for Claude to merge**, with the earlier v4 main-control PLAYED PASS, candidate boot PASS and full integrated **be5b0bf** gate (4007 synthetic passes,749 dump passes; format/lint clean). This acceptance update is **docs only atop `029a60c13d`**; runtime, tests, diagnostic packet, saves and logs are unchanged. Experimental/default-off status and the documented Chest/free-travel prerequisites remain. No full-playthrough, finale-refusal, all-story-prop, additional reload or arbitrary destination-presentation claim is added.

@@ -31,6 +31,12 @@ label = "Dungeon reward shuffle (experimental)"
 kind = "boolean"
 group = "Items"
 help = "Off by default. Shuffle the three stones and six medallions among their nine usual rewards, including Rauru. First-pull reward delivery passed. With this on, the closed Door opened with three owned stones before Dodongo/Jabu completion. With only Emerald and Ruby owned, it stayed closed with no opening scene; the saved state confirmed the refusal. Ocarina of Time, Song of Time and Impa's send-off are still needed. Boss completion still controls blue warps, sage scenes, restoration, Prelude and the Light Arrow story."
+[shuffle_master_sword]
+label = "Master Sword shuffle (experimental)"
+kind = "boolean"
+group = "Items"
+help = "Off by default; needs shuffled chests and Free time travel on for now. The pedestal's first pull gives a shuffled item instead of the Master Sword, which can then be found only in a shuffled chest. The pedestal still moves Link between ages, and adult Link has no Master Sword until he finds it. Built, not played."
+enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests to move the Master Sword." }]
 [bridge]
 label = "Ganon's Castle bridge (experimental)"
 kind = "choice"

@@ -19,7 +19,9 @@ new = true
 region = "Dodongos Cavern Lower Right Side"
 type = "Chest"
 vanilla = "Rupees (20)"
-rule = "is_adult or Sticks or Slingshot or Bombs or Kokiri_Sword"
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword, child
+# weapons the child's; it folds to the rule before while shuffle_master_sword is false.
+rule = "adult_sword or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs"
 source = "Census 7764016096998075927, lower-Lizalfos arena room 5; appear-chest event DodongoCavern_Gimmick_DefeatLizalfos01. Inherited normal Lizalfos fight rule (Dodongos Cavern.json:55). https://www.ign.com/wikis/ocarina-of-time-remake/Dodongo_Cavern_Dungeon_Walkthrough."
 
 [locations."Dodongo Cavern Room 10 Chest (Item_ScrubBusinessSeed)"]
@@ -35,5 +37,6 @@ new = true
 region = "Dodongos Cavern Upper Lizalfos"
 type = "Chest"
 vanilla = "Scrub Business Seed"
-rule = "is_adult or Sticks or Slingshot or Bombs or Kokiri_Sword"
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): as Room 5's.
+rule = "adult_sword or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs"
 source = "Census 850464708089653824, upper-Lizalfos arena room 16; appear-chest event DodongoCavern_Gimmick_DefeatLizalfos02. Inherited normal Lizalfos fight rule (Dodongos Cavern.json:136). https://www.ign.com/wikis/ocarina-of-time-remake/Dodongo_Cavern_Dungeon_Walkthrough."

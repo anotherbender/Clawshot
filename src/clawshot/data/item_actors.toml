@@ -15,6 +15,7 @@
 
 [items]
 "Kokiri Sword" = { actor = "Item_Sword_Kokiri", source = "KF Kokiri Sword Chest" }
+"Master Sword" = { actor = "Weapon_Sword_Master", source = "DoorOfTime/Event115 canonical pouch actor; r18-master-sword-design.md, r19-sword.md; chest adapter built, not played" }
 "Slingshot" = { actor = "Item_Range_SlingShot", source = "Deku Tree Slingshot Chest" }
 "Boomerang" = { actor = "Item_Boomerang", source = "Jabu Jabus Belly Boomerang Chest" }
 "Bow" = { actor = "Item_Range_Bow", source = "Forest Temple Bow Chest" }

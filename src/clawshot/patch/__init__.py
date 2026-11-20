@@ -21,7 +21,7 @@ from clawshot.generate import Seed, Settings, from_placements, generate, key_fam
 from clawshot.generate import hints as stone_hints
 from clawshot.generate import names as location_names
 from clawshot.generate import tokens as token_policy
-from clawshot.generate.fill import shuffled_locations
+from clawshot.generate.fill import SWORD_PEDESTAL_SOURCE, shuffled_locations
 from clawshot.patch import bags, custom_items, darunia, drops, freestanding, gamedata, scrubs, shops, text, tokens
 from clawshot.patch import events as chest_events
 from clawshot.patch import items as item_actors
@@ -110,8 +110,10 @@ def make_seed(
         for name in shuffled
     )
     token_locations = [name for name in shuffled if world.locations[name].type == token_policy.SHUFFLE]
+    sword_pickups = sum(world.locations[name].type == SWORD_PEDESTAL_SOURCE for name in shuffled)
     if (
-        len(chests) + len(shop_locations) + floor_pickups + len(token_locations) + key_pickups != len(shuffled)
+        len(chests) + len(shop_locations) + floor_pickups + len(token_locations) + key_pickups + sword_pickups
+        != len(shuffled)
         and not extra_steps
     ):
         raise PatchError("non-chest shuffle needs a kind-specific extra patch step")
@@ -196,12 +198,21 @@ def make_seed(
         from clawshot.patch.age import changes as age_changes
 
         changes += (age_changes(out.placements, free_time_travel=True),)
-    from clawshot.patch import dampe_safety, door, equipment, mido_schedule, reward_bridge, start_items
+    from clawshot.patch import (
+        dampe_safety,
+        door,
+        equipment,
+        master_sword,
+        mido_schedule,
+        reward_bridge,
+        start_items,
+    )
 
     changes += (
         door.changes(out.placements, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
         start_items.changes(),
         equipment.changes(),
+        *([master_sword.changes(out.placements)] if settings.shuffle_master_sword else []),
         dampe_safety.changes(),
     )
     changes += (reward_bridge.changes(mode=settings.bridge, count=settings.bridge_count),)

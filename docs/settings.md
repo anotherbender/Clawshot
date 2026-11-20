@@ -438,6 +438,46 @@ still require usable Light Arrows. Ganon's boss key is never awarded by this sce
 it follows the ordinary boss-key placement rules below. Round19 corrects the default
 logic to these native readers, without changing the scene or its saved writes.
 
+## Master Sword shuffle
+
+`--shuffle-master-sword` (app: **Master Sword shuffle (experimental)**, under Items) is experimental
+and off by default, including both presets; `--no-shuffle-master-sword` overrides a settings string.
+Off, the first pull grants and equips the Master Sword natively, and existing settings strings and
+spoiler settings keep their bytes.
+
+On, the Temple of Time pedestal's first pull becomes its own check, **Master Sword Pedestal**, which
+gives one ordinary shuffled item instead of the sword; progressive copies cannot go there. The
+reward uses the native nonblocking pouch receipt, without a separate get window, to preserve the
+white-faded handoff before the age write.
+Rauru's reward, the first-pull and first-arrival scenes and the Door's completion stay native. The
+**Master Sword** item (`Weapon_Sword_Master`) goes only to shuffled chests. The pedestal still moves
+Link between ages in both directions, and changing age neither gives nor removes the sword: adult
+Link has no Master Sword until he finds it. Logic models that adult without a blade; an owned
+Biggoron Sword still counts where a sword is needed, and the final battle requires the owned Master
+Sword. The breakable Giant's Knife is preserved as equipment, but logic does not rely on its
+unmodelled durability to reach another check.
+
+For now it needs two existing settings, a conservative boundary proposed by cs19c and awaiting a
+maintainer decision ([round 19 sword](../plans/rounds/r19-sword.md)):
+
+- **Chest shuffle.** Without `Chest` the settings are refused everywhere: a settings string, the
+  command line, `--print-settings` and the app.
+- **Free time travel** (`--logic free_time_travel=true`, or the app's **Free time travel
+  (experimental)** switch). Natively an adult returns to child only after the Forest Temple, which an
+  adult without a sword may be unable to clear; free travel keeps that return open instead of a new
+  fill guarantee. App validation and seed generation refuse Master Sword shuffle unless the effective
+  logic has `free_time_travel=true`. `--print-settings` only encodes the string and does not check
+  this requirement, so a printed string can still be refused when you generate.
+
+**Candidate v4 played pass, 2026-11-20.** Kareem completed the first pull without Master Sword,
+returned to child, then passed the second unowned pull that froze in v3. Zora's River chest granted
+and immediately equipped a usable Master Sword; the owned child/adult round trip also passed.
+Exactly two unowned pulls were played, not three; the maintainer accepted the repeated-path coverage.
+The main v4 control also passed. These checks do not certify a full playthrough or finale refusal.
+The pedestal remains silent; no item window is inserted into the scene. Design, deviation and
+evidence: [round 19 sword](../plans/rounds/r19-sword.md) and
+[round 18 Master Sword design](../plans/rounds/r18-master-sword-design.md).
+
 ## Door of Time and returning to child
 
 | Option | Requirement / effect |
@@ -445,7 +485,7 @@ logic to these native readers, without changing the scene or its saved writes.
 | `--door-of-time closed` | Default: meet Zelda and Impa, then Ocarina of Time and playable Song of Time. With vanilla rewards, keep the native completed-stone route. With reward shuffle, require all three **owned** Spiritual Stones instead; finding stones never completes their dungeons. |
 | `--door-of-time song_only` | Field-arrival clock state and Impa's real field send-off, then either child ocarina and the learned Song of Time. No stones needed to open the Door. |
 | `--door-of-time open` | The Door waits for Field-arrival clock state and Impa's real field send-off, then opens without songs or stones; the first-pull pedestal has no extra item gate. |
-| `--logic free_time_travel=true` | Experimental, default off: adult return before Forest completion. The app's **Free time travel (experimental)** switch is the same override. |
+| `--logic free_time_travel=true` | Experimental, default off: adult return before Forest completion. The app's **Free time travel (experimental)** switch is the same override. Required by [Master Sword shuffle](#master-sword-shuffle). |
 
 Door mode and reverse travel are independent. The default return guarantee proves an adult can
 unlock return from the minimum mandatory first-pull inventory and adult checks; optional child

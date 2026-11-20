@@ -27,7 +27,9 @@ new = true
 source = "Nintendo Life guide: back down through the switch room to 3F's central column; the vine wall leads down to 2F"
 
 [exits."Deku Tree Top Floor"."Deku Tree Basement"]
-rule = "here(is_adult or can_child_attack or Nuts)"
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword; it folds
+# to is_adult, the rule before, while shuffle_master_sword is false.
+rule = "here(adult_sword or can_child_attack or Nuts)"
 new = true
 source = "Nintendo Life guide, 'Jumping into the spider web (3F to B1)': from 3F's central column, jump onto the 1F web (Obj_InsideTheDekuTree_SpiderWeb_A_01, room 0, y 100) to fall into B1. The condition is OoT Randomizer's for the lobby's way down (Deku Tree.json:20), kept"
 
@@ -45,6 +47,10 @@ region = "Deku Tree Top Floor"
 source = "data: Obj_TBox_A_01 11368028582977069031 (TBox_DekuNutBundle), room 3 at y 126; Nintendo Life guide: through the vent behind the compass chest"
 
 [locations."Deku Tree GS Compass Room"]
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword; it folds
+# to the translated rule while shuffle_master_sword is false.
+rule = "adult_sword or can_child_attack"
+was = "is_adult or can_child_attack"
 region = "Deku Tree Top Floor"
 source = "data: Enemy_Skulltula_Gold 13609975487234437568, room 3 at y 121; Nintendo Life guide: in the alcove the raised platforms reach, past a Skulltula"
 

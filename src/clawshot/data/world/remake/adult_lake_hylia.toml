@@ -6,8 +6,10 @@ source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_
 # Mirror the real Iron Boots chest's access rule, never its shuffled reward. The Water-quest step follows the lesson.
 [events."Ice Cavern End"."Ice Cavern End Chest Access"]
 new = true
-rule = "(is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)) and Ocarina"
-source = "Claude, 2026-11-17, precaution pending a played pre-Ice check; Kareem informed. 0.2.2 safety decision; plans/rounds/r16-water-gate.md. Source is Ice Cavern Iron Boots Chest, Banc/IceCavern/IceCavern_Static.bcett.byml.zs Hash 6859289214373847284; its access rule is ice_cavern.toml:91. The retained SageOfWater:IceCavern_WaterSerenade wrapper advances story progress regardless of shuffled Boots/Serenade; this precaution does not claim the native hit-rejection cause is proven. Round 18 interim lesson rule (Kareem via Main, 2026-11-18; revised 2026-11-20, song_lessons.toml): that wrapper runs Dm_SY_Treasurebox (the chest reward, unguarded), then Event281/Event283 Dm_MelodyGet_Water (Sheik's lesson), and only then sets SageOfWater_GetWaterSerenade and SageOfWater Step05/Step04 (Event285/280, Event284/282), so the step needs the lesson's Ocarina, either instrument at either age."
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): mirrors Ice Cavern Iron Boots Chest's rewrite there;
+# it folds to the rule before while shuffle_master_sword is false.
+rule = "(adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)) and Ocarina"
+source = "Claude, 2026-11-17, precaution pending a played pre-Ice check; Kareem informed. 0.2.2 safety decision; plans/rounds/r16-water-gate.md. Source is Ice Cavern Iron Boots Chest, Banc/IceCavern/IceCavern_Static.bcett.byml.zs Hash 6859289214373847284; its access rule is ice_cavern.toml:91. The retained SageOfWater:IceCavern_WaterSerenade wrapper advances story progress regardless of shuffled Boots/Serenade; this precaution does not claim the native hit-rejection cause is proven. Round 18 interim lesson rule (Kareem via Main, 2026-11-18; song_lessons.toml): that wrapper runs Dm_SY_Treasurebox (the chest reward, unguarded), then Event281/Event283 Dm_MelodyGet_Water (Sheik's lesson), and only then sets SageOfWater_GetWaterSerenade and SageOfWater Step05/Step04 (Event285/280, Event284/282), so the step needs the lesson's age-usable Ocarina (age_ocarina.toml)."
 
 [locations."LH Sun"]
 rule = "'Water Temple Clear' and can_use(Bow)"

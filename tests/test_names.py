@@ -5,6 +5,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from clawshot.census.definitions import load as load_definitions
+from clawshot.generate.swords import PEDESTAL
 from clawshot.patch.gifts import (
     GALLERY_EXPERT_CHECKS,
     MARKET_BOTTLE_CHECK,
@@ -46,6 +47,8 @@ def test_every_supported_placement_and_linked_gift_has_directions_for_all_copies
     ootr[SHOPKEEPER_CHECK] = ""
     expected[MARKET_BOTTLE_CHECK].add(MARKET_BOTTLE_STEP)
     ootr[MARKET_BOTTLE_CHECK] = ""
+    expected[PEDESTAL].add("DoorOfTime/Event115")
+    ootr[PEDESTAL] = PEDESTAL
     for event, name in GALLERY_EXPERT_CHECKS.items():
         expected[name].add("MiniGame_HitTarget/" + event)
         ootr[name] = ""

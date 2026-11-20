@@ -73,7 +73,10 @@ was = "Raise_Water_Level and (Small_Key_Water_Temple, 4)"
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Finding the Longshot): third spent key opens the high west falling-platform door after pillar and middle-water locks."
 
 [exits."Water Temple Falling Platform Room"."Water Temple Dark Link Region"]
-rule = "can_use(Hookshot)"
+# Round 19 Master Sword shuffle (remake/master_sword.toml header; r18-master-sword-design.md section 7): Dark Link is
+# fought with a sword before the Longshot room. adult_sword folds to is_adult, implied by can_use(Hookshot), while
+# shuffle_master_sword is false.
+rule = "can_use(Hookshot) and adult_sword"
 was = "can_use(Hookshot) and (Small_Key_Water_Temple, 5)"
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Finding the Longshot): moving targets and dragon switch puzzle lead directly to Dark Link; no fourth/fifth small-key door here."
 

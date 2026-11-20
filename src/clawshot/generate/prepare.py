@@ -5,7 +5,7 @@ from collections.abc import Mapping
 from dataclasses import replace
 from typing import Any
 
-from clawshot.generate import key_families, rewards, tokens
+from clawshot.generate import key_families, rewards, swords, tokens
 from clawshot.generate.fill import SHOP_ONLY_PREFIX, FillError, Settings
 from clawshot.generate.progressive import prepare_spec, restrict_settings
 from clawshot.world.load import build_world
@@ -39,6 +39,7 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
     """
     spec = rewards.prepare_spec(tokens.prepare_spec(prepare_spec(spec), settings), settings)
     spec = key_families.prepare_spec(spec, settings)
+    spec = swords.prepare_spec(spec, settings)
     logic = dict(settings.logic)
     if "open_forest" in spec.get("settings", {}):
         if "open_forest" in logic and logic["open_forest"] != settings.forest:
@@ -74,7 +75,10 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
     spec = with_shop_prices(spec, settings.shuffle, settings.shop_prices, settings.cheap_deku_shield)
     settings = _hold_shop_goods(spec, settings)
     world = build_world(world_spec(spec, settings), settings.logic)
+    if settings.shuffle_master_sword and swords.PEDESTAL not in world.locations:
+        raise FillError("Master Sword shuffle needs the Temple of Time pedestal within the selected areas")
     settings = rewards.restrict_settings(world, tokens.restrict_settings(world, settings))
+    settings = swords.restrict_settings(world, settings)
     return key_families.restrict_settings(world, restrict_settings(world, settings)), world
 
 
