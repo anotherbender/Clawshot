@@ -53,7 +53,7 @@ Read-only evidence:
   entirely rather than attempting another item-get wrapper.
 
 **Current boot-check packet:** `E:/OOTRemake/work/r19-cows/v2/ingame/`.
-Use `01-main-control.bat`, then `02-candidate.bat` **in that new directory**.
+Use `Cows v2 - main-control.bat`, then `Cows v2 - candidate.bat` in that directory.
 Checklist: `v2/ingame/CHECKLIST.md`, Longshot 3.0.0; same one-cow first/repeat/
 Save/Continue acceptance, estimate **8–12 minutes both arms / 4–6 candidate**.
 The original v1 mods, launchers, frozen log and profiles are unchanged.
@@ -90,6 +90,11 @@ repeat after Continue and third milking. Expect silent +20 and milk first,
 milk only second, milk only after Continue. No in-game v2 result, saved true
 value or persistence pass is claimed. No full gate/lock: research-only exemption
 still applies; the earlier 41-test receipt is historical, not a new test run.
+
+Claude later confirmed the “crashed, then froze” report used OLD v1 (11:05 log),
+not v2; v2 was never launched. To disambiguate, he renamed v1 launchers
+`OLD v1 (froze) - ...bat` and v2 launchers `Cows v2 - ...bat`. Both external
+checklists now use those names. V2 remains **unplayed**, not a failed v2 check.
 
 ## Public reference and scope decision
 
