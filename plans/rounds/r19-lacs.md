@@ -173,3 +173,30 @@ post. No in-game acceptance claim: no qualifying natural pending-LACS save exist
 and the existing scene/Gift resource packet is byte-identical to main. No new
 game-behavior patch needs a play-held merge; changed generated placements still
 depend on the ordinary oracle, not a claim that a full playthrough was observed.
+
+## MAIN MOVED — f5c679d rebase and replacement gate
+
+Claude's 2026-11-20 steer supersedes the initial d9deb65 READY receipt above.
+Rebased onto `f5c679d` (0.2.3 release candidate). The sole conflict was
+`docs/settings.md`: kept main's newly played reward/bridge/closed-Door evidence
+and this track's ordinary-Gift LACS paragraph, removing the stale blanket
+"built, not played" statement for the round18 options. Main's withdrawn
+`skippable_story` implementation and validation refusal stay intact.
+
+Main's `generate/fill.py` delta only rejects enabled `skippable_story`; no fill
+ordering, destination policy, world logic or LACS implementation changed in
+the rebase. Per Claude's steer, the recorded 300/300 zero-exhaustion sweep is
+retained, not repeated for release documentation/version/validation changes.
+
+The rebased focused set and **one replacement full gate** have separate receipts
+under `E:/OOTRemake/work/r19-lacs/f5c679d-regate/`; the original gate logs remain
+unchanged. Commands, native inputs and process-based worker limits are the same
+as above. The completion thread must name the rebased exact tested head; the
+old `ed5054a789` READY no longer authorizes merging.
+
+Full-gate acceptance follows the round19 rule: retain any original UI/Node
+deadline failure and load evidence, then require that exact node to pass
+isolated before accepting it; never silently relabel an exit1 suite as exit0.
+No timeout widening or unrelated implementation change is authorized here.
+Merge remains blocked until 0.2.3 is published. No new in-game claim or save
+fixture is introduced by this rebase.
