@@ -210,7 +210,7 @@ complete reward-shuffled playthrough. Other completion gates stay native; see [r
 The persistent `Met Child Zelda` event models the **whole courtyard/Impa lesson and accepted
 send-off through DoorOfTime Step02**, not first courtyard contact. Both moat rewards, Saria's
 song source and **every** Door mode require it; shuffled items do not advance native quests.
-Its route is Malon's fixed Egg / Chicken, Talon, the courtyard, Impa and an age-usable Ocarina.
+Its route is Malon's fixed Egg / Chicken, Talon, the courtyard, Impa and an Ocarina.
 `Field Owl Arrival` models the saved arrival effect, not literal owl history: native owl play or the real send-off's
 missing-arrival restoration supplies it. `Time Flows` and both early Door rules require both events.
 The temporary first-adult clock hold is clearable at the native adult Market exit or a genuine
@@ -223,9 +223,15 @@ requires Dodongo's completion and available night. Sources: `remake/child_hyrule
 Kareem verified Saria before Darunia and the Step03 escape/reload controls on Longshot on
 2026-11-13; Bombchu Shop's entrance correction remains native-data evidence.
 
-**Interim song lessons.** All twelve `Dm_MelodyGet_*` song checks require an age-usable Ocarina:
-either instrument as child, Ocarina of Time as adult. Kareem reproduced the no-ocarina Minuet play-back
-softlock and passed its Ocarina control on 2026-11-18. Shuffled gifts still run that play-back.
+**Interim song lessons.** All twelve `Dm_MelodyGet_*` song checks require an Ocarina: either instrument
+at either age. Kareem reproduced the no-ocarina Minuet play-back softlock and passed its Ocarina control on
+2026-11-18. On 2026-11-20 his [round-19](../plans/rounds/r19-scenes.md) Minuet control (adult, Fairy Ocarina
+only, main build) played the native lesson and granted its Boomerang; round 18's issue #34 adult-Fairy control
+had already played Sun's Song
+([check13](../plans/rounds/r18-equipment.md#check13-acceptance-and-combined-integration)). Lessons therefore no
+longer ask an adult for the Ocarina of Time. Generic song playing (`remake/age_ocarina.toml`) keeps its
+Time-only adult rule, and existing age, story, source and weapon prerequisites stay. Shuffled gifts still run
+that play-back.
 The post-lesson Impa send-off and Ice Cavern Water-quest event share the requirement; the moat Ocarina
 and Iron Boots chest rewards are given before their lessons, so those reward rules are not gated.
 This is a logic safeguard, not a fix for walking into an automatic scene without an instrument.

@@ -71,8 +71,8 @@ source = "AllSage Event25/26 read Shadow/Spirit awakening histories; EscapeDunge
 rule = "is_child and 'Defeat King Dodongo' and 'Defeat Barinade' and 'Met Child Zelda'"
 source = "DoorOfTime Event38/39/56 count Fire/Water completion only; existing round16 escape/moat readiness retains those quests and real send-off, not Forest or reward stock; r16-time.md"
 [completion.locations."Song from Ocarina of Time"]
-rule = "is_child and 'Defeat King Dodongo' and 'Defeat Barinade' and 'Met Child Zelda' and Ocarina and (is_child or (Ocarina, 2))"
-source = "Same native escape/moat source as the Ocarina pickup; round16 #32, r16-time.md. Preserve MAIN FINAL's age-usable lesson instrument (world/remake/song_lessons.toml); the item precedes the lesson, which still needs an instrument when its reward is shuffled"
+rule = "is_child and 'Defeat King Dodongo' and 'Defeat Barinade' and 'Met Child Zelda' and Ocarina"
+source = "Same native escape/moat source as the Ocarina pickup; round16 #32, r16-time.md. Preserve the lesson's Ocarina (world/remake/song_lessons.toml); the item precedes the lesson, which still needs an instrument when its reward is shuffled"
 
 # With rewards vanilla, a closed-door pull necessarily completed these quests.
 # Ownership-mode pulls instead carry only the three required stones (door table below).
@@ -81,8 +81,8 @@ source = "Same native escape/moat source as the Ocarina pickup; round16 #32, r16
 "Defeat King Dodongo" = 1
 "Defeat Barinade" = 1
 [completion.locations."Sheik in Kakariko"]
-rule = "is_adult and 'Defeat Phantom Ganon' and 'Defeat Volvagia' and 'Defeat Morpha' and Ocarina and (is_child or (Ocarina, 2))"
-source = "Native sage quest completion, not shuffled medals; r18-rewards.md reader table. Preserve MAIN FINAL's age-usable lesson instrument (world/remake/song_lessons.toml): adult Link needs the Ocarina of Time"
+rule = "is_adult and 'Defeat Phantom Ganon' and 'Defeat Volvagia' and 'Defeat Morpha' and Ocarina"
+source = "Native sage quest completion, not shuffled medals; r18-rewards.md reader table. Preserve the lesson's Ocarina, either instrument at either age (world/remake/song_lessons.toml)"
 
 [door]
 region = "Temple of Time"

@@ -95,7 +95,7 @@ def test_each_lesson_and_farewell_really_grants_effective_reward_once(compiled, 
 
 @pytest.mark.parametrize(
     "name,child,selected,fairy",
-    [("forest", False, ocarina.FAIRY, 1), ("epona", True, "", 0), ("saria_farewell", True, "", 0)],
+    [("forest", False, ocarina.FAIRY, 0), ("epona", True, "", 0), ("saria_farewell", True, "", 0)],
 )
 def test_staged_target_callers_never_enter_pose_or_cinematic_context(compiled, name, child, selected, fairy):
     moved, scenes, charts, rows = compiled
@@ -113,3 +113,15 @@ def test_staged_target_callers_never_enter_pose_or_cinematic_context(compiled, n
         assert any(operation == "EventReserveBancChange" for operation, _ in current["effects"])
     run(charts, rows, scene.flow, scene.entry, current, data_only=True)
     assert current["stock"][expected] == 1, (name, current)
+
+
+@pytest.mark.parametrize("selected", ["", ocarina.FAIRY, ocarina.TIME])
+def test_adult_fairy_stock_keeps_the_native_minuet_lesson(compiled, selected):
+    _, scenes, charts, rows = compiled
+    scene = next(scene for scene in scenes if scene.name == "forest")
+    current = state(child=False, selected=selected, fairy=1)
+    trace, transitions = run(charts, rows, scene.flow, scene.entry, current, stop_native=True, data_only=True)
+    # Stop before the native caller starts Player_Event, earlier than its movie transition.
+    assert trace[-1] == (scene.flow, scene.cut), (selected, transitions, trace)
+    assert not transitions, (selected, transitions, trace)
+    assert not current.get("grants"), current

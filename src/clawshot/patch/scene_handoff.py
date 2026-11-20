@@ -3,7 +3,7 @@
 The data names the early cut, native resume, grant and ordered retained effects.
 A separate ordinary FlowchartEvent runs the shared GetPouchContent get window and
 actual pouch add. Native cinematic entries never start on the replacement path.
-Usable-instrument callers retain their entire original graph.
+Callers with either ocarina in stock retain their entire original graph.
 """
 
 import copy
@@ -102,49 +102,26 @@ def _table_transform(before: byml.Document, after: byml.Document):
 
 
 def _usable(chart: evfl.Flowchart) -> None:
-    """Native equality/Bool/pouch ABI: 0=true/held; explicit return 0=usable."""
+    """Native pouch ABI: 0=held; return 0 if either ocarina has stock, regardless of age/selection."""
     if any(entry.name == USABLE for entry in chart.entry_points):
         raise PatchError("scene handoff: instrument helper already installed")
-    game, string = keys._operation(chart, "GameDataActor", "queries", "EventQueryIsGameDataString64")
-    _, boolean = keys._operation(chart, "GameDataActor", "queries", "EventQueryIsGameDataBool")
     pouch, held = keys._operation(chart, "PouchSystemActor", "queries", "EventQueryIsExistInPouch")
     start = len(chart.events)
     chart.events.extend(
         [
             evfl.SwitchEvent(
-                USABLE + "Time",
-                game,
-                string,
-                [(0, start + 1), (1, start + 2)],
-                {"GameDataName": ocarina.EQUIPPED, "Index": -1, "Value": ocarina.TIME},
-            ),
-            evfl.SwitchEvent(
                 USABLE + "TimeHeld",
                 pouch,
                 held,
-                [(0, start + 5), (1, start + 6)],
+                [(0, start + 2), (1, start + 1)],
                 {"Actor": ocarina.TIME, "Num": 1},
-            ),
-            evfl.SwitchEvent(
-                USABLE + "Fairy",
-                game,
-                string,
-                [(0, start + 3), (1, start + 6)],
-                {"GameDataName": ocarina.EQUIPPED, "Index": -1, "Value": ocarina.FAIRY},
             ),
             evfl.SwitchEvent(
                 USABLE + "FairyHeld",
                 pouch,
                 held,
-                [(0, start + 4), (1, start + 6)],
+                [(0, start + 2), (1, start + 3)],
                 {"Actor": ocarina.FAIRY, "Num": 1},
-            ),
-            evfl.SwitchEvent(
-                USABLE + "Child",
-                game,
-                boolean,
-                [(0, start + 5), (1, start + 6)],
-                {"GameDataName": "Sequence_IsChildhood", "Index": -1},
             ),
             evfl.ReturnEvent(USABLE + "Yes", 0),
             evfl.ReturnEvent(USABLE + "No", 1),

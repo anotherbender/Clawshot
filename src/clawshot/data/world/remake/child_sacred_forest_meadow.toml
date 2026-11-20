@@ -22,9 +22,9 @@
 # So the Wolfos grotto opens with the Song of Storms, and N64's storms grotto scrubs are gone.
 
 [locations."Song from Saria"]
-rule = "is_child and 'Met Child Zelda' and Ocarina and (is_child or (Ocarina, 2))"
+rule = "is_child and 'Met Child Zelda' and Ocarina"
 was = "is_child and at('HC Garden Skippable Locations', is_child)"
-source = "Section46 / r14-steps AINB census: SacredForestMeadow_Child_Prefab_3265 node0 creates Saria only after DoorOfTime Step01; _bbc3 nodes3/5 create the unplayed-song trigger under the same predicate. Met Child Zelda models the complete courtyard/Impa sequence through DoorOfTime_SendOff Event7 (Step02), not merely entry into the garden or remote song ownership. Round 18 interim lesson rule (Kareem via Main, 2026-11-18; song_lessons.toml): Dm_MelodyGet_Saria runs the play-along Event135/Event85/Event86 before its song step Event109, so it needs an age-usable Ocarina (age_ocarina.toml)."
+source = "Section46 / r14-steps AINB census: SacredForestMeadow_Child_Prefab_3265 node0 creates Saria only after DoorOfTime Step01; _bbc3 nodes3/5 create the unplayed-song trigger under the same predicate. Met Child Zelda models the complete courtyard/Impa sequence through DoorOfTime_SendOff Event7 (Step02), not merely entry into the garden or remote song ownership. Round 18 interim lesson rule (Kareem via Main, 2026-11-18; revised 2026-11-20, song_lessons.toml): Dm_MelodyGet_Saria runs the play-along Event135/Event85/Event86 before its song step Event109, so it needs an Ocarina."
 
 [exits."SFM Entryway"."SFM Wolfos Grotto"]
 rule = "can_play(Song_of_Storms)"

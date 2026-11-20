@@ -18,9 +18,9 @@
 # `at_dampe_time` (cross-area decision, Main, round 4; native clock predicate, round16).
 
 [events."HC Garden Skippable Locations"."Met Child Zelda"]
-rule = "is_child and Ocarina and (is_child or (Ocarina, 2))"
+rule = "is_child and Ocarina"
 new = true
-source = "Section46: Met Child Zelda models completion of the courtyard AND Impa lesson/accepted send-off through DoorOfTime Step02, not first courtyard contact. HyruleCastle_Prefab_941f requests the meeting at Goto_HyruleCastle Step04; Goto_HyruleCastle Event30/32 completes it and initializes DoorOfTime Step01. Step01 Impa talk starts Dm_MelodyGet_Zelda; the after-lesson talk Event124 reserves HyruleField_DoorOfTime_SendOff, whose Event7 writes Step02 without an additional inventory/stone test. Same route as HC Zeldas Letter and Song from Impa; Hyrule Castle Grounds -> HC Garden requires Weird Egg or Chicken (OoTR Overworld.json:1379), representing Talon's wake-up. Round 18 interim lesson rule (Kareem via Main, 2026-11-18; song_lessons.toml): DoorOfTime_AreaOut Event68 offers the other send-off (Event131) only once HavePlayedEvent.Dm_MelodyGet_Zelda, otherwise Impa walks Link back; the send-off therefore needs the lesson's age-usable Ocarina (age_ocarina.toml)."
+source = "Section46: Met Child Zelda models completion of the courtyard AND Impa lesson/accepted send-off through DoorOfTime Step02, not first courtyard contact. HyruleCastle_Prefab_941f requests the meeting at Goto_HyruleCastle Step04; Goto_HyruleCastle Event30/32 completes it and initializes DoorOfTime Step01. Step01 Impa talk starts Dm_MelodyGet_Zelda; the after-lesson talk Event124 reserves HyruleField_DoorOfTime_SendOff, whose Event7 writes Step02 without an additional inventory/stone test. Same route as HC Zeldas Letter and Song from Impa; Hyrule Castle Grounds -> HC Garden requires Weird Egg or Chicken (OoTR Overworld.json:1379), representing Talon's wake-up. Round 18 interim lesson rule (Kareem via Main, 2026-11-18; revised 2026-11-20, song_lessons.toml): DoorOfTime_AreaOut Event68 offers the other send-off (Event131) only once HavePlayedEvent.Dm_MelodyGet_Zelda, otherwise Impa walks Link back; the send-off therefore needs the lesson's Ocarina."
 
 [events."HC Garden"."Time Flows"]
 rule = "is_child and 'Met Child Zelda' and 'Field Owl Arrival'"

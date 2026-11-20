@@ -104,17 +104,10 @@ def run(charts, rows, flow, entry, current, *, stop_native=False, data_only=Fals
             elif operation == "SyntheticPoseWait":
                 if stop_native:
                     return "native"
-                usable = (
-                    current.get(ocarina.EQUIPPED) == ocarina.TIME
-                    and current["stock"].get(ocarina.TIME, 0) > 0
-                    or current["Sequence_IsChildhood"]
-                    and current.get(ocarina.EQUIPPED) == ocarina.FAIRY
-                    and current["stock"].get(ocarina.FAIRY, 0) > 0
-                )
+                usable = any(current["stock"].get(actor, 0) > 0 for actor in (ocarina.FAIRY, ocarina.TIME))
                 if not usable:
                     raise AnimationWait((contexts, trace))
             elif operation == "EventTriggerAddOrRemovePouchContent":
-                assert "NativeScene" not in contexts or current.get(ocarina.EQUIPPED), contexts
                 content = params["Actor"]
                 current["stock"][content] = current["stock"].get(content, 0) + params["Num"]
                 current["IsGet." + content] = True
@@ -244,12 +237,12 @@ def fixture(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize("child", [False, True])
 @pytest.mark.parametrize("selected", ["", ocarina.FAIRY, ocarina.TIME, "InvalidInstrument"])
-@pytest.mark.parametrize("owned", [False, True])
-def test_actual_grant_or_native_lesson_follows_active_age_usable_instrument(fixture, child, selected, owned):
+@pytest.mark.parametrize("fairy,time", [(0, 0), (1, 0), (0, 1), (1, 1)])
+def test_actual_grant_or_native_lesson_follows_either_ocarina_stock(fixture, child, selected, fairy, time):
     scene, original, build = fixture
     _, charts, rows = build()
-    current = state(child=child, selected=selected, fairy=int(owned), time=int(owned))
-    usable = owned and (selected == ocarina.TIME or child and selected == ocarina.FAIRY)
+    current = state(child=child, selected=selected, fairy=fairy, time=time)
+    usable = bool(fairy or time)
     if not usable:
         with pytest.raises(AnimationWait):
             run(

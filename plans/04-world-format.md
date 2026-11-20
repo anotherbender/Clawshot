@@ -409,12 +409,13 @@ There is no reverse race return. Its windmill exit and access event require Hook
 Ordinary `Kak Windmill` access from the village is unchanged. Native boundary facts and unresolved whole-world
 audit questions are in `rounds/r18-logic.md`.
 
-All twelve song-lesson checks require an age-usable Ocarina pending Track G's scene fix: child may use
-either instrument; adult requires Ocarina of Time. Their existing source/age prerequisites stay intact.
+All twelve song-lesson checks conservatively require either Ocarina at either age. Kareem's
+2026-11-20 adult-Fairy Minuet control played the native lesson and gave its shuffled reward;
+r18 issue34 also observed adult Fairy playing Sun's Song. The former adult Time-only lesson
+restriction was therefore removed; source/age/story/combat prerequisites stay intact.
 The post-lesson `Met Child Zelda` send-off and `Ice Cavern End Chest Access` event match the lesson guard.
-The moat Ocarina item and Iron Boots chest reward precede their lessons, so those reward rules stay unchanged.
-Evidence: Kareem's played no-ocarina Minuet softlock and Ocarina control (2026-11-18), native twelve-flow trace
-in `rounds/r18-logic.md`; this changes logic, not native scene triggering.
+The moat Ocarina item and Iron Boots chest reward precede their lessons and remain ungated by it.
+Ordinary song-playing helpers and Door item requirements are unchanged. Evidence: `rounds/r19-scenes.md`.
 
 Every solo goal proof also refuses failures in the native verified-region scope. External placements,
 which still skip the solo goal/first-pull proofs, run that same scoped physical-trap refusal. This changes

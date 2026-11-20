@@ -1,7 +1,7 @@
 # Round 19 Track scenes — cs19a
 
 Agent/model: `openai-codex/gpt-6.1-sol`; branch `r19/scenes`; base `d9deb65`.
-Status: **READY — play-held**. Automated gate and 300-seed sweep complete; staged gameplay checks remain unplayed.
+Status: **Revising after Kareem's played controls** — stock-only dispatch and adult-Fairy lesson logic; gate/rebuilt Minuet boot-check pending.
 The round overview and this track file were absent at intake; the user brief supplies round scope.
 
 ## Mechanism proposed before broad edits
@@ -12,7 +12,7 @@ One scene-handoff compiler, driven by entries in a scene data file. Each entry n
 - the **caller** flow/entry and early cut point before any instrument pose, dialogue or parallel lesson;
 - the native continuation after the omitted sequence;
 - the ordered native state-write event references to retain, plus explicit histories of omitted event transitions;
-- activation: no active age-usable instrument (always enabled), or the separate default-off `skip_saria_farewell` setting.
+- activation: both ocarina stocks zero (always enabled), or the separate default-off `skip_saria_farewell` setting.
 
 The caller dispatches to a per-check entry in one generated `Clawshot_SceneGet` flow, registered as an ordinary
 `FlowchartEvent` at `PlayerPos`, with no animation resources (native donor: `KokiriForest_ArriveLostWood`).
@@ -27,10 +27,10 @@ named native tail. State is not reconstructed from item ownership. New subflow c
 that reaches them, and both event registries receive the normal event/preload declarations. Usable-instrument
 arms retain their entire original caller and cinematic graphs; the added dispatch is outside both.
 
-Active instrument means `PlayerStatus.EquipOcarina` **and** the selected instrument's current pouch stock, not
-historical `IsGet` or the maximum owned tier. Fairy is permitted only for child; Time at either age. Empty, other,
-missing-stock and adult-Fairy selections take plain-get. Queries are shared in `GetPouchContent`, avoiding new
-GameData actors in cinematic callers. Native query ABI must be pinned with native examples.
+Current rule (Kareem, 2026-11-20): native lesson if **either** ocarina has pouch stock, at either age.
+Selection and historical `IsGet` do not participate. Only zero stock for both instruments takes plain-get.
+The original active-selector/child-only-Fairy premise was disproved by the played adult-Fairy Minuet control.
+Pouch queries are shared in `GetPouchContent`, avoiding new GameData actors in cinematic callers.
 Minuet's early dispatch must precede Event107 `C08-Ocarina-Hold` (`IsWaitEnd=true`), not just Event9's later shared
 learning call. All twelve lessons need the same treatment, with Time's two distinct rewards and Sun's multi-file
 sequence explicitly represented. Caller quest/send-off/chest continuations remain native.
@@ -74,16 +74,16 @@ its isolated library root was `work/r19-scenes/ui-empty-seeds`, never the player
 
 ## Scope fences and verification plan
 
-No Track A rule relaxation, fill algorithm, placement restriction, location or logic change is planned. Any safe
-no-instrument proof will produce a proposal only; logic remains conservatively instrument-gated in this track.
+Original scope held Track A unchanged. Kareem's 2026-11-20 follow-up explicitly authorizes removing the
+adult Time-only lesson restriction: either ocarina is sufficient; all non-instrument prerequisites stay intact.
 A small Settings-only `generate/fill.py` edit was requested on the thread before touching its owner's file.
 The Saria option must round-trip through CLI, CS1, spoiler and the schema-driven app, default off.
 Existing `pack/resources.toml` already includes all `Event/EventFlow/*.bfevfl.zs`; any new non-covered input will
 be named there and in a private layered fixture, never written into the shared dump.
 
-Required staged Longshot 3.0.0 checks, each with an identical main-control packet: adult Minuet with only Fairy
-(control freezes), one child lesson with no instrument, and Saria's bridge with option on. Use natural archived
-save copies where possible; disclose at most one unavoidable same-value edit in both arms. No player seed/save
+Original staged checks were adult-Fairy Minuet, child no-instrument lesson, and Saria farewell-on.
+The Minuet control **did not freeze**: it played the native lesson and gave Boomerang. The replacement packet
+uses the same archived adult save, with exactly one stock edit for its missing-instrument arm. No player seed/save
 writes. Stage from the current Longshot template; Claude boot-checks and Kareem plays. Exact paths, state
 predicates, loaded-file evidence and unmeasured time estimates will be recorded before handoff.
 
@@ -292,3 +292,47 @@ lines, real reward stock, source histories, Save/Continue/re-entry and clean nat
 **No game was launched by cs19a. READY means ready for the staged maintainer play, not gameplay acceptance.**
 Claude boot-checks; Kareem verifies visuals/control/persistence. Track A's instrument requirement stays unchanged.
 Other scene applicability and required evidence remain listed above, without implementing those broader skips.
+
+## Played results and stock-only correction — 2026-11-20
+
+Kareem reports all three original candidates **PASS**: Minuet immediately gave Boomerang with correct text
+and no scene; Impa immediately gave Boomerang without the lesson, then completed the normal Field send-off;
+Saria gave Ocarina of Time with correct text and went straight to Field without the farewell. Saria briefly
+popping into view is cosmetic. These are Kareem's actual observations, not agent-replayed checks.
+
+The Minuet **control also passed its native lesson with adult Fairy Ocarina** and gave Boomerang. Together
+with r18 issue34's adult Sun's Song observation, this disproves this track's original adult-Fairy softlock
+premise. Earlier control-freeze predictions and age/selector dispatch descriptions are superseded.
+The actual missing-instrument softlock is zero stock of both ocarinas.
+
+Kareem's requested correction: keep encounters with either instrument; check current pouch stock only.
+The shared guard now uses two native pouch queries and returns native for either stock>=1, independent
+of age, selection and historical ownership. Source grants/continuations and the separate Saria option
+are unchanged. The lesson-specific logic overlays likewise admit either ocarina at either age, retaining
+their original age/story/combat/source predicates and conservative no-instrument requirement.
+
+Rebuild Minuet in a **fresh** packet: adult Fairy stock1 keeps the native lesson; the same archived save
+with exactly one disclosed Fairy `StockNum`1->0 edit takes the normal-get skip. No age, selector, IsGet,
+story or Time-stock edits. Old played packets/users and source archives remain untouched.
+Corrected dispatch, logic sweep, full gate and Claude's new boot-check remain pending at this entry.
+
+### Corrected focused proof
+
+`OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run pytest tests/test_scene_handoff.py
+tests/test_scene_handoff_dump.py tests/test_song_lessons.py tests/test_sheik_logic.py
+tests/test_dungeon_rewards.py::test_owned_door_is_separate_from_native_completion_readers
+tests/test_dungeon_rewards.py::test_completion_overrides_retain_either_ocarina_song_lessons
+tests/test_story_steps_darunia.py tests/test_story_steps_fire.py -q --tb=short --maxfail=1`:
+**190 passed in21.20s**. Edited Python format/lint checks also pass.
+
+The stock matrix covers child/adult, empty/Fairy/Time/invalid selections and independent stock combinations;
+historical Time ownership is deliberately true even for stock0. Real native serialized Minuet routes with adult
+Fairy reach the unchanged caller's first `Player_Event` action (`Event26`, `EventTriggerPlayerEventStartWithDrawn`),
+not the replacement event. Stock0 reaches the real shared grant path. Existing ordinary grant/once/continuation
+checks stay intact. The initial new native positive assertion stopped at that first Player action before the
+movie transition; its printed payload identified the correct native boundary, now asserted directly.
+
+Lesson-specific source overlays, Ice/Impa post-lesson events and dungeon-reward/count-bridge rule copies now
+accept Fairy as adult. No-instrument lesson refusal and non-instrument prerequisites remain covered.
+Ordinary `can_play*`/Mido/warp policy and genuine Door-of-Time item requirements are unchanged; their
+age-metadata rationale is not presented as proof that adult Fairy cannot play lessons.

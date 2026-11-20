@@ -252,11 +252,11 @@ native grants and admission rules, not a claim that every item/age pair has been
 The [round18 audit](../plans/rounds/r18-equipment.md) separates played results, native-data evidence
 and unverified boundaries. Wrong-age item-bar precautions remain [below](#hints-models-and-age-warnings).
 
-Lessons retain main's native ocarina sequence. Round18's attempted no-usable-ocarina bypass was withdrawn
-after Kareem's adult/Fairy-only Minuet check froze following the demonstration (2026-11-19).
-This includes every child/Impa and adult bypass; the physical repair is deferred.
-Logic requires an ocarina for lessons: either as child, Ocarina of Time as adult. Walking into an automatic
-lesson without the required instrument can still freeze the game, even though logic avoids that route.
+Round18's attempted late lesson bypass was withdrawn. Kareem's round19 control on 2026-11-20
+established that adult Link **can** play the native Minuet lesson with the Fairy Ocarina and
+receive its shuffled reward, consistent with round18 issue34's adult Sun's Song check.
+Lessons therefore accept either ocarina at either age; the no-instrument case needs the early
+caller handoff described below, not an age-based skip.
 
 ## Shops and scrub prices
 
@@ -361,16 +361,18 @@ actual reward through the normal get window. It preserves the source's completio
 and native travel/lighting continuation. `--no-skip-saria-farewell` restores the native sequence.
 This is separate from fast start's Saria **opening** scene and from skippable dialogue.
 
-An always-on softlock guard replaces song lessons with a normal item get when the **active**
-ocarina cannot be used at Link's age: the selected instrument must have stock, with Fairy
-usable only by child Link and Time usable at either age. Historical ownership is insufficient.
-The native lesson remains when that selection is usable. Shuffled lessons give the placed
-reward, not an additional vanilla song; native quest, scene-history and once-only effects remain.
-The moat's item and Time-song reward are distinct and both survive its replacement.
+An always-on softlock guard replaces song lessons with a normal item get only when **both**
+Fairy Ocarina and Ocarina of Time have zero pouch stock. Either instrument keeps the entire
+native lesson at either age, regardless of the selected instrument or historical `IsGet` flags.
+Shuffled lessons give the placed reward, not an additional vanilla song; native quest,
+scene-history and once-only effects remain. The moat's item and Time-song reward are distinct
+and both survive its replacement.
 
-Both handoffs are **built, not played** pending their Longshot 3.0.0 candidate/control checks.
-Logic still conservatively requires an age-usable ocarina for lessons; this guard does not
-relax access rules or enable general Great Fairy/Rauru/story-scene skips.
+Kareem passed the Minuet/Impa normal-get handoffs and Saria farewell skip on Longshot 3.0.0
+on 2026-11-20. The Minuet control also passed with adult Fairy; the corrected stock-only
+dispatch awaits its paired adult-Fairy/native and no-ocarina/skip check. Logic still
+conservatively requires **any** ocarina for lessons; this does not enable general Great
+Fairy/Rauru/story-scene skips or remove non-instrument prerequisites.
 
 ## Dungeon rewards and Ganon's Castle bridge
 
@@ -390,7 +392,7 @@ Boss deaths, blue warps, sage scenes, world restoration, carpenters/card and rev
 time travel remain completion-driven. Prelude follows Forest completion; Light Arrows
 follow the Shadow and Spirit awakening scenes, not their medallions. Logic matches
 these separate ownership and completion predicates.
-Song lessons still require an age-usable ocarina even when their rewards are shuffled.
+Song lessons still require either ocarina, at either age, even when their rewards are shuffled.
 The moat item precedes its Time-song lesson, so the item check itself needs no instrument.
 The native animated emblem in each sage/stone scene remains its source symbol;
 the acquisition window, owned reward and Zelda Notes target follow the shuffled item.

@@ -1,6 +1,7 @@
-# Early sword pulls can carry Fairy Ocarina into adulthood. Native PouchTable permits
-# Fairy only as child, Time as both (section37 / r9-itembar); section41 adds early-door modes.
-# An abstract Ocarina count of one must not let an adult play Saria through Mido.
+# Conservative ordinary song-playing policy, distinct from song-lesson admission.
+# The native PouchTable age metadata cited below does not prove lesson usability:
+# Kareem played adult-Fairy Minuet and Sun's Song (2026-11-20 / r18 issue34).
+# Lesson rules now accept either instrument. Ordinary playing/Mido/warp policy stays unchanged here.
 [helpers."can_play(song)"]
 was = "(Ocarina or can_oi) and song and (not shuffle_individual_ocarina_notes or has_all_notes_for_song(song))"
 rule = "((Ocarina and (is_child or (Ocarina, 2))) or can_oi) and song and (not shuffle_individual_ocarina_notes or has_all_notes_for_song(song))"

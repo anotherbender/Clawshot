@@ -1,52 +1,53 @@
-# Round 18 interim song-lesson rule (Kareem via Main, 2026-11-18): every Dm_MelodyGet_* lesson needs an
-# age-usable Ocarina: the Fairy Ocarina as child only, the Ocarina of Time at both ages (age_ocarina.toml).
+# Interim song-lesson rule (Round 18, Kareem via Main, 2026-11-18; revised 2026-11-20): every Dm_MelodyGet_*
+# lesson needs an Ocarina, either instrument at either age (the Ocarina alias). Kareem's 2026-11-20 round-19
+# Minuet control (adult, Fairy Ocarina only, main build) played the native lesson and granted its reward,
+# and round 18's issue #34 adult-Fairy control played Sun's Song, so no lesson asks an adult for the Ocarina of
+# Time. Generic song playing keeps its own instrument ages (age_ocarina.toml).
 # Native (build e0f3ccfa, read-only trace in E:/OOTRemake/work/r18-logic/song-lessons): each lesson runs
 # Dm_SY_Ocarina LearningOcarinaPlayExample, LearningOcarinaFollowExample (EventWaitOcarinaInputForLearning with
 # EventPlayerPlayOcarinaFree: Link plays it himself) and LearningOcarinaPlayAuto(ForSeek) before its song step.
 # The gift patch skips only the play-along's add step (03-game-data.md section 19), so a shuffled reward still
-# waits for the lesson. Track G owns forced-scene safety; this keeps logic from relying on an unplayable lesson.
+# waits for the lesson. Track G owns forced-scene safety; logic does not rely on the no-instrument path.
 # Lessons with an existing override are guarded there: Sheik at Temple (sheik.toml), Song from Ocarina of Time
-# (child_hyrule_field.toml), Song from Saria (child_sacred_forest_meadow.toml). Song from Malon's translated rule
-# already needs a child Ocarina (lon_lon_ranch.toml:26). Events written only after a lesson match it: Met Child
-# Zelda (child_hyrule_castle.toml) and Ice Cavern End Chest Access (adult_lake_hylia.toml). Rewards given before
-# a lesson (HF Ocarina of Time Item, Dm_MelodyGet_Time Event70; Ice Cavern Iron Boots Chest) are not guarded.
+# (child_hyrule_field.toml), Song from Saria (child_sacred_forest_meadow.toml); dungeon_rewards.toml's completion
+# copies of Song from Ocarina of Time and Sheik in Kakariko keep the same guard. The translated Song from Malon
+# (lon_lon_ranch.toml:26) and Song from Windmill (kakariko.toml:207; Dm_MelodyGet_Storm first input Event36, then
+# play-along Event6/Event9/Event13 before its song step Event29) rules already need an Ocarina. Events written only
+# after a lesson match it: Met Child Zelda (child_hyrule_castle.toml) and Ice Cavern End Chest Access
+# (adult_lake_hylia.toml). Rewards given before a lesson (HF Ocarina of Time Item, Dm_MelodyGet_Time Event70;
+# Ice Cavern Iron Boots Chest) are not guarded.
 
 [locations."Sheik at Colossus"]
-rule = "Ocarina and (is_child or (Ocarina, 2))"
+rule = "Ocarina"
 was = "True"
 source = "Interim lesson rule (header): Dm_MelodyGet_Spilit runs the play-along Event8/Event9/Event19 before its song step Event17."
 
 [locations."Sheik in Crater"]
-rule = "is_adult and Ocarina and (is_child or (Ocarina, 2))"
+rule = "is_adult and Ocarina"
 was = "is_adult"
 source = "Interim lesson rule (header): Dm_MelodyGet_Fire runs the play-along Event2/Event3/Event91 before its song step Event192."
 
 [locations."Sheik in Forest"]
-rule = "is_adult and Ocarina and (is_child or (Ocarina, 2))"
+rule = "is_adult and Ocarina"
 was = "is_adult"
 source = "Interim lesson rule (header): Dm_MelodyGet_Forest runs the play-along Event7/Event9/Event32 before its song step Event22."
 
 [locations."Sheik in Ice Cavern"]
-rule = "(is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)) and Ocarina and (is_child or (Ocarina, 2))"
+rule = "(is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)) and Ocarina"
 was = "is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Interim lesson rule (header): the Iron Boots chest's SageOfWater:IceCavern_WaterSerenade gives the chest reward (Dm_SY_Treasurebox) first, then Dm_MelodyGet_Water runs the play-along Event16/Event2/Event14 before its song step Event29."
 
 [locations."Sheik in Kakariko"]
-rule = "is_adult and Forest_Medallion and Fire_Medallion and Water_Medallion and Ocarina and (is_child or (Ocarina, 2))"
+rule = "is_adult and Forest_Medallion and Fire_Medallion and Water_Medallion and Ocarina"
 was = "is_adult and Forest_Medallion and Fire_Medallion and Water_Medallion"
 source = "Interim lesson rule (header): Dm_MelodyGet_Shadow runs the play-along Event12/Event13/Event23 before its song step Event21."
 
 [locations."Song from Impa"]
-rule = "Ocarina and (is_child or (Ocarina, 2))"
+rule = "Ocarina"
 was = "True"
 source = "Interim lesson rule (header): DoorOfTime Step01_Npc_Hylia_Impa_Child_Talk starts Dm_MelodyGet_Zelda, which runs the play-along Event27/Event49/Event50 before its song step Event111."
 
 [locations."Song from Royal Familys Tomb"]
-rule = "(is_adult or Slingshot or Boomerang or Sticks or has_explosives or Kokiri_Sword) and Ocarina and (is_child or (Ocarina, 2))"
+rule = "(is_adult or Slingshot or Boomerang or Sticks or has_explosives or Kokiri_Sword) and Ocarina"
 was = "is_adult or Slingshot or Boomerang or Sticks or has_explosives or Kokiri_Sword"
 source = "Interim lesson rule (header): GimmickFlow_RoyalFamilyTomb CheckStone_To_MelodyGet_Sun plays Dm_MelodyGet_Sun (play-along child Event0/Event106/Event107, adult Event3/Event145/Event146) before Event57 starts Dm_MelodyGet_Sun_03, whose Event34 is the song step."
-
-[locations."Song from Windmill"]
-rule = "is_adult and Ocarina and (is_child or (Ocarina, 2))"
-was = "is_adult and Ocarina"
-source = "Interim lesson rule (header): Dm_MelodyGet_Storm has Link play first (Event36) and runs the play-along Event6/Event9/Event13 before its song step Event29; the translated Ocarina count let an adult use the child-only Fairy Ocarina."
