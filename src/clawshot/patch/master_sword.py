@@ -178,12 +178,10 @@ def pedestal_transform(actor: str) -> Callable[[bytes], bytes]:
             or fc.events[grant.next].flowchart != "ReplaceEquipmentForEraChange"
         ):
             raise PatchError(f"Master Sword: changed first-pull grant: {grant!r}")
-        # Source's native first-pull history gates this grant; repeat draws never visit it.
-        # Standard get pipeline supplies the actual reward's window, non-forced grant and autosave.
-        fc.events[at] = evfl.SubFlowEvent(
-            grant.name, "GetPouchContent", "GetPouchContentByActorName", grant.next, {"ActorName": actor}
-        )
-        _register(fc, at)
+        # This is still the white-faded first-pull boot handoff, before the age
+        # write and Rauru reservation. Do not hold it on a get-window/dialog wait.
+        # Keep the native nonblocking receipt; only its reward/equip policy changes.
+        fc.events[at] = replace(grant, params={**grant.params, "Actor": actor, "IsEquipDIrect": False})
         return _write(doc)
 
     return apply

@@ -401,8 +401,10 @@ Off, the first pull grants and equips the Master Sword natively, and existing se
 spoiler settings keep their bytes.
 
 On, the Temple of Time pedestal's first pull becomes its own check, **Master Sword Pedestal**, which
-gives one ordinary shuffled item instead of the sword; progressive copies cannot go there. Rauru's
-reward, the first-pull and first-arrival scenes and the Door's completion stay native. The
+gives one ordinary shuffled item instead of the sword; progressive copies cannot go there. The
+reward uses the native nonblocking pouch receipt, without a separate get window, to preserve the
+white-faded handoff before the age write.
+Rauru's reward, the first-pull and first-arrival scenes and the Door's completion stay native. The
 **Master Sword** item (`Weapon_Sword_Master`) goes only to shuffled chests. The pedestal still moves
 Link between ages in both directions, and changing age neither gives nor removes the sword: adult
 Link has no Master Sword until he finds it. Logic models that adult without a blade; an owned
@@ -422,10 +424,12 @@ maintainer decision ([round 19 sword](../plans/rounds/r19-sword.md)):
   logic has `free_time_travel=true`. `--print-settings` only encodes the string and does not check
   this requirement, so a printed string can still be refused when you generate.
 
-**Built, not played; held for play.** Its staged checks with a control built from main are pending:
-first pull without owning the sword (control: the native grant and equip), equipping the Master Sword
-after finding it in a chest, and an age round trip that neither loses nor creates it. Design and native
-data trace: [round 18 Master Sword design](../plans/rounds/r18-master-sword-design.md).
+**Play-held after a played failure.** Kareem's main control granted the Light Medallion and Master
+Sword as expected; the original candidate froze under a white screen after the pull movie. The
+native-receipt repair requires replay: first pull without owning the sword, equipping it after finding
+it in a chest, and a real age round trip that neither loses nor creates it. Design, deviation and
+evidence: [round 19 sword](../plans/rounds/r19-sword.md) and
+[round 18 Master Sword design](../plans/rounds/r18-master-sword-design.md).
 
 ## Door of Time and returning to child
 

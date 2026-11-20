@@ -226,19 +226,74 @@ def test_finale_refuses_before_safety_save_without_sword_but_preserves_dream(rom
 
 
 @pytest.mark.dump
-def test_first_pull_replacement_keeps_age_chain_and_uses_real_reward(romfs):
-    before = evfl.read(native(romfs, "DoorOfTime"))
-    after = evfl.read(master_sword.pedestal_transform("Item_Boomerang")(native(romfs, "DoorOfTime")))
-    old = next(e for e in before.flowchart.events if e.name == "Event115")
-    new = next(e for e in after.flowchart.events if e.name == "Event115")
-    assert new == evfl.SubFlowEvent(
-        old.name, "GetPouchContent", "GetPouchContentByActorName", old.next, {"ActorName": "Item_Boomerang"}
-    )
-    # No changed scene, era, quest or first-pull gate can hide a second sword grant.
-    after.flowchart.events[after.flowchart.events.index(new)] = old
-    for entry, original in zip(after.flowchart.entry_points, before.flowchart.entry_points, strict=True):
-        entry.sub_flow_events = original.sub_flow_events
-    assert after == before
+@pytest.mark.parametrize("visibility", ["immediate", "buffered"])
+@pytest.mark.parametrize("owned", [False, True])
+def test_first_pull_credits_reward_and_reaches_adult_rauru_without_waiting_for_ui(romfs, visibility, owned):
+    door = evfl.read(master_sword.pedestal_transform("Item_Boomerang")(native(romfs, "DoorOfTime"))).flowchart
+    era = evfl.read(master_sword.era_transform(equipment.transform(native(romfs, "ReplaceEquipmentForEraChange"))))
+    get = evfl.read(native(romfs, "GetPouchContent")).flowchart
+    charts = {door.name: door, get.name: get}
+    state = initial("", owned=True, child=True)
+    state.update({f"IsGet.{MASTER}": owned, f"PouchData.{MASTER}.StockNum": int(owned)})
+    pouch = {KOKIRI: 1, MASTER: int(owned)}
+
+    def drive(entry):
+        pending = [(door, door.entry_point(entry).main_event)]
+        for _ in range(100):
+            if not pending:
+                return None
+            fc, at = pending.pop()
+            if at == evfl.NONE:
+                continue
+            event = fc.events[at]
+            params = getattr(event, "params", None) or {}
+            if isinstance(event, evfl.SubFlowEvent):
+                pending.append((fc, event.next))
+                if event.flowchart == era.flowchart.name:
+                    run(era.flowchart, state, pouch, child=True, visibility=visibility)
+                else:
+                    child = charts[event.flowchart or fc.name]
+                    pending.append((child, child.entry_point(event.entry_point).main_event))
+                continue
+            actor = fc.actors[event.actor]
+            if isinstance(event, evfl.SwitchEvent):
+                assert actor.queries[event.query] == "EventQueryHavePlayedEvent", event
+                pin = 0 if state.get("HavePlayedEvent." + params["EventName"], False) else 1
+                pending.append((fc, dict(event.cases)[pin]))
+                continue
+            op = actor.actions[event.action]
+            if op == "EventTransition":
+                state["HavePlayedEvent." + params["EventName"]] = True
+            elif op == "EventTriggerAddOrRemovePouchContent":
+                item = params["Actor"]
+                pouch[item] = pouch.get(item, 0) + params["Num"]
+                state[f"IsGet.{item}"] = True
+                state[f"PouchData.{item}.StockNum"] = pouch[item]
+                if params["IsEquipDIrect"]:
+                    state[EQUIPPED] = item
+            elif op == "EventTriggerSetGameDataBool":
+                state[params["GameDataName"]] = params["Value"]
+            elif op == "EventReserveBancChange":
+                return params
+            else:
+                # The pull movie deliberately leaves a white fade for the next boot event.
+                # Resolve native GetPouchContent calls too: its get-window setup must not
+                # hold this handoff on dialog input before the grant, age write and reserve.
+                assert op in ("EventWait", "EventTriggerBancRequestBeforehandLoad"), (fc.name, op, params, state)
+            pending.append((fc, event.next))
+        raise AssertionError(("first-pull handoff did not finish", state, pouch))
+
+    destination = drive("SageRoom_MeetGanondorf")
+    assert (destination["NextBanc"], destination["BootEventName"]) == ("SageRoom", "SageRoom_MeetRauru")
+    assert state["Sequence_IsChildhood"] is False
+    assert state["IsGet.Item_Boomerang"] is True
+    assert state["PouchData.Item_Boomerang.StockNum"] == 1
+    assert state[f"IsGet.{MASTER}"] is owned
+    assert pouch[MASTER] == int(owned)
+    assert state[EQUIPPED] == (MASTER if owned else "")
+    # A real repeat draw takes the existing era-travel scene, not the first-pull reward.
+    drive("DoorOfTime_Draw")
+    assert pouch["Item_Boomerang"] == 1
 
 
 @pytest.mark.dump
