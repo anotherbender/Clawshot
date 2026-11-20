@@ -229,6 +229,8 @@ D11 keeps cows out (`plans/decisions.md:28-29`). Current floor hearts deliberate
 and all copies (`src/clawshot/patch/freestanding.py:1-5,50-66`), with a five-item palette
 (`src/clawshot/patch/drops.py:23-29`; `src/clawshot/patch/freestanding.py:120-133`). Floor/jail keys have a
 separate recovery/once-only contract (`plans/rounds/r18-keys.md:36-50,143-173`).
+All nine translated cow checks are explicitly excluded as non-one-time sources
+(`src/clawshot/data/world/remake.toml:211-247`), not just hidden by a UI toggle.
 
 The [0.4.0 note][R40] separately ties Skulltula retirement to collecting its dropped reward, not merely
 killing it. Our generated pickup retains the native collection graph/source-Hash contract
@@ -254,14 +256,21 @@ one-time price/hint failures. [PR45][P45] adds fairy price controls but says tha
 **Clawshot exposure:** native display-only shelves are an intentional narrower contract, not support
 for arbitrary majors or progressive deal shelves (`src/clawshot/generate/fill.py:333-358`;
 `plans/decisions.md:56-58`). Price selection is shared between logic and overlay, affordable10 or native
-with a cheap Kokiri Deku Shield exception (`src/clawshot/settings.py:38-53`). Merchant experiments remain
-held: Medigoron, Wasteland Bombchu seller and Granny potion
+with a cheap Kokiri Deku Shield exception (`src/clawshot/settings.py:38-53`).
+Wallet predicates use the native 200/500/1000 capacities (`src/clawshot/data/shops.toml:1765-1775`) and
+recompile the price clause without removing stock/story rules (`src/clawshot/world/shops.py:55-59,75-91`).
+`tests/test_settings_prices.py:13-65` covers exact prices removing conditional discounts, shuffled-only
+affordability, retained child/story/refill restrictions and item-scoped cheap shields. Our current
+once-scrub fixed prices span0–1000, default vanilla, not arbitrary merchant prices
+(`src/clawshot/data/settings.toml:13-17`); wallet boundaries and unchanged payment/once flow have coverage
+(`tests/test_shop_settings.py:92-128`). Those tests already cover existing policy; no duplicate test is proposed.
+Merchant experiments remain held: Medigoron, Wasteland Bombchu seller and Granny potion
 (`src/clawshot/data/world/remake/gifts.toml:86-100`). Cow/holder composition from PR21 is not offered here.
 Merchant success flags are deliberately inside native sale-success paths
 (`src/clawshot/patch/gifts.py:98-102,128-129`), not a receipt inferred from money/stock ownership.
 The held merchant prototype already has semantic refusal/shortfall/capacity, successful charge and
-saved-state repeat tests (`tests/test_gifts_merchants.py:179-234`). Its simulated reload is a state
-round-trip, not played acceptance; do not add duplicate tests or mistake the prototype for enabled shuffle.
+saved-state repeat tests (`tests/test_gifts_merchants.py:179-234`). Its simulated reload copies interpreter
+state, not a serialized save or played acceptance; do not mistake the prototype for enabled shuffle.
 
 **Proposal: nothing** to adopt their pricing/defaults/palette. Reuse the merchant tests already present.
 **Test to add** only for new price/shelf contracts before later commerce release: offered price = charged
