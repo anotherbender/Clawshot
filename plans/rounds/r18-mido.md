@@ -89,10 +89,23 @@ normal, rather than an orphaned blocker. No game was launched or save edited by 
 
 ## Gate queue
 
-Claude's current integration base is main `2d9ddefa2c16d5205f6a52d29a98d6c62c4b22b9` (F+G and E merged).
-On check 14's pass, cs18a is authorized to wait for cs18b's posted rebased head on that base, then
-stack Mido on cs18b, resolve `patch/__init__.py` additively, run focused tests and freeze the exact
-stacked head. **cs18b alone drives one combined full gate**; cs18a takes no lock and runs no separate
-gate or sweep. Do not rebase onto an unposted or stale cs18b head. Full gate remains pending; no READY
-claim until the combined gate passes. The original implementation is
-`421ef418389c9348d5bd89e25a41a8f298928ff4`; integration evidence follows when available.
+Main base is `2d9ddefa2c16d5205f6a52d29a98d6c62c4b22b9` (F+G and E merged).
+After both played checks passed, cs18b posted frozen rebased head
+`9a88aebd7e72a7332c48842e73fdc30661a55f6f`. All four Mido commits were successfully rebased onto
+that exact head. The `patch/__init__.py` conflict was resolved additively: retain Dampe/story safety,
+reward bridge and owned-reward Door arguments, add the kept-Mido expression/component, and preserve
+ocarina's final composition after source/progressive/bag transforms.
+
+The first scoped format check printed one adjacent-literal collapse in the synthetic Mido fixture;
+that exact formatting-only change was applied. Corrected scoped format and lint both passed.
+No game process was running at the focused-check process snapshot; the combined Mido and B ocarina,
+equipment, scrub, bag, get-item and gifts suites use native `OOT_ROMFS`, `-n 12` and internal workers1.
+Focused log: `E:/OOTRemake/work/r18-mido/stacked-focused.log`.
+
+Combined focused result: **413 passed in 192.26 s** across the 32 selected files, including native
+Mido and ocarina suites. No failed test or unchanged rerun. Source is frozen after this result;
+the final receipt commit includes only this evidence and the already-tested fixture formatting fix.
+
+**cs18b alone drives one combined full gate** on the frozen stacked handoff; cs18a takes no lock and
+runs no separate gate or sweep. No READY claim until that combined gate passes. The original Mido
+implementation is `421ef418389c9348d5bd89e25a41a8f298928ff4`; its behavior is unchanged by stacking.

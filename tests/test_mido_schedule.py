@@ -60,8 +60,7 @@ def schedule():
                 "EventEntry": [
                     {
                         "EventName": (
-                            "Work/Event/EventSetting/Npc_Kokiri_Mido_Child_C5_T."
-                            "engine__event__EventSettingParam.gyml"
+                            "Work/Event/EventSetting/Npc_Kokiri_Mido_Child_C5_T.engine__event__EventSettingParam.gyml"
                         )
                     }
                 ],
