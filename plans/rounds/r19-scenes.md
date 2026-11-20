@@ -1,7 +1,7 @@
 # Round 19 Track scenes — cs19a
 
 Agent/model: `openai-codex/gpt-6.1-sol`; branch `r19/scenes`; current code base `f5c679d` (original base `d9deb65`).
-Status: **READY — play-held**. Stock-only dispatch and adult-Fairy lesson logic gated; corrected Minuet pairs await Claude's boot-check.
+Status: **GATE DONE; candidate boot checks PASS; gameplay pending**. Kareem plays the v2 candidates first; controls optional. READY awaits his play.
 The round overview and this track file were absent at intake; the user brief supplies round scope.
 
 ## Mechanism proposed before broad edits
@@ -414,3 +414,16 @@ passes stand; this corrected dispatch has automated routing proof, not a claimed
 Kareem must see native adult-Fairy versus plain-get stock0, correct item/text/stock, clean controls, source
 completion and no duplicate after Save/Continue/re-entry. Saria's brief reported pop-in remains cosmetic and
 unchanged. No general encounter skip, generic song-playing/warp relaxation or Door item relaxation was added.
+
+## Claude's v2 boot checks — gameplay still pending
+
+Claude reports both Minuet stock-v2 **candidate boot checks PASS** on Longshot3.0.0:
+**27 RomFS entries each, crash0**. This is boot evidence, not observation of the lesson/grant branches.
+Scenes gate is ticked DONE; no new gate or sweep is required for this evidence-only update.
+
+Kareem's current list is **candidates first, controls optional**. The v2 checklist reflects that priority.
+Claude renamed the old played Minuet launchers under `work/r19-scenes/ingame` to
+`OLD v1 (played) - ...`; those names are left intact and must not be confused with the v2 packet.
+The corrected code/packet remains pinned to `84e5b261`; no code, saves or mods changed here.
+**READY awaits Kareem's v2 play**, including native lesson with Fairy stock1 versus normal-get skip
+with both stocks0, correct reward/text, clean controls and persistence. No new gameplay pass is claimed.
