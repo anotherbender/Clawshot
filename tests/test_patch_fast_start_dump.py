@@ -6,6 +6,8 @@ from clawshot.formats import byml, zsdic
 from clawshot.generate import Settings
 from clawshot.patch import make_seed, write_seed
 from clawshot.patch.gamedata import GAME_DATA_LIST, OPENING_FLOW, _find, opening_without_movie
+from clawshot.patch.mido_schedule import AFTER_CLEAR
+from clawshot.save import key
 
 pytestmark = pytest.mark.dump
 SLICE = ("KokiriForest", "LostWood", "InsideTheDekuTree")
@@ -23,4 +25,11 @@ def test_default_seed_removes_the_opening_movie_without_story_flags(romfs, tmp_p
     _, navi = _find(expected, "ActionGuide_IsEnd.Navi")
     navi["DefaultValue"] = True
     actual = byml.read(dicts.decompress(GAME_DATA_LIST, (target / "romfs" / GAME_DATA_LIST).read_bytes()))
+    # The kept-Mido guard adds an unsaved expression, never a story/save flag.
+    expressions = actual["Data"]["BoolExp"]
+    added = [row for row in expressions if row["Hash"] == key(AFTER_CLEAR)]
+    assert len(added) == 1
+    assert added[0]["SaveFileIndex"] == -1
+    assert added[0]["ResetTypeValue"] == 0
+    expressions.remove(added[0])
     assert byml.difference(actual, expected) is None

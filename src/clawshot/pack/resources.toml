@@ -12,6 +12,7 @@ files = [
     "Pack/Actor/Item_ZeldaLetter.pack.zs", # the custom items' donor pack
     "Event/EventFlow/EventFlowFileEntry.Product.110.byml.zs",
     "System/Resource/ResourceSizeTable.Product.111.Nin_Ounce_NVN2.rsizetable.zs",
+    "Component/AIScheduleParam/Npc_Kokiri_Mido_Child.game__component__AIScheduleParam.bgyml", # R18: kept-Mido schedule guard
     "Logic/Market_Common_f252.logic.module.ainb", # Round10 Door of Time open mode (cs10b)
     "Logic/HyruleField_Child_Prefab_0ce5.logic.module.ainb", # R16: late escape area
     "Logic/HyruleField_Child_Prefab_9e35.logic.module.ainb", # R16: escape storm

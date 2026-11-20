@@ -101,11 +101,18 @@ def test_written_files_differ_only_where_the_plan_says(romfs, tmp_path, seed_num
         need = rstb.required_size(path, len(data))
         expected_table.set(path, max(table.get(path), need))
     print(f"  other steps: {len(extra)} files")
+    # Raw preallocated components retain their native entry; the writer must not
+    # apply the compressed-resource size formula to these measured allocations.
+    raw = [file.path for file in output.fast_start_files]
+    for path in raw:
+        native_entry = table.get(path)
+        assert native_entry is not None, path
+        assert len((out / "romfs" / path).read_bytes()) <= (romfs / path).stat().st_size <= native_entry, path
 
     raised = expected_table != table
     files = sorted(p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file())
     table_file = [f"romfs/{rstb.TABLE_PATH}"] if raised else []
-    planned = [*plan.files(), *extra]
+    planned = [*plan.files(), *extra, *raw]
     assert files == sorted(["spoiler.json", "play-note.md", *(f"romfs/{p}" for p in planned), *table_file])
     if raised:
         new_table = rstb.read(dicts.decompress(rstb.TABLE_PATH, (out / "romfs" / rstb.TABLE_PATH).read_bytes()))
