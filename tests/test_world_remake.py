@@ -262,3 +262,16 @@ def test_the_300_and_500_rupee_fairies_need_the_adult_wallet(region: str, locati
     assert not search.can_access(world.locations[location], ADULT)
     search.collect("Adult Wallet")
     assert search.can_access(world.locations[location], ADULT)
+
+
+@pytest.mark.parametrize("shield", ["Hylian Shield", "Deku Shield"])
+def test_a_child_beats_the_kokiri_storms_grotto_scrubs_with_either_shield(shield: str):
+    """The grotto's Deku Scrub trio guards the chest; a child reflected their nuts with the Hylian Shield
+    (BBender, 2026-11-20). Only this grotto: the Deku Tree's scrubs still need has_shield."""
+    world = fountain("KF Storms Grotto")
+    chest = world.locations["KF Storms Grotto Chest"]
+    search = Search(world, [])
+    assert not search.can_access(chest, CHILD)
+    search.collect(shield)
+    assert search.can_access(chest, CHILD)
+    assert load_spec()["helpers"]["has_shield"] == "(is_adult and Hylian_Shield) or (is_child and Deku_Shield)"
