@@ -200,3 +200,47 @@ isolated before accepting it; never silently relabel an exit1 suite as exit0.
 No timeout widening or unrelated implementation change is authorized here.
 Merge remains blocked until 0.2.3 is published. No new in-game claim or save
 fixture is introduced by this rebase.
+
+## Accepted native-chain proof and merge — 2026-11-20
+
+Claude accepted the complete event-data chain and merged `c7dbc2b6` into main
+as merge commit `fa9d7ac`; main's intervening commits were documentation-only.
+**Lacs DONE. Static event data, no played minimum.**
+The following is the accepted proof, not an in-game two-sage-route claim.
+
+Native citations (paths below are relative to the read-only RomFS):
+
+- `Event/EventFlow/DoorOfTime.bfevfl.zs`, Event101 (first-pull Rauru scene) ->
+  Event96 boots `Market_Adult_AllSage_Start`.
+  `RSDB/EventSetting.Product.111.rstbl.byml.zs`, that row, maps directly to
+  `AllSage:Market_Adult_AllSage_Start`.
+- `Event/EventFlow/AllSage.bfevfl.zs`, first-adult entry:
+  Event9 -> Event0 -> Event2 -> Event74 -> Event153 -> Event1 ->
+  **Event18 writes AllSage Step01** -> Event19 initializes SageOfForest Step01.
+  No branch requires Forest, Fire or Water completion. The Forest write is
+  initialization, not a completion prerequisite.
+- `Event/EventFlow/Dm_SY_BancChange_EscapeDungeon.bfevfl.zs`, Shadow sage-room
+  path Event301 -> Event127 -> Event111 (awakening) -> Event126 (reward) ->
+  **Event130**; Spirit path Event302 -> Event144 -> Event133 (awakening) ->
+  Event143 (reward) -> Event141 -> Event177 -> **Event139**.
+  Both dispatch `SageRoom_Allsage_LastSage`, without other-sage or count tests.
+- EventSetting row `SageRoom_Allsage_LastSage` maps directly to
+  `AllSage:SageRoom_AllSage_LastSage`. Its entire entry is
+  **Event25** (`HavePlayedEvent.Dm_Awake_Spirit`) true ->
+  **Event26** (`HavePlayedEvent.Dm_Awake_Shadow`) true ->
+  **Event8** (`Dm_SageRoom_0010`) -> **Event20 writes AllSage Step02**.
+  The intervening movie and its Effect/Env child timelines contain no state
+  queries; their registrations add no Forest/Fire/Water eligibility condition.
+- `Logic/Market_Adult_Prefab_c668.logic.module.ainb`, nodes0-4:
+  AllSage Step02 plus Player contact requests the Light Arrows scene.
+  No medal, Prelude, awake-count or other-sage input exists in that module.
+- Forest Event199/208 and Fire/Water Event291/292 with Event306/307/308/311
+  in EscapeDungeon belong to separate intermediate quest-log branches, not
+  predecessors of the last-sage entry. Spirit's awake-count decrement,
+  Event267, occurs after its last-sage dispatch Event139.
+
+Full read-only inspection record:
+`E:/OOTRemake/work/r19-lacs/LACS-STEP02-CHAIN.md`.
+The five-temple guide route is sufficient, not the minimum event predicate.
+No implementation change, replacement sweep, gate or game run was needed for
+this accepted proof. This follow-up changes only the round record.
