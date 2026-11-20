@@ -90,6 +90,22 @@ def _worker(run, request, stage, sender):
         sender.close()
 
 
+def publish_seed(stage: Path, out: Path, result: dict) -> dict:
+    """Publish completed seed files with their verified digest and portable manifest."""
+    # Reserve an absent destination with exclusive mkdir: POSIX rename may replace an empty directory.
+    # Only this freshly reserved directory is cleaned on failure.
+    seed = stage / "seed"
+    digest = tree_digest(seed)
+    out.mkdir()
+    try:
+        seed.rename(out / "seed")
+        record = write_manifest(out, result | {"output_sha256": digest})
+    except BaseException:
+        shutil.rmtree(out)
+        raise
+    return result | record | {"output": str(out)}
+
+
 class Jobs:
     """At most one live worker. Worker injection is Python-only, for synthetic-world consumers/tests."""
 
@@ -146,19 +162,9 @@ class Jobs:
                 break
 
     def _publish(self, result):
-        # Reserve an absent destination with exclusive mkdir: POSIX rename may replace an empty directory.
-        # Only this freshly reserved directory is cleaned on failure. Cancellation and publication serialize.
+        # Cancellation and publication serialize under the caller's lock.
         _, out = self.request.paths()
-        seed = self.stage / "seed"
-        digest = tree_digest(seed)
-        out.mkdir()
-        try:
-            seed.rename(out / "seed")
-            record = write_manifest(out, result | {"output_sha256": digest})
-        except BaseException:
-            shutil.rmtree(out)
-            raise
-        self.state.update(status="succeeded", result=result | record | {"output": str(out)})
+        self.state.update(status="succeeded", result=publish_seed(self.stage, out, result))
         self._finish_stage("done")
 
     def _finish_stage(self, status):
