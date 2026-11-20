@@ -202,8 +202,9 @@ Shadow's floor key stays native under every setting. See [key placement limits](
 
 With dungeon rewards shuffled, the closed Door uses the three owned Stones rather than child boss
 completion, retaining the instrument/song/send-off prerequisites. Kareem opened it before Dodongo and
-Jabu were done, with no escape/moat scene; two-Stone refusal is still pending. The first-pull shuffled
-reward and a medallion-count bridge below/at its count also passed. These are bounded checks, not a
+Jabu were done, with no escape/moat scene. With only Emerald and Ruby owned, the Door stayed closed
+and no opening scene played; the saved state confirmed the two Stones and closed Door. The first-pull
+shuffled reward and a medallion-count bridge below/at its count also passed. These are bounded checks, not a
 complete reward-shuffled playthrough. Other completion gates stay native; see [reward settings](settings.md#dungeon-rewards-and-ganons-castle-bridge).
 
 The persistent `Met Child Zelda` event models the **whole courtyard/Impa lesson and accepted

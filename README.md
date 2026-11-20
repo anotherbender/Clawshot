@@ -118,7 +118,8 @@ The first-arrival lighting repair passed on rc.7 on 2026-11-17. For new seeds; n
 
 Cows, pots, crates and loose rupees are not shuffled. Dungeon reward shuffle is a separate experimental option, off by default; it does not move rewards outside their nine slots.
 With reward shuffle on, the closed Door opened with all three Stones owned while Dodongo and Jabu were
-unfinished, stayed open, and triggered no escape/moat scene. Refusal with only two Stones is still pending.
+unfinished, stayed open, and triggered no escape/moat scene. With only Emerald and Ruby owned, the Door
+stayed closed and no opening scene played.
 **Small keys anywhere** puts dungeon chest keys and the Well floor key in supported shuffled chests,
 including other dungeons and the overworld. The Well replacement keeps a key-shaped model; leaving it,
 recovering it, collecting it once, returning and Continue passed in game. Shadow's floor key stays vanilla.
@@ -154,8 +155,10 @@ Kareem played these on Longshot rc.7 on 2026-11-19:
   stayed open after reloading in Kareem's check.
 - **Dampé will not start a race without Hookshot or Longshot.** The no-Hookshot check faded back in front of
   Dampé, with normal movement and the existing warp back up usable; it did not return Link to the surface.
-- **Optional speech skips:** Talon's wake-up passed with a few lines still unskippable. The castle owl had no
-  speech, but kept a short fly-away. Zelda, Impa and the additional Field/summit/Lake owl checks remain pending.
+- **Owl skips remain experimental, but were played.** The castle owl and Field owls near Kakariko and the
+  Lake approach had no speech, with a short look/fly-away. Summit and Lake travel owls kept a short offer
+  and working flights.
+- **Story-dialogue skipping is not available yet.** It is withdrawn for 0.2.3.
 
 ### Known issues
 

@@ -309,14 +309,8 @@ restriction; Navi waking Link and normal new-game initialization still run. Movi
 **passed Kareem's new-game check on 2026-11-12**. `--skip intro saria deku_tree kaepora`
 selects fast-start skips; `--skip` alone disables them. These are separate from shuffled kinds.
 
-`--skippable-story` is a separate default-off option (app: **Skippable story dialogue**).
-It enables the native skip button during non-choice Talon wake-up, child Zelda and Impa speech.
-Encounters and choices still play; item grants and flag writes are outside the skippable regions.
-Saria's bridge gift and first-pull Rauru/Sheik are unchanged. `--no-skippable-story` disables it; CS1 stores the choice.
-Talon's candidate was accepted by Kareem (2026-11-19): mostly skippable, some speech remains unskippable.
-Zelda's two dialogues and Impa speech remain **unplayed**, default-off opt-ins.
-EXPERIMENTAL: Zelda's two dialogue skips are unplayed and require the optional story dialogue setting.
-EXPERIMENTAL: Impa's speech and send-off skips are unplayed and require the optional story dialogue setting.
+**Story-dialogue skipping is not available yet.** It is withdrawn for 0.2.3: the option is hidden
+and requests to enable it are refused.
 
 The Kaepora skip also marks the skipped first-field panorama complete, ending its native
 music-suppression window. The previous preset could leave Hyrule Field silent during the day.
@@ -328,14 +322,12 @@ location UI and required for the Field map. Like the Saria skip's Kokiri Forest 
 also reveals the area's pause map before the first visit. This new-game minimap/full-map correction
 still awaits in-game verification; existing saved visit state is not migrated.
 
-With Kaepora skipped, later castle/Field/river/woods owl speech is also omitted while each scene's
-map banner and flags still run. Summit and Lake Hylia flight offers/flights remain available.
-Castle arrival passed Kareem's candidate check (2026-11-19): short stop/fly-away remains, no speech,
-banner/map/Malon preserved. Other added owl scenes/flight offers are **unplayed**; all require the
-default-off `kaepora` fast-start selection, including under Recommended.
-EXPERIMENTAL: Field owl speech skips are unplayed and require the optional Kaepora skip.
-EXPERIMENTAL: Summit owl offer changes are unplayed and require the optional Kaepora skip.
-EXPERIMENTAL: Lake flight owl offer changes are unplayed and require the optional Kaepora skip.
+The optional, default-off `kaepora` fast-start selection remains **experimental**, including under
+Recommended. It omits later owl speech while preserving scene flags and travel.
+Kareem played the castle arrival: no speech, a short stop/fly-away, with banner/map/Malon preserved.
+The Field owls near Kakariko and the Lake approach also passed: no speech, a short look-and-fly-away.
+The summit and Lake travel owls kept a short offer and working flights.
+These results do not cover every owl scene; later Woods/Zora owl additions remain unplayed.
 
 Every new seed also refuses to start Dampé's race without an owned Hookshot or Longshot.
 Kareem accepted the no-tool candidate (2026-11-19): no race, fade out/in at the **same spot before Dampé**,
@@ -395,7 +387,8 @@ With Gift shuffle, the native Light Arrow story still runs even if its gift move
 Kareem's Longshot rc.7 checks on 2026-11-19 confirmed the shuffled first-pull reward, a medallion-count
 bridge staying closed below its count and opening at the count, and the closed Door opening with all
 three Stones owned while Dodongo and Jabu were unfinished. The Door stayed open; no escape or moat
-scene played. The two-Stone refusal check is still pending.
+scene played. With only Emerald and Ruby owned, the Door stayed closed and no opening scene played;
+the saved state confirmed both Stones and the closed Door.
 Other shuffled boss rewards, stones/combined bridge counts, late story order and a full playthrough
 are not certified by those checks. Both options remain experimental.
 Detailed evidence: [dungeon rewards and bridge](../plans/rounds/r18-rewards.md).

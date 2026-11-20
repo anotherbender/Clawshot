@@ -129,3 +129,22 @@ No DOM/app-state edits, game, generation or personal-seed access. Server/browser
 It also checked **84 local document links/anchors**, all passing, including the outcome's track links.
 Receipt: `E:/OOTRemake/work/r18-docs/release-proof/result.json`; screenshots alongside.
 The throwaway `release_help_smoke.py` was removed after proof. No permanent tests or product code added.
+
+## Later release intake — Door, owls and story-option withdrawal
+
+Claude supplied the remaining results after `d52a8617f9`: two-Stone refusal passed with
+Emerald+Ruby owned, Door closed and no opening scene, confirmed in the saved state.
+Field owls at the Kakariko and Lake approaches passed without speech, retaining a short
+look/fly-away. Summit/Lake travel owls kept short offers and working flights. These owl
+skips remain experimental; Woods/Zora additions have no new played acceptance.
+
+README, settings/logic guides, generator evidence comments and the outcome now reflect these
+results. The earlier pending list in this record is historical, superseded by this intake.
+Removed the user-facing Talon/Zelda/Impa option description: story-dialogue skipping is not
+available yet, withdrawn for 0.2.3 (hidden/refused). The outcome records the withdrawal and
+Round 19 carry-forward without presenting Talon's earlier partial pass as a shipping feature.
+`src/clawshot/app/settings.toml` is untouched: cs18g owns that option's withdrawal.
+No version bump, game run, generation or full gates.
+
+Reran the focused command recorded above: **45 passed in 71.95 s**. No expectation changes
+were needed. No UI surface or executable behavior was changed by this documentation follow-up.

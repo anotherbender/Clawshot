@@ -20,7 +20,7 @@ reviewed stack, not invented merge commits. Staging/receipt commits can follow i
 | D — chests/gifts | Admit ten canonical checks (178/184 ordinary chests); finish attribution; keep expert gallery rupees repeatable; enable the forty-token gift. | `ce8d1e3`, `688a313`, `c7db527`; landing `d3ce136` | [Chests and gifts](r18-chests.md) |
 | E — rewards/bridge | Nine-slot dungeon reward shuffle, owned-Stones closed Door and unique-owned-reward bridge modes; stage rewards before held progression. | `743c71b`, `47c625b`, `3bca02d`; landing `2d9ddef` | [Rewards](r18-rewards.md) |
 | F — key families | Well floor replacement, separate Fortress jail-key option and tracker support; repair native jail collection completion; hold Shadow floor vanilla. | `fea6d72`, `22cb420`, `91ec1b6`, `d64f048`; F+G landing `8fadebf` | [Keys](r18-keys.md) |
-| G — story | Dampé race refusal without a tool; optional Talon/Zelda/Impa speech and owl skips. Withdraw every unsafe no-instrument lesson bypass after failed play. | `de36c43`, withdrawal `623c434`; F+G landing `8fadebf` | [Story](r18-story.md) |
+| G — story | Dampé race refusal without a tool and experimental owl skips. Unsafe no-instrument lesson bypasses were removed after failed play. Talon/Zelda/Impa dialogue skipping is withdrawn for 0.2.3 by cs18g (hidden/refused), not a shipping option. | Original work `de36c43`, lesson withdrawal `623c434`; F+G landing `8fadebf`; dialogue withdrawal follow-up owned by cs18g, SHA not yet supplied | [Story](r18-story.md) |
 | H — documentation | Roadmap index plus verbatim round histories; staged Claude skill split outside installed skills. Release docs now align with the reported played scope. | `0582338`; this release-docs branch follows `d9deb65` | [Documentation](r18-docs.md) |
 | A+B follow-ups | Preserve Time selection after Fairy receipt; keep Mido at his equipment gate after early Zelda; include the raw schedule in packed-input caches. | `3dc13fb`, `e81180e`, fixture `fc0a03d`; landing `d9deb65` | [Ocarina](r18-equipment.md#issue34-implementation--r18ocarina), [Mido](r18-mido.md) |
 
@@ -42,21 +42,23 @@ It is not agent-run gameplay and is not a claim that the later Longshot stable 3
 | Fortress jail keys | After the Valley carpenter boss's Yes, the guard appears; one rescue and the repaired 20-rupee drop passed, once-only after return/Continue. | All four rescues, captain/card and Training Ground **UNPLAYED** with the option; keep it experimental. |
 | Dungeon rewards | First sword pull gives the shuffled reward. | Other boss rewards and a full shuffled playthrough remain unplayed. |
 | Medallion bridge | Stays closed below the configured count and opens at the count. | Stones/combined-count modes and late Light Arrow/trial order not newly played. |
-| Owned-Stones Door | Opens with all three Stones while Dodongo/Jabu are unfinished; stays open; no escape/moat scene. | Two-Stone refusal still pending; this was not an escape/moat completion check. |
+| Owned-Stones Door | Opens with all three Stones while Dodongo/Jabu are unfinished; stays open; no escape/moat scene. With only Emerald+Ruby, stays closed with no opening scene; saved state confirms both Stones and closed Door. | Not an escape/moat completion check or a full shuffled playthrough. |
 | Dampé, no Hookshot | Refuses the race; fades back in front of Dampé, normal control, existing warp back up usable. | Not a surface return; do not describe it as one. |
-| Talon speech | Skip works, with a few lines still unskippable. | Zelda/Impa pending separately. |
-| Castle owl | No speech; short stop/fly-away retained. | Other owl checks pending separately. |
+| Castle owl | No speech; short stop/fly-away retained. | Experimental; not blanket acceptance of every owl scene. |
+| Field owls (Kakariko/Lake approach) | No speech; short look-and-fly-away works. | Experimental; only these encounters played. |
+| Summit/Lake travel owls | Short offer; flight works. | Experimental; not blanket acceptance of every owl route. |
 | Ocarina (#34) | Fairy after Time keeps Time selected as child/adult; adult Sun's Song works and Time persists after Continue. Control's adult Sun's Song also works with Fairy. | Cosmetic downgrade **for Sun's Song** only; no broader adult-song or lesson-safety inference. |
 | Mido (#35) | Sword-only refusal, shield clears the passage, tree mouth open; reload retains the clear and normal late Mido position. | The fixture's declared castle-step edit is in the track record; not a complete early-Zelda playthrough. |
 
-## Still pending tonight — do not promote without Claude's result
+## Withdrawn or still unplayed
 
-- Zelda's two dialogue skips and Impa's speech/send-off skips.
-- Field owls, summit offer and Lake flight/offer checks. Later Woods/Zora owl additions also have no new played acceptance.
-- Owned-Stones Door refusal with only two Stones.
+- **Talon/Zelda/Impa dialogue skipping is withdrawn for 0.2.3.** cs18g owns hiding the option and
+  refusing attempts to enable it. Talon's earlier partial pass is historical, not a shipping feature.
+- Later Woods/Zora owl additions have no new played acceptance. The played Field/summit/Lake
+  skips above still remain default-off experimental options.
 
-These remain default-off experimental options where applicable. A staged launcher or dry run is not a played pass.
-Update this section only from the new report; do not silently move tonight's checks into the accepted table.
+Claude's follow-up supersedes the initial pending list: two-Stone refusal and the named owl checks passed.
+A staged launcher or dry run is not a played pass; no wider acceptance follows from these results.
 
 ## Engineering evidence already recorded by the owning tracks
 
@@ -89,6 +91,8 @@ Already deferred by Claude, rather than invented new release scope:
   they do not prevent a player walking into an automatic scene out of logic.
 - **Saria bridge farewell skip.** The unrelated Saria speech patch was removed; the actual bridge timeline/gift
   needs its own safe design and played check ([story record](r18-story.md#check12-played-decision--supersedes-the-earlier-play-hold)).
+- **Talon/Zelda/Impa dialogue skip.** Withdrawn for 0.2.3 (hidden and refused by cs18g).
+  Reconsider only with a safe design and played acceptance; the earlier Talon partial pass does not ship.
 - **Shadow floor key.** Keep vanilla until a natural pre-room save permits the required recovery/once-only check.
 - **Held progression ordering.** Measure the proposed most-constrained-first ordering within shared progression,
   using preserved matched cohorts. Attribution found gift holds, not the three chest admissions, increased
@@ -100,5 +104,5 @@ Already deferred by Claude, rather than invented new release scope:
   ([design](r18-master-sword-design.md)).
 
 Additional coverage to schedule, not silently accepted: all-four Fortress rescues/card/Training Ground,
-other reward slots/bridge modes, and any tonight checks still unfinished when Claude closes the round.
+other reward slots/bridge modes, and the unplayed Woods/Zora owl additions.
 No change here repairs a played seed or save; never regenerate over one.
