@@ -17,8 +17,9 @@ These new source adapters and their played tracker updates still await in-game a
 2. Open **Tracker** and press **Use selected seed**. Alternatively Browse to, or paste, the
    seed's output folder and press **Track seed**. Both `output/seed/spoiler.json` and a raw
    generator folder containing `spoiler.json` are accepted.
-3. Leave **Save folder** empty for this seed's own Play saves (`output/user`). Nothing is
-   created or changed by tracking. Before a new game is saved, the tracker waits for a save.
+3. Leave **Save folder** empty for this seed's own Play saves (`output/user`). Tracking creates
+   or changes nothing in your game, seed or save folders; the only file it writes holds your manual
+   marks (see **In logic**). Before a new game is saved, the tracker waits for a save.
 4. The newest `slot_NN/progress.sav` by modification time is selected automatically. Use
    **Slot** to pin another slot; choose **Newest saved slot** to follow the newest again.
 5. Save in the game. The page polls once a second and updates without reloading. This is
@@ -42,6 +43,55 @@ counts collected Skulltulas out of the seed's total (in brackets, how many are u
 every OBS view that shows the quest group, labels on or off; seeds without Token shuffle don't show it.
 A Skulltula shows `?` when only one of its two records is set, or when the save is not the save layout
 those records were checked on.
+
+## In logic
+
+**Checks by area** lists each area's checks by name; their rewards stay hidden unless spoiler mode is
+on. Every open check (not collected, or `?` and not marked done) is shown **in logic** (highlighted)
+when the seed's own logic says you can reach it with what your save holds, or **out of logic** (dimmed)
+otherwise. Each area heading adds "N in logic". **Show only in-logic** hides the rest, and areas with
+nothing left to show fold away.
+
+- **What counts as held.** Only what your save holds: items, upgrades, songs, stones and medallions,
+  hearts, Gold Skulltula tokens, bottles, magic and dungeon items, plus the seed's starting items.
+  The spoiler's placements are never used, so in-logic gives nothing away.
+- **Used-up items.** A trade item, Ruto's Letter or a shield counts once the save shows you got it,
+  even after you traded it on, delivered it, or lost the shield. Bombchus count once found, even when
+  used. Other items count only while you hold them.
+- **Small keys** count every key you found in that dungeon, spent ones included. Boss keys, maps and
+  compasses count once you have them.
+- **Bottles.** Each bottle you own counts as a bottle, except one holding Ruto's Letter, which counts as
+  the letter only: as in the seed's logic, the letter is not also an empty bottle.
+- **Hearts** count whole hearts; loose Pieces of Heart are not added.
+- **Story steps.** Meeting Zelda (Impa's send-off) and the owl's arrival in Hyrule Field are read from
+  the save. Other story steps are worked out from the logic itself.
+- **Unknown fields.** Anything the save cannot show counts as not held, and the tab says so in one line
+  naming it: in-logic may then be more cautious than the game.
+
+**In logic for** chooses the age: **Either age** (the default: a check counts when either age can reach
+it, as the seed's logic does), **Follow save**, **Child** or **Adult**. Follow save reads the save's
+`Sequence_IsChildhood` flag, which normal play keeps right but Longshot's debug age switch does not
+change. When the save does not say, Follow save shows either age and says so. Your choice is remembered
+in this browser. Styling, area counts and the filter all follow it.
+
+In-logic needs a seed made by this same Clawshot version, whose settings rebuild into the seed's logic
+and whose every location is in this version's world. Otherwise the age control and filter are greyed
+out with the reason, and the rest of the tracker works as before. A save, not live play, is read: pick
+something up and save before it counts.
+
+**Marking checks done.** Some checks the save cannot show (`?`): shop items, a few gifts, some floor
+pickups. Use **Mark done** on such a check once you have it, so it leaves the open list; **Unmark**
+undoes it. A marked check shows as marked by you, not as collected, never adds its item to what you
+hold, and keeps its reward hidden in spoiler-free mode. If a later save does show that check, the save
+wins and the mark is removed. Marks are kept per seed and per save folder (the game writes each save to
+its next slot, so they follow you from slot to slot), survive a restart of Clawshot, and **Clear manual
+marks** removes this seed and save folder's marks after asking. They live in
+`tracker-marks.json` in Clawshot's preferences folder: `%APPDATA%/Clawshot` on Windows,
+`~/Library/Application Support/Clawshot` on macOS, `$XDG_CONFIG_HOME/clawshot` (default
+`~/.config/clawshot`) on Linux. If that file cannot be read, the tracker warns, shows no marks and
+leaves the file alone until you change a mark.
+
+The OBS view shows none of this: no in-logic data and no marks.
 
 ## Hookshot Play
 
@@ -162,7 +212,8 @@ All fonts are installed system fonts.
 
 `uv run python -m clawshot.ui --no-open` prints a token URL without opening any window or dialog.
 Paste paths to track saves; Browse/Open/Play remain disabled. The standalone OBS view is also
-available in this mode. The tracker never starts a game, writes a save, or changes seed contents.
+available in this mode. The tracker never starts a game, writes a save, or changes seed contents;
+it writes only its manual-marks file in the preferences folder.
 
 The automated evidence uses synthetic saves, read-only copies of real saves and headless browser
 captures. Those checks do not prove in-game pickup/update behavior; the maintainers' staged

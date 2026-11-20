@@ -1,0 +1,117 @@
+# Plan: tracker-in-logic
+
+Spec: `docs/specs/tracker-in-logic/spec.md`. Criteria keep the spec's identifiers (e.g. `1.3`); criteria added by
+this plan are marked `P` (e.g. `P2.a`). Touch points found in the code today:
+
+- `src/clawshot/tracker/seeds.py` (`load_seed`, `Seed.metadata`, `installed_version`, `output_sha256`)
+- `src/clawshot/tracker/state.py` (`build_state`, `areas`, `_check_entry`, `collected`, `_Reader`)
+- `src/clawshot/tracker/saves.py` (`TrackerSession.configure` / `_poll`)
+- `src/clawshot/ui/tracker.py` (`TrackerController`, `call`), `src/clawshot/ui/server.py` (token/Host/Origin checks)
+- `src/clawshot/ui/static/tracker.html|js|css`
+- `src/clawshot/world/search.py` (`Search`), `src/clawshot/generate/prepare.py` (`prepare`), `src/clawshot/app/schema.py` (`validate`)
+- `src/clawshot/patch/gifts.py` (`shopkeeper_spec`, `seed_setup`), `src/clawshot/patch/scrubs.py` (`seed_setup`),
+  `src/clawshot/patch/__init__.py` (`make_seed`), `src/clawshot/__main__.py` and `src/clawshot/app/jobs.py` (the two
+  callers of `gifts.seed_setup` + `make_seed`)
+- `src/clawshot/app/preferences.py` (`user_preferences_path`, the preferences folder the marks file sits in)
+- `src/clawshot/world/search.py` (`Search.__init__` closed-return-gate child view, `can_access(location, age=None)`),
+  `src/clawshot/world/rules.py` (`has_bottle`), `src/clawshot/generate/fill.py` (how the generator feeds items)
+
+Revised 2026-11-20 after the main maintainer's review (see the spec's revision note); "(maint)" marks their calls.
+Tests run with `uv run --with pytest-xdist pytest -n auto`; dump tests skip without `OOT_ROMFS`.
+
+1. [x] Check prerequisites and open questions
+    1.1 [x] `uv run ruff format --check`, `uv run ruff check` and `uv run --with pytest-xdist pytest -n auto` pass on `main` before any change (baseline recorded). Baseline 2026-11-20 on the branch's start: format and lint pass; 3806 passed, 499 skipped (12 min, -n auto).
+    1.2 [x] Work happens on a feature branch (not `main`); the PR description records the maintainer's answers to Q1 (rewording approved) and Q2 (held-now only without a known acquired-once flag) and the review changes D9, D11, D14, D16–D18. Branch `feature/tracker-in-logic`; PR description pending (task 15).
+    1.3 [x] Confirmed by reading code that `validate(text=...)` + `prepare(spec, settings)` is the generator's own path to the searched `World`; any difference is reported instead of worked around. Result: it is not (spec Background); resolved by D15 and task 2.
+
+2. [x] Shared logic-world builder (D15; new module `src/clawshot/patch/logic_world.py`)
+    2.1 [x] P2.a `scrubs.seed_setup`'s spec change (sale type and wallet-tier rule) is split into a dump-free `scrubs.logic_spec(spec, settings)`; `seed_setup` calls it, with no change to its results (existing scrub tests pass unchanged).
+    2.2 [x] 1.5 `logic_world(settings, spec=None) -> (Settings, World)` applies `gifts.shopkeeper_spec` (Gift or NPC shuffled) and `scrubs.logic_spec` (Scrub shuffled), then `prepare`; it reads no dump (test runs it with no `OOT_ROMFS` and a monkeypatched romfs access that fails if called).
+    2.3 [x] 1.5 `gifts.seed_setup` and `make_seed` take their reachability-changing spec steps from the shared builder's functions, so there is one definition of each step (no copied transform). Gift half's test (`test_gift_seed_setup_uses_the_shared_step`) is `dump`-marked: not yet run (no `OOT_ROMFS` on the agent's machine).
+    2.4 [x] 1.5 Equivalence test: for synthetic settings with Gift/NPC and Scrub shuffle on and off, the world `make_seed` hands to `generate` (captured by monkeypatching `generate`) equals `logic_world`'s in regions, exits, events, locations, location rules (source text) and items. The test is `dump`-marked if `make_seed` needs a romfs, and a synthetic-spec variant covers the spec steps without one. Synthetic variant passes; `dump` variant `test_make_seed_searches_the_logic_world` not yet run (no `OOT_ROMFS`).
+    2.5 [x] P2.b `logic_world` gives the same world for the user's settings string and the effective one the spoiler stores (gift types expanded from `Gift`), since the tracker only has the latter.
+    2.6 [x] 1.6 Determinism: a seed generated before and after the refactor (synthetic world via `generate`, plus `make_seed` under `-m dump`) gives byte-identical output and spoiler. Synthetic: 12 spoilers (Chest/Scrub/Gift/Gift+Scrub x seeds 1-3, full spec) hashed before and after: identical (agent, 2026-11-20). `make_seed` half rests on the `dump` tests (`test_seed_dump.py`, the 2.4 dump test): not yet run.
+
+3. [x] Logic world loader (new module `src/clawshot/tracker/logic.py`)
+    3.1 [x] 1.1 For a seed whose `generator` equals `clawshot <installed version>`, the tracker rebuilds the seed's `World` from the spoiler's settings string with `validate` + `logic_world`.
+    3.2 [x] 1.2 The world is built once per loaded seed and cached on the session; save polls do not rebuild it (test counts `logic_world` calls across several polls).
+    3.3 [x] 1.3 Generator mismatch, missing settings string, an exception in validate/`logic_world`, or a spoiler location missing from the rebuilt world (D14; reason names the first missing location) yields `logic.available = false` with a human-readable `logic.reason`; no check carries in-logic data; every existing tracker field is unchanged (test compares the state with and without the logic layer).
+    3.4 [x] 1.4 Computing logic writes nothing to seed, save, dump or game folders (test snapshots those synthetic folders' trees and mtimes before/after).
+    3.5 [x] P3.a The `Seed` exposes the spoiler's `settings_string` and `generator` (read in `load_seed`), with no change to existing `Seed` fields.
+    3.6 [x] 1.3 Spoiler-location gate test: a synthetic spoiler naming a location the rebuilt world lacks gives `logic.available = false` with that location in `logic.reason`; a spoiler whose locations all exist passes the gate.
+
+4. [x] Logic inventory mapping data (new file `src/clawshot/data/tracker_logic.toml`)
+    4.1 [x] 2.2 Mapping from tracker cells (items, upgrades, songs, rewards, hearts, tokens, bottles, magic, dungeon items) to logic item names lives in the TOML file, with an `unmapped` table giving a reason per progression item not mapped.
+    4.2 [x] 2.2 A test fails when a progression item of the world is neither mapped nor listed as unmapped.
+    4.3 [x] 2.3 Tier cells map each held tier to a copy count of the progressive logic item (e.g. Longshot = 2 Progressive Hookshot), checked against `clawshot.progressive` tiers by a test.
+    4.4 [x] P4.a Every logic name in the file exists in the world's item table or event names (test), and every cell id exists in `tracker.state` (test).
+    4.5 [x] 2.2 Story-step logic names (e.g. `Met Child Zelda`, `Field Owl Arrival`) map to their save flags where the flag is known, else appear in `unmapped` with a reason (D17); the 4.2 test is expected to list them until they are handled. Field Owl Arrival and Met Child Zelda map to their flags (sources in the TOML); the other remake-added story events are listed unmapped.
+
+5. [x] Logic inventory builder (`tracker/logic.py`)
+    5.1 [x] 2.1 The inventory is built only from the tracker's save-read state plus the world's starting items; a test with a spoiler whose placements differ shows no change in the inventory.
+    5.2 [x] 2.4 A trade item, Ruto's Letter or a shield counts as held when held now or its acquired-once flag is set (test for each case: held, flag only, neither); an item without a known acquired-once flag counts only when held now (Q2, test).
+    5.3 [x] 2.5 Small keys per dungeon use the found count including spent keys; boss keys, maps and compasses use their saved flags.
+    5.4 [x] 2.6 A cell whose save value is unknown contributes nothing and is listed in `logic.unknown_items`.
+    5.5 [x] 2.7 Bottles follow `has_bottle` (D18): each owned slot without the letter gives one bottle item; a slot holding Ruto's Letter gives one `Rutos Letter` and no bottle item (test: letter-only save has `has_bottle` false; letter plus an empty bottle has it true; letter counted once).
+    5.6 [x] P5.a The inventory is a sorted, deterministic multiset (same save gives the same inventory, byte-equal JSON).
+    5.7 [x] 2.1 The inventory goes to `Search` as the constructor's `items`, as the generator feeds assumed items (D16); test on a synthetic world with `age_return` closed: the tracker's child/adult/either results equal those of `Search(world, items)` built directly, and a child-only check reached via an item the save holds stays in logic for child.
+    5.8 [x] P5.b `Search` adds `world.start_items` itself; to avoid counting starting items twice, the tracker passes per name the save's count minus the starting count (floored at 0), so each item counts as the larger of the two (test with a starting item the save also holds). Proposed by Claude; raised in the PR.
+
+6. [x] In-logic per check (`tracker/logic.py` + `tracker/state.py`)
+    6.1 [x] 3.1 A check is open when its save state is False, or None and not manually marked.
+    6.2 [x] 3.2 Each open check carries `in_logic: {child, adult, either}`: `child`/`adult` from `Search.can_access(location, age)`, `either` from `Search.can_access(location)` with no age (test on a small synthetic custom world where one check is child-only, one adult-only, one neither, plus a case where `either` differs from `child or adult`, or, if the search cannot produce one, a test that `either` comes from the no-age call). either always equals child-or-adult in this search (_passes is any over ages), so the test checks either comes from the no-age call.
+    6.3 [x] 3.3 Collected and marked checks carry no `in_logic` and never count as in logic.
+    6.4 [x] 3.4 Each area reports `in_logic` counts for `child`, `adult` and `either` (the last from the checks' `either`).
+    6.5 [x] 3.5 The search reruns only when the inventory changes (test counts `Search` constructions across polls with the same and a changed save).
+    6.6 [x] 3.6 An open check's entry has no `item`/`item_label` unless spoiler mode is on (existing behaviour, test extended to logic-enabled state).
+    6.7 [x] P6.a The state gains a top-level `logic` object: `available`, `reason`, `unknown_items`, `age` (task 10); field names documented in the module docstring.
+
+7. [x] Manual marks storage (new module `src/clawshot/tracker/marks.py`)
+    7.1 [x] 4.6 Marks are JSON in the preferences folder, the parent of `app.preferences.user_preferences_path()` (`%APPDATA%\Clawshot`, macOS/XDG equivalents; not the deletable `%LOCALAPPDATA%\Clawshot\Cache`), keyed by seed identity (`output_sha256`, else SHA-256 of the spoiler file) and save slot path.
+    7.2 [x] 4.7 Marks survive a reload of the store and are separate per seed and per slot (test: another slot of the same seed starts empty; another seed starts empty).
+    7.3 [x] 4.10 An unreadable or missing marks file gives a warning and is treated as empty; the file is not overwritten until a mark changes (test checks the bad file's bytes are kept after a read). A missing file reads as no marks without a warning (a fresh install has none): proposed by Claude, raised in the PR.
+    7.4 [x] P7.a Writes are atomic (write temp file, replace) and deterministic (sorted keys); tests redirect the folder to `tmp_path`.
+
+8. [x] Mark rules in the state (`tracker/state.py`, `tracker/saves.py`)
+    8.1 [x] 4.2 A marked check is reported as `marked: true`, distinct from `collected: true`, and counts as done in area counts and the open list.
+    8.2 [x] 4.3 A mark does not add the check's item to the logic inventory (test: inventory equal with and without the mark).
+    8.3 [x] 4.4 In spoiler-free mode a marked check's entry has no `item`/`item_label`.
+    8.4 [x] 4.5 When a save reads a marked check as True or False, the save's state is used and the mark is removed from storage.
+
+9. [x] Mark and clear endpoints (`ui/tracker.py`)
+    9.1 [x] 4.1 `POST tracker-mark {check, marked}` toggles a check between unknown and marked; checks with a save-confirmed state are rejected.
+    9.2 [x] 4.8 `POST tracker-clear-marks` removes all marks of the current seed and slot (confirmation happens in the UI; the endpoint requires `confirmed: true`).
+    9.3 [x] 4.9 Both endpoints are POST behind the server's token/Host/Origin checks and reject unknown check ids, checks not currently unknown, and requests without a configured seed and slot (tests in `tests/test_tracker_http.py`).
+
+10. [x] Age selection
+    10.1 [x] 5.2 The state reports `logic.save_age`: `child` when `Sequence_IsChildhood` is true, `adult` when false, `null` when unreadable (test with synthetic saves for all three).
+    10.2 [x] 5.1 The Tracker tab has an age control: Either (default), Follow save, Child, Adult.
+    10.3 [x] 5.2 Follow save with an unreadable Bool uses Either and shows a one-line note.
+    10.4 [x] 5.3 A chosen non-default option persists in localStorage (each access in try/catch) and the page works with storage unavailable.
+    10.5 [x] 5.4 In-logic styling, area counts and the filter follow the selected age.
+
+11. [x] Tracker tab display (`ui/static/tracker.html|js|css`)
+    11.1 [x] 6.1 Each open check is styled in-logic or out-of-logic; collected and marked checks keep their own styles.
+    11.2 [x] 6.2 Each area heading shows "N in logic" for the selected age next to its existing counts.
+    11.3 [x] 6.3 "Show only in-logic" hides open out-of-logic, collected and marked checks; areas with nothing visible collapse.
+    11.4 [x] 6.4 With logic unavailable, the age control and filter are disabled and `logic.reason` is shown; the rest of the tab works as today.
+    11.5 [x] 6.5 A non-empty `logic.unknown_items` shows one line saying in-logic may be conservative, naming the cells.
+    11.6 [x] 4.1/4.2/4.8 Unknown checks have a mark toggle; marked checks look distinct from collected; a "Clear manual marks" button asks for confirmation before calling the endpoint.
+    11.7 [x] P11.a Any new static file is added to `ui/server.py` STATIC and `ui/release.py`'s file list; `tests/test_ui_release.py` passes. No new static file was needed (test_no_new_static_files); test_ui_release passes.
+
+12. [x] OBS view unchanged
+    12.1 [x] 6.6 The `tracker-obs` payload strips `logic`, `marked` and `in_logic` data, and a test shows its payload equals the pre-feature payload for the same seed and save. Test compares the OBS payload with logic on and a mark set against logic off and no marks (equal), and pins the area keys to the pre-feature set.
+
+13. [x] Docs
+    13.1 [x] 7.1 `docs/tracker.md` gains an "In logic" section covering D1–D18 as the player sees them, including a note that Follow save reads `Sequence_IsChildhood`, which Longshot's debug age switch does not change.
+    13.2 [x] 7.1 The "Nothing is created or changed by tracking" statement is reworded to "nothing in your game, seed or save folders", naming the marks file's location (Q1 approved by the maintainer).
+
+14. [x] Tests and checks
+    14.1 [x] 7.2 Synthetic-fixture tests cover the version gate and spoiler-location gate (1.3), the shared builder's equivalence (1.5), inventory mapping including tiers, acquired-once, found keys, unknown fields, the closed return gate and Ruto's Letter in a bottle (2.x), per-age and either-age in-logic on a small custom world (3.x), marks lifecycle and isolation per seed/slot (4.x), Follow save from `Sequence_IsChildhood` (5.2) and the unchanged OBS payload (6.6). No game data, saves or logs in fixtures or the PR (AGENTS.md rule 1).
+    14.2 [x] 7.3 `uv run ruff format --check`, `uv run ruff check` and `uv run --with pytest-xdist pytest -n auto` pass; `OOT_ROMFS=<romfs> uv run pytest -m dump` passes for task 2 (it touches the seed pipeline). Format, lint and the full suite pass (3902 passed, 505 skipped, 2026-11-20). The dump run is not done: no OOT_ROMFS on the agent's machine; listed in pr.md for a maintainer.
+    14.3 [x] P14.a Determinism: two builds of the state from the same seed, save and marks give equal JSON.
+
+15. [ ] In-game acceptance (maintainer run)
+    15.1 [x] 7.4 The PR gives the maintainer exact steps: with a Clawshot Play seed, save after collecting a few items, confirm the in-logic list matches what is reachable in game for that age; buy a shop item, mark its check, restart Clawshot, confirm the mark persists and the shop item stays hidden in spoiler-free mode. The result is recorded by the maintainer, not claimed by the agent. Steps written in docs/specs/tracker-in-logic/pr.md; the result is for the maintainer to record.
+    15.2 [x] P15.a Decisions made during implementation are listed in the PR with who proposed them, including D15 (proposed by Claude, chosen by BBender, 2026-11-20), the maintainer's review changes (D9 folder, D11 default Either, D14 location check, D16–D18, Q1, Q2) and P5.b (proposed by Claude). Listed in docs/specs/tracker-in-logic/pr.md.
+    15.3 [ ] P15.b Commits carry an `Assisted-by: <model>` trailer and add named paths only; the PR is MIT-compatible and contains no game files, saves or logs.
