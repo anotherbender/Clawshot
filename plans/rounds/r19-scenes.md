@@ -1,7 +1,7 @@
 # Round 19 Track scenes — cs19a
 
-Agent/model: `openai-codex/gpt-6.1-sol`; branch `r19/scenes`; base `d9deb65`.
-Status: **Revising after Kareem's played controls** — stock-only dispatch and adult-Fairy lesson logic; gate/rebuilt Minuet boot-check pending.
+Agent/model: `openai-codex/gpt-6.1-sol`; branch `r19/scenes`; current code base `f5c679d` (original base `d9deb65`).
+Status: **READY — play-held**. Stock-only dispatch and adult-Fairy lesson logic gated; corrected Minuet pairs await Claude's boot-check.
 The round overview and this track file were absent at intake; the user brief supplies round scope.
 
 ## Mechanism proposed before broad edits
@@ -336,3 +336,81 @@ Lesson-specific source overlays, Ice/Impa post-lesson events and dungeon-reward/
 accept Fairy as adult. No-instrument lesson refusal and non-instrument prerequisites remain covered.
 Ordinary `can_play*`/Mido/warp policy and genuine Door-of-Time item requirements are unchanged; their
 age-metadata rationale is not presented as proof that adult Fairy cannot play lessons.
+
+## Corrected gate and Minuet boot-check handoff
+
+**Gated code/merge head: `84e5b261de238af7986264264d019ce9586d19e3`.**
+Rebased onto main `f5c679d532b688ea1a98a5ffb158a821454ce07d` (0.2.3); main's withdrawn
+`skippable_story` remains hidden and refused at validation. Settings conflicts retained that withdrawal
+while adding the separate Saria option; no old speech-skip feature was restored.
+Claude explicitly waived another rebase for main's later docs-only `b1aa1a1` audit.
+Post-rebase focus: **190 passed in22.30s**. Settings/schema withdrawal coverage: **48 passed in40.20s**.
+
+One owned initial sweep, with Saria skip enabled for all recipes and bounded fill/beatability checks intact:
+
+| Recipe | Seeds passed | Exhausted | Fill attempts |
+|---|---:|---:|---:|
+| Broad | 200 | 0 | 207 |
+| Defaults | 50 | 0 | 50 |
+| Recommended | 50 | 0 | 52 |
+
+The sweep measured399.593s (enclosing stage436.031s); it was not repeated after main's docs-only advance
+or during the startup isolation continuation. All phase-start game snapshots were empty.
+Full format: **484 files pass**; lint: pass. Full synthetic: **3840 passed,536 skipped,one error in272.89s**.
+The error was setup of
+`tests/test_app_play.py::test_saved_seed_plan_does_not_need_the_original_game_files[deleted]`:
+its existing20s join expired with `status=running`, validation still pending. This is the original failed
+invocation, not a relabelled green full suite.
+
+Claude reviewed that the Play implementation was untouched and accepted a conditional load diagnosis:
+**contention is an inference, not proof**. His condition was three exact-node isolated passes on the same
+head, stopping at the first isolated failure without widening the timeout, plus a passing native suite.
+All three completed under owned serialization, on `84e5b261`, with `CLAWSHOT_WORKERS=1`:
+
+| Isolated run | Result | Pytest seconds |
+|---|---|---:|
+| 1, native continuation | PASS | 1.23 |
+| 2, retained turn | PASS | 9.86 |
+| 3, retained turn | PASS | 1.83 |
+
+No source or timeout edits occurred between these runs. No full synthetic retry was made.
+**Full native suite: 533 passed,zero skipped in2154.74s**, including native-root, NUP/cache-only and
+private layered-dump coverage. Native used12 pytest workers/internal4; no game was running at stage start.
+The turn was retained for runs2–3 as Claude instructed; after they completed, the owned lock was released
+and `LOCK RELEASED` was posted before any further gate acquisition. Lacs is next in Claude's ordered queue.
+
+Receipts, with exact commands, environments, settings, individual logs and phase load evidence:
+
+- `E:/OOTRemake/work/r19-scenes/gate-stock-84e5b261de/gate-results.json` — sweep, format, lint, failed full synthetic.
+- `E:/OOTRemake/work/r19-scenes/gate-stock-84e5b261de/sweep/sweep-results.json` — all300 successful seed rows.
+- `E:/OOTRemake/work/r19-scenes/gate-stock-84e5b261de-resume/gate-results.json` — isolated run1 and full native.
+- `E:/OOTRemake/work/r19-scenes/startup-three-84e5b261de/results.json` — all three isolated runs, retaining run1.
+
+### Fresh Minuet packet for Claude
+
+`E:/OOTRemake/work/r19-scenes/ingame-minuet-stock-v2/CHECKLIST.md`
+names four Longshot3.0.0 launchers: two input conditions, each with current-main control and corrected candidate.
+Controls were rebuilt from an isolated export of `f5c679d`; candidates pin the gated `84e5b261` code.
+Both candidates have identical22-file mods; both controls have10-file mods; exactly one mod per launcher.
+All **four cmd dry runs and four exact-input reports passed**. No agent started Longshot.
+
+- `fairy-native`: naturally adult, Fairy selected/IsGet=true/stock1, Time false/stock0; **no new save edit**.
+  Both control and candidate must keep the native lesson and grant Boomerang with correct text.
+- `no-ocarina-skip`: same archived adult input, with **only Fairy StockNum1->0**, identical in control/candidate.
+  Exactly byte **82196** differs; selection, historical ownership, age, story and Time stock are unchanged.
+  Candidate must skip the lesson and give Boomerang normally. Observe the control's actual old lesson behavior;
+  the inconsistent ownership history does not justify promising it must freeze.
+
+`packet-proof.json` pins code, input, mod hashes and the stock edit. The original archive and all earlier
+played packets/users were untouched. The source's r16 ancestry includes Sun/Time ownership priming before
+its played song-only Door; not called pristine vanilla. Mido still blocks: the disclosed named Meadow
+teleport is presentation coverage, not a route-access proof. Unmeasured estimate:6–12min per input condition.
+The read-only `check_minuet_stock_v2.py` reports input identity and saved-state/load evidence; after play it
+uses the newest saved slot. Songs have no stock field here, so extra vanilla Minuet is checked by IsGet,
+not an invented zero-stock requirement.
+
+**READY is for Claude's boot-check, then Kareem's new paired play.** The earlier three played candidate
+passes stand; this corrected dispatch has automated routing proof, not a claimed new gameplay pass.
+Kareem must see native adult-Fairy versus plain-get stock0, correct item/text/stock, clean controls, source
+completion and no duplicate after Save/Continue/re-entry. Saria's brief reported pop-in remains cosmetic and
+unchanged. No general encounter skip, generic song-playing/warp relaxation or Door item relaxation was added.
