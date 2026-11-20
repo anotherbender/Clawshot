@@ -137,6 +137,11 @@ count = true
 [cells.kokiri_sword]
 item = "Kokiri Sword"
 
+# Master Sword: the cell reads IsGet.Weapon_Sword_Master (world.toml "Master Sword", r18-master-sword-design.md
+# section 3); progression only with Master Sword shuffle.
+[cells.master_sword]
+item = "Master Sword"
+
 [cells.giants_knife]
 item = "Giants Knife"
 
@@ -324,6 +329,7 @@ label = "Deku Nuts"
 "Malon Song Source Cleared" = "story step without an audited save flag: the search derives it"
 "Market Gallery Normal Clear" = "story step without an audited save flag: the search derives it"
 "Zora River Domain Arrival" = "story step without an audited save flag: the search derives it"
+"Clawshot Light Arrow Story" = "story step without an audited save flag: the search derives it from the Bongo Bongo and Twinrova awakenings"
 "Time Flows" = "story step without an audited save flag: the search derives it from Met Child Zelda and Field Owl Arrival"
 # Native chains: a seed's world counts only the chain copies, which the tier cells grant; these are the chains'
 # fixed tiers and counters (world.toml [native_progressive]).
