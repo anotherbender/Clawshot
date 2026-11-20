@@ -83,8 +83,18 @@ uv run ruff check
 uv run pytest
 ```
 
-The test pool caps itself at three workers. On a busy machine, optionally set `CLAWSHOT_WORKERS=1`
-before running tests to use one worker instead. Without a dump, native-data tests skip.
+For an optional parallel run, use:
+
+```sh
+uv run --with pytest-xdist pytest -n auto
+```
+
+`pytest-xdist` is not in the project's dev dependencies; `--with` supplies it for this command.
+No grouping flag is required. Use `-n 4` instead of `-n auto` to bound pytest processes on a shared PC;
+`CLAWSHOT_WORKERS` controls the separate generator pools, not that pytest process count.
+
+The nested generator pool caps itself at three workers. On a busy machine, optionally set
+`CLAWSHOT_WORKERS=1` before running tests to use one worker instead. Without a dump, native-data tests skip.
 For format or census changes, also check your own read-only supported dump (path is an example):
 
 ```sh

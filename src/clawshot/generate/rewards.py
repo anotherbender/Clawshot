@@ -36,9 +36,9 @@ def prepare_spec(spec: Mapping[str, Any], settings: "Settings") -> Mapping[str, 
             locations[name] = {key: value for key, value in info.items() if key != "keep_vanilla"} | {"type": TYPE}
     completion = data["completion"]
     helpers = {**spec["helpers"], **completion.get("helpers", {})}
-    helpers["can_build_rainbow_bridge"] = data["bridge"][settings.bridge]
+    if settings.bridge != "vanilla":
+        helpers["can_build_rainbow_bridge"] = data["bridge"][settings.bridge]
     regions = []
-    story = data["story_event"]
     owned_door = data["door"] if settings.dungeon_rewards and settings.door_of_time == "closed" else None
     world_settings = dict(spec.get("settings", {}))
     if settings.door_of_time == "closed":
@@ -55,8 +55,6 @@ def prepare_spec(spec: Mapping[str, Any], settings: "Settings") -> Mapping[str, 
         exits = dict(region.get("exits", {}))
         if owned_door and region["name"] == owned_door["region"] and owned_door["exit"] in exits:
             exits[owned_door["exit"]] = {"rule": owned_door["rule"], "source": owned_door["source"]}
-        if region["name"] == story["region"]:
-            events[story["name"]] = {"rule": story["rule"], "source": story["source"]}
         regions.append({**region, "locations": rules, "events": events, "exits": exits})
     return {
         **spec,

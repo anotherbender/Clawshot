@@ -1,4 +1,14 @@
 [locations."ToT Light Arrows Cutscene"]
-rule = "is_adult and Forest_Medallion and Fire_Medallion and Water_Medallion and Shadow_Medallion and Spirit_Medallion"
+rule = "is_adult and 'Defeat Bongo Bongo' and 'Defeat Twinrova'"
 was = "is_adult and can_trigger_lacs"
-source = "https://www.nintendolife.com/guides/zelda-ocarina-of-time-bow-arrow-fire-ice-light-arrows-switch-2 (Light Arrows): finish all five adult temples, then return to Temple of Time. N64 vanilla helper only tested Shadow and Spirit; it is not proof of the remake trigger. This uses the documented complete-sage route; reduced-medallion cutscene alternatives remain an in-game question."
+source = "AllSage Event25/26 require HavePlayedEvent.Dm_Awake_Spirit and Dm_Awake_Shadow; EscapeDungeon Event130/139 call this after the completed awakening scenes, not owned medals. Native trigger retained with or without shuffled rewards; r18-rewards.md reader table, Kareem 2026-11-19."
+
+[events."Temple of Time"."Clawshot Light Arrow Story"]
+rule = "is_adult and 'Defeat Bongo Bongo' and 'Defeat Twinrova'"
+new = true
+source = "Market_Adult_Prefab_c668 requires AllSage Step02 after both awakening histories. AllSage Event10 completes the Temple story and Event11 advances Defeat_Ganon Step01 independently of Dm_TimeTemple_0130/Event85's shuffled gift; r18-rewards.md."
+
+[helpers.can_build_rainbow_bridge]
+rule = "'Clawshot Light Arrow Story'"
+was = "( (bridge == 'open') or (bridge == 'vanilla' and Shadow_Medallion and Spirit_Medallion and Light_Arrows) or (bridge == 'stones' and has_stones(bridge_stones)) or (bridge == 'medallions' and has_medallions(bridge_medallions)) or (bridge == 'dungeons' and has_dungeon_rewards(bridge_rewards)) or (bridge == 'tokens' and (Gold_Skulltula_Token, bridge_tokens)) or (bridge == 'hearts' and has_hearts(bridge_hearts)))"
+source = "GanonCastle_Level_Field_00_Prefab_14ba reads Defeat_Ganon Step01, written by the completed Temple story, not Light Arrow ownership or medallions; r18-rewards.md. Explicit count bridges replace this helper in generate.rewards."

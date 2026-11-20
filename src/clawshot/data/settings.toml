@@ -18,6 +18,7 @@
 shuffle = ["Chest"]
 dungeon_items = "own_dungeon"
 shuffle_hideout_keys = false # Round 18, Kareem: the four Fortress jail keys get their own opt-in; needs Chest shuffle
+shuffle_100_token_reward = false # Round 19, issue #12: opt-in progression at the first 100-token House reward; needs Gift shuffle
 dungeon_rewards = false # Kareem, r18: shuffle only the nine reward slots, including Rauru
 shuffle_master_sword = false # Round 19, Kareem: opt-in; cs19c proposal: Master Sword chest-only, needs Chest and free_time_travel
 bridge = "vanilla"

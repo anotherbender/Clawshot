@@ -103,7 +103,9 @@ class Settings:
     chest (``all_anywhere``, experimental). Both release modes need ``Chest`` shuffled (Round 18: before, ``anywhere``
     without it was accepted and moved nothing) and also shuffle the Well floor key's source; Shadow stays native.
     ``shuffle_hideout_keys`` (needs ``Chest``) shuffles the four Fortress jail keys' sources
-    (``clawshot.generate.key_families``). ``logic`` overrides logic settings from ``settings.toml``.
+    (``clawshot.generate.key_families``). ``shuffle_100_token_reward`` (default off, needs ``Gift``, or its expanded
+    ``NPC``) lifts the first 100-token House reward's non-progression-only rule (issue #12); the reward stays junk
+    otherwise. ``logic`` overrides logic settings from ``settings.toml``.
 
     ``areas`` and ``goal`` cut the world down to a slice (a playtest of a few areas): only the regions in those
     census areas (Banc folders) and the area-less start regions, with ``goal`` in place of the world's. Empty: the
@@ -121,6 +123,7 @@ class Settings:
     shuffle: tuple[str, ...] = tuple(DEFAULTS["shuffle"])
     dungeon_items: str = DEFAULTS["dungeon_items"]
     shuffle_hideout_keys: bool = DEFAULTS["shuffle_hideout_keys"]
+    shuffle_100_token_reward: bool = DEFAULTS["shuffle_100_token_reward"]
     dungeon_rewards: bool = DEFAULTS["dungeon_rewards"]
     shuffle_master_sword: bool = DEFAULTS["shuffle_master_sword"]
     bridge: str = DEFAULTS["bridge"]
@@ -185,6 +188,13 @@ class Settings:
             raise ValueError("shuffle_hideout_keys must be a boolean")
         if self.shuffle_hideout_keys and "Chest" not in self.shuffle:
             raise ValueError("shuffle_hideout_keys moves the jail keys into shuffled chests: shuffle Chest")
+        if type(self.shuffle_100_token_reward) is not bool:
+            raise ValueError("shuffle_100_token_reward must be a boolean")
+        # ``clawshot.patch.gifts.seed_setup`` expands Gift to NPC; an effective (spoiler) string names NPC.
+        if self.shuffle_100_token_reward and not {"Gift", "NPC"} & set(self.shuffle):
+            raise ValueError(
+                "shuffle_100_token_reward needs the 100-token House reward among shuffled gifts: shuffle Gift"
+            )
         if type(self.dungeon_rewards) is not bool:
             raise ValueError("dungeon_rewards must be a boolean")
         if type(self.shuffle_master_sword) is not bool:
@@ -260,6 +270,8 @@ class Settings:
             out["shuffle_hideout_keys"] = True  # absent when off: existing settings strings and logs keep their bytes
         if self.shuffle_master_sword:
             out["shuffle_master_sword"] = True
+        if self.shuffle_100_token_reward:
+            out["shuffle_100_token_reward"] = True  # absent when off, like shuffle_hideout_keys
         if self.item_location_types:
             out["item_location_types"] = {
                 k: list(self.item_location_types[k]) for k in sorted(self.item_location_types)

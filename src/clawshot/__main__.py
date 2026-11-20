@@ -18,6 +18,7 @@ moves the event gifts that can be changed (``clawshot.patch.gifts``); the others
 ``--shuffle-master-sword`` (experimental, off) makes the Temple of Time pedestal's first pull a check and the Master
 Sword a shuffled chest item; the pedestal still moves Link between ages. It needs Chest, and generation refuses it
 without ``--logic free_time_travel=true``.
+``--shuffle-100-token-reward`` (off; needs Gift) lets the first 100-token House reward hold progression.
 """
 
 import argparse
@@ -84,6 +85,12 @@ def main(argv: list[str] | None = None) -> int:
         action=argparse.BooleanOptionalAction,
         default=None,
         help="experimental, default off: four Fortress guard floor keys into shuffled chests; card scene stays vanilla",
+    )
+    parser.add_argument(
+        "--shuffle-100-token-reward",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="experimental, default off (junk only): first 100-token House reward may hold progression; needs Gift",
     )
     parser.add_argument(
         "--dungeon-rewards",
@@ -167,6 +174,7 @@ def main(argv: list[str] | None = None) -> int:
             ("shuffle", "shuffle"),
             ("dungeon_items", "dungeon_items"),
             ("shuffle_hideout_keys", "shuffle_hideout_keys"),
+            ("shuffle_100_token_reward", "shuffle_100_token_reward"),
             ("dungeon_rewards", "dungeon_rewards"),
             ("shuffle_master_sword", "shuffle_master_sword"),
             ("bridge", "bridge"),

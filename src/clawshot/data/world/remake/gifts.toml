@@ -53,7 +53,7 @@ source = "cs8d, build e0f3ccfa: GatheringTokenGold/Event200 grants Item_BombchuB
 
 [locations."Kak 100 Gold Skulltula Reward"]
 nonprogression_only = true
-source = "Claude, 2026-11-15, r15 review/maintainer #12 policy: the first 100-token reward stays junk by default. Three newly admitted native sources make 100 reachable, so reachability must not implicitly opt into progression here. Every fill/swap and externally supplied placement must exclude progression-class items, Token on or off; no opt-in this round."
+source = "Claude, 2026-11-15, r15 review/maintainer #12 policy: the first 100-token reward stays junk by default. Three admitted native sources make 100 reachable; reachability must not implicitly opt into progression. Every fill/swap and external placement excludes progression unless Settings.shuffle_100_token_reward explicitly lifts this policy (r19-tokens.md); explicit delivery exclusions remain."
 
 # Kareem confirmed all seven swaps (answers.md R8-FROGS, 2026-11-09).
 # Round 10 item 1 fixes the five variable song contributions at OoTR's Rupees (20).

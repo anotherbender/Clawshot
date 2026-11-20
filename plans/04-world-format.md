@@ -489,8 +489,10 @@ fill walks lists in world-file order, never a set (a test compares two interpret
 locations, with known items satisfying `fill.allowed` under the same precomputed tier/container screens as the
 fill. The screen pool includes each item as many times as either the normalized generator pool or supplied
 assignments provide; a remote lower tier/container is obtainable, never assumed guaranteed before its gate.
-An unbuildable progressive pool is refused. Data exclusions, including House100's nonprogression-only rule,
-cannot be widened by supplied assignments. Unshuffled sources retain their native rewards.
+An unbuildable progressive pool is refused. Data exclusions cannot be widened by supplied assignments.
+House100 remains non-progression-only unless `Settings.shuffle_100_token_reward` explicitly opts in
+with Gift/NPC shuffle; its threshold100 and all explicit item/delivery exclusions remain intact.
+Unshuffled sources retain their native rewards.
 These calls deliberately skip local goal/age-return proofs: the external placer must prove its whole world
 or multiworld. They still refuse evidenced physical traps in the native scope. They choose no hints, have no
 spheres and report a null opening route; they are not certified solo seeds.

@@ -71,9 +71,20 @@ compasses; every `Buy*`/shop-stock item (including refills and bottle contents);
 (Gerudo Membership Card). Their existing destination/pool holds remain unchanged. Fire Arrows and other
 out-of-pool items are not silently added.
 
-The 100-token House reward accepts only non-progression items in every seed, including Gift shuffle with
+By default the 100-token House reward accepts only non-progression items, including Gift shuffle with
 Token off. This is an explicit placement rule, not a consequence of which Skulltulas are reachable.
-There is no progression-at-100 opt-in this round; #12 remains open.
+
+`--shuffle-100-token-reward` (app: **100-token reward (experimental)**, under Items) is a separate
+default-off opt-in for [#12](https://github.com/hiKareeem/Clawshot/issues/12); both presets keep it off.
+It needs `Gift` shuffle (an effective spoiler string's `NPC` also counts) and is refused otherwise.
+When on, only that automatic non-progression rule is lifted: the first 100-token reward may hold a
+progression item, so a seed can require collecting all 100 Gold Skulltula tokens. The threshold stays 100
+and other destination holds and exclusions still apply. `--no-shuffle-100-token-reward` overrides a
+settings string; CS1 stores the choice. The shuffled reward is the father's first `GatheringTokenGold`
+grant (Event215), gated by the quest's native completion; his later repeat 200-rupee payout (Event471)
+is not a check and stays native (native trace:
+[section 35](../plans/03-game-data.md#35-round-8-gift-checks-native-identities-and-success-only-merchant-sales-cs8d)).
+Built, not played.
 
 Cows, pots, crates, loose rupees, recovery hearts, Treasure Chest Game keys and
 silver-rupee puzzles stay unchanged. Dungeon rewards have their own default-off
@@ -393,6 +404,15 @@ Other shuffled boss rewards, stones/combined bridge counts, late story order and
 are not certified by those checks. Both options remain experimental.
 Detailed evidence: [dungeon rewards and bridge](../plans/rounds/r18-rewards.md).
 
+The Temple of Time Light Arrows scene is an ordinary `Gift` check, already included
+when Gift shuffle is selected. It may give another eligible gift item; without Gift
+shuffle it still gives Light Arrows. In every mode its trigger remains the completed
+Shadow and Spirit awakening scenes, not owned medallions. The vanilla bridge follows
+that Temple story even when its reward is not Light Arrows; the six trials and finale
+still require usable Light Arrows. Ganon's boss key is never awarded by this scene:
+it follows the ordinary boss-key placement rules below. Round19 corrects the default
+logic to these native readers, without changing the scene or its saved writes.
+
 ## Master Sword shuffle
 
 `--shuffle-master-sword` (app: **Master Sword shuffle (experimental)**, under Items) is experimental
@@ -513,8 +533,8 @@ model and native room retirement wiring. Other dungeons' keys, majors, hearts an
 are not floor-key rewards. On Longshot rc.7 on 2026-11-19, Kareem left the Well replacement,
 recovered it, collected its silent +20 rupees, and confirmed it stayed collected after leaving,
 returning and Continue. This proves the checked Well pickup, not every scripted floor key.
-Own-dungeon mode leaves it untouched. The Shadow Temple floor key stays vanilla under every setting:
-**built, held until a natural pre-room save exists**. Its adapter is not admitted to generation.
+Own-dungeon mode leaves it untouched. The Shadow Temple floor key stays in its usual place
+under every setting until it has been tested in game; see `plans/rounds/r19-keys.md`.
 
 `--shuffle-hideout-keys` (UI: **Fortress jail keys (experimental)**) separately releases the four
 Fortress guard floor keys into supported shuffled chests. Default **off** in both presets;
