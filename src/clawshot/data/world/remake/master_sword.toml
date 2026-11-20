@@ -1,0 +1,431 @@
+# Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md sections 7-9; clawshot.generate.swords).
+# OoT Randomizer's adult always holds the Master Sword, so its rules read is_adult for an armed adult. Each entry
+# here reads adult_sword (world.toml helper) instead, wherever an adult fights, cuts or strikes:
+# - adult_sword is is_adult while the world's logic setting shuffle_master_sword is false. That constant folds every
+#   entry, and the entries listed below in other files, to its translated rule for each age that reaches it: off,
+#   the logic, pool and output are unchanged (tests/test_master_sword_logic.py compares each against its `was`).
+# - On, an adult needs an owned durable blade: the Master Sword or Biggoron Sword (the Giant's Knife breaks; logic never
+#   counts it, conservatively, though the runtime keeps an owned knife usable). The child-only weapons an
+#   `is_adult or ...` rule lists (Kokiri Sword: IsUsableChild only; sticks, slingshot, boomerang, Deku Shield:
+#   OoT Randomizer's _is_child_item) are gated to the child, so they never arm a swordless adult; the any-age
+#   alternatives a rule names (explosives, Din's Fire, nuts, the Megaton Hammer) stay usable without a sword.
+# - Compounded adult branches gate only the sword's assists, never the kill weapons they name (can_kill_biri).
+# - Where OoT Randomizer's rule is True in an adult-only room whose native reward follows a fight, the matching
+#   can_kill_* helper (LogicHelpers.json) or adult_sword is required; the sources mark the conservative ones.
+# - Noncombat is_adult (travel, heights, adult-only places, trades) is unchanged, as are rules that already need a
+#   killing item (Volvagia's Hammer; the Flare Dancer chest's room needs the Hammer). Trick and glitch rules stay as
+#   translated: they never compile while tricks are off (AGENTS.md rule 6), and enabling one needs this review.
+# - Ganondorf's room and the Triforce need the Master Sword itself (section 9.4).
+# Entries owned by other override files carry the same rewrite there (rule only, `was` kept): adult_forest_temple
+# (Forest Temple Lobby -> Central Area), adult_gerudo_training_ground (Lobby -> Lava Room Front), adult_lake_hylia
+# (Ice Cavern End Chest Access), adult_water_temple (Falling Platform Room -> Dark Link Region), child_deku_tree
+# (Top Floor -> Basement, Deku Tree GS Compass Room), child_dodongos_cavern (Upper Lizalfos -> Bomb Bag Ledge),
+# child_kakariko (Kak Redead Grotto Chest), extra_dodongo_cavern (Room 5 and Room 16 chests), song_lessons (Sheik in
+# Ice Cavern, Song from Royal Familys Tomb), token_routes (HF GS Lone Tree), remake.toml (Spirit Temple Mirror Shield
+# Chest).
+# Not changed, by review: SFM Entryway -> Sacred Forest Meadow (the Wolfos ambush is the child's; the adult maze's
+# Moblins need no fight), Graveyard Shield Grave Chest (its ReDead is Graveyard_Child_Dynamic's; child_graveyard keeps
+# the adult's translated True), KF Storms Grotto Chest (the scrub trio is beaten with a shield), the octorok helpers (a
+# reflected rock), the DMT Gold Skulltulas above Dodongo's Cavern (the Megaton Hammer they need also kills).
+# Additional native enemy-counter/chest bindings were audited by cs19c (r19-sword.md). Ungated map/glass chests
+# do not acquire an invented combat rule merely because their N64 name mentions an enemy.
+
+# Helpers (OoT Randomizer LogicHelpers.json).
+
+[helpers.can_cut_shrubs]
+rule = "adult_sword or (is_child and (Sticks or Kokiri_Sword or Boomerang)) or has_explosives or can_use(Megaton_Hammer)"
+was = "is_adult or Sticks or Kokiri_Sword or Boomerang or has_explosives or can_use(Megaton_Hammer)"
+source = "LogicHelpers.json:46. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_stun_deku]
+rule = "adult_sword or (is_child and (Slingshot or Boomerang or Sticks or Kokiri_Sword or Deku_Shield)) or has_explosives or can_use(Dins_Fire) or Nuts or can_use(Megaton_Hammer)"
+was = "is_adult or (Slingshot or Boomerang or Sticks or Kokiri_Sword or has_explosives or can_use(Dins_Fire) or Nuts or Deku_Shield or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:54. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_mow_the_lawn]
+rule = "adult_sword or (is_child and (Sticks or Kokiri_Sword or Progressive_Strength_Upgrade or Boomerang or has_explosives))"
+was = "is_adult or (is_child and (Sticks or Kokiri_Sword or Progressive_Strength_Upgrade or Boomerang or has_explosives))"
+source = "LogicHelpers.json:84. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult. Its adult branch names no alternative, so a swordless adult does not mow (conservative)."
+
+[helpers.can_jumpslash]
+rule = "adult_sword or (is_child and (Sticks or Kokiri_Sword)) or can_use(Megaton_Hammer)"
+was = "is_adult or Sticks or Kokiri_Sword or can_use(Megaton_Hammer)"
+source = "LogicHelpers.json:123. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_armos]
+rule = "has_soul(Armos) and (adult_sword or (is_child and (Sticks or ((Nuts or Boomerang) and (Kokiri_Sword or Slingshot)))) or has_explosives or can_use(Megaton_Hammer))"
+was = "has_soul(Armos) and (is_adult or Sticks or has_explosives or ((Nuts or Boomerang) and (Kokiri_Sword or Slingshot)) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:126. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_biri]
+rule = "has_soul(Biri_and_Bari) and ((is_child and ((Kokiri_Sword and (can_take_damage or Nuts or Magic_Meter)) or Sticks or Boomerang or can_use(Megaton_Hammer))) or (is_adult and (Hookshot or Bow or Megaton_Hammer or can_use(Sticks) or (adult_sword and (can_take_damage or Nuts or Magic_Meter)))) or Bombs or (Nuts and has_bombchus) or can_use(Dins_Fire))"
+was = "has_soul(Biri_and_Bari) and ((is_child and ((Kokiri_Sword and (can_take_damage or Nuts or Magic_Meter)) or Sticks or Boomerang or can_use(Megaton_Hammer))) or (is_adult and (can_take_damage or Nuts or Hookshot or Bow or Megaton_Hammer or Magic_Meter or can_use(Sticks))) or Bombs or (Nuts and has_bombchus) or can_use(Dins_Fire))"
+source = "LogicHelpers.json:133. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): compounded adult branch: only the sword's assists (taking the shock, nuts, magic for a spin attack, as the child branch pairs them with the Kokiri Sword) need adult_sword; the kill weapons it names (Hookshot, Bow, Megaton Hammer, swapped sticks) stay sword-free."
+
+[helpers.can_kill_bari]
+rule = "has_soul(Biri_and_Bari) and ((is_child and ((Kokiri_Sword and (can_take_damage or Nuts or Magic_Meter or Boomerang)) or Sticks or can_use(Megaton_Hammer))) or (is_adult and (Hookshot or Bow or Megaton_Hammer or can_use(Sticks) or (adult_sword and (can_take_damage or Nuts or Magic_Meter)))) or Bombs or ((Nuts or can_use(Boomerang)) and has_bombchus) or can_use(Dins_Fire))"
+was = "has_soul(Biri_and_Bari) and ((is_child and ((Kokiri_Sword and (can_take_damage or Nuts or Magic_Meter or Boomerang)) or Sticks or can_use(Megaton_Hammer))) or (is_adult and (can_take_damage or Nuts or Hookshot or Bow or Megaton_Hammer or Magic_Meter or can_use(Sticks))) or Bombs or ((Nuts or can_use(Boomerang)) and has_bombchus) or can_use(Dins_Fire))"
+source = "LogicHelpers.json:134. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): compounded adult branch: only the sword's assists (taking the shock, nuts, magic for a spin attack, as the child branch pairs them with the Kokiri Sword) need adult_sword; the kill weapons it names (Hookshot, Bow, Megaton Hammer, swapped sticks) stay sword-free."
+
+[helpers.can_kill_tailsparan]
+rule = "has_soul(Tailpasaran) and ((is_child and ((Kokiri_Sword and (Magic_Meter or can_take_damage)) or Sticks or Boomerang or can_use(Megaton_Hammer))) or (is_adult and (Megaton_Hammer or can_use(Sticks) or can_use(Boomerang) or (adult_sword and (Magic_Meter or can_take_damage)))))"
+was = "has_soul(Tailpasaran) and ((is_child and ((Kokiri_Sword and (Magic_Meter or can_take_damage)) or Sticks or Boomerang or can_use(Megaton_Hammer))) or (is_adult and (Magic_Meter or can_take_damage or Megaton_Hammer or can_use(Sticks) or can_use(Boomerang))))"
+source = "LogicHelpers.json:135. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): compounded adult branch: only the sword's assists (magic, taking the shock, as the child branch pairs them with the Kokiri Sword) need adult_sword; the Megaton Hammer and swapped sticks or boomerang stay sword-free."
+
+[helpers.can_kill_stinger]
+rule = "has_soul(Stinger) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot)) or has_explosives or can_use(Megaton_Hammer))"
+was = "has_soul(Stinger) and (is_adult or Kokiri_Sword or Sticks or Slingshot or has_explosives or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:136. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_tektite]
+rule = "has_soul(Tektite) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot)) or has_explosives or can_use(Megaton_Hammer))"
+was = "has_soul(Tektite) and (is_adult or Kokiri_Sword or Sticks or Slingshot or has_explosives or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:137. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_skulltula]
+rule = "has_soul(Skulltula) and (adult_sword or can_child_damage)"
+was = "has_soul(Skulltula) and (is_adult or can_child_damage)"
+source = "LogicHelpers.json:138. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_wolfos]
+rule = "has_soul(Wolfos) and (adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+was = "has_soul(Wolfos) and (is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:139. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_redead]
+rule = "has_soul(Redead_and_Gibdo) and (adult_sword or (is_child and (Sticks or Kokiri_Sword)) or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+was = "has_soul(Redead_and_Gibdo) and (is_adult or Sticks or Kokiri_Sword or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:140. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_keese]
+rule = "has_soul(Keese) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot or Boomerang)) or (Nuts and has_explosives) or can_use(Megaton_Hammer))"
+was = "has_soul(Keese) and (is_adult or Kokiri_Sword or Sticks or Slingshot or Boomerang or (Nuts and has_explosives) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:141. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_keese_stationary]
+rule = "has_soul(Keese) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot or Boomerang)) or has_explosives or can_use(Megaton_Hammer))"
+was = "has_soul(Keese) and (is_adult or Kokiri_Sword or Sticks or Slingshot or Boomerang or has_explosives or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:142. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_scrub]
+rule = "has_soul(Deku_Scrub) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot or Boomerang)) or can_use(Dins_Fire) or (Nuts and has_explosives) or can_use(Megaton_Hammer))"
+was = "has_soul(Deku_Scrub) and (is_adult or Kokiri_Sword or Sticks or Slingshot or Boomerang or can_use(Dins_Fire) or (Nuts and has_explosives) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:143. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_blue_bubble]
+rule = "has_soul(Bubble) and (Bombs or (is_adult and (Megaton_Hammer or (adult_sword and (Nuts or Hylian_Shield or Mirror_Shield or Hookshot or Bow or can_use(Boomerang))))) or (is_child and (can_use(Megaton_Hammer) or ((Boomerang or Nuts or Deku_Shield or Hylian_Shield) and (Sticks or Kokiri_Sword or Slingshot)))))"
+was = "has_soul(Bubble) and (Bombs or (is_adult and (Nuts or Hylian_Shield or Mirror_Shield or Hookshot or Megaton_Hammer or Bow or can_use(Boomerang))) or (is_child and (can_use(Megaton_Hammer) or ( (Boomerang or Nuts or Deku_Shield or Hylian_Shield) and (Sticks or Kokiri_Sword or Slingshot) )) ))"
+source = "LogicHelpers.json:144. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): compounded adult branch: the stunners it names (nuts, shields, Hookshot, swapped boomerang) assist the implicit sword, as the child branch pairs a stunner with a weapon; the Megaton Hammer, a standalone kill in the child branch too, stays sword-free. Conservative: the Bow is kept only beside a sword (arrows against the remake's bubbles are not verified)."
+
+[helpers.can_kill_green_bubble]
+rule = "has_soul(Bubble) and (adult_sword or Bombs or (is_child and (Sticks or Kokiri_Sword or Slingshot)) or can_use(Megaton_Hammer))"
+was = "has_soul(Bubble) and (is_adult or Bombs or Sticks or Kokiri_Sword or Slingshot or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:145. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_floormaster]
+rule = "has_soul(Floormaster) and (adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or (Bombs and Nuts) or has_bombchus or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+was = "has_soul(Floormaster) and (is_adult or Slingshot or Sticks or Kokiri_Sword or (Bombs and Nuts) or has_bombchus or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:146. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_wallmaster]
+rule = "has_soul(Wallmaster) and (adult_sword or can_child_damage)"
+was = "has_soul(Wallmaster) and (is_adult or can_child_damage)"
+source = "LogicHelpers.json:147. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_like_like]
+rule = "has_soul(Like_Like) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot)) or Bombs or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+was = "has_soul(Like_Like) and (is_adult or Kokiri_Sword or Sticks or Slingshot or Bombs or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:148. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_lizalfos]
+rule = "has_soul(Lizalfos_and_Dinalfos) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot)) or (Bombs and Nuts) or can_use(Megaton_Hammer))"
+was = "has_soul(Lizalfos_and_Dinalfos) and (is_adult or Kokiri_Sword or Sticks or Slingshot or (Bombs and Nuts) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:149. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_lizalfos_with_bombs]
+rule = "has_soul(Lizalfos_and_Dinalfos) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot)) or Bombs or can_use(Megaton_Hammer))"
+was = "has_soul(Lizalfos_and_Dinalfos) and (is_adult or Kokiri_Sword or Sticks or Slingshot or Bombs or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:150. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_dinolfos]
+rule = "has_soul(Lizalfos_and_Dinalfos) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or (Slingshot and Nuts))) or can_use(Megaton_Hammer))"
+was = "has_soul(Lizalfos_and_Dinalfos) and (is_adult or Kokiri_Sword or Sticks or (Slingshot and Nuts) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:151. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_withered_deku_baba]
+rule = "has_soul(Deku_Baba) and (adult_sword or (is_child and (Kokiri_Sword or Boomerang)))"
+was = "has_soul(Deku_Baba) and (is_adult or Kokiri_Sword or Boomerang)"
+source = "LogicHelpers.json:153. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_dodongo]
+rule = "has_soul(Dodongo) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot)) or has_explosives or can_use(Megaton_Hammer))"
+was = "has_soul(Dodongo) and (is_adult or Kokiri_Sword or Sticks or Slingshot or has_explosives or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:154. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_dodongo_with_bomb_flower]
+rule = "has_soul(Dodongo) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot)) or has_explosives or Progressive_Strength_Upgrade or can_use(Megaton_Hammer))"
+was = "has_soul(Dodongo) and (is_adult or Kokiri_Sword or Sticks or Slingshot or has_explosives or Progressive_Strength_Upgrade or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:155. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_gohma_larva]
+rule = "has_soul(Gohma_Larvae) and (adult_sword or can_child_attack)"
+was = "has_soul(Gohma_Larvae) and (is_adult or can_child_attack)"
+source = "LogicHelpers.json:156. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_baby_dodongo]
+rule = "has_soul(Baby_Dodongo) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot or Boomerang)) or has_explosives or can_use(Megaton_Hammer))"
+was = "has_soul(Baby_Dodongo) and (is_adult or Kokiri_Sword or Sticks or Slingshot or Boomerang or has_explosives or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:157. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_stalfos]
+rule = "has_soul(Stalfos) and (adult_sword or (is_child and Kokiri_Sword) or can_use(Megaton_Hammer))"
+was = "has_soul(Stalfos) and (is_adult or Kokiri_Sword or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:158. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_iron_knuckle]
+rule = "has_soul(Iron_Knuckle) and (adult_sword or has_explosives or (is_child and (Kokiri_Sword or (Sticks and Slingshot))) or can_use(Megaton_Hammer))"
+was = "has_soul(Iron_Knuckle) and (is_adult or has_explosives or Kokiri_Sword or (Sticks and Slingshot) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:161. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_guay]
+rule = "has_soul(Guay) and (adult_sword or (is_child and (Kokiri_Sword or Sticks or Slingshot or Boomerang)) or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+was = "has_soul(Guay) and (is_adult or Kokiri_Sword or Sticks or Slingshot or Boomerang or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:162. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_flare_dancer]
+rule = "has_soul(Flare_Dancer) and (has_explosives or can_use(Megaton_Hammer) or can_use(Hookshot)) and (adult_sword or (is_child and (Sticks or Kokiri_Sword)) or can_use(Megaton_Hammer))"
+was = "has_soul(Flare_Dancer) and (has_explosives or can_use(Megaton_Hammer) or can_use(Hookshot)) and (is_adult or Sticks or Kokiri_Sword or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:163. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_torch_slug]
+rule = "has_soul(Torch_Slug) and (adult_sword or (is_child and (Sticks or Kokiri_Sword)) or Bombs or can_use(Megaton_Hammer))"
+was = "has_soul(Torch_Slug) and (is_adult or Sticks or Kokiri_Sword or Bombs or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:164. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+[helpers.can_kill_freezard]
+rule = "has_soul(Freezard) and (adult_sword or (is_child and Sticks) or has_explosives or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+was = "has_soul(Freezard) and (is_adult or Sticks or has_explosives or can_use(Dins_Fire) or can_use(Megaton_Hammer))"
+source = "LogicHelpers.json:165. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch stood for OoT Randomizer's always-held Master Sword and is now adult_sword; the child weapons it lists are gated to the child (Weapon_Sword_Kokiri is IsUsableChild only; sticks, slingshot, boomerang and Deku Shield are child items, _is_child_item), and the any-age alternatives it names stay usable by a swordless adult."
+
+# Region rules, in world file order.
+
+[events."KF Outside Deku Tree"."Deku Stick Drop"]
+rule = "(adult_sword and not entrance_shuffle) or can_use(Kokiri_Sword) or can_use(Boomerang)"
+was = "(is_adult and not entrance_shuffle) or can_use(Kokiri_Sword) or can_use(Boomerang)"
+source = "Overworld.json:225. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult's Deku Babas are cut down: adult_sword (no adult alternative named)."
+
+[events."KF Outside Deku Tree"."Deku Nut Drop"]
+rule = "adult_sword and not entrance_shuffle"
+was = "is_adult and not entrance_shuffle"
+source = "Overworld.json:226. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult's Deku Babas are cut down: adult_sword (no adult alternative named)."
+
+[locations."SFM Wolfos Grotto Chest"]
+rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
+was = "is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
+source = "Overworld.json:2954. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the grotto's Wolfos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Hideout 1 Torch Jail"."Hideout 1 Torch Jail Gerudo"]
+rule = "adult_sword or (is_child and Kokiri_Sword)"
+was = "is_adult or Kokiri_Sword"
+source = "Overworld.json:887. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the jail guard's fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Hideout 2 Torches Jail"."Hideout 2 Torches Jail Gerudo"]
+rule = "adult_sword or (is_child and Kokiri_Sword)"
+was = "is_adult or Kokiri_Sword"
+source = "Overworld.json:914. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the jail guard's fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Hideout 3 Torches Jail"."Hideout 3 Torches Jail Gerudo"]
+rule = "adult_sword or (is_child and Kokiri_Sword)"
+was = "is_adult or Kokiri_Sword"
+source = "Overworld.json:944. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the jail guard's fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Hideout 4 Torches Jail"."Hideout 4 Torches Jail Gerudo"]
+rule = "adult_sword or (is_child and Kokiri_Sword)"
+was = "is_adult or Kokiri_Sword"
+source = "Overworld.json:965. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the jail guard's fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Deku Tree Upper Lobby Recovery Heart"]
+rule = "adult_sword or can_child_attack or Nuts"
+was = "is_adult or can_child_attack or Nuts"
+source = "Deku Tree.json:10. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Deku Tree Lobby"."Deku Stick Drop"]
+rule = "adult_sword or (is_child and (Kokiri_Sword or Boomerang))"
+was = "is_adult or Kokiri_Sword or Boomerang"
+source = "Deku Tree.json:12. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Deku Tree Lobby"."Deku Nut Drop"]
+rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
+was = "is_adult or Slingshot or Sticks or has_explosives or Kokiri_Sword or can_use(Dins_Fire)"
+source = "Deku Tree.json:13. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Deku Tree GS Basement Gate"]
+rule = "adult_sword or can_child_attack"
+was = "is_adult or can_child_attack"
+source = "Deku Tree.json:37. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the Gold Skulltula: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[exits."Dodongos Cavern Lobby"."Dodongos Cavern Staircase Room"]
+rule = "at('Dodongos Cavern Torch Room', adult_sword or (is_child and Sticks) or can_use(Dins_Fire))"
+was = "at('Dodongos Cavern Torch Room', is_adult or Sticks or can_use(Dins_Fire))"
+source = "Dodongos Cavern.json:27. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): conservative: the adult branch stands where the child needs sticks or Din's Fire and its adult mechanism is not identified, so it needs adult_sword; sticks are a child weapon."
+
+[locations."Dodongos Cavern GS Side Room Near Lower Lizalfos"]
+rule = "adult_sword or has_explosives or (is_child and (Sticks or Slingshot or Boomerang or Kokiri_Sword))"
+was = "is_adult or has_explosives or Sticks or Slingshot or Boomerang or Kokiri_Sword"
+source = "Dodongos Cavern.json:48. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Forest Temple First Stalfos Chest"]
+rule = "adult_sword or (is_child and Kokiri_Sword)"
+was = "is_adult or Kokiri_Sword"
+source = "Forest Temple.json:21. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the Stalfos fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Forest Temple NW Outdoors"."Deku Stick Drop"]
+rule = "adult_sword or (is_child and (Kokiri_Sword or Boomerang))"
+was = "is_adult or Kokiri_Sword or Boomerang"
+source = "Forest Temple.json:48. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Forest Temple NW Outdoors"."Deku Nut Drop"]
+rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
+was = "is_adult or Slingshot or Sticks or has_explosives or Kokiri_Sword or can_use(Dins_Fire)"
+source = "Forest Temple.json:49. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Forest Temple NE Outdoors"."Deku Stick Drop"]
+rule = "adult_sword or (is_child and (Kokiri_Sword or Boomerang))"
+was = "is_adult or Kokiri_Sword or Boomerang"
+source = "Forest Temple.json:89. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Forest Temple NE Outdoors"."Deku Nut Drop"]
+rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
+was = "is_adult or Slingshot or Sticks or has_explosives or Kokiri_Sword or can_use(Dins_Fire)"
+source = "Forest Temple.json:90. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Forest Temple Bow Chest"]
+rule = "not shuffle_master_sword or can_kill_stalfos"
+was = "True"
+source = "Forest Temple.json:155. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): native N64 layout: the Bow chest appears after the room's Stalfos fall; can_kill_stalfos keeps the Megaton Hammer. OoT Randomizer's True relied on the always-held sword; only an adult reaches this region, so off it is True for every reachable age."
+
+[events."Phantom Ganon Boss Room"."Defeat Phantom Ganon"]
+rule = "((can_use(Hookshot) or can_use(Bow)) and adult_sword) or (can_use(Slingshot) and Kokiri_Sword)"
+was = "can_use(Hookshot) or can_use(Bow) or (can_use(Slingshot) and Kokiri_Sword)"
+source = "Bosses.json:92. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): r18-master-sword-design.md section 7 (Bosses.json:92): phase two's returned energy ball and the fallen Phantom Ganon are struck with the sword, so the adult's Hookshot or Bow route needs adult_sword; the child's Slingshot and Kokiri Sword route is unchanged."
+
+[locations."Fire Temple Megaton Hammer Chest"]
+rule = "has_explosives and (not shuffle_master_sword or can_kill_flare_dancer)"
+was = "has_explosives"
+source = "Fire Temple.json:149. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): native N64 layout: the second Flare Dancer guards the Hammer room; its rule's explosives knock off the flame, can_kill_flare_dancer adds the strike (adult_sword or a shuffled Megaton Hammer). OoT Randomizer's True relied on the always-held sword; only an adult reaches this region, so off it is True for every reachable age."
+
+[events."Morpha Boss Room"."Defeat Morpha"]
+rule = "(can_use(Hookshot) and adult_sword) or (logic_water_morpha and (adult_sword or (is_child and Kokiri_Sword)))"
+was = "can_use(Hookshot) or (logic_water_morpha and (is_adult or Kokiri_Sword))"
+source = "Bosses.json:141. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): r18-master-sword-design.md section 7 (Bosses.json:141): the nucleus is struck after the Hookshot pull, conservatively with a sword; the trick branch's Kokiri Sword is the child's."
+
+[locations."Shadow Temple Hover Boots Chest"]
+rule = "not shuffle_master_sword or adult_sword"
+was = "True"
+source = "Shadow Temple.json:18. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): native N64 layout: Dead Hand guards the Hover Boots. OoT Randomizer names no other Dead Hand weapon (its Bottom of the Well fight reads the Kokiri Sword), so conservatively adult_sword. OoT Randomizer's True relied on the always-held sword; only an adult reaches this region, so off it is True for every reachable age."
+
+[locations."Shadow Temple After Wind Enemy Chest"]
+rule = "not shuffle_master_sword or can_kill_redead"
+was = "True"
+source = "Shadow Temple.json:132. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the enemy chest appears after its room's Gibdos fall (Redead_and_Gibdo soul, native N64 layout). OoT Randomizer's True relied on the always-held sword; only an adult reaches this region, so off it is True for every reachable age."
+
+[events."Bongo Bongo Boss Room"."Defeat Bongo Bongo"]
+rule = "((is_child and Kokiri_Sword) or adult_sword) and (can_use(Hookshot) or can_use(Bow) or can_use(Slingshot) or logic_shadow_bongo) and (can_use(Lens_of_Truth) or logic_lens_bongo)"
+was = "(Kokiri_Sword or is_adult) and (can_use(Hookshot) or can_use(Bow) or can_use(Slingshot) or logic_shadow_bongo) and (can_use(Lens_of_Truth) or logic_lens_bongo)"
+source = "Bosses.json:167. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the eye is struck with a sword once the hands are stunned: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Twinrova Boss Room"."Defeat Twinrova"]
+rule = "can_use(Mirror_Shield) and adult_sword"
+was = "can_use(Mirror_Shield)"
+source = "Bosses.json:194. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): r18-master-sword-design.md section 7 (Bosses.json:194): Twinrova's final strikes after the Mirror Shield reflections need adult_sword."
+
+[exits."Ice Cavern Beginning"."Ice Cavern Spinning Scythe Room"]
+rule = "here(adult_sword or has_explosives or can_use(Dins_Fire))"
+was = "here(is_adult or has_explosives or can_use(Dins_Fire))"
+source = "Ice Cavern.json:13. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the opening room's Freezards (its explosives and Din's Fire are can_kill_freezard's): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Ice Cavern Iron Boots Chest"]
+rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
+was = "is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
+source = "Ice Cavern.json:78. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the end room's Wolfos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Gerudo Training Ground Stalfos Chest"]
+rule = "adult_sword or (is_child and Kokiri_Sword)"
+was = "is_adult or Kokiri_Sword"
+source = "Gerudo Training Ground.json:8. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the Stalfos fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Gerudo Training Ground Beamos Chest"]
+rule = "has_explosives and (adult_sword or (is_child and Kokiri_Sword))"
+was = "has_explosives and (is_adult or Kokiri_Sword)"
+source = "Gerudo Training Ground.json:9. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the room's fight after the Beamos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[exits."Gerudo Training Ground Lobby"."Gerudo Training Ground Boulder Room"]
+rule = "adult_sword or (is_child and Kokiri_Sword)"
+was = "is_adult or Kokiri_Sword"
+source = "Gerudo Training Ground.json:27. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): through the Stalfos room: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Gerudo Training Ground Before Heavy Block Chest"]
+rule = "not shuffle_master_sword or can_kill_wolfos"
+was = "True"
+source = "Gerudo Training Ground.json:120. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): conservative, native N64 layout not verified in the remake: the chest appears after the silver-block room's Wolfos fall. OoT Randomizer's True relied on the always-held sword; only an adult reaches this region, so off it is True for every reachable age."
+
+[locations."Gerudo Training Ground Hammer Room Clear Chest"]
+rule = "not shuffle_master_sword or (can_kill_torch_slug and can_kill_keese)"
+was = "True"
+source = "Gerudo Training Ground.json:164. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): conservative, native N64 layout not verified in the remake: the room is cleared of its Torch Slugs and Fire Keese for this chest. OoT Randomizer's True relied on the always-held sword; only an adult reaches this region, so off it is True for every reachable age."
+
+[locations."Ganons Castle Forest Trial Chest"]
+rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
+was = "is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
+source = "Ganons Castle.json:36. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the trial's Wolfos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Ganons Castle Water Trial"."Blue Fire"]
+rule = "has_bottle and (adult_sword or (is_child and (Sticks or Kokiri_Sword)) or has_explosives)"
+was = "has_bottle and (is_adult or Sticks or Kokiri_Sword or has_explosives)"
+source = "Ganons Castle.json:75. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the trial's Freezards: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[events."Ganons Castle Water Trial"."Fairy"]
+rule = "Blue_Fire and (adult_sword or has_explosives or can_use(Dins_Fire))"
+was = "Blue_Fire and (is_adult or has_explosives or can_use(Dins_Fire))"
+source = "Ganons Castle.json:77. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the trial's Freezards (its alternatives are can_kill_freezard's): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Ganons Castle Water Trial Fairy Pot Drop"]
+rule = "Blue_Fire and (adult_sword or has_explosives or can_use(Dins_Fire))"
+was = "Blue_Fire and (is_adult or has_explosives or can_use(Dins_Fire))"
+source = "Ganons Castle.json:76. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the trial's Freezards (its alternatives are can_kill_freezard's): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[locations."Ganons Tower Boss Key Chest"]
+rule = "adult_sword or (is_child and Kokiri_Sword)"
+was = "is_adult or Kokiri_Sword"
+source = "Bosses.json:222. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the tower's fights: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[exits."Ganons Castle Tower"."Ganons Castle Tower Below Boss"]
+rule = "(adult_sword or (is_child and Kokiri_Sword)) and (Boss_Key_Ganons_Castle or (shuffle_pots != 'off'))"
+was = "(is_adult or Kokiri_Sword) and (Boss_Key_Ganons_Castle or (shuffle_pots != 'off'))"
+source = "Bosses.json:226. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the tower's fights: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+
+[exits."Ganons Castle Tower Below Boss"."Ganondorf Boss Room"]
+rule = "Boss_Key_Ganons_Castle and (not shuffle_master_sword or Master_Sword)"
+was = "Boss_Key_Ganons_Castle"
+source = "Bosses.json:258. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): r18-master-sword-design.md section 9.4 with the cs19c finale guard (Defeat_Ganon BossAppear_1 before Event43 and BossAppear_2, dream branches kept): an owned Master Sword before Ganondorf's arena, never Biggoron alone. Off the added term is True."
+
+[events."Ganondorf Boss Room"."Triforce"]
+rule = "can_use(Light_Arrows) and (not shuffle_master_sword or Master_Sword)"
+was = "can_use(Light_Arrows)"
+source = "Bosses.json:267. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): r18-master-sword-design.md sections 6, 7 and 9.4: Defeat_Ganon BossAppear_2 Event33/Event66 waits on an equipped Master Sword; ownership is required at the arena's admission and here. Off the added term is True."
+
+[locations."Forest Temple Floormaster Chest"]
+rule = "not shuffle_master_sword or can_kill_floormaster"
+was = "True"
+source = "Native ForestTemple_Static chest Hash7535137041266964235, AiGroup4259229318023648138, module ForestTemple_Level_Room_18_Prefab_d8e6: binds Enemy_Floormaster_9708, Obj_EnemyCounter_A_01_e91c and chest; EnemyRemain/Dead and Gimmick_TreasureBoxAppear_Any_Magic. Conservative clearance requirement from these native bindings (cs19c, 2026-11-19, r19-sword.md); off remains exactly True."
+
+[locations."Shadow Temple Map Chest"]
+rule = "not shuffle_master_sword or (can_kill_redead and can_kill_keese)"
+was = "True"
+source = "Native ShadowTemple_Static chest Hash13528903653876646082, AiGroup7752599007990121224, module ShadowTemple_Level_Room_B1F_C_Prefab_95d1: binds ReDead/Keese, enemy counter and chest; EnemyRemain/IsDeadNotDelay and Gimmick_TreasureBoxAppear_02_Any_Magic. Conservative joint clearance (cs19c, 2026-11-19, r19-sword.md); off remains exactly True."
+
+[locations."Shadow Temple Compass Chest"]
+rule = "not shuffle_master_sword or can_kill_redead"
+was = "True"
+source = "Native ShadowTemple_Static chest Hash1733372171176975157, AiGroup4550791846560649848, module ShadowTemple_Level_Room_B2F_B_Prefab_3238: binds two Gibdos, enemy counter and chest; EnemyRemain/IsDeadNotDelay and Gimmick_TreasureBoxAppear_02_Any_Magic. Conservative clearance (cs19c, 2026-11-19, r19-sword.md); off remains exactly True."
+

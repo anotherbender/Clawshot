@@ -15,6 +15,9 @@ moves the event gifts that can be changed (``clawshot.patch.gifts``); the others
 ``--shuffle Freestanding`` adds the fourteen saved heart-piece floor checks (native palette only; off).
 ``--shuffle Token`` (off) shuffles all 100 native Gold Skulltulas across explicitly played reward families
 (``clawshot.generate.tokens``); tokens may also go to chests. Token without Chest is refused.
+``--shuffle-master-sword`` (experimental, off) makes the Temple of Time pedestal's first pull a check and the Master
+Sword a shuffled chest item; the pedestal still moves Link between ages. It needs Chest, and generation refuses it
+without ``--logic free_time_travel=true``.
 """
 
 import argparse
@@ -88,6 +91,16 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="experimental: shuffle stones/medallions only among the nine rewards, including Rauru",
     )
+    parser.add_argument(
+        "--shuffle-master-sword",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help=(
+            "experimental, default off, built not played: pedestal first pull gives a shuffled item and the Master "
+            "Sword goes to shuffled chests only; the pedestal still changes age; needs Chest and, for generation, "
+            "--logic free_time_travel=true"
+        ),
+    )
     parser.add_argument("--bridge", choices=("vanilla", "stones", "medallions", "rewards"))
     parser.add_argument(
         "--bridge-count", type=int, help="unique rewards to open bridge only; stones 0..3, medals 0..6, rewards 0..9"
@@ -155,6 +168,7 @@ def main(argv: list[str] | None = None) -> int:
             ("dungeon_items", "dungeon_items"),
             ("shuffle_hideout_keys", "shuffle_hideout_keys"),
             ("dungeon_rewards", "dungeon_rewards"),
+            ("shuffle_master_sword", "shuffle_master_sword"),
             ("bridge", "bridge"),
             ("bridge_count", "bridge_count"),
             ("areas", "areas"),

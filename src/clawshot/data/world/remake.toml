@@ -81,6 +81,10 @@ area = "DesertColossus"
 source = "census: Item_Gauntlet_Silver, in DesertColossus (03-game-data.md section 9, 'Moved'); D16 for the tier"
 
 [locations."Spirit Temple Mirror Shield Chest"]
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): the Iron Knuckle (Nabooru) fight before the
+# Colossus hand, native N64 layout. Only an adult reaches it, so while shuffle_master_sword is false it is True there.
+rule = "not shuffle_master_sword or can_kill_iron_knuckle"
+was = "True"
 area = "DesertColossus"
 source = "census: Item_Shield_Mirror, in DesertColossus (03-game-data.md section 9, 'Moved')"
 

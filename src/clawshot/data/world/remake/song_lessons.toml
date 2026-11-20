@@ -27,7 +27,9 @@ was = "is_adult"
 source = "Interim lesson rule (header): Dm_MelodyGet_Forest runs the play-along Event7/Event9/Event32 before its song step Event22."
 
 [locations."Sheik in Ice Cavern"]
-rule = "(is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)) and Ocarina and (is_child or (Ocarina, 2))"
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword, child
+# weapons the child's; it folds to the rule before while shuffle_master_sword is false.
+rule = "(adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)) and Ocarina and (is_child or (Ocarina, 2))"
 was = "is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Interim lesson rule (header): the Iron Boots chest's SageOfWater:IceCavern_WaterSerenade gives the chest reward (Dm_SY_Treasurebox) first, then Dm_MelodyGet_Water runs the play-along Event16/Event2/Event14 before its song step Event29."
 
@@ -42,7 +44,8 @@ was = "True"
 source = "Interim lesson rule (header): DoorOfTime Step01_Npc_Hylia_Impa_Child_Talk starts Dm_MelodyGet_Zelda, which runs the play-along Event27/Event49/Event50 before its song step Event111."
 
 [locations."Song from Royal Familys Tomb"]
-rule = "(is_adult or Slingshot or Boomerang or Sticks or has_explosives or Kokiri_Sword) and Ocarina and (is_child or (Ocarina, 2))"
+# Round 19 Master Sword shuffle (remake/master_sword.toml header): as above.
+rule = "(adult_sword or (is_child and (Slingshot or Boomerang or Sticks or Kokiri_Sword)) or has_explosives) and Ocarina and (is_child or (Ocarina, 2))"
 was = "is_adult or Slingshot or Boomerang or Sticks or has_explosives or Kokiri_Sword"
 source = "Interim lesson rule (header): GimmickFlow_RoyalFamilyTomb CheckStone_To_MelodyGet_Sun plays Dm_MelodyGet_Sun (play-along child Event0/Event106/Event107, adult Event3/Event145/Event146) before Event57 starts Dm_MelodyGet_Sun_03, whose Event34 is the song step."
 

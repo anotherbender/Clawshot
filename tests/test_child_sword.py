@@ -54,6 +54,11 @@ def run(fc, state, pouch, *, child, visibility="buffered", reading="stock"):
                 answer = view.get(params["GameDataName"], "") == ""
             elif op == "EventQueryIsGameDataBool":
                 answer = view.get(params["GameDataName"], False)
+            elif op == "EventQueryIsGameDataInt":
+                value = view.get(params["GameDataName"], 0)
+                comparison = 0 if value == params["Value"] else 1 if value < params["Value"] else 2
+                at = dict(event.cases)[comparison]
+                continue
             elif op == "EventQueryPlayerIsChild":
                 answer = child
             elif op == "EventQueryIsExistInPouch":

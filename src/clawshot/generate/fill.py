@@ -35,6 +35,8 @@ HIDEOUT_KEY_SOURCE = "HideoutKeyPickup"
 """The four Fortress jail-key sources' location type with ``shuffle_hideout_keys``. Never a ``shuffle`` kind."""
 HIDEOUT_KEY_DESTINATIONS = ("Chest", HIDEOUT_KEY_SOURCE)
 """Where a Fortress key may go: a chest (named Fortress grant) or a jail source (its native key)."""
+SWORD_PEDESTAL_SOURCE = "SwordPedestal"
+"""The first-pull source when ``shuffle_master_sword`` is enabled; never a user shuffle kind."""
 RELEASED_DUNGEON_ITEM_TYPES: dict[str, frozenset[str]] = {
     "own_dungeon": frozenset(),
     "anywhere": frozenset({SMALL_KEY}),
@@ -120,6 +122,7 @@ class Settings:
     dungeon_items: str = DEFAULTS["dungeon_items"]
     shuffle_hideout_keys: bool = DEFAULTS["shuffle_hideout_keys"]
     dungeon_rewards: bool = DEFAULTS["dungeon_rewards"]
+    shuffle_master_sword: bool = DEFAULTS["shuffle_master_sword"]
     bridge: str = DEFAULTS["bridge"]
     bridge_count: int = DEFAULTS["bridge_count"]
     logic: dict[str, Any] = field(default_factory=dict)
@@ -184,6 +187,12 @@ class Settings:
             raise ValueError("shuffle_hideout_keys moves the jail keys into shuffled chests: shuffle Chest")
         if type(self.dungeon_rewards) is not bool:
             raise ValueError("dungeon_rewards must be a boolean")
+        if type(self.shuffle_master_sword) is not bool:
+            raise ValueError("shuffle_master_sword must be a boolean")
+        if self.shuffle_master_sword and "Chest" not in self.shuffle:
+            raise ValueError("Master Sword shuffle needs Chests set to Shuffled.")
+        if SWORD_PEDESTAL_SOURCE in self.shuffle:
+            raise ValueError("SwordPedestal is not a shuffle kind: use shuffle_master_sword")
         limits = {"vanilla": 0, "stones": 3, "medallions": 6, "rewards": 9}
         if not isinstance(self.bridge, str) or self.bridge not in limits:
             raise ValueError("bridge must be vanilla, stones, medallions or rewards")
@@ -249,6 +258,8 @@ class Settings:
             out["goal"] = self.goal
         if self.shuffle_hideout_keys:
             out["shuffle_hideout_keys"] = True  # absent when off: existing settings strings and logs keep their bytes
+        if self.shuffle_master_sword:
+            out["shuffle_master_sword"] = True
         if self.item_location_types:
             out["item_location_types"] = {
                 k: list(self.item_location_types[k]) for k in sorted(self.item_location_types)
@@ -376,6 +387,8 @@ def shuffled_locations(world: World, settings: Settings) -> list[str]:
     N64-only) and are not held to their vanilla item (``keep_vanilla``, a reason, e.g. the Treasure Chest Game's room
     boxes: D17). The others keep their vanilla item."""
     kinds = {*settings.shuffle, *key_source_types(settings)}
+    if settings.shuffle_master_sword:
+        kinds.add(SWORD_PEDESTAL_SOURCE)
     return [
         name
         for name, loc in world.locations.items()

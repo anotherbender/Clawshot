@@ -3214,3 +3214,11 @@ where = "Gerudo Fortress cell halls: collect the defeated guard's floor reward; 
 oot_randomizer_name = ""
 source = "plans/rounds/r18-keys.md; native key-04 identity across guard/event/resting forms"
 ids = ["10731814783987785199"]
+
+[[location]]
+location = "Master Sword Pedestal"
+name = "Temple of Time Pedestal"
+where = "Beyond the Door of Time: the first sword pull, before the first adult arrival"
+oot_randomizer_name = "Master Sword Pedestal"
+source = "DoorOfTime/Event115; plans/rounds/r18-master-sword-design.md section 4; r19-sword.md"
+ids = ["DoorOfTime/Event115"]

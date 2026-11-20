@@ -86,6 +86,12 @@ age_pull_event = "Time Travel"
 # Keeps Temple Sheik through both first-arrival scenes, then hides him until Forest completion.
 free_time_travel = false
 
+# Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md sections 7-9), read by adult_sword
+# and the finale rules. Always false here: a seed sets it to Settings.shuffle_master_sword
+# (clawshot.generate.swords.prepare_spec), and seed logic naming it must agree. False, every rule naming adult_sword
+# folds to its translated is_adult form.
+shuffle_master_sword = false
+
 # Return-kit fill constraint (reviewer, round 5): Forest's checked rules need Bow, strength, grapple and keys.
 # Keep strength copies adult-only. Claude's Round 14 exception credits native Darunia's Bracelet as child
 # capability, not a copy tier: child DC still requires his Lullaby/Saria route, while adult strength needs copies.
@@ -180,7 +186,17 @@ destinations = ["Chest"]
 # "Nothing" (OoT Randomizer's own item) is shown the same way when a chest holds it.
 "Archipelago Item" = { class = "normal" }
 
+# The Master Sword's canonical pouch actor Weapon_Sword_Master: ownership IsGet.Weapon_Sword_Master, stock
+# PouchData.Weapon_Sword_Master.StockNum, no Item_Sword_Master row (r18-master-sword-design.md section 3; tracker
+# master_sword). In a pool only with Master Sword shuffle, from the pedestal check clawshot.generate.swords adds.
+"Master Sword" = { class = "progression" }
+
 [helpers.Progressive_Strength_Upgrade]
 # The quoted counted form reads the raw counter, not this age-aware helper.
 rule = "(progressive_copies_only and is_child and 'Goron Bracelet') or ((not progressive_copies_only or not is_child) and ('Progressive Strength Upgrade', 1))"
 source = "Claude, 2026-11-13, Round 14 deliberate child-capability exception: native Darunia's Lullaby/Saria/door route supplies child lift but no copy tier; all three copies supply adult tiers. E native audit work/r14-steps/ainb/FINDINGS.md:70-73 confirms DC has no quest-step precondition. See plans/rounds/r14-progressive.md."
+
+[helpers.adult_sword]
+# OoT Randomizer's adult always holds the Master Sword, so its rules read is_adult for an armed adult.
+rule = "is_adult and (not shuffle_master_sword or Master_Sword or Biggoron_Sword)"
+source = "Round 19 cs19c (plans/rounds/r18-master-sword-design.md sections 3 and 7): RSDB/PouchActorInfo and PouchTable mark Weapon_Sword_Master, Weapon_Sword_Biggoron, Weapon_Sword_Giant and Weapon_Sword_BrokenGiant the IsUsableAdult blades, Weapon_Sword_Kokiri IsUsableChild only. Off (shuffle_master_sword false) this folds to is_adult, so every rule naming it compiles to its translated form; on, an adult needs an owned durable blade. Conservative (Main review, 2026-11-19): the Giant's Knife breaks after use (section 8: the break is not modelled), so logic never counts it; the runtime still keeps an owned knife usable."
