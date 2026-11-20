@@ -3,12 +3,14 @@
 import copy
 
 import pytest
+from test_mido_schedule import game_data as mido_game_data
+from test_mido_schedule import schedule as mido_schedule
 
 from clawshot import patch as patch_api
 from clawshot.census.gifts import FLOW_VERSIONS
-from clawshot.formats import byml, evfl, msbt, sarc, zsdic
+from clawshot.formats import byml, evfl, msbt, rstb, sarc, zsdic
 from clawshot.generate import Settings
-from clawshot.patch import key_text, keys, text
+from clawshot.patch import key_text, keys, ocarina, text
 from clawshot.patch.key_targets import DungeonGrant
 from clawshot.patch.key_text import labels
 from clawshot.patch.plan import ChestChange, Plan
@@ -482,6 +484,9 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
     documents, rows = key_sources()
     handover = patch_api.bags.HANDOVER_FLOW
     documents[handover] = evfl.EventFlowFile(handover, flowchart=evfl.Flowchart(handover))
+    documents[keys.POUCH].flowchart.actors.append(evfl.Actor("UISystemActor"))
+    for name in ("Dm_SY_GetInEvent", "Dm_Kokiri_0155", "Dm_MelodyGet_Time"):
+        documents[name] = evfl.EventFlowFile(name, flowchart=evfl.Flowchart(name))
     originals = {keys.flow_path(name): evfl.write(document) for name, document in documents.items()}
     originals[keys.SETTINGS] = byml.write(rows)
     originals[keys.ANALYZED] = byml.write(key_analysis(rows))
@@ -508,8 +513,16 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
             "SaveFileIndex": 0,
         }
     )
+    for kind, entries in mido_game_data()["Data"].items():
+        game_data["Data"].setdefault(kind, []).extend(entries)
     originals["GameData/GameDataList.Product.110.byml.zs"] = byml.write(game_data)
     originals["Banc/Synthetic/Synthetic_Static.bcett.byml.zs"] = byml.write({"Actors": []})
+    schedule_path = tmp_path / patch_api.mido_schedule.SCHEDULE
+    schedule_path.parent.mkdir(parents=True, exist_ok=True)
+    schedule_path.write_bytes(byml.write(mido_schedule()))
+    table = rstb.ResourceSizeTable()
+    table.set(patch_api.mido_schedule.SCHEDULE, 1 << 20)
+    originals[rstb.TABLE_PATH] = rstb.write(table)
     originals[text.archive_path("USen")] = sarc.write(
         {
             key_text.GET_TEXT: msbt.write(msbt.Msbt({}, buckets=2)),
@@ -546,6 +559,15 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
     monkeypatch.setattr(patch_api.item_actors, "load", lambda: patch_api.item_actors.loads(""))
     monkeypatch.setattr(patch_api, "make_plan", lambda *args, overrides=None: plan)
     monkeypatch.setattr(text, "sheik_hint_changes", lambda *args: {})
+    # The real receipt compiler sees the same resource set this invented world's
+    # writer applies below; unrelated native quest scenes are not part of it.
+    compile_receipts = ocarina.changes
+
+    def chest_receipts(romfs, *, prior_changes):
+        present = tuple({path: change for path, change in step.items() if path in originals} for step in prior_changes)
+        return compile_receipts(romfs, prior_changes=present)
+
+    monkeypatch.setattr(ocarina, "changes", chest_receipts)
     output = patch_api.make_seed(
         tmp_path,
         0,
