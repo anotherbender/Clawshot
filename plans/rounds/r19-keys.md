@@ -106,9 +106,9 @@ contracts. Full measured evidence/scripts:
 `E:/OOTRemake/work/r19-keys/shadow/shadow-natural-findings.{md,json}`,
 `shadow_scan.json`, `shadow_select.py`, `parent-route-prerequisites.json`.
 
-**Maintainer question, not an overnight blocker:** approve that separate
-45–75-minute natural preparation on Longshot 3.0.0, or wait for a natural
-near-room-13 snapshot? Shadow remains held either way until that fixture exists.
+**Maintainer decision — Claude, 2026-11-20:** keep Shadow held; **no 45–75-minute
+preparation run**. Wait for a natural near-room-13 save from Kareem's own
+playthrough. The route assessment above is retained as evidence, not a play request.
 A future pair must credit its remote Shadow key before candidate door-spending:
 the replacement intentionally keeps the key model but grants 20 rupees, not a key.
 
@@ -172,10 +172,12 @@ Receipts: `packet-compare.json`, `fixture-copy-proof.json`,
 `banc-inverse.json`, `check11-compare.json`, `launcher-dryruns.json`,
 `stage-readback.json`, `parent-route-prerequisites.json`.
 
-### Longshot 3.0.0 checklist — built, not played
+### Optional Longshot 3.0.0 checklist — built, not played
 
-Claude boot-checks first. Run control first, then candidate from its independent
-copy; **Continue the only Fortress save**, never reuse control progress.
+**Claude, 2026-11-20:** Claude will boot-check this packet; the lengthy
+four-rescue continuation is **optional for Kareem**, not a required morning check.
+If chosen, run control first, then candidate from its independent copy;
+**Continue the only Fortress save**, never reuse control progress.
 Teleport/clock only; no inventory, age, guard, quest or source cheats.
 This is a diagnostic packet, not a generated/beatable seed.
 
@@ -220,6 +222,19 @@ Fortress named grants. It does not prove the game traverses or retires a source.
 Sweep and full gate serialize under `work/rounds/r19/gate.lock`. The first
 acquisition was refused while cs19d held the lock; no keys sweep started and no
 foreign lock was changed. Driver: `E:/OOTRemake/work/r19-keys/checks.py`.
+
+**Morning gate/CPU steer — Claude, 2026-11-20:** cs19b takes the lock first;
+cs19f goes only after cs19b releases it. The obsolete overnight waiter was
+cancelled before any keys sweep ran. Focused tests outside the lock use at most
+`-n 4`; only the lock holder may use `-n 12` / `CLAWSHOT_WORKERS=12`.
+A running Longshot at a stage start requires `-n 4` / workers 1.
+
+The overnight wait used notification mask 1 (file names), so lock-directory
+deletions did not wake it; **zero keys sweep seeds ran overnight**. It was
+cancelled. Corrected mask 2 (directory names) was proved on an owned temporary
+directory: create/remove notification returned 0 (signalled), without polling.
+The morning isolated browser proof shows the renewed natural-pre-room-save hold:
+`work/r19-keys/morning-natural-save-hold-ui.webp`; own tab/server closed.
 
 The single full-gate receipt is
 `E:/OOTRemake/work/r19-keys/final-gate-proof.json`: it records the exact tested
