@@ -4,7 +4,7 @@ import pytest
 from test_generate import chest, dungeon_world
 
 from clawshot.generate import FillError, Settings, generate
-from clawshot.generate.fill import allowed, check_beatable, is_restricted
+from clawshot.generate.fill import allowed, check_beatable, is_restricted, shuffled_locations
 from clawshot.patch import gifts, make_seed
 from clawshot.world import build_world, load_spec, load_world
 
@@ -12,6 +12,18 @@ OWN, ANYWHERE, ALL = Settings(), Settings(dungeon_items="anywhere"), Settings(du
 CHEST_FAMILIES = ["SmallKey", "BossKey", "GanonBossKey", "Map", "Compass"]
 """The families ``all_anywhere`` lets out; ``anywhere`` lets out only the first."""
 NON_CHEST = ["Freestanding", "NPC", "Scrub", "BossHeart", "Token"]
+BOSS_KEY_CHESTS = {
+    "Boss Key (Forest Temple)": "Forest Temple Boss Key Chest",
+    "Boss Key (Fire Temple)": "Fire Temple Boss Key Chest",
+    "Boss Key (Water Temple)": "Water Temple Boss Key Chest",
+    "Boss Key (Spirit Temple)": "Spirit Temple Boss Key Chest",
+    "Boss Key (Shadow Temple)": "Shadow Temple Boss Key Chest",
+    "Boss Key (Ganons Castle)": "Ganons Tower Boss Key Chest",
+}
+"""Every boss key's native chest; Ganon's is the tower chest."""
+UNSHUFFLED_CHESTS = Settings(shuffle=("Freestanding",))
+"""No ``dungeon_items`` choice is named vanilla: dungeon items keep their native chests when chests stay native."""
+TEMPLE_BOSS_KEY, GANON_BOSS_KEY = "Boss Key (Temple)", "Boss Key (Ganons Castle)"
 
 
 @pytest.mark.parametrize("kind", CHEST_FAMILIES)
@@ -156,6 +168,24 @@ def test_world_dungeon_items_leave_only_with_all_anywhere_and_only_for_chests(it
         assert allowed(world, ALL, name, item), name
 
 
+def test_ganons_tower_chest_shuffles_and_admits_boss_keys_like_every_boss_key_chest():
+    world = load_world()
+    homes = set(BOSS_KEY_CHESTS.values())
+    for key, home in BOSS_KEY_CHESTS.items():
+        location, info = world.locations[home], world.items[key]
+        assert info.type == ("GanonBossKey" if home == "Ganons Tower Boss Key Chest" else "BossKey"), key
+        assert (location.type, location.vanilla) == ("Chest", key)
+        assert world.regions[location.region].dungeon == info.dungeon
+    assert not homes & set(shuffled_locations(world, UNSHUFFLED_CHESTS))
+    for settings in (OWN, ANYWHERE, ALL):
+        assert homes <= set(shuffled_locations(world, settings)), settings
+        for home in homes:
+            assert allowed(world, settings, home, "Rupees (5)")
+            for key, key_home in BOSS_KEY_CHESTS.items():
+                # A boss chest takes another dungeon's boss key, Ganon's included, only with all_anywhere.
+                assert allowed(world, settings, home, key) is (settings == ALL or home == key_home), (home, key)
+
+
 def two_dungeon_world() -> dict:
     """``dungeon_world`` with a second dungeon and its compass, and floor pick-ups in the village and the temple."""
     spec = dungeon_world()
@@ -205,6 +235,89 @@ def test_all_anywhere_seeds_move_every_family_through_chests_and_old_anywhere_mo
             check_beatable(seed.world, seed.placements)
     assert moved["anywhere"] == {"SmallKey"}
     assert moved["all_anywhere"] == {"SmallKey", "BossKey", "Map", "Compass"}
+
+
+def boss_parity_world() -> dict:
+    """A temple with an ordinary boss key and Ganon's Castle, each with a free chest and its native boss-key chest,
+    and a field with two chests and a floor pick-up. The temple's boss opens the tower; Ganon's key opens Ganon."""
+    floor = {"type": "Freestanding", "vanilla": "Coin", "rule": "True"}
+    return {
+        "start": "Field",
+        "goal": "'Beat Ganon'",
+        "items": {
+            TEMPLE_BOSS_KEY: {"type": "BossKey"},
+            GANON_BOSS_KEY: {"type": "GanonBossKey"},
+            "Coin": {"class": "normal"},
+        },
+        "regions": [
+            {
+                "name": "Field",
+                "area": "FieldArea",
+                "locations": {"Field Chest": chest("Coin"), "Field Side Chest": chest("Coin"), "Field Floor": floor},
+                "exits": {"Temple": "True", "Castle": "True"},
+            },
+            {
+                "name": "Temple",
+                "area": "TempleArea",
+                "dungeon": "Temple",
+                "locations": {"Temple Chest": chest("Coin"), "Temple Boss Key Chest": chest(TEMPLE_BOSS_KEY)},
+                "exits": {"Temple Boss": "Boss_Key_Temple"},
+            },
+            {"name": "Temple Boss", "area": "TempleArea", "events": {"Temple Clear": "True"}},
+            {
+                "name": "Castle",
+                "area": "CastleArea",
+                "dungeon": "Ganons Castle",
+                "locations": {"Castle Chest": chest("Coin")},
+                "exits": {"Castle Tower": "'Temple Clear'"},
+            },
+            {
+                "name": "Castle Tower",
+                "area": "CastleArea",
+                "dungeon": "Ganons Castle",
+                "locations": {"Tower Boss Key Chest": chest(GANON_BOSS_KEY)},
+                "exits": {"Ganondorf": "Boss_Key_Ganons_Castle"},
+            },
+            {"name": "Ganondorf", "area": "CastleArea", "events": {"Beat Ganon": "True"}},
+        ],
+    }
+
+
+PARITY_MODES = {
+    "vanilla": UNSHUFFLED_CHESTS,
+    "own_dungeon": Settings(shuffle=("Chest", "Freestanding")),
+    "anywhere": Settings(shuffle=("Chest", "Freestanding"), dungeon_items="anywhere"),
+    "all_anywhere": Settings(shuffle=("Chest", "Freestanding"), dungeon_items="all_anywhere"),
+}
+
+
+@pytest.mark.parametrize("mode", list(PARITY_MODES))
+def test_ganon_boss_key_is_placed_like_an_ordinary_boss_key(mode):
+    spec = boss_parity_world()
+    homes = {TEMPLE_BOSS_KEY: "Temple Boss Key Chest", GANON_BOSS_KEY: "Tower Boss Key Chest"}
+    seen, moved = {key: set() for key in homes}, set()
+    for number in range(40):
+        seed = generate(spec, number, PARITY_MODES[mode])
+        check_beatable(seed.world, seed.placements)
+        breaks, families = breaks_and_moves(seed)
+        assert breaks == [], (mode, number)
+        moved |= families
+        for name, item in seed.placements.items():
+            if item in homes:
+                seen[item].add(name)
+        # Both native boss-key chests are shuffled destinations exactly when chests are.
+        assert all((home in seed.shuffled) is (mode != "vanilla") for home in homes.values()), (mode, number)
+    if mode == "vanilla":
+        assert (seen, moved) == ({key: {home} for key, home in homes.items()}, set())
+    elif mode == "all_anywhere":
+        assert moved == {"BossKey", "GanonBossKey"}  # both leave, only into chests (no breaks)
+    else:
+        # Own dungeon and small keys anywhere keep both boss keys home, each in either chest of its own dungeon.
+        assert moved == set()
+        assert seen == {
+            TEMPLE_BOSS_KEY: {"Temple Chest", "Temple Boss Key Chest"},
+            GANON_BOSS_KEY: {"Castle Chest", "Tower Boss Key Chest"},
+        }
 
 
 def test_an_all_anywhere_seed_of_the_whole_world_keeps_foreign_dungeon_items_in_chests():
