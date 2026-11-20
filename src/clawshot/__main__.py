@@ -15,6 +15,7 @@ moves the event gifts that can be changed (``clawshot.patch.gifts``); the others
 ``--shuffle Freestanding`` adds the fourteen saved heart-piece floor checks (native palette only; off).
 ``--shuffle Token`` (off) shuffles all 100 native Gold Skulltulas across explicitly played reward families
 (``clawshot.generate.tokens``); tokens may also go to chests. Token without Chest is refused.
+``--shuffle-100-token-reward`` (off; needs Gift) lets the first 100-token House reward hold progression.
 """
 
 import argparse
@@ -81,6 +82,12 @@ def main(argv: list[str] | None = None) -> int:
         action=argparse.BooleanOptionalAction,
         default=None,
         help="experimental, default off: four Fortress guard floor keys into shuffled chests; card scene stays vanilla",
+    )
+    parser.add_argument(
+        "--shuffle-100-token-reward",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="experimental, default off (junk only): first 100-token House reward may hold progression; needs Gift",
     )
     parser.add_argument(
         "--dungeon-rewards",
@@ -154,6 +161,7 @@ def main(argv: list[str] | None = None) -> int:
             ("shuffle", "shuffle"),
             ("dungeon_items", "dungeon_items"),
             ("shuffle_hideout_keys", "shuffle_hideout_keys"),
+            ("shuffle_100_token_reward", "shuffle_100_token_reward"),
             ("dungeon_rewards", "dungeon_rewards"),
             ("bridge", "bridge"),
             ("bridge_count", "bridge_count"),

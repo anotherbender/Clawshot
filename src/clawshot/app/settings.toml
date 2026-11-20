@@ -20,6 +20,12 @@ kind = "boolean"
 group = "Items"
 help = "Off by default; needs shuffled chests. Move the four guards' floor keys into chests, leaving red-rupee replacements with a key-shaped model. Answer Yes to the Valley carpenter boss before the jail encounters. One guard/rescue and its once-only 20-rupee drop passed, including return and Continue. All four rescues, the captain's card and Training Ground remain unplayed with this option."
 enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests to move Fortress jail keys." }]
+[shuffle_100_token_reward]
+label = "100-token reward (experimental)"
+kind = "boolean"
+group = "Items"
+help = "Off by default: the first 100-token Skulltula House reward holds only junk. Needs shuffled gifts. On lets it hold progression, so a seed may require collecting all 100 Gold Skulltula tokens. Built, not played."
+enabled_when = [{ key = "shuffle", contains = "Gift", reason = "Shuffle gifts to let the 100-token reward hold progression." }]
 [dungeon_rewards]
 label = "Dungeon reward shuffle (experimental)"
 kind = "boolean"

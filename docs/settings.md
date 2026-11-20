@@ -71,9 +71,20 @@ compasses; every `Buy*`/shop-stock item (including refills and bottle contents);
 (Gerudo Membership Card). Their existing destination/pool holds remain unchanged. Fire Arrows and other
 out-of-pool items are not silently added.
 
-The 100-token House reward accepts only non-progression items in every seed, including Gift shuffle with
+By default the 100-token House reward accepts only non-progression items, including Gift shuffle with
 Token off. This is an explicit placement rule, not a consequence of which Skulltulas are reachable.
-There is no progression-at-100 opt-in this round; #12 remains open.
+
+`--shuffle-100-token-reward` (app: **100-token reward (experimental)**, under Items) is a separate
+default-off opt-in for [#12](https://github.com/hiKareeem/Clawshot/issues/12); both presets keep it off.
+It needs `Gift` shuffle (an effective spoiler string's `NPC` also counts) and is refused otherwise.
+When on, only that automatic non-progression rule is lifted: the first 100-token reward may hold a
+progression item, so a seed can require collecting all 100 Gold Skulltula tokens. The threshold stays 100
+and other destination holds and exclusions still apply. `--no-shuffle-100-token-reward` overrides a
+settings string; CS1 stores the choice. The shuffled reward is the father's first `GatheringTokenGold`
+grant (Event215), gated by the quest's native completion; his later repeat 200-rupee payout (Event471)
+is not a check and stays native (native trace:
+[section 35](../plans/03-game-data.md#35-round-8-gift-checks-native-identities-and-success-only-merchant-sales-cs8d)).
+Built, not played.
 
 Cows, pots, crates, loose rupees, recovery hearts, Treasure Chest Game keys and
 silver-rupee puzzles stay unchanged. Dungeon rewards have their own default-off
