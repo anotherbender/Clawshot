@@ -1,7 +1,7 @@
 # Round 19 — sword (cs19c)
 
 Branch `r19/sword`, base `d9deb65cedf841495ef3bbe2fb2d1083fa42bb43`.
-Model: `openai-codex/gpt-6.1-sol`. In progress; no play claim.
+Model: `openai-codex/gpt-6.1-sol`. Frozen implementation; acceptance status comes from the exact-head gate receipt and final cs-r19 handoff. No play claim.
 
 ## Contract and questions
 
@@ -13,7 +13,7 @@ Round-19 overview/track files were absent at start; this track record is newly c
 
 ## Implementation and evidence
 
-Pending. Built behavior is not played until Kareem runs staged Longshot 3.0.0 checks with main controls. Gate and sweep receipts will pin exact source head externally; no READY claim before completion.
+Implementation commit `418780a970c35dd6fb9e6e8338dc3320782cfec2`. Built behavior is not played until Kareem runs staged Longshot 3.0.0 checks with main controls. Gate and sweep receipts pin source heads externally; no READY claim before completion.
 
 ### Runtime design / explicit refinements
 
@@ -28,7 +28,7 @@ Pending. Built behavior is not played until Kareem runs staged Longshot 3.0.0 ch
 
 - `E:/OOTRemake/work/rounds/r19/sword-layered-dump`: copied the provided read-only combined layered fixture and added only `Pack/Actor/Weapon_Sword_Master.pack.zs` (31321 bytes) from read-only RomFS. Original fixture/dump untouched. Explicit pack manifest entry and option-on cache parity rows added.
 - Natural first-pull profile: `work/save-backups/2026-11-09_1022-main-adult-first/save/5a3c9e1f0b7d24680000000000000001/slot_02`; source progress SHA256 `a4afee4dea4b428c1ce77d421042c080593fd6de1f2f5711656bde5fa0d80fa5`. Direct reader proof: child=true, Door Step06, `_0040`/Rauru/Sheik histories=false, Master IsGet=false/stock0, exact pinned River chest `IsTreasureBoxOpen.8838426083116998768=false`. No save edit.
-- Main control archived from actual `d9deb65`; v2 diagnostic control built13 resources through main's writer, same pinned River Master chest and existing free-travel patch. Candidate pedestal will give20 rupees; control keeps native first-pull grant. Earlier non-v2 main packet is withdrawn and never played. Final paired manifests/dry-runs pending.
+- Main control archived from actual `d9deb65`; candidate archived from `418780a970`. Both v2 diagnostic packets built13 matching resource paths through their respective writers, same pinned River Master chest and existing free-travel patch. Candidate pedestal gives20 rupees; control keeps native first-pull grant. `packet-{main,candidate}-proof.json` records each resource hash; `packet-paired-proof.json` proves matching path sets, untouched profile hashes and both real cmd dry runs exit0 resolving Longshot 3.0.0 stable, one mod, overlay unset, CRLF/no Hookshot launcher. Earlier non-v2 main packet is withdrawn and never played. `report_play.py` read both isolated copies: child=true, Master=false/stock0, current Kokiri/other-era empty, first pull=false, exact pinned chest=false. No boot/play.
 - First builder attempt timed out during whole-census scanning, before any packet existed. Printed load: CPU100%, Defender67% process CPU. Cause-directed change scans only the pinned River Banc files; scoped control built successfully. No unchanged timeout rerun.
 - One premature runtime pytest attempt failed **collection** because the in-flight logic slice's `generate/swords.py` did not yet exist. No tests executed, no pass claimed; rerun only after integration.
 - Checklist: `work/r19-sword/ingame/CHECKLIST.md`, **Longshot3.0.0**, estimated35–55min (unmeasured), main native grant; candidate no-sword first pull; unowned real-pedestal round trip; chest find/manual equip; owned round trip and reload. Claude boot-checks; Kareem plays. Script reads only isolated v2 profiles. No suitable natural swordless finale state is fabricated; short packet does not certify finale or all story prop scenes.
@@ -50,3 +50,28 @@ Native room follow-through (`room-fights.json`, `chest-gates.json`, `room-predic
 - Scoped formatter changes applied through anchored edits. Scoped lint printed import ordering and one comparison style warning; both fixed from those exact diagnostics. Full format/lint remain part of the gate.
 
 No game started. No save was edited. No version change.
+
+### Mandatory option-on sweep — passed
+
+Source `418780a970c35dd6fb9e6e8338dc3320782cfec2`, atomic owned `gate.lock`, no supervisor deadline. Canonical production `make_seed` preparation (including native Gift/key/source admission) captured immediately before generation, not a copied legacy setup. Seeds190000 onward per cohort; broad recipe from `E:/OOTRemake/work/r18-fill/settings.txt`. All three turn Master Sword shuffle on **and explicitly enable its required free-time-travel prerequisite**; no other recipe change. Tasklist checked at each cohort start: no game,12 workers throughout. Total387.484s.
+
+| Recipe | Accepted | Exhausted | Fill attempts | Maximum attempts |
+| --- | ---: | ---: | ---: | ---: |
+| Broad | 200 | 0 | 211 | 2 |
+| Defaults + option/prerequisite | 50 | 0 | 50 | 1 |
+| Recommended + option/prerequisite | 50 | 0 | 53 | 2 |
+
+Every accepted seed passed generation's goal/beatability oracle, contained exactly one Master Sword in a Chest and included the shuffled pedestal. No retry-bound increase or fill-algorithm change. Exact effective CS1 recipes, every per-seed result and wall times: external `sweep-results.json` / `sweep-rows.jsonl`. Lock released by its owner. This proves solver acceptance, not in-game swordless combat.
+
+### Exact-head gate / final handoff protocol
+
+This evidence-only commit freezes the merge candidate; runtime/data remain the swept and staged `418780a970` implementation. **After this commit**, `work/r19-sword/gate.py` rebases current local main, runs the focused native/runtime/logic/settings/child-repair set, acquires its own atomic gate lock and executes exactly one full gate on the frozen HEAD:
+
+1. `uv run ruff format --check`.
+2. `uv run ruff check`.
+3. `CLAWSHOT_WORKERS=12 uv run --with pytest-xdist pytest -n 12`, dump environment unset.
+4. `CLAWSHOT_WORKERS=4 uv run --with pytest-xdist pytest -m dump -n 12`, real `OOT_ROMFS` / `OOT_NUP` and private `OOT_DUMP=E:/OOTRemake/work/rounds/r19/sword-layered-dump`.
+
+At every stage start a running Longshot/Hookshot reduces pytest to4 and CLAWSHOT_WORKERS to1. CPU/Defender load evidence precedes suites. No supervisor deadline. `gate-results.json` is the authoritative exact source HEAD, main HEAD, commands, exits and times; `gate-{focused,format,lint,synthetic,dump}.log` retains output. Final cs-r19 handoff reports actual outcomes/commits only after completion; no source edit after that gate. If main moves before merge, rebase and re-gate per round rule.
+
+**Acceptance left for morning:** Claude boot-checks the paired Longshot 3.0.0 launchers; Kareem plays the control and candidate checklist (35–55min unmeasured), retaining runtime load lines plus first-pull, found/equipped, unowned and owned real-age-round-trip and Save/Continue results. No full playthrough, story-prop animation, arbitrary destination presentation or finale refusal is certified by the short packet. Product validation boundary above remains explicit for maintainer review. Target readiness kind is **READY (play-held)**, never a played/merge-ready claim.
