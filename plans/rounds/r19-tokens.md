@@ -65,8 +65,19 @@ fixture provenance follow in the external packet report.
 House/default-policy and three-route focus initially gave **36 passed, one failed** in 180.72 s.
 The new native inverse test used `ActorName` at Event215; the actual parsed payload printed
 `{TakenRewardActor: Obj_Rupee_Gold}`. Corrected only that test field name, not production.
-The aimed native plus Settings/CLI/schema/API run is recorded in
-`work/r19-tokens/focused-integrated.log`. No unchanged rerun.
+The aimed native plus Settings/CLI/schema/API run gave **63 passed in 106.64 s**:
+`work/r19-tokens/focused-integrated.log`. No unchanged rerun of the failed parameter test.
+
+Rebase onto current local main `d9deb65` reported up to date. The requested post-rebase
+House/routes/option suite gave **54 passed, one HTTP schema-request timeout** in 291.52 s.
+CPU evidence printed **100% load**, Defender working set **1,153,789,952 bytes** and concurrent
+Python workers while cs19b owned the sweep lock. The isolated HTTP node passed **1/1 in
+7.70 s**, without a source change, as the round's load-diagnosis rule requires.
+The new transport test unnecessarily compiled the full world behind GET schema; it now
+uses the existing `synthetic_spec()` like the other loopback HTTP tests, retaining real
+HTTP, Gift-dependency validation and CS1 assertions. No timeout was widened. The separate
+production-world form and native House100 tests remain. Receipts:
+`rebased-focused.log`, `http-isolated.log`, `http-fixture-focused.log`.
 
 Actual isolated browser proof: Recommended starts Off; clicking its native On button checks
 the control and produces a CS1 string with the option; Defaults restores Off and disables the

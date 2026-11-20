@@ -5,7 +5,7 @@ import json
 import zlib
 
 import pytest
-from test_app import synthetic_run
+from test_app import synthetic_run, synthetic_spec
 from test_ui import request, running_server
 
 from clawshot.__main__ import main
@@ -105,7 +105,7 @@ def test_app_form_replay_and_effective_string_match_the_cli(capsys):
 
 
 def test_http_settings_route_keeps_presets_off_and_refuses_the_opt_in_without_gift():
-    with running_server(Application(Jobs(synthetic_run))) as server:
+    with running_server(Application(Jobs(synthetic_run), spec=synthetic_spec())) as server:
         status, _, config = request(server, "schema")
         assert status == 200 and config["values"][KEY] is False  # the Recommended preset
         assert all(preset["values"][KEY] is False for preset in config["presets"])
