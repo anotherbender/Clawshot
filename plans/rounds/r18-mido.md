@@ -42,7 +42,7 @@ These cover the native component round trip/exact inverse edit, all castle-step/
 unchanged saved layout, source drift/hash collisions, actual public written allocations and open-mode
 passthrough, alongside existing native equipment/clear contracts. Formatting completed; scoped lint
 initially found one overlong fixture string, fixed by literal concatenation; scoped lint then **passed**.
-External logs: `work/r18-issue35/mido-{red,focused}.log`. No game result or placement sweep is claimed.
+External logs: `work/r18-issue35/mido-{red,focused}.log`. No placement sweep is needed; played evidence below.
 
 ## Play packet
 
@@ -52,8 +52,8 @@ Initial CLI dry runs initialized identical isolated saves without launching the 
 resolved Hookshot. Claude corrected both launchers using the nested Longshot finder from the
 r18-issue34 packet and reports corrected dry runs resolve **Longshot rc.7**. All play checks and future
 packets use that Longshot template, with `longshot_log.txt`; the original launcher proof is historical
-save-identity evidence, not rc.7 proof. Claude's boot check is in progress; Kareem plays. No runtime
-pass is claimed.
+save-identity evidence, not rc.7 proof. Claude subsequently reported check 14 **PLAYED PASS**;
+the observations below are maintainer-reported, not an agent-run game check.
 
 Control is the **public generated overlay from d3ce136** preserved by the failing regression; candidate
 is the corresponding passing public overlay from implementation `421ef418389c9348d5bd89e25a41a8f298928ff4`.
@@ -78,15 +78,21 @@ mechanism experiment: **no chest/randomized checks**. Prove sword-only refusal, 
 save's bridge remains closed; that is outside this gate check. No inventory, position, Zelda-history
 or other quest edit is concealed. No Slingshot or Gohma play is needed.
 
-Control must reproduce the absent/relocated guard plus invisible wall. Candidate must retain Mido at
-the passage, finish the refusal, clear only after the equipped pair, and leave the wall cleared after
-reload; his later post-clear relocation is expected. Loading proof must include the candidate's loose
-child AIScheduleParam and GameDataList. Runtime repair and existing-save healing remain **PLAY-HELD**.
+## Check 14 — PLAYED PASS
+
+Claude reported Kareem's check 14 pass: main had no Mido at the guard spot and retained the invisible
+wall. Candidate kept Mido blocking the passage, refused sword-only Link, and opened the way after
+the shield; the tree mouth was open. After reload Mido walked along the tunnel toward the Deku Tree,
+stopped at his native late spot and remained talkable; the wall stayed gone. The played saves showed
+the blocker false, mouth open and 0070 seen. This confirms the predicted post-clear relocation is
+normal, rather than an orphaned blocker. No game was launched or save edited by cs18a for this check.
 
 ## Gate queue
 
-No lock acquisition before the combined F+G owner releases it and our assigned turn. Implementation
-`421ef418389c9348d5bd89e25a41a8f298928ff4` is frozen; this later packet receipt changes documentation only.
-Focused checks passed; one full gate is queued behind F and G, not started. The manual-only helper
-`work/r18-mido/gate.py` refuses an occupied lock and never watches or rebases main. No sweep is needed
-for this non-placement change. No READY claim: full gate pending and runtime repair unplayed.
+Claude's current integration base is main `2d9ddefa2c16d5205f6a52d29a98d6c62c4b22b9` (F+G and E merged).
+On check 14's pass, cs18a is authorized to wait for cs18b's posted rebased head on that base, then
+stack Mido on cs18b, resolve `patch/__init__.py` additively, run focused tests and freeze the exact
+stacked head. **cs18b alone drives one combined full gate**; cs18a takes no lock and runs no separate
+gate or sweep. Do not rebase onto an unposted or stale cs18b head. Full gate remains pending; no READY
+claim until the combined gate passes. The original implementation is
+`421ef418389c9348d5bd89e25a41a8f298928ff4`; integration evidence follows when available.
