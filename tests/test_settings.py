@@ -79,3 +79,26 @@ def test_print_settings_needs_no_dump_and_explicit_options_override_string(capsy
     assert chosen.songs == "anywhere"
     assert chosen.shop_prices == "affordable"
     assert chosen.cheap_deku_shield is False
+
+
+def test_withdrawn_story_skip_is_refused_before_generation(capsys):
+    message = "Skippable story dialogue isn't available yet"
+    with pytest.raises(ValueError, match=message):
+        Settings(skippable_story=True)
+    with pytest.raises(SystemExit) as error:
+        main(["--skippable-story", "--print-settings"])
+    assert error.value.code == 2
+    assert message in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("enabled", [False, True])
+def test_old_story_skip_strings_are_refused_only_when_enabled(enabled):
+    payload = {"skippable_story": enabled, "fast_start": ["kaepora"]}
+    text = "CS1." + base64.urlsafe_b64encode(zlib.compress(json.dumps(payload).encode())).decode().rstrip("=")
+    if enabled:
+        with pytest.raises(ValueError, match="Skippable story dialogue isn't available yet"):
+            Settings.from_string(text)
+    else:
+        restored = Settings.from_string(text)
+        assert restored.fast_start == ("kaepora",)
+        assert restored.skippable_story is False

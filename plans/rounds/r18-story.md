@@ -415,3 +415,34 @@ The resulting head gets **one** full gate; broad sweep only if either track chan
 Claude confirmed that **F drives** (F's14:45 post); G will stack on F's rebased frozen head and send
 the exact stacked head to F. Neither takes the lock before E releases. This withdrawal head is frozen
 for handoff, not falsely covered by the earlier `b79ff5a27e` gate.
+
+## 0.2.3 withdrawal after the experimental opt-in play
+
+Kareem played the tonight packet; Claude relayed the outcome on2026-11-20. Zelda/Impa dialogue skipping
+failed **as a feature**: Skip overlaps Conversation Log and fades around just one dialogue box rather than
+skipping a speech. Choices remain intact; no breakage was reported. Field owls work with a short awkward
+look/fly-away; summit/Lake short offers, skippable scenes and real flights passed.
+
+Claude's0.2.3 decision: withdraw Talon/Zelda/Impa story skipping; keep fast Kaepora and its owl transforms.
+G branched `r18/story-withdraw` from `d9deb65`. The story flow module, its production hook and obsolete
+flow tests are removed. The reserved `skippable_story=false` setting remains only to recognize legacy input;
+true is refused with **“Skippable story dialogue isn't available yet”**. CLI help no longer advertises it.
+The app schema and form payload omit the hidden control while complete metadata still validates old inputs.
+
+**Old enabled share strings are refused**, not silently changed to off. Old off-valued CS1 payloads remain
+valid and retain their other settings, subject to the existing generator-version check on player share strings.
+HTTP regression tests verify that rejected imports cannot start work and off-valued imports retain Kaepora.
+`docs/settings.md` is untouched by G; cs18h owns its edits.
+
+Initial focused settings, app/schema, UI server/sharing, native owl, lesson-logic and Dampé checks:
+**947 passed in65.21s**, `-n4`, workers1, with romfs enabled. Scoped Ruff format/check passed after fixing
+the two printed formatting/import-layout findings; no unchanged retry occurred. Real isolated browser UI
+showed no story-skip control, retained the Kaepora control, and displayed the refusal when Apply was pressed
+on an enabled historical payload. The UI server used empty scratch seed roots and in-memory preferences;
+no game was launched. No placement or owl implementation changes.
+
+Claude then released **`401a2e5`** (cs18h docs/help merged) as the required base. G rebases and repeats the
+focused checks on that frozen head, then takes the separate **r18** gate for one full format/lint/synthetic/dump
+gate, no sweep. Game-active stages use `-n4`/workers1; otherwise `-n12`/workers12, except a simultaneous
+r19 lock at synthetic start reduces that stage to `-n8`/workers8. Results and the exact head are recorded
+privately under `E:/OOTRemake/work/r18-story/withdraw-023/`; READY is posted only after observed success.

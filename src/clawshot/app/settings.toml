@@ -84,10 +84,11 @@ status_labels = { on = "Skipped", off = "Plays" }
 group = "World"
 help = "Choose which opening scenes to skip. Skipped shortens the opening; Plays leaves the usual scene. Forest access has its own setting."
 [skippable_story]
-label = "Skippable story dialogue (experimental)"
+label = "Skippable story dialogue"
 kind = "boolean"
 group = "World"
-help = "Off by default. Enable the skip button during non-choice Talon wake-up, child Zelda and Impa speech. Encounters, choices, rewards and story progress remain. Talon's check passed with a few lines still unskippable; Zelda and Impa are still unplayed. Saria's bridge gift and first-pull Rauru/Sheik are unchanged."
+hidden = true
+help = "Skippable story dialogue isn't available yet. The scene replacement is deferred to round 19."
 [shop_prices]
 label = "Shop prices"
 kind = "choice"

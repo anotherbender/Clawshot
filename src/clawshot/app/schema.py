@@ -51,9 +51,8 @@ def _row(key: str, metadata: dict, default, choices: list, names: set[str]) -> d
     return info
 
 
-def schema() -> list[dict]:
-    """One row per Settings field, then one per ``logic_override`` switch: a presentation of one supported
-    boolean logic override (``Settings.logic``), not a generator setting of its own."""
+def _rows() -> list[dict]:
+    """Complete validation metadata, including hidden retired settings."""
     metadata = tomllib.loads(METADATA_PATH.read_text(encoding="utf-8"))
     names = {field.name for field in fields(Settings)}
     switches = [key for key, info in metadata.items() if "logic_override" in info]
@@ -83,6 +82,11 @@ def schema() -> list[dict]:
     return result
 
 
+def schema() -> list[dict]:
+    """Supported player controls; hidden settings remain recognizable only for validation."""
+    return [row for row in _rows() if not row.get("hidden")]
+
+
 def validate(values: dict | None = None, *, text: str | None = None, spec: dict | None = None) -> Settings:
     """Decode or construct, enforce presentation types, then compile with the actual logic oracle.
 
@@ -99,7 +103,7 @@ def validate(values: dict | None = None, *, text: str | None = None, spec: dict 
     elif not isinstance(values, dict):
         raise ValueError("settings must be an object")
     defaults = asdict(Settings())
-    known = {item["key"]: item for item in schema()}
+    known = {item["key"]: item for item in _rows()}
     if unknown := values.keys() - known.keys():
         raise ValueError(f"unknown settings: {sorted(unknown)}")
     switches = {key: info for key, info in known.items() if "logic_override" in info}
@@ -150,9 +154,11 @@ def settings_payload(settings: Settings) -> dict:
     """Form values include derived logic switches and preserve explicit overrides in ``logic``.
     Editing a switch clears its old override through the metadata's existing ``clears`` convention."""
     values = asdict(settings)
-    rows = schema()
+    rows = _rows()
     for info in rows:
-        if "logic_override" in info:
+        if info.get("hidden"):
+            values.pop(info["key"], None)
+        elif "logic_override" in info:
             value = values["logic"].get(info["logic_override"], info["default"])
             if type(value) is not bool:
                 raise ValueError(f"{info['label']} must be a boolean")

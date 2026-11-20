@@ -143,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
         "--skippable-story",
         action=argparse.BooleanOptionalAction,
         default=None,
-        help="allow skipping non-choice Talon/Zelda/Impa speech; encounters and rewards remain (default off)",
+        help=argparse.SUPPRESS,
     )
     args = parser.parse_args(argv)
 

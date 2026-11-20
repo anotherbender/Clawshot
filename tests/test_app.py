@@ -112,7 +112,9 @@ def wait_job(jobs):
 
 def test_schema_is_exhaustive_and_replay_preserves_values():
     rows = schema()
-    assert {row["key"] for row in rows if "logic_override" not in row} == {field.name for field in fields(Settings)}
+    assert {row["key"] for row in rows if "logic_override" not in row} == {field.name for field in fields(Settings)} - {
+        "skippable_story"
+    }
     switches = {row["key"]: row["logic_override"] for row in rows if "logic_override" in row}
     assert switches == {"free_time_travel": "free_time_travel"}  # presentations of logic overrides
     settings = validate(

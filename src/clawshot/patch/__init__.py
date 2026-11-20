@@ -196,14 +196,13 @@ def make_seed(
         from clawshot.patch.age import changes as age_changes
 
         changes += (age_changes(out.placements, free_time_travel=True),)
-    from clawshot.patch import dampe_safety, door, equipment, mido_schedule, reward_bridge, start_items, story_dialogue
+    from clawshot.patch import dampe_safety, door, equipment, mido_schedule, reward_bridge, start_items
 
     changes += (
         door.changes(out.placements, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
         start_items.changes(),
         equipment.changes(),
         dampe_safety.changes(),
-        story_dialogue.changes(enabled=settings.skippable_story),
     )
     changes += (reward_bridge.changes(mode=settings.bridge, count=settings.bridge_count),)
     item_names: dict[str, str] = {}

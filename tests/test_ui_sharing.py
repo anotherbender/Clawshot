@@ -1,7 +1,11 @@
 """A player share string replays the real synthetic pipeline, not a second settings codec."""
 
+import base64
+import json
+import zlib
 from pathlib import Path
 
+import pytest
 from test_app import app_source as app_source
 from test_app import synthetic_run, synthetic_spec, wait_job
 from test_ui import request, running_server
@@ -44,3 +48,20 @@ def test_shared_seed_replays_identical_output_and_other_versions_cannot_start_wo
             return {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
 
         assert files(Path(results[0]["output"])) == files(Path(results[1]["output"]))
+
+
+@pytest.mark.parametrize("enabled", [False, True])
+def test_old_story_skip_share_strings_cannot_reenable_the_withdrawn_option(enabled):
+    payload = {"skippable_story": enabled, "fast_start": ["kaepora"]}
+    text = "CS1." + base64.urlsafe_b64encode(zlib.compress(json.dumps(payload).encode())).decode().rstrip("=")
+    app = Application(Jobs(synthetic_run), spec=synthetic_spec())
+    with running_server(app) as server:
+        status, _, result = request(server, "shared-seed", {"seed": 42, "settings_string": share_settings(text)})
+        if enabled:
+            assert status == 400
+            assert "Skippable story dialogue isn't available yet" in result["error"]
+        else:
+            assert status == 200
+            assert result["values"]["fast_start"] == ["kaepora"]
+            assert "skippable_story" not in result["values"]
+        assert request(server, "job")[2]["status"] == "idle"

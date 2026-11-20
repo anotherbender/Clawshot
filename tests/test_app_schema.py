@@ -190,3 +190,13 @@ def test_every_door_mode_with_the_switch_generates_or_gets_the_return_refusal(mo
     search = Search(result.world)
     search.collect_spheres(result.placements)
     assert search.won()
+
+
+def test_withdrawn_story_skip_is_not_a_player_control_but_still_refuses_old_form_values():
+    rows = {row["key"]: row for row in schema()}
+    assert "skippable_story" not in rows
+    assert "skippable_story" not in settings_payload(Settings())["values"]
+    assert "kaepora" in rows["fast_start"]["choices"]
+    with pytest.raises(ValueError, match="Skippable story dialogue isn't available yet"):
+        validate({"skippable_story": True})
+    assert validate({"skippable_story": False, "fast_start": ["kaepora"]}).fast_start == ("kaepora",)

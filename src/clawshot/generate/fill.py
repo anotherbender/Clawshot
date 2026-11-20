@@ -129,6 +129,7 @@ class Settings:
     exclusive_location_types: tuple[str, ...] = ()
     location_type_items: dict[str, tuple[str, ...]] = field(default_factory=dict)
     fast_start: tuple[str, ...] = tuple(DEFAULTS["fast_start"])
+    # Reserved for reading old off-valued settings; the enabled feature is withdrawn.
     skippable_story: bool = DEFAULTS["skippable_story"]
     songs: str = DEFAULTS["songs"]
     shop_prices: str = DEFAULTS["shop_prices"]
@@ -204,6 +205,8 @@ class Settings:
             raise ValueError("cheap_deku_shield must be a boolean")
         if not isinstance(self.skippable_story, bool):
             raise ValueError("skippable_story must be a boolean")
+        if self.skippable_story:
+            raise ValueError("Skippable story dialogue isn't available yet")
         if not isinstance(self.forest, str) or self.forest not in CATALOG["forest"]:
             raise ValueError("forest must be 'closed', 'closed_deku' or 'open'")
         if self.door_of_time not in ("closed", "song_only", "open"):
