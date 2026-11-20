@@ -77,6 +77,14 @@ No `Defeat_Ganon` transform was added (sword owns its finale guard).
   Boomerang and restoring only Event85's ActorName yields the entire original
   native event tree: every branch, binding, timeline and flag write is preserved.
   Gift output does not touch AllSage or add GameDataList state for LACS.
+- Same explicit Gift diagnostic assignment built using actual local main
+  `d9deb65` imports and candidate imports: **all 24 decompressed resource outputs
+  byte-identical**, including the LACS scene. Receipt `parity-main.json` /
+  `parity-candidate.json`. Only the world rule differs. This is not a whole-seed
+  comparison and not an in-game result.
+- Actual CLI `uv run python -m clawshot --dungeon-items vanilla --print-settings`
+  exits **2**, naming `own_dungeon`, `anywhere`, `all_anywhere` as valid choices.
+- Scoped Ruff format/check on the four changed Python files: **pass**.
 - Research `probe_scene.py`, external `scene-probe.json` records the native grant
   and last-sage reader values. No decoded game data is committed.
 - No new output resource paths: existing Gift scene and native writer only;
@@ -84,9 +92,35 @@ No `Defeat_Ganon` transform was added (sword owns its finale guard).
 
 ## Natural save / controlled play check
 
-Read-only survey in progress. No played result is claimed. If no natural adult
-snapshot with Spirit+Shadow awakening scenes complete and LACS still pending exists,
-record that absence rather than clearing story history or inventory to fabricate one.
+**No qualifying natural late pre-LACS save exists in the permitted archives.**
+Read-only `scan_late_saves.py` decoded **2,787 files / 693 distinct contents**, zero
+parse errors; excluded every path with a seed-named component. No file has AllSage
+Step02. All 102 files with Shadow/Spirit awakenings have both, but already have
+LACS history true, Light Arrows owned and AllSage Complete. Since the round18 survey,
+311 additional files in 103 backup folders are all test-round backups, not new
+natural playthrough snapshots.
+
+Closest natural pre-LACS family: `save-backups/2026-11-11_2050-main-after-water`
+(all six slots), adult, Forest/Fire/Water awakened, Shadow/Spirit Ready, no Light
+Arrows and LACS unplayed. Reaching a real LACS-ready save requires playing both last
+temples and saving before returning to the Temple of Time; no short time estimate
+is claimed.
+
+The natural r17 chest-hunt snapshot
+`2026-11-17_213402-r17-chest-hunt-main-save-1/.../slot_02` has the Tower boss-key
+chest closed, no Ganon boss key, all six trials cleared and both last sages done,
+but LACS already played. The survey read every Castle chest through
+`save.flag('IsTreasureBoxOpen.<Hash>')`; Tower Hash `17092385671602176550` false,
+the other eleven true in that exact slot. It is unsuitable for a LACS comparison.
+
+No paired launcher is fabricated, no story/inventory/era edits are applied and no
+non-discriminating packet is presented as a LACS check. The existing runtime Gift
+packet is identical to main; this track changes only modeled logic and adds
+regressions, so it requires no **new game-behavior** play gate. A future LACS
+acceptance check must use **Longshot 3.0.0**, a genuine pending-scene save, matched
+main/candidate assignments, load-log proof and saved reward/story/reload checks.
+External provenance: `save-survey-findings.json`, `save-survey-summary.json`,
+`save-survey.json`. **Nothing was played.**
 
 ## Sweep and final gate
 
