@@ -166,10 +166,10 @@ Kareem reported these played checks:
   stayed open after reloading in Kareem's check.
 - **Dampé will not start a race without Hookshot or Longshot.** The no-Hookshot check faded back in front of
   Dampé, with normal movement and the existing warp back up usable; it did not return Link to the surface.
+- **Castle owl:** no speech, with a short fly-away retained. Owl skips remain experimental.
 
 **Longshot 3.0.0 stable (2026-11-19/20):**
 
-- **Castle owl:** no speech, with a short fly-away retained. Owl skips remain experimental.
 - **Two-Stone Door refusal:** with Emerald and Ruby owned, the Door stays closed and no opening scene
   plays; the saved state confirms both Stones and the closed Door.
 - **Field owls near Kakariko and the Lake approach:** no speech, with a short look-and-fly-away.
