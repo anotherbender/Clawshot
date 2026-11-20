@@ -194,6 +194,7 @@ def test_native_meadow_lesson_grants_song_without_losing_later_fire_progress(pro
         movie,
         pouch=pouch,
         step=step,
+        instrument=("Item_Ocarina_Fairy", 1),
         extra=(evfl.read(written[MEADOW_FLOW]), evfl.read(written[SONG_FLOW])),
         entries=(("SacredForestMeadow", "SacredForestMeadow_Field_MelodyGet_Saria"),),
     )

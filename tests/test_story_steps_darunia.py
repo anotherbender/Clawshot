@@ -145,7 +145,9 @@ class UnregisteredCall(AssertionError):
     pass
 
 
-def play(stone, movie, *, step, source=False, song=True, owned=(), pouch=None, entries=(), extra=()):
+def play(
+    stone, movie, *, step, source=False, song=True, owned=(), pouch=None, entries=(), extra=(), instrument=("", 0)
+):
     """Play a song to Darunia and follow both flows' state-changing events.
 
     ``owned`` contains canonical saved IsGet suffixes, not acquisition-actor names. Completed transitions
@@ -153,6 +155,8 @@ def play(stone, movie, *, step, source=False, song=True, owned=(), pouch=None, e
     Water starts uncleared and the stone count at its native default 2. A step write is applied as
     written, without assuming engine protection from IsIgnoreCompletedChallenge=False. ``entries``
     runs successive source/door/talk/song callbacks in the same saved state."""
+    # These Darunia/Saria routes are child routes. Selection/stock are explicit,
+    # independent of historical IsGet, when following the shared lesson guard.
     flows = {"Get_StoneOfFire": stone.flowchart, "Dm_Goron_0030": movie.flowchart}
     flows.update({document.flowchart.name: document.flowchart for document in extra})
     if pouch is not None:
@@ -178,6 +182,11 @@ def play(stone, movie, *, step, source=False, song=True, owned=(), pouch=None, e
         if name == "EventQueryTalkChoice2":
             assert fc.name == "Dm_MelodyGet_Saria", event
             return 0  # accept the meadow lesson; its performance/presentation helpers are not modeled
+        if name == "EventQueryIsGameDataString64":
+            assert params["GameDataName"] == "PlayerStatus.EquipOcarina", event
+            return 0 if instrument[0] == params["Value"] else 1
+        if name == "EventQueryIsExistInPouch":
+            return 0 if instrument[0] == params["Actor"] and instrument[1] >= params["Num"] else 1
         if name == darunia.READ_EXPRESSION:
             expression = params["GameDataName"]
             if expression in ("Get_StoneOfFire_IsCompleted_Exp", "Get_StoneOfWater_IsCompleted_Exp"):
@@ -187,6 +196,8 @@ def play(stone, movie, *, step, source=False, song=True, owned=(), pouch=None, e
             cutoff = expression.removeprefix("Get_StoneOfFire_IsAfter_").removesuffix("_Exp")
             return 0 if STEPS.index(state[STEP]) > STEPS.index(cutoff) else 1
         if name == darunia.READ_BOOL:
+            if params["GameDataName"] == "Sequence_IsChildhood":
+                return 0
             assert params.get("Index") == -1, event
             return 0 if state.get(params["GameDataName"], False) else 1
         raise AssertionError(f"unmodeled query {name}: {event}")
@@ -201,6 +212,15 @@ def play(stone, movie, *, step, source=False, song=True, owned=(), pouch=None, e
             params = getattr(event, "params", None) or {}
             if isinstance(event, evfl.SwitchEvent):
                 index = dict(event.cases).get(query(fc, event, params), evfl.NONE)
+            elif isinstance(event, evfl.ReturnEvent):
+                return event.value
+            elif isinstance(event, evfl.SubFlowSwitchEvent):
+                if index not in entry.sub_flow_events:
+                    raise UnregisteredCall(f"{fc.name}:{entry.name}: {event.name} not registered")
+                child_chart = flows[event.flowchart or fc.name]
+                child = child_chart.entry_point(event.entry_point)
+                returned = run(child_chart, child, child.main_event, arguments=params)
+                index = dict(event.cases).get(returned, evfl.NONE)
             elif isinstance(event, evfl.ForkEvent):
                 assert isinstance(fc.events[event.join], evfl.JoinEvent), event
                 for fork in event.forks:

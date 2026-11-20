@@ -108,11 +108,16 @@ def test_written_files_differ_only_where_the_plan_says(romfs, tmp_path, seed_num
         native_entry = table.get(path)
         assert native_entry is not None, path
         assert len((out / "romfs" / path).read_bytes()) <= (romfs / path).stat().st_size <= native_entry, path
+    for path, generated in output.new_files.items():
+        data = dicts.decompress(path, (out / "romfs" / path).read_bytes())
+        assert data == generated.data, path
+        assert not (romfs / path).exists(), path
+        expected_table.set(path, rstb.required_size(path, len(data)))
 
     raised = expected_table != table
     files = sorted(p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file())
     table_file = [f"romfs/{rstb.TABLE_PATH}"] if raised else []
-    planned = [*plan.files(), *extra, *raw]
+    planned = [*plan.files(), *extra, *raw, *output.new_files]
     assert files == sorted(["spoiler.json", "play-note.md", *(f"romfs/{p}" for p in planned), *table_file])
     if raised:
         new_table = rstb.read(dicts.decompress(rstb.TABLE_PATH, (out / "romfs" / rstb.TABLE_PATH).read_bytes()))

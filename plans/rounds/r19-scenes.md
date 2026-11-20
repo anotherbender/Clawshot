@@ -217,3 +217,37 @@ Printed causes and responses (cs19a):
   sensitivity, not an established scene or app behavior failure. No app code or timeout was changed.
 
 The cause-fixed gate is required; this failed receipt is not renamed a pass.
+
+### Corrected-head native gate findings
+
+Head `80cbbca3c76b09ea47e54633cb09983458bea4a8` rebased cleanly; **60 focused checks passed in30.46s**.
+An actual small-keys-anywhere Recommended seed7 additionally compiled **33 named-key bindings**,2912 shared
+events and312 shuffled checks against the real RomFS with Saria on. The missing inputs were confined to the
+invented fixture; no production missing-file fallback was added.
+
+The corrected full synthetic invocation had **3826 passed,535 skipped,three20s pending-start failures**
+(one UI-sharing node and two app-library fixture cases). Those exact three nodes passed in isolation
+**3/3 in3.67s** under an owned lock, per the round's startup/load rule. The original invocation remains failed
+in its receipt; it is not represented as a clean full-suite run.
+
+The subsequent full native run had **523 passed,9 failed in1984.41s**, no skipped tests. The NUP/cache-only
+matrix is among the passed nodes. Sweeps did not start because the runner stopped and released its matching lock.
+Receipts: `work/r19-scenes/gate-80cbbca3c7/` and `gate-80cbbca3c7-resume/`.
+
+All nine printed native failures concern test contracts/oracles for the new production flow. Cause-specific
+updates (cs19a, posted before editing), with production code unchanged:
+
+- The three seed-writer cases now include generated resources in the exact file set and verify their bytes,
+  native absence and exact size-table allocations instead of assuming all output overwrites native files.
+- Token tests assert only their own pickup/actor-pack contribution, not that unrelated generated resources
+  cannot exist. Every generated file still receives byte/native-absence/allocation checks; archive-member
+  allocation checks apply only to actor packs, not EVFL files.
+- The shared child Darunia/Saria interpreter now follows real SubFlowSwitch/Return nodes and explicit active
+  instrument stock. The meadow positive control supplies a child-usable Fairy selection; source-grant and
+  later-Fire non-regression assertions stay intact.
+- Raw Gift/Door edits still face the original commutativity oracle. The snapshot scene compiler is explicitly
+  ordered after Door, and the test now additionally checks the actual full production order's quest/clock
+  outcomes rather than illegally moving that compiler before the source snapshot it consumes.
+
+Revised oracle focus (shared Darunia/Fire synthetic consumers plus native meadow and production-order Door):
+**55 passed in118.63s**. The remaining exact-file-set/actor-pack contracts are included in the next native gate.

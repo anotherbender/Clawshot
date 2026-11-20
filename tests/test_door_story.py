@@ -16,7 +16,7 @@ import pytest
 
 from clawshot.formats import byml, evfl, zsdic
 from clawshot.generate import Settings
-from clawshot.patch import darunia, door, door_story, gifts, make_seed
+from clawshot.patch import darunia, door, door_story, gifts, make_seed, scene_handoff
 from clawshot.patch.gamedata import GAME_DATA_LIST
 from clawshot.patch.plan import PatchError
 from clawshot.save import key
@@ -1178,9 +1178,8 @@ def test_dump_darunia_fire_guard_composes_in_either_order(native, early):
 
 
 @pytest.mark.dump
-def test_dump_composes_with_a_gift_seed_transforms_in_either_order(romfs, native):
-    """Every transform a gift-shuffle seed ships for these flows but the door story's own (Darunia's guards, the
-    castle's gifts)."""
+def test_dump_gift_edits_preserve_door_progress_in_production_order(romfs, native):
+    """Raw edits commute; the snapshot handoff compiler consumes Door's effective result in production order."""
     flows, _, orders = native
     settings = Settings(shuffle=("Chest", "Shop", gifts.SHUFFLE, "Scrub", "BossHeart"), songs="song")
     spec, settings, gift_step = gifts.seed_setup(romfs, load_spec(), settings)
@@ -1189,10 +1188,18 @@ def test_dump_composes_with_a_gift_seed_transforms_in_either_order(romfs, native
         others = [
             changes[path]
             for changes in output.extra_changes
-            if path in changes and getattr(changes[path], "__module__", None) != door_story.__name__
+            if path in changes
+            and getattr(changes[path], "__module__", None) not in (door_story.__name__, scene_handoff.__name__)
         ]
         alone, after, before = assert_composes(flows[path], path, others, early)
         check_composed(path, alone, (after, before), orders, early)
+        effective = flows[path]
+        for changes in output.extra_changes:
+            if path in changes:
+                effective = changes[path](effective)
+        # This seed uses the native closed Door; its source order/clock repairs
+        # must still hold after all downstream scene compilation.
+        check_composed(path, alone, (evfl.read(effective).flowchart,), orders, early=False)
 
 
 @pytest.mark.dump

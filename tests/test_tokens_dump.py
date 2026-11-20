@@ -327,7 +327,8 @@ def test_production_token_seed_writes_only_source_selectors_and_pickups(
     assert not written & {tokens.TOKEN_PACK, tokens.ENEMY_PACK, "Pack/AI.Global.Product.111.pack.zs"}
     assert not any(path.startswith("RSDB/Tag.") for path in written)
     expected = {row["drop_actor"] for row in rows} - {None}
-    assert set(output.new_files) == {tokens.pack_path(actor) for actor in expected} <= written
+    pickups = {path for path in output.new_files if PurePosixPath(path).name.startswith(tokens.PICKUP_PREFIX)}
+    assert pickups == {tokens.pack_path(actor) for actor in expected} <= written
     drops = {int(row["id"]): row["drop_actor"] for row in rows}
     for location in census:  # every copy of every source: the selector the spoiler names, or none at all
         for path in location.files:
@@ -347,7 +348,8 @@ def test_production_token_seed_writes_only_source_selectors_and_pickups(
 
 def test_token_off_seed_has_no_token_output(romfs):
     output = make_seed(romfs, 7, Settings())
-    assert (dict(output.new_files), output.token_sources) == ({}, ())
+    assert output.token_sources == ()
+    assert not any(PurePosixPath(path).name.startswith(tokens.PICKUP_PREFIX) for path in output.new_files)
     assert "tokens" not in output.spoiler()["patch"]
     assert not any(tokens.GAME_ACTOR_INFO in changes for changes in output.extra_changes)
     assert token_policy.SHUFFLE not in {location.type for location in output.seed.world.locations.values()}
@@ -384,7 +386,8 @@ def test_custom_chest_items_and_token_pickups_write_one_valid_set_of_tables(romf
     )
     generated = {row.drop_actor for row in output.token_sources} - {None}
     expected = {NOTHING, "Item_Clawshot_AP_000"} | generated
-    assert generated and set(output.new_files) == {tokens.pack_path(actor) for actor in expected}
+    actor_packs = {path for path in output.new_files if path.startswith("Pack/Actor/")}
+    assert generated and actor_packs == {tokens.pack_path(actor) for actor in expected}
     before = {path: original(path) for path in TABLES}
     out = tmp_path / "combined"
     write_seed(output, romfs, out)
@@ -406,6 +409,8 @@ def test_custom_chest_items_and_token_pickups_write_one_valid_set_of_tables(romf
         assert content == file.data
         assert sizes.get(path) == rstb.required_size(path, len(content))
         assert not (romfs / path).exists()
+        if not path.endswith(".pack.zs"):
+            continue  # non-pack resources still receive the byte, native-absence and allocation checks above
         for name, data in sarc.read(content).items():
             if name in file.members:
                 donor, growth = file.members[name]
