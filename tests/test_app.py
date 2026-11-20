@@ -105,7 +105,9 @@ def app_source(tmp_path, zsdic_pack):
 
 
 def wait_job(jobs):
-    jobs.thread.join(20)
+    # A test-only hang detector: cold spawns took 20.2–21.2s at 100% CPU plus Defender (r19).
+    # Saved-seed fixtures no longer spawn; only the nine genuine lifecycle tests use this wait.
+    jobs.thread.join(60)
     assert not jobs.thread.is_alive(), jobs.snapshot()
     return jobs.snapshot()
 
