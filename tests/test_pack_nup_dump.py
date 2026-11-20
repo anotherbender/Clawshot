@@ -37,6 +37,7 @@ def resource_modes():
     yield "mixed-all-key-sources", replace(all_kinds, dungeon_items="anywhere", shuffle_hideout_keys=True)
     yield "dungeon-rewards-bridge", Settings(dungeon_rewards=True, bridge="rewards", bridge_count=9)
     yield "saria-farewell", replace(all_kinds, skip_saria_farewell=True)
+    yield "hundred-token-reward", replace(all_kinds, shuffle_100_token_reward=True)
     skips = tuple(name for name in gamedata.load() if name not in ("mido", "forest_exit"))
     for forest in CATALOG["forest"]:
         yield f"forest-{forest}", replace(all_kinds, forest=forest, fast_start=skips)

@@ -64,9 +64,6 @@ notes = "Event47"
 [completion.helpers.has_all_stones]
 rule = "'Defeat Queen Gohma' and 'Defeat King Dodongo' and 'Defeat Barinade'"
 source = "r18-rewards.md: native moat/escape readers follow completed child quests, not reward ownership; Claude 2026-11-18. Closed Door has its own ownership override, Kareem 2026-11-19"
-[completion.locations."ToT Light Arrows Cutscene"]
-rule = "is_adult and 'Defeat Bongo Bongo' and 'Defeat Twinrova'"
-source = "AllSage Event25/26 read Shadow/Spirit awakening histories; EscapeDungeon completes those scenes after the bosses; r17-dungeon-items.md section 3"
 [completion.locations."HF Ocarina of Time Item"]
 rule = "is_child and 'Defeat King Dodongo' and 'Defeat Barinade' and 'Met Child Zelda'"
 source = "DoorOfTime Event38/39/56 count Fire/Water completion only; existing round16 escape/moat readiness retains those quests and real send-off, not Forest or reward stock; r16-time.md"
@@ -94,9 +91,6 @@ source = "Kareem via Claude, 2026-11-19: closed Door with shuffled rewards needs
 "Goron Ruby" = 1
 "Zora Sapphire" = 1
 
-[bridge.vanilla]
-rule = "'Defeat Bongo Bongo' and 'Defeat Twinrova' and 'Clawshot Light Arrow Story'"
-source = "AllSage Event11 advances Defeat_Ganon Step01 after the Temple scene, independently of its shuffled gift; r17-dungeon-items.md section 4"
 [bridge.stones]
 rule = "has_stones(clawshot_bridge_count)"
 source = "Kareem 2026-11-18: unique owned stones alone open the bridge; native Light Arrow trials stay intact"
@@ -106,8 +100,3 @@ source = "Kareem 2026-11-18: unique owned medallions including Light, not comple
 [bridge.rewards]
 rule = "has_dungeon_rewards(clawshot_bridge_count)"
 source = "Kareem 2026-11-18: unique owned stones plus medallions; 0..9"
-[story_event]
-region = "Temple of Time"
-name = "Clawshot Light Arrow Story"
-rule = "is_adult and 'Defeat Bongo Bongo' and 'Defeat Twinrova'"
-source = "Market_Adult_Prefab_c668 and AllSage Event25/26: native Temple scene requires both awakening histories, not Light Arrow ownership"

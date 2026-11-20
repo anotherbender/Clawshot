@@ -12,6 +12,7 @@ from test_app import synthetic_run, wait_job
 from test_pack_loader import hookshot_mods, longshot_launcher
 
 from clawshot.app import GenerationRequest, Jobs, detect_dump, detect_game, play_plan
+from clawshot.app.jobs import publish_seed
 from clawshot.app.library import MANIFEST
 from clawshot.app.paths import absolute_path, output_path
 from clawshot.pack import VERSION_FILES, version_digest
@@ -25,18 +26,32 @@ def made_ui_seed(app_source, tmp_path, monkeypatch):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b"invented fingerprint input: " + relative.encode())
     monkeypatch.setattr("clawshot.pack.ROMFS_SHA256", version_digest(app_source))
-    jobs = Jobs(synthetic_run)
-    try:
-        jobs.start(GenerationRequest(str(app_source), str(tmp_path / "made"), 7, "CS1"))
-        state = wait_job(jobs)
-        assert state["status"] == "succeeded", state
-    finally:
-        jobs.close()
+    # Saved-seed consumers need the real generated files, not another worker-lifecycle test.
+    # Keep spawn/cancellation coverage in test_app and test_ui; publication is shared with Jobs.
+    stage, out = tmp_path / "staging", tmp_path / "made"
+    result = synthetic_run(GenerationRequest(str(app_source), str(out), 7, "CS1"), stage, lambda _stage: None)
+    result = publish_seed(stage, out, result)
+    stage.rmdir()
     hookshot = tmp_path / "hookshot"
     exe = hookshot / "bin/hookshot.exe"
     exe.parent.mkdir(parents=True)
     exe.write_bytes(b"synthetic non-executable HOS_MODS\0")
-    return state["result"], hookshot, app_source
+    return result, hookshot, app_source
+
+
+def test_saved_fixture_and_job_publish_identical_manifests(made_ui_seed, tmp_path):
+    result, _, source = made_ui_seed
+    out = tmp_path / "job-made"
+    jobs = Jobs(synthetic_run)
+    try:
+        jobs.start(GenerationRequest(str(source), str(out), 7, "CS1"))
+        state = wait_job(jobs)
+        assert state["status"] == "succeeded", state
+        fixture_manifest = json.loads((Path(result["output"]) / MANIFEST).read_text())
+        job_manifest = json.loads((out / MANIFEST).read_text())
+        assert fixture_manifest == job_manifest
+    finally:
+        jobs.close()
 
 
 def files_under(root):

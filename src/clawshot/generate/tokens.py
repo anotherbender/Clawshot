@@ -37,6 +37,7 @@ SHUFFLE = "Token"
 SOURCE_TYPE = "GS Token"
 """The world data's (OoT Randomizer's) type of a Gold Skulltula check."""
 TOKEN_ITEM = "Gold Skulltula Token"
+HOUSE_REWARD = "Kak 100 Gold Skulltula Reward"
 TOKEN_DESTINATIONS = ("Chest", SHUFFLE)
 """The check kinds a token item may go to: no exact-one native grant is proven for gifts, scrubs, shops or floors."""
 ADMITTED_FAMILIES = frozenset(
@@ -99,13 +100,39 @@ def _retyped(info: Any) -> Any:
     return {**info, "type": SHUFFLE} if isinstance(info, Mapping) and info.get("type") == SOURCE_TYPE else info
 
 
+def _house_reward_spec(spec: Mapping[str, Any], settings: Settings) -> Mapping[str, Any]:
+    """Lift only the default hundred-token junk policy, never explicit delivery exclusions."""
+    if not settings.shuffle_100_token_reward:
+        return spec
+
+    def admitted(name: str, info: Any) -> Any:
+        if name == HOUSE_REWARD and isinstance(info, Mapping):
+            return {key: value for key, value in info.items() if key != "nonprogression_only"}
+        return info
+
+    return {
+        **spec,
+        "locations": {name: admitted(name, info) for name, info in spec.get("locations", {}).items()},
+        "regions": [
+            {
+                **region,
+                "locations": {name: admitted(name, info) for name, info in region["locations"].items()},
+            }
+            if "locations" in region
+            else region
+            for region in spec.get("regions", ())
+        ],
+    }
+
+
 def prepare_spec(spec: Mapping[str, Any], settings: Settings) -> Mapping[str, Any]:
-    """``spec`` with every ``GS Token`` check a ``Token`` check when the seed shuffles ``Token``; unchanged when off.
+    """Apply the explicit House100 opt-in and retype Skulltulas only when ``Token`` is shuffled.
 
     The type may be given under ``[locations]`` or with the region's rule; both are retyped. Held and N64-only
     checks are retyped too, but stay unshuffled as for any kind."""
     if SOURCE_TYPE in settings.shuffle:
         raise FillError(f"{SOURCE_TYPE!r} is not a shuffle kind: Gold Skulltulas are shuffled with {SHUFFLE!r}")
+    spec = _house_reward_spec(spec, settings)
     if SHUFFLE not in settings.shuffle:
         return spec
     entries = [*spec.get("locations", {}).items()]
