@@ -84,13 +84,17 @@ settings string; CS1 stores the choice. The shuffled reward is the father's firs
 grant (Event215), gated by the quest's native completion; his later repeat 200-rupee payout (Event471)
 is not a check and stays native (native trace:
 [section 35](../plans/03-game-data.md#35-round-8-gift-checks-native-identities-and-success-only-merchant-sales-cs8d)).
-Built, not played.
+Played on **Longshot 3.0.0 stable, 2026-11-20**: the first reward gave Hammer at 100 tokens,
+then the native repeating 200-rupee gold payout. This does not certify every possible replacement
+([round 19 tokens](../plans/rounds/r19-tokens.md)).
 
 Cows, pots, crates, loose rupees, recovery hearts, Treasure Chest Game keys and
 silver-rupee puzzles stay unchanged. Dungeon rewards have their own default-off
 option below. Pot and ground-rupee
 experiments are not seed options: grants were observed, but a thrown pot stranded and lost its
 reward. Completion and recovery are not solved by a destruction flag.
+Cow work remains research only: no cow locations, option or production patch shipped
+([round 19 cows](../plans/rounds/r19-cows.md)).
 
 The Round 15 forced diagnostics are not shuffle options or beatable seeds. Their core, reward-family,
 route and first-Time-ocarina parts provide the played evidence for this explicit catalogue; they do not
@@ -241,8 +245,9 @@ Fairy Ocarina when found, but keep the Ocarina of Time selected if it is already
 Kareem passed the child and adult checks on Longshot rc.7 on 2026-11-19: adult Sun's Song worked,
 and Time stayed selected after Continue. In the unchanged adult check, Sun's Song also worked while
 holding Fairy. That result covers Sun's Song, not every adult song or the automatic song lessons.
-Logic still requires Time for adult songs and lessons. Existing seed folders and saves are not repaired;
-this is not a no-instrument song-lesson bypass.
+Ordinary adult song-playing logic still requires Time; lesson logic accepts either ocarina at either age.
+The separate [scene handoff](#scene-handoffs-experimental) handles zero stock of both instruments.
+Existing seed folders and saves are not repaired.
 
 ### Cross-age equipment receipts
 
@@ -266,8 +271,8 @@ and unverified boundaries. Wrong-age item-bar precautions remain [below](#hints-
 Round18's attempted late lesson bypass was withdrawn. Kareem's round19 control on 2026-11-20
 established that adult Link **can** play the native Minuet lesson with the Fairy Ocarina and
 receive its shuffled reward, consistent with round18 issue34's adult Sun's Song check.
-Lessons therefore accept either ocarina at either age; the no-instrument case needs the early
-caller handoff described below, not an age-based skip.
+Lesson logic therefore accepts either ocarina at either age; the no-instrument physical guard
+uses the early caller handoff described below ([round 19 scenes](../plans/rounds/r19-scenes.md)).
 
 ## Shops and scrub prices
 
@@ -379,10 +384,14 @@ Shuffled lessons give the placed reward, not an additional vanilla song; native 
 scene-history and once-only effects remain. The moat's item and Time-song reward are distinct
 and both survive its replacement.
 
-Kareem passed the Minuet/Impa normal-get handoffs and Saria farewell skip on Longshot 3.0.0
-on 2026-11-20. Both corrected Minuet v2 candidates also **PLAYED PASS**: adult Fairy keeps
-the real lesson without freezing; zero stock of both instruments skips it. Both give Boomerang
-with correct text, with saved ownership/source completion, no extra Minuet and unchanged ocarina stocks.
+Kareem passed the morning candidates on **Longshot 3.0.0 stable, 2026-11-20**: Minuet gave Boomerang
+without a lesson; Impa skipped its lesson, gave Boomerang and kept the normal Hyrule Field dialogue.
+With `skip_saria_farewell` on, Saria gave the correct item text and went straight to Hyrule Field
+without the farewell movie; her brief pop-in is cosmetic
+([morning played results](../plans/rounds/r19-scenes.md#played-results-and-stock-only-correction--2026-11-20)).
+Both corrected Minuet stock-v2 candidates also **played pass at 14:16**: adult Fairy keeps the
+native lesson, then Boomerang; zero stock of both instruments skips straight to a normal get.
+Both give correct text, with saved ownership/source completion, no extra Minuet and unchanged ocarina stocks.
 Continue/re-entry was not reported. The native arm's override is inferred from its played lesson
 and saved shuffled reward; two expected file-load lines are absent for an unexplained logger gap.
 The [round record](../plans/rounds/r19-scenes.md#minuet-v2-played-pass-and-accepted-logger-gap)
@@ -395,7 +404,8 @@ ocarina for lessons; general Great Fairy/Rauru/story skips and non-instrument pr
 It shuffles the three Spiritual Stones and six medallions only among their nine reward
 slots, including Rauru's Light Medallion on the first sword pull. Rewards cannot go
 to chests, gifts, shops or Skulltulas, and other items cannot occupy reward slots.
-The first pull still grants the sword and retains the native song/story sequence.
+The first pull retains the native song/story sequence. It still grants the sword unless the
+separate Master Sword shuffle option is on.
 Placement obeys reachability: in a normal closed-Door seed the three Stones must
 come from Gohma, King Dodongo and Barinade, in a seeded order, before adult rewards.
 
@@ -407,8 +417,8 @@ Boss deaths, blue warps, sage scenes, world restoration, carpenters/card and rev
 time travel remain completion-driven. Prelude follows Forest completion; Light Arrows
 follow the Shadow and Spirit awakening scenes, not their medallions. Logic matches
 these separate ownership and completion predicates.
-Song lessons still require either ocarina, at either age, even when their rewards are shuffled.
-The moat item precedes its Time-song lesson, so the item check itself needs no instrument.
+Lesson logic conservatively requires either ocarina at either age; the physical zero-stock guard
+is described above. The moat item precedes its Time-song lesson, so that item check needs no instrument.
 The native animated emblem in each sage/stone scene remains its source symbol;
 the acquisition window, owned reward and Zelda Notes target follow the shuffled item.
 
@@ -435,8 +445,10 @@ shuffle it still gives Light Arrows. In every mode its trigger remains the compl
 Shadow and Spirit awakening scenes, not owned medallions. The vanilla bridge follows
 that Temple story even when its reward is not Light Arrows; the six trials and finale
 still require usable Light Arrows. Ganon's boss key is never awarded by this scene:
-it follows the ordinary boss-key placement rules below. Round19 corrects the default
+it follows the ordinary boss-key placement rules below. Round 19 corrects the default
 logic to these native readers, without changing the scene or its saved writes.
+This is **static event-data evidence only, not played**
+([round 19 LACS](../plans/rounds/r19-lacs.md)).
 
 ## Master Sword shuffle
 
@@ -457,8 +469,7 @@ Biggoron Sword still counts where a sword is needed, and the final battle requir
 Sword. The breakable Giant's Knife is preserved as equipment, but logic does not rely on its
 unmodelled durability to reach another check.
 
-For now it needs two existing settings, a conservative boundary proposed by cs19c and awaiting a
-maintainer decision ([round 19 sword](../plans/rounds/r19-sword.md)):
+It requires two existing settings ([round 19 sword](../plans/rounds/r19-sword.md)):
 
 - **Chest shuffle.** Without `Chest` the settings are refused everywhere: a settings string, the
   command line, `--print-settings` and the app.
@@ -469,7 +480,8 @@ maintainer decision ([round 19 sword](../plans/rounds/r19-sword.md)):
   logic has `free_time_travel=true`. `--print-settings` only encodes the string and does not check
   this requirement, so a printed string can still be refused when you generate.
 
-**Candidate v4 played pass, 2026-11-20.** Kareem completed the first pull without Master Sword,
+**Candidate v4 played pass, Longshot 3.0.0 stable, 2026-11-20 at 16:21.**
+Kareem completed the first pull without Master Sword,
 returned to child, then passed the second unowned pull that froze in v3. Zora's River chest granted
 and immediately equipped a usable Master Sword; the owned child/adult round trip also passed.
 Exactly two unowned pulls were played, not three; the maintainer accepted the repeated-path coverage.
@@ -535,8 +547,10 @@ Free travel keeps Temple Sheik through both first-arrival scenes, then hides him
 completion. Forest completion, not its medallion, controls Prelude even when rewards are shuffled.
 Early return, repeated age changes, the post-Forest Prelude and the fixed first adult arrival have
 recorded in-game acceptance (R9-FREE-TRAVEL, R9-PRELUDE-PATCHED, R10-FIRST-PULL-FIXED). Default stays off.
-Adult song logic still requires the Ocarina of Time. Adult Sun's Song worked with Fairy in the
-2026-11-19 check; that does not establish other adult songs or safe Fairy-only lessons.
+Ordinary adult song-playing logic still requires the Ocarina of Time. Adult Sun's Song worked with Fairy
+in the 2026-11-19 check; the separate adult-Fairy Minuet lesson passed on 2026-11-20
+([round 19 scenes](../plans/rounds/r19-scenes.md#minuet-v2-played-pass-and-accepted-logger-gap)).
+Neither result certifies every adult song.
 
 The app shows this override as the **Free time travel (experimental)** switch under World, not as a
 separate generator setting. On writes the same settings string as `--logic free_time_travel=true`;
@@ -559,8 +573,8 @@ model and native room retirement wiring. Other dungeons' keys, majors, hearts an
 are not floor-key rewards. On Longshot rc.7 on 2026-11-19, Kareem left the Well replacement,
 recovered it, collected its silent +20 rupees, and confirmed it stayed collected after leaving,
 returning and Continue. This proves the checked Well pickup, not every scripted floor key.
-Own-dungeon mode leaves it untouched. The Shadow Temple floor key stays in its usual place
-under every setting until it has been tested in game; see `plans/rounds/r19-keys.md`.
+Own-dungeon mode leaves it untouched. Round 19 changes no key behavior: the Shadow Temple floor key
+stays in its usual place under every setting ([round 19 keys](../plans/rounds/r19-keys.md)).
 
 `--shuffle-hideout-keys` (UI: **Fortress jail keys (experimental)**) separately releases the four
 Fortress guard floor keys into supported shuffled chests. Default **off** in both presets;

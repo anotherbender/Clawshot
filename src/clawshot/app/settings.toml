@@ -24,7 +24,8 @@ enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests 
 label = "100-token reward (experimental)"
 kind = "boolean"
 group = "Items"
-help = "Off by default: the first 100-token Skulltula House reward holds only junk. Needs shuffled gifts. On lets it hold progression, so a seed may require collecting all 100 Gold Skulltula tokens. Built, not played."
+# Played evidence: plans/rounds/r19-tokens.md (2026-11-20, Longshot 3.0.0 stable).
+help = "Off by default: the first 100-token Skulltula House reward holds only junk. Needs shuffled gifts. On lets it hold progression, so a seed may require collecting all 100 Gold Skulltula tokens. Played on Longshot 3.0.0: Hammer at 100 tokens, then the repeating gold rupee."
 enabled_when = [{ key = "shuffle", contains = "Gift", reason = "Shuffle gifts to let the 100-token reward hold progression." }]
 [dungeon_rewards]
 label = "Dungeon reward shuffle (experimental)"
@@ -35,7 +36,8 @@ help = "Off by default. Shuffle the three stones and six medallions among their 
 label = "Master Sword shuffle (experimental)"
 kind = "boolean"
 group = "Items"
-help = "Off by default; needs shuffled chests and Free time travel on for now. The pedestal's first pull gives a shuffled item instead of the Master Sword, which can then be found only in a shuffled chest. The pedestal still moves Link between ages, and adult Link has no Master Sword until he finds it. Built, not played."
+# Played evidence: plans/rounds/r19-sword.md, final v4 acceptance (2026-11-20, Longshot 3.0.0 stable).
+help = "Off by default; needs shuffled chests and Free time travel on for now. The pedestal's first pull gives a shuffled item instead of the Master Sword, which can then be found only in a shuffled chest. The pedestal still moves Link between ages, and adult Link has no Master Sword until he finds it. V4 played on Longshot 3.0.0: unowned pulls, chest acquisition/equip/use and the owned age round trip passed."
 enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests to move the Master Sword." }]
 [bridge]
 label = "Ganon's Castle bridge (experimental)"
@@ -105,7 +107,8 @@ help = "Skippable story dialogue isn't available yet. The scene replacement is d
 label = "Skip Saria's bridge farewell (experimental)"
 kind = "boolean"
 group = "World"
-help = "Off by default. Skip the bridge farewell movie and gift animation, giving that location's actual item through the normal item-get window. Source completion and story flags remain. Separate from Saria's opening scene. Built, not yet played."
+# Played evidence: plans/rounds/r19-scenes.md, morning candidates (2026-11-20, Longshot 3.0.0 stable).
+help = "Off by default. Skip the bridge farewell movie and gift animation, giving that location's actual item through the normal item-get window. Source completion and story flags remain. Separate from Saria's opening scene. Played on Longshot 3.0.0: correct item text, then straight to Hyrule Field without the farewell movie."
 [shop_prices]
 label = "Shop prices"
 kind = "choice"

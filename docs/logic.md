@@ -40,6 +40,8 @@ shuffled), `vanilla_fixed` (a concrete tier), and `new = true` (a remake additio
 meanings in a port. Do not turn a held check into a randomized check just because it has a rule.
 The current acceptance boundary is in [settings](settings.md), with observations in
 `plans/playtest/answers.md` and the [roadmap index](../plans/00-roadmap.md) plus its linked round files.
+Cow work remains research only; no cow shuffle option or production check shipped
+([round 19 cows](../plans/rounds/r19-cows.md)).
 
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
@@ -184,6 +186,12 @@ ownership before equipping it. An absent sword clears only that candidate; no it
 does not gain a sword from time travel. Kareem passed the child-return repair on Longshot rc.7
 on 2026-11-19; this is not a claim that every equipment/age combination has been played.
 
+Experimental, default-off Master Sword shuffle requires Chest shuffle and free time travel.
+Sword-dependent adult rules then require an owned Master Sword or durable Biggoron Sword, and the finale
+requires the owned Master Sword. V4's two unowned pulls, chest acquisition/equip/use and owned age round
+trip passed on Longshot 3.0.0 stable, 2026-11-20 at 16:21; that does not certify every combat gate or
+finale refusal ([round 19 sword](../plans/rounds/r19-sword.md#final-acceptance--candidate-v4-played-pass--ready)).
+
 Imported Gerudo Fortress rules treat `Gerudo_Membership_Card` as friendly access. In the remake the guards,
 desert gate, Training Ground entrance and horseback archery check Spirit quest progress, which the
 captain's native hand-over writes after giving the card. D39 keeps `Hideout Gerudo Membership Card`
@@ -198,7 +206,8 @@ With Fortress jail-key shuffle enabled, one guard/rescue and the repaired once-o
 passed on Longshot rc.7 (2026-11-19), after the carpenter boss's Yes. All four rescues, the card and
 Training Ground are still unplayed with that option; no new pre-rescue access is inferred.
 The Well floor replacement passed recovery and once-only leave/return/Continue checks.
-Shadow's floor key stays native under every setting. See [key placement limits](settings.md#door-of-time-and-returning-to-child).
+Round 19 changes no key behavior: Shadow's floor key stays in its usual place under every setting
+([round 19 keys](../plans/rounds/r19-keys.md)). See [key placement limits](settings.md#door-of-time-and-returning-to-child).
 
 With dungeon rewards shuffled, the closed Door uses the three owned Stones rather than child boss
 completion, retaining the instrument/song/send-off prerequisites. Kareem opened it before Dodongo and
@@ -206,6 +215,11 @@ Jabu were done, with no escape/moat scene. With only Emerald and Ruby owned, the
 and no opening scene played; the saved state confirmed the two Stones and closed Door. The first-pull
 shuffled reward and a medallion-count bridge below/at its count also passed. These are bounded checks, not a
 complete reward-shuffled playthrough. Other completion gates stay native; see [reward settings](settings.md#dungeon-rewards-and-ganons-castle-bridge).
+
+The Light Arrows scene (LACS) and vanilla bridge follow completion of the Shadow and Spirit awakenings,
+not owned medallions, including with default settings. This is a logic correction based on **static
+event-data evidence only, not played**; the six trials and finale still require usable Light Arrows
+([round 19 LACS](../plans/rounds/r19-lacs.md)).
 
 The persistent `Met Child Zelda` event models the **whole courtyard/Impa lesson and accepted
 send-off through DoorOfTime Step02**, not first courtyard contact. Both moat rewards, Saria's
@@ -223,28 +237,36 @@ requires Dodongo's completion and available night. Sources: `remake/child_hyrule
 Kareem verified Saria before Darunia and the Step03 escape/reload controls on Longshot on
 2026-11-13; Bombchu Shop's entrance correction remains native-data evidence.
 
-**Interim song lessons.** All twelve `Dm_MelodyGet_*` song checks require an Ocarina: either instrument
-at either age. Kareem reproduced the no-ocarina Minuet play-back softlock and passed its Ocarina control on
+**Song lessons and no-instrument safety.** Logic conservatively requires an Ocarina for all twelve
+`Dm_MelodyGet_*` checks: either instrument at either age. Kareem reproduced the old no-ocarina Minuet
+softlock and passed its Ocarina control on
 2026-11-18. On 2026-11-20 his [round-19](../plans/rounds/r19-scenes.md) Minuet control (adult, Fairy Ocarina
 only, main build) played the native lesson and granted its Boomerang; round 18's issue #34 adult-Fairy control
 had already played Sun's Song
 ([check13](../plans/rounds/r18-equipment.md#check13-acceptance-and-combined-integration)). Lessons therefore no
 longer ask an adult for the Ocarina of Time. Generic song playing (`remake/age_ocarina.toml`) keeps its
-Time-only adult rule, and existing age, story, source and weapon prerequisites stay. Shuffled gifts still run
-that play-back.
+Time-only adult rule, and existing age, story, source and weapon prerequisites stay. Shuffled gifts
+retain the native lesson when either instrument has pouch stock.
 The post-lesson Impa send-off and Ice Cavern Water-quest event share the requirement; the moat Ocarina
 and Iron Boots chest rewards are given before their lessons, so those reward rules are not gated.
-This is a logic safeguard, not a fix for walking into an automatic scene without an instrument.
-The attempted no-instrument bypass failed in play and was removed; the physical freeze remains.
-Native sources and regression proof: [song-lesson requirements](../plans/rounds/r18-logic.md).
+The physical guard now replaces the lesson with a normal get only when **both instruments have zero
+pouch stock**, independently of age, selection or historical ownership. That fixes the former
+no-ocarina lesson-freeze known issue without relaxing the model's conservative instrument requirement.
+On Longshot 3.0.0 stable, 2026-11-20, the morning Minuet/Impa candidates skipped lessons and gave
+Boomerang; Impa retained normal Hyrule Field dialogue. The separate `skip_saria_farewell` option gave
+correct item text and continued straight to Hyrule Field without the farewell movie; Saria's brief
+pop-in is cosmetic. Minuet stock v2 passed at 14:16 with adult Fairy retaining the native lesson,
+then Boomerang, and zero stock of both instruments going straight to a normal get.
+Continue/re-entry was not reported; the round file distinguishes the accepted native-arm inference
+from its missing load lines ([round 19 scenes](../plans/rounds/r19-scenes.md)).
 
 The fixed `Ocarina` alias MAX-combines Fairy tier1 and Time tier2; it is not a count of two progressive
 copies. Issue #34 showed that a later Fairy receipt can overwrite the native selected instrument while
 logic retains tier2. New outputs preserve Time selection after the genuine Fairy grant when Time is
 owned; stock, `IsGet` and source flags remain native. Kareem passed the child and adult checks on
 Longshot rc.7 on 2026-11-19: adult Sun's Song worked and Time remained selected after Continue.
-Adult Sun's Song also worked with Fairy in the control. That single song does not establish every
-adult melody or safe Fairy-only lessons; the conservative adult Time requirement stays in logic.
+Adult Sun's Song also worked with Fairy in the control; adult-Fairy Minuet has the separate round-19
+lesson acceptance above. Neither proves every adult melody; ordinary adult song-playing logic keeps Time.
 Older outputs can still select Fairy after Time; ownership history alone does not prove the active instrument.
 
 The independent adult-return proof retains compulsory child story events using the same
@@ -257,6 +279,11 @@ not the untranslated N64 vanilla pool. Shops, floor pickups and gifts have desti
 held/excluded checks remain fixed sources for logic where applicable. Sources:
 `src/clawshot/generate/fill.py`, `src/clawshot/generate/__init__.py`,
 `plans/04-world-format.md`, Generating a seed and Replayable generator settings; attribution: `NOTICE`.
+
+The default non-progression restriction at the first 100-token House reward is lifted only by the
+separate `shuffle_100_token_reward` opt-in, which requires Gift shuffle. Hammer at the first 100-token
+reward followed by the native repeating gold rupee passed on Longshot 3.0.0 stable, 2026-11-20
+([round 19 tokens](../plans/rounds/r19-tokens.md)). This does not certify every replacement.
 
 Determinism requires the same source/world data, seed and effective settings. Tests include changed
 Python hash seeds; unordered placement iteration and timestamps are forbidden. A passing search is

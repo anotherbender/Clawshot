@@ -93,9 +93,11 @@ that proves the model, not that every route has been verified in the game.
 | One-time Business Scrubs | Four kinds of one-time Deku Scrub sale are enabled; repeat vendors stay unchanged. The adult Mirror Shield purchase that previously froze now finishes. Not every shuffled sale or item/age combination has been played. |
 | Boss hearts and floor Heart Pieces | Optional, off by default. A Hylian Shield worked at King Dodongo and the ranch tower. Only native floor pickups are allowed; other locations and pickup combinations are not all verified. |
 | Gold Skulltulas | Optional, off in both presets; requires Chest shuffle. All 100 native sources are admitted, including the played Field tree, ranch tower and cross-age wetlands route. The lone tree works by day; tower retrieval remains night-only. Played reward families now include container-backed ammo/Bombchus, magic, special upgrades and Ocarina of Time; Fairy Ocarina and the [other explicit exclusions](docs/settings.md#what-enters-the-shuffle) remain held. Each member still needs its native structural check. |
+| 100-token House reward | Separate experimental, default-off option; requires Gift shuffle. Allows progression at the first reward without changing the native repeating payout. [Settings and played evidence](docs/settings.md#what-enters-the-shuffle). |
 | Hints and convenience options | Gossip Stones speak hints without the Mask of Truth by default; this, fast start, the forest option that opens only the exit bridge (`--forest closed_deku`) and 10-rupee Kokiri prices have in-game evidence. |
-| Scene handoffs | Played: Minuet keeps the native lesson with adult Fairy and gives a normal get with no ocarina; Impa's handoff and Saria's farewell skip also passed. Only zero stock of both instruments replaces lessons. Saria's separate option remains experimental and off by default. [Settings](docs/settings.md#scene-handoffs-experimental). |
+| Scene handoffs | Lessons use a normal get only with zero stock of both ocarinas; either instrument retains the native lesson, at either age. Saria's separate farewell skip remains experimental and off by default. [Settings and played evidence](docs/settings.md#scene-handoffs-experimental). |
 | Free time travel | Experimental, off by default. Early adult return, the Prelude scene and the corrected first adult arrival have passed in-game checks. |
+| Master Sword shuffle | Experimental, default off; requires Chest shuffle and free time travel. The sword goes to a chest; the pedestal still changes age. [Settings and v4 played evidence](docs/settings.md#master-sword-shuffle). |
 
 With Token added to the shipped presets, played bottle, Double Defense, Echo Gem and gold-rupee rewards
 may also reach Skulltulas without becoming chest-safe; fixed Nut/Stick upgrades remain Scrub-only.
@@ -111,19 +113,25 @@ digging prize now give shuffled rewards. Both passed their in-game checks on 202
 Dampé still shows a heart prize but gives the shuffled item.
 
 Expert galleries, merchant experiments and some Skulltula House rewards stay unchanged.
-The 10- and 40-token reward swaps have been observed, not every threshold.
+The 10- and 40-token reward swaps have been observed; the separate 100-token opt-in also passed
+([round 19 tokens](plans/rounds/r19-tokens.md)). This does not certify every threshold or replacement.
 The Door of Time's earlier song-only and open modes passed a first door/sword-pull check.
 Both wait for Field-arrival clock state and Zelda/Impa's real send-off. The open-mode gate and
 later escape/moat order repair and immediate child-return clock clear passed on Longshot rc.7.
 The first-arrival lighting repair awaits v5 play checks. For new seeds; no save-repair or older-seed compatibility guarantee.
 
+Cows remain **research only; nothing shipped** ([round 19 cows](plans/rounds/r19-cows.md)).
 Cows, pots, crates and loose rupees are not shuffled. Dungeon reward shuffle is a separate experimental option, off by default; it does not move rewards outside their nine slots.
 With reward shuffle on, the closed Door opened with all three Stones owned while Dodongo and Jabu were
 unfinished, stayed open, and triggered no escape/moat scene. With only Emerald and Ruby owned, the Door
 stayed closed and no opening scene played.
+The Light Arrows scene (LACS) and vanilla-bridge logic follow the Shadow/Spirit awakening story,
+not owned medallions. This correction is **static event-data evidence only, not played**
+([round 19 LACS](plans/rounds/r19-lacs.md)).
 **Small keys anywhere** puts dungeon chest keys and the Well floor key in supported shuffled chests,
 including other dungeons and the overworld. The Well replacement keeps a key-shaped model; leaving it,
-recovering it, collecting it once, returning and Continue passed in game. Shadow's floor key stays vanilla.
+recovering it, collecting it once, returning and Continue passed in game. Round 19 changes no key
+behavior: Shadow's floor key stays in its usual place ([round 19 keys](plans/rounds/r19-keys.md)).
 **Fortress jail keys** is a separate experimental, default-off switch. After answering Yes to the carpenter
 boss, one guard encounter, rescue and 20-rupee drop passed; the drop stayed collected after returning and Continue.
 All four rescues, the captain's card and Training Ground still need play checks.
@@ -162,7 +170,7 @@ Kareem reported these played checks:
   and triggers no escape/moat scene.
 - **Taking the Fairy Ocarina after the Ocarina of Time keeps Time selected in new seeds.** Child and adult checks
   passed, including adult Sun's Song and Continue. Adult Sun's Song also worked with Fairy in the control;
-  that does not establish every adult song or a safe no-ocarina lesson.
+  that does not establish every adult song. The separate lesson-handoff checks are recorded below.
 - **Mido still checks sword and shield after an early Zelda visit.** The repaired passage and Deku Tree mouth
   stayed open after reloading in Kareem's check.
 - **Dampé will not start a race without Hookshot or Longshot.** The no-Hookshot check faded back in front of
@@ -176,6 +184,21 @@ Kareem reported these played checks:
 - **Field owls near Kakariko and the Lake approach:** no speech, with a short look-and-fly-away.
 - **Summit and Lake travel owls:** a short offer and working flights. These owl skips remain experimental.
 
+**Longshot 3.0.0 stable (2026-11-20, round 19):**
+
+- **Morning scene candidates:** Minuet gave Boomerang without a lesson; Impa skipped the lesson,
+  gave Boomerang and kept the normal Hyrule Field dialogue. Saria gave the correct item text, then
+  went straight to Hyrule Field without the farewell movie with `skip_saria_farewell` on.
+  Her brief pop-in is cosmetic ([scenes played results](plans/rounds/r19-scenes.md#played-results-and-stock-only-correction--2026-11-20)).
+- **Minuet stock v2, 14:16:** adult Fairy Ocarina retained the native lesson before Boomerang;
+  zero stock of both ocarinas went straight to the normal get. Continue/re-entry was not reported.
+  [Round record and accepted native-arm logger gap](plans/rounds/r19-scenes.md#minuet-v2-played-pass-and-accepted-logger-gap).
+- **100-token reward (#12):** the first reward gave Hammer at 100 tokens, then the native repeating
+  200-rupee gold payout ([round 19 tokens](plans/rounds/r19-tokens.md)).
+- **Master Sword shuffle v4, 16:21:** two unowned pulls, River chest acquisition/immediate equip/use,
+  and the owned child/adult round trip passed. This is not a full playthrough or finale-refusal check
+  ([round 19 sword](plans/rounds/r19-sword.md#final-acceptance--candidate-v4-played-pass--ready)).
+
 Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
 
 ### Known issues
@@ -184,8 +207,6 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
   other items; changing areas does not clear the old item-bar jam. Newly generated seeds initialize an empty
   nut slot (0/20). Kareem verified child Bow first, then Boomerang use without a reload on 2026-11-12.
   Existing saves are not modified. `play-note.md` lists age-locked rewards but reveals item locations.
-- **Song lessons can still freeze without a usable ocarina.** Logic requires one before the lesson, but cannot
-  protect you if you walk into an automatic scene without it. The attempted lesson-skip repair is not shipped.
 - **Trading items share one displayed slot.** An adult trade item can hide the child's Cucco; Save and Continue
   does not fix that. Wake Talon and show Zelda's Letter before taking Anju's adult Pocket Egg. Newly generated
   seeds keep trading items vanilla; older Gift seeds may contain shuffled adult trade items.
