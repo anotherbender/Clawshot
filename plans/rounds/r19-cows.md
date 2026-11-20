@@ -9,9 +9,11 @@ documented `d9deb65` source, not newly generated 0.2.3 seeds. No settings files
 were changed or withdrawn story fields restored. Claude's research-only
 full-gate/lock exemption remains applicable; no gate or sweep was run on rebase.
 
-**STOPPED: research-only handoff for r20.** V1 control gave milk; v1 candidate
-froze. Kareem then played v2: milk only, no +20, no crash/freeze. No post-milk
-Save was made, so the Bool remains unknown. No speculative v3 is staged.
+**Research-only r20 handoff; one authorized save-only data point pending.**
+V1 control gave milk; v1 candidate froze. Kareem then played v2: milk only,
+no +20, no crash/freeze, but no post-milk Save; the Bool remains unknown.
+Claude accepted no speculative v3 and will request one unchanged-v2 run:
+milk once, **SAVE**, quit, then inspect the key. No packet changes are made.
 No cow locations, option, logic, fill, production patch or version change.
 Only this research record enters the branch.
 Scripts, decoded research, profiles and mods stay outside the repository under
@@ -23,6 +25,21 @@ it will not merge as a game-behavior implementation. Focused tests and paired
 staging only. No sweep is applicable: no locations, destinations, logic or fill
 changed. No `.nup` working-set/resource-list change; production input reads and
 output are unchanged.
+
+## Authorized unchanged-v2 save-only check — result pending
+
+Claude accepted the stop/no-v3 decision, then authorized one bounded data point:
+Kareem runs the existing `Cows v2 - candidate.bat`, milks once, **SAVES**, and
+quits. Claude reads:
+`uv run python E:/OOTRemake/work/r19-cows/check_save.py candidate --packet v2`.
+No `--expect true` is needed for this diagnostic read: retain the actual
+true/false/missing value and inspected save path. The mod, profile and inspector
+are unchanged. No repeat/reload acceptance is being claimed from this one run.
+
+A true newly saved key would establish that the new Bool writer ran despite the
+missing rupee signal. False/missing needs the actual saved-file evidence before
+any conclusion. **No result has been posted yet.** Record Claude's observation
+here when supplied; do not infer it from the earlier unsaved attempt.
 
 ## Final outcome: v2 played, path localized statically, cause unresolved
 
