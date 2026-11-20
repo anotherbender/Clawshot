@@ -393,6 +393,15 @@ Other shuffled boss rewards, stones/combined bridge counts, late story order and
 are not certified by those checks. Both options remain experimental.
 Detailed evidence: [dungeon rewards and bridge](../plans/rounds/r18-rewards.md).
 
+The Temple of Time Light Arrows scene is an ordinary `Gift` check, already included
+when Gift shuffle is selected. It may give another eligible gift item; without Gift
+shuffle it still gives Light Arrows. In every mode its trigger remains the completed
+Shadow and Spirit awakening scenes, not owned medallions. The vanilla bridge follows
+that Temple story even when its reward is not Light Arrows; the six trials and finale
+still require usable Light Arrows. Ganon's boss key is never awarded by this scene:
+it follows the ordinary boss-key placement rules below. Round19 corrects the default
+logic to these native readers, without changing the scene or its saved writes.
+
 ## Door of Time and returning to child
 
 | Option | Requirement / effect |
