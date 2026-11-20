@@ -124,12 +124,52 @@ External provenance: `save-survey-findings.json`, `save-survey-summary.json`,
 
 ## Sweep and final gate
 
-Pending current-main rebase, focused verification and the serialized gate lock.
-Required recipes: the exact broad CS1 in `work/r18-fill/settings.txt` (200 seeds),
-Defaults (50), Recommended (50), zero exhausted. No new option is being added.
-External driver/receipts live under `work/r19-lacs/`; no game data enters Git.
+Rebased onto current local main `d9deb65` (`git rebase main`: already up to date).
+Post-rebase locked focus on implementation head `471901008ecdfb62cfae62faa0bf7236ccd454d5`:
+**134 passed / 4 deselected** synthetic (24.57 s), **2 passed / 2 deselected**
+native (22.03 s). Includes ordinary/Ganon boss-key source admission and generated
+placement parity regressions, LACS trigger, bridge, trials/finale and reward contracts.
+
+Locked native-prepared sweep: **300/300; zero exhausted**, 410.72 s wall time.
+No new option or recipe modification. Same production Gift/scrub/floor/chest
+setup, source-contract restrictions, ordinary fill retries and beatability oracle.
+
+| Recipe | Passed | Exhausted | Maximum attempts |
+|---|---:|---:|---:|
+| Exact broad CS1, `work/r18-fill/settings.txt` | 200 | 0 | 3 |
+| Defaults | 50 | 0 | 1 |
+| Recommended | 50 | 0 | 2 |
+
+Broad seeds include `2306988613`, `12345`, and `19070000..19070197`;
+Defaults `19071000..19071049`; Recommended `19072000..19072049`.
+Receipts `sweep-results.json`, `sweep-rows.jsonl`, `sweep-gate-results.json`,
+`gate-focused.log`, `gate-focused-native.log`, `gate-sweep.log` under
+`E:/OOTRemake/work/r19-lacs/`. No game running at each stage start;
+12 workers; own token lock released after the sweep. Subsequent changes are
+round-record evidence only, not implementation or tests.
+
+The **one full gate** runs on the final committed merge head, with per-stage
+`tasklist` and token-owned `work/rounds/r19/gate.lock` serialization:
+
+1. `uv run ruff format --check`
+2. `uv run ruff check`
+3. `CLAWSHOT_WORKERS=12 uv run --with pytest-xdist pytest -n 12`
+4. `CLAWSHOT_WORKERS=4 uv run --with pytest-xdist pytest -m dump -n 12`
+
+If a game runs, both pytest stages use `-n 4` / workers1 instead. Native inputs:
+`OOT_ROMFS=E:/Games/Hookshot/romfs`,
+`OOT_NUP=E:/Games/Hookshot/The Legend of Zelda Ocarina of Time [0400486024DEC000][v131072].nup`,
+`OOT_DUMP=E:/OOTRemake/work/r18-issue34/combined-layered-dump` (read-only).
+No working-set additions. The exact-head results and durations are retained in
+`full-gate-results.json` plus `gate-{format,lint,synthetic,dump}.log`;
+the completion thread handoff reports their observed counts, not an assumed pass.
 
 ## Handoff status
 
-Implementation and initial focused/native proof complete; boss-key regression
-review, natural-save result, final sweep/full gate and READY handoff pending.
+Implementation commit `65804b12fd`; runtime/save evidence `471901008e`;
+this final record adds sweep proof only. **READY (merge)** is authorized only
+after all four final gate stages exit0 on the exact head named in the completion
+post. No in-game acceptance claim: no qualifying natural pending-LACS save exists,
+and the existing scene/Gift resource packet is byte-identical to main. No new
+game-behavior patch needs a play-held merge; changed generated placements still
+depend on the ordinary oracle, not a claim that a full playthrough was observed.
