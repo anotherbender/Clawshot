@@ -10,7 +10,7 @@ from clawshot import patch as patch_api
 from clawshot.census.gifts import FLOW_VERSIONS
 from clawshot.formats import byml, evfl, msbt, rstb, sarc, zsdic
 from clawshot.generate import Settings
-from clawshot.patch import key_text, keys, ocarina, text
+from clawshot.patch import key_text, keys, ocarina, scene_handoff, text
 from clawshot.patch.key_targets import DungeonGrant
 from clawshot.patch.key_text import labels
 from clawshot.patch.plan import ChestChange, Plan
@@ -487,6 +487,41 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
     documents[keys.POUCH].flowchart.actors.append(evfl.Actor("UISystemActor"))
     for name in ("Dm_SY_GetInEvent", "Dm_Kokiri_0155", "Dm_MelodyGet_Time"):
         documents[name] = evfl.EventFlowFile(name, flowchart=evfl.Flowchart(name))
+    # This world has one invented scene, not the native game's story resources.
+    # Compile it for real so the shared pouch sees scene, key and bag additions.
+    scene = scene_handoff.Scene(
+        name="synthetic_lesson",
+        check="Invented lesson",
+        flow="SyntheticLesson",
+        entry="Main",
+        cut="Gift",
+        resume="",
+        condition="no_ocarina",
+        grants=("SyntheticLesson/Gift",),
+        before=(),
+        after=(),
+        histories=("SyntheticLesson",),
+        once="HavePlayedEvent.SyntheticLesson",
+    )
+    documents[scene.flow] = _document(
+        scene.flow,
+        [evfl.Actor("EventSystemActor", actions=["EventTransition"])],
+        [
+            evfl.SubFlowEvent(
+                "Gift", keys.POUCH, "GetPouchContentByActorName", params={"ActorName": "Item_Range_SlingShot"}
+            )
+        ],
+        [evfl.EntryPoint("Main", 0, [0])],
+    )
+    documents[keys.POUCH].flowchart.entry_points.append(evfl.EntryPoint("GetPouchContentByActorName", 3, [3]))
+    rows.append(
+        {
+            "__RowId": scene_handoff.DONOR,
+            "FlowchartFileName": "Work/Event/EventFlow/SyntheticLesson.evfc",
+            "EntryPointName": "Main",
+        }
+    )
+    monkeypatch.setattr(scene_handoff, "load", lambda: (scene,))
     originals = {keys.flow_path(name): evfl.write(document) for name, document in documents.items()}
     originals[keys.SETTINGS] = byml.write(rows)
     originals[keys.ANALYZED] = byml.write(key_analysis(rows))
@@ -505,14 +540,15 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
             },
         }
     }
-    game_data["Data"]["Bool"].append(
-        {
-            "Hash": byml.U32(save_key("ActionGuide_IsEnd.Navi")),
-            "DefaultValue": False,
-            "ResetTypeValue": 8,
-            "SaveFileIndex": 0,
-        }
-    )
+    for name in ("ActionGuide_IsEnd.Navi", scene.once):
+        game_data["Data"]["Bool"].append(
+            {
+                "Hash": byml.U32(save_key(name)),
+                "DefaultValue": False,
+                "ResetTypeValue": 8,
+                "SaveFileIndex": 0,
+            }
+        )
     for kind, entries in mido_game_data()["Data"].items():
         game_data["Data"].setdefault(kind, []).extend(entries)
     originals["GameData/GameDataList.Product.110.byml.zs"] = byml.write(game_data)

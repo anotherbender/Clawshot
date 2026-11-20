@@ -1,7 +1,7 @@
 # Round 19 Track scenes — cs19a
 
 Agent/model: `openai-codex/gpt-6.1-sol`; branch `r19/scenes`; base `d9deb65`.
-Status: implementation and focused native-data proof complete; staging/full gate pending. Not READY.
+Status: staged, not played; corrected-head full gate pending after printed fixture/startup failures. Not READY.
 The round overview and this track file were absent at intake; the user brief supplies round scope.
 
 ## Mechanism proposed before broad edits
@@ -181,3 +181,39 @@ hazard; no unsupported teleport through courtyard barriers is prescribed.
 The reporter is `E:/OOTRemake/work/r19-scenes/check_packet.py`: input identity checks, and later actual saved
 reward stock/IsGet, source histories and runtime `mods: <file> <- <path>` evidence. It never asserts visual
 acceptance. Candidate/control launchers and a human checklist accompany the eventual gated mod bytes.
+
+## Pinned code, packet and first gate receipt
+
+Production code head: `979e471c5e59c66a7744b53a37e31c9fb50c9f91`. Explicit rebase onto current local main
+`d9deb65cedf841495ef3bbe2fb2d1083fa42bb43` was up to date. Post-rebase focused scene/native/settings/app checks:
+**101 passed in 76.36s**. This includes explicit original-request history completion after Spirit's renamed
+native child returns; otherwise that usable-instrument arm could leave the original requester active.
+
+Actual public Recommended seed7 smoke, Saria skip on: **311 shuffled checks,174 files written**;
+new scene flow present and spoiler setting true. This used the real RomFS and complete downstream key,
+progressive, bag, selector, writer and size-table pipeline, not just isolated handoff compilation.
+
+Packet: `work/r19-scenes/ingame/CHECKLIST.md`; **six input identity reports passed and six actual cmd dry runs
+exited0**, pinned to Longshot 3.0.0 stable. Controls import the archived main source; candidates the production
+head above. Control mods contain10 files, candidate mods22; hashes and imported source paths are recorded in
+`packet-build-proof.json`. No game was started. Pair estimates remain unmeasured: Minuet6–12min, Impa8–14min,
+Saria6–12min. Do not present their combined matrix as a sub20min check.
+
+First full gate acquired its own lock after Track sword released it. Ruff: **485 files formatted**, lint passed.
+Synthetic: **3826 passed,535 skipped,2 failed,1 error in286.69s**. Dump/sweeps did not start.
+Receipt/logs: `work/r19-scenes/gate-979e471c5e/`. The runner released only its matching owned lock.
+
+Printed causes and responses (cs19a):
+
+- Both key/bag public-pipeline failures attempted to read missing `AllSage.bfevfl.zs` from an invented, chest-only
+  resource fixture. The fixture now supplies one invented scene, ordinary donor registration and actor-name
+  entry and selects those synthetic data rows; the real handoff/key/bag compilers still run. No no-op build mock,
+  production missing-file fallback or key assertion was introduced. An intermediate fixture attempt printed its
+  missing EventSystemActor; adding that explicit synthetic actor fixed it. The two original nodes then passed
+  **2/2 in3.46s**.
+- App-play setup expired its existing20s worker join while validation was still pending under12-way load.
+  The exact isolated node passed **1/1 in19.94s**. Stage-start process evidence includes MsMpEng's roughly805MB
+  working set but no readable CPU counter; Defender CPU causation is not established. **[INFERENCE]** startup/load
+  sensitivity, not an established scene or app behavior failure. No app code or timeout was changed.
+
+The cause-fixed gate is required; this failed receipt is not renamed a pass.
