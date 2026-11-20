@@ -1,6 +1,6 @@
 # Round 19 — sword (cs19c)
 
-Branch `r19/sword`, base `d9deb65cedf841495ef3bbe2fb2d1083fa42bb43`.
+Branch `r19/sword`, original base `d9deb65cedf841495ef3bbe2fb2d1083fa42bb43`; rebased onto release main `f5c679d532b688ea1a98a5ffb158a821454ce07d` after the v3 build.
 Model: `openai-codex/gpt-6.1-sol`. **NOT READY: Kareem played v2 and hit a white-screen freeze.** Initial gate/READY below are historical; the native-receipt repair requires boot-check and replay.
 
 ## Contract and questions
@@ -99,3 +99,11 @@ Repair commit/source `4ab3cc5b4c9bbdf4aec5605170a0dce43d75dacc`; fresh paired la
 **Claude's product steer:** prefer a visible normal window after the scene, but explicitly allow a silent v3 if that is not safe this round. Inspected cs19a's played `scene_handoff.py`: it dispatches a separately registered ordinary FlowchartEvent with no animation resources. It does not simply insert a get subflow later in the old movie. Native adult return here still chains `AllSage/Market_Adult_AllSage_Start` → `_0050` (fade2) → `_0055` (fade0) → player warp → three quest steps. A deferred presentation would need its own audited ordinary-event boundary/registration and must **not grant the already credited item twice**. V3 takes the approved silent fallback, rather than add another unplayed transition to this repair. No separate pedestal window, even after adult control; stated in public settings help and the checklist.
 
 Boot-check/replay estimate: **25–40min candidate**, optional fresh native control8–12min, unmeasured. Existing played control remains valid because the new control resources match. Priority is first-pull handoff through Rauru/Sheik to adult control without Master, then real unowned age round trip, chest get/manual equip, owned age round trip and Save/Continue. `report_play.py --revision v3` reads only the new profiles. V2 failure evidence remains untouched. **NOT READY until replayed; no fresh full-gate claim.**
+
+### MAIN MOVED / release rebase
+
+Rebased the four sword commits onto `f5c679d` as directed. Two conflicts resolved: app settings retain main's played dungeon-reward help plus the sword switch; patch pipeline keeps main's withdrawn-story import/removal and the sword hook. Main's hidden/reserved off-valued story compatibility remains, enabled story is refused; no withdrawn feature is restored. Observed current validation: Broad recipe and Defaults have `skippable_story=False`; `Settings(skippable_story=True)` raises `Skippable story dialogue isn't available yet`.
+
+Inspected `d9deb65..f5c679d` in generate/fill.py, generate/prepare.py and world data: the only fill-module delta is the reserved-field comment and enabled-story validation refusal. No placement algorithm, pool, source selection, world rule or goal changed. Per the rebase steer, no new sweep; prior300/300 cohorts had story off and remain applicable.
+
+V3's archived packet source/hash receipts remain truthful (pre-rebase repair `4ab3cc5b4c`); its native-receipt mechanism is unchanged by this rebase. **After this evidence commit**, rerun focused native/runtime/logic/settings/child tests, then ONE full gate under the owned lock on that exact rebased HEAD. Fresh receipts/logs go under `work/r19-sword/gate-f5c679d/`, preserving the original gate and its withdrawn readiness. Passing this new gate will still **not** mean READY: v3 boot-check and Kareem replay remain required.
