@@ -33,12 +33,12 @@ allowed read-only backup/copy roots. No flag, inventory or era edits selected.
 
 ### Public evidence correction
 
-`README.md` incorrectly advertised active Well/Shadow floor sources while the
-superseding round-18 hold and generation allowlist admit only the Well. README,
-settings help and the floor adapter's evidence docstring now distinguish:
-Well's short played pickup/re-entry result; one Fortress identity's played
-once-only result; unplayed all-four rescue/card/Training Ground; held Shadow.
-No pickup algorithm, settings default, palette or source allowlist changed.
+At intake, `README.md` advertised active Well/Shadow floor sources while the
+superseding r18 hold and generation allowlist admitted only the Well. Initial
+corrections distinguished the narrow played results from held/unplayed work.
+The released-main rebase retains main's newer README, Well/remote-item play
+evidence and withdrawn story controls; only the natural-save Shadow hold is
+layered into its key help. No pickup algorithm, default, palette or allowlist changed.
 
 Actual isolated browser proof used in-memory preferences, an empty external
 library and disabled play/open capabilities. Hovering Fortress showed the
@@ -199,10 +199,21 @@ the GerudoValley/GerudoFortress Bancs, four jail actor packs, EventSetting,
 ActorInfo, PouchActorInfo and GetPouchContent. Check packet-owned saved counters,
 collection Bools, carpenter Bools, card stock and Spirit step, not just HUD/text.
 
-**Still unplayed:** guards/drops/doors/rescues013–015, all-four rescue completion,
-captain/card scene, Training Ground entry, these three remote key grants and
-post-completion Continue. The r18 one-source persistence pass proves none of
-those missing checks. Fortress remains experimental/default off.
+**Not fully accepted:** individual guards/drops/doors/rescues013–015, all-four
+rescue completion, captain/card scene, Training Ground entry, the three remote
+key grants and post-completion Continue. Fortress remains experimental/default off.
+
+**2026-11-20 play attempt (Kareem via Claude):** guard drops were red rupees,
+as expected, but Kareem could not find the keys. There was no `CHECKLIST.md`
+beside the launchers: this was a handoff failure, not a demonstrated key-grant
+failure. No retry to confirm that report, save edit or loaded-mod rebuild.
+
+Fixed handoff: `E:/OOTRemake/work/r19-keys/fortress/ingame/CHECKLIST.md`, beside
+both launchers. It puts the three key-chest routes before the cell fights,
+explains the invisible second tent chest and Valley-vs-Fortress HUD, supplies
+plain cell landmarks, held/found/rescue counts and fail-versus-route-blocker
+criteria. All three actual emitted chest bindings read back as named Fortress
+keys in both packets. Completion posted on `cs-r19` at 10:18.
 
 ## Verification and handoff
 
@@ -235,6 +246,45 @@ cancelled. Corrected mask 2 (directory names) was proved on an owned temporary
 directory: create/remove notification returned 0 (signalled), without polling.
 The morning isolated browser proof shows the renewed natural-pre-room-save hold:
 `work/r19-keys/morning-natural-save-hold-ui.webp`; own tab/server closed.
+
+### Mandatory sweep — passed, zero exhausted
+
+Frozen source: `a73b985cd476d75fc316bf38a8dd41905fe97f03`, based on d9deb65.
+The corrected waiter acquired the lock after cs19b released it; the sweep
+finished and released only its matching owner/token. Every row used native
+preparation, fill and beatability, not personal seeds.
+
+| Recipe | Passed | Exhausted | Workers | Game running at stage start |
+|---|---:|---:|---:|---|
+| Supplied broad CS1, Fortress keys on | 200 | 0 | 1 | Yes |
+| Defaults | 50 | 0 | 12 | No |
+| Recommended | 50 | 0 | 12 | No |
+
+Exact recipes, per-seed rows, stage times and owner receipt:
+`E:/OOTRemake/work/r19-keys/sweep-a73b985cd476/`.
+The release delta adds enabled-story refusal and removes that patch, but changes
+no placement algorithm, prepare/world data or logic for these recipes. All
+three have `skippable_story=false`; the previous disabled patch returned no
+changes. Per Claude's MAIN MOVED instruction, reuse this sweep after rebase;
+do not run another unchanged placement sweep. Main's version is now 0.2.3.
+
+### Released-main rebase and final focus
+
+Rebased onto **d9514c4b6cc2cfb260e4c0adbb8deb70ab51422c**: f5c679d's published
+0.2.3 code plus b1aa1a1's audit and the cows stop record (both docs-only).
+README/settings/app-help conflicts retained main's newer played evidence and
+story withdrawal; the key help additionally says to await a natural pre-room save.
+No withdrawn story control, source patch or enabled setting was restored.
+
+Rebased evidence head **b11c86211c2c6a13c1739ff04cb70cf7e83e5ef4**:
+the same four-file focused command above passed **84 tests in 55.69 s**, serial,
+`CLAWSHOT_WORKERS=1` outside the lock. No failed focused checks or broad rerun.
+The final commit below this receipt changes only this round record.
+
+Actual isolated 0.2.3 browser surface retained main's Well/map/compass evidence,
+displayed the natural-save Shadow hold and had no skippable-story control.
+Screenshot: `work/r19-keys/rebased-natural-save-hold-ui.webp`.
+Own tab/server closed; empty external library and memory-only preferences used.
 
 The single full-gate receipt is
 `E:/OOTRemake/work/r19-keys/final-gate-proof.json`: it records the exact tested
