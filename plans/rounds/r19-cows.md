@@ -3,6 +3,12 @@
 cs19e; branch `r19/cows`; research/packet source main
 `d9deb65cedf841495ef3bbe2fb2d1083fa42bb43`; model `openai-codex/gpt-6.1-sol`.
 
+Branch rebased onto release-candidate main `f5c679d` after Claude's MAIN MOVED
+notice; no conflicts. The staged diagnostic packets remain frozen from the
+documented `d9deb65` source, not newly generated 0.2.3 seeds. No settings files
+were changed or withdrawn story fields restored. Claude's research-only
+full-gate/lock exemption remains applicable; no gate or sweep was run on rebase.
+
 **READY (play-held), research only: silent v2 staged below.** Kareem played the
 v1 control (milk only); v1 candidate froze during its added get, before rupees.
 V2 is built, not played. No cow locations, option, logic, fill, production patch
