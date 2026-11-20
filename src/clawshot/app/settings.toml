@@ -13,24 +13,24 @@ label = "Dungeon items"
 kind = "choice"
 choices = ["own_dungeon", "anywhere", "all_anywhere"]
 group = "Items"
-help = "Small keys anywhere moves small keys into shuffled chests, including the Well floor key; boss keys, maps and compasses stay in their own dungeon. All dungeon items anywhere is experimental and moves those too. The Well floor replacement and the separate Fortress jail-key switch are built, not played. Shadow's floor key stays vanilla under every choice: built, held until a natural pre-room save exists."
+help = "Small keys anywhere moves small keys into shuffled chests, including the Well floor key; boss keys, maps and compasses stay home. All dungeon items anywhere is experimental and moves those too. Well recovery and once-only collection, and map/compass display, passed in game. Shadow's floor key always stays vanilla. Fortress jail keys have a separate experimental switch."
 [shuffle_hideout_keys]
 label = "Fortress jail keys (experimental)"
 kind = "boolean"
 group = "Items"
-help = "Off by default; needs shuffled chests. Shuffle the four defeated guards' floor keys into chests, trading red rupees back to their pickups. Rewards keep a key-shaped floor model. All four carpenter rescues and the captain's vanilla card scene remain required. Built, not yet played."
+help = "Off by default; needs shuffled chests. Move the four guards' floor keys into chests, leaving red-rupee replacements with a key-shaped model. Answer Yes to the Valley carpenter boss before the jail encounters. One guard/rescue and its once-only 20-rupee drop passed, including return and Continue. All four rescues, the captain's card and Training Ground remain unplayed with this option."
 enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests to move Fortress jail keys." }]
 [dungeon_rewards]
 label = "Dungeon reward shuffle (experimental)"
 kind = "boolean"
 group = "Items"
-help = "Off by default. Shuffle the three stones and six medallions among their nine reward slots, including Rauru. The closed Door requires three owned stones, Ocarina of Time, learned Song of Time and Impa's real send-off. Blue warps, sage scenes, restoration, Prelude and Light Arrow story still follow native completion. Built, not played."
+help = "Off by default. Shuffle the three stones and six medallions among their nine usual rewards, including Rauru. First-pull reward delivery passed. With this on, the closed Door opened with three owned stones before Dodongo/Jabu completion; two-Stone refusal is pending. Ocarina of Time, Song of Time and Impa's send-off are still needed. Boss completion still controls blue warps, sage scenes, restoration, Prelude and the Light Arrow story."
 [bridge]
 label = "Ganon's Castle bridge (experimental)"
 kind = "choice"
 choices = ["vanilla", "stones", "medallions", "rewards"]
 group = "World"
-help = "Vanilla follows the native Light Arrow story. Count modes open only the bridge with N unique owned rewards; Light Arrows are still needed inside. Built, not played."
+help = "Vanilla follows the usual Light Arrow story. Count modes open only the bridge with your chosen number of different owned rewards; Light Arrows are still needed inside. The medallion bridge stayed shut below its count and opened at the count in game. Stones and combined-count modes remain unplayed."
 [bridge.labels]
 vanilla = "Vanilla story"
 stones = "Stones"
@@ -53,7 +53,7 @@ label = "Song placement"
 kind = "choice"
 choices = ["song", "anywhere"]
 group = "Items"
-help = "Find songs at the usual song rewards, or mix them into the other places you shuffle."
+help = "Find songs at the usual song rewards, or mix them into the other places you shuffle. Automatic lessons can still freeze without a usable ocarina. Logic requires one before the lesson, but cannot protect a player who walks into the scene without it."
 [forest]
 label = "Kokiri Forest"
 kind = "choice"
@@ -74,7 +74,7 @@ kind = "boolean"
 group = "World"
 logic_override = "free_time_travel"
 clears = { logic = ["free_time_travel"] }
-help = "Experimental, off by default. After Sheik's first scene with adult Link, Sheik no longer blocks the Master Sword pedestal, so adult Link can return to child before the Forest Temple and change age freely. Seeds made with it on may expect those early trips back to child. The Prelude of Light scene still plays after the Forest Temple. Early return, repeated age changes, the first adult arrival and the Prelude scene have passed in-game checks; returning to child after an early Door of Time has not been checked in game."
+help = "Experimental, off by default. After Sheik's first adult scene, return to child before the Forest Temple and change age freely. Seeds may expect those early trips. Prelude still follows Forest completion. Early return, repeated age changes, first adult arrival, Prelude and the repaired child sword return have passed in game. This does not repair an old seed or save."
 [fast_start]
 label = "Fast start"
 kind = "multi"
@@ -87,7 +87,7 @@ help = "Choose which opening scenes to skip. Skipped shortens the opening; Plays
 label = "Skippable story dialogue (experimental)"
 kind = "boolean"
 group = "World"
-help = "Off by default. Enable the skip button during non-choice Talon wake-up, child Zelda and Impa speech. Encounters, choices, rewards and story flags remain. Built, not yet played; Saria's bridge gift and first-pull Rauru/Sheik are unchanged."
+help = "Off by default. Enable the skip button during non-choice Talon wake-up, child Zelda and Impa speech. Encounters, choices, rewards and story progress remain. Talon's check passed with a few lines still unskippable; Zelda and Impa are still unplayed. Saria's bridge gift and first-pull Rauru/Sheik are unchanged."
 [shop_prices]
 label = "Shop prices"
 kind = "choice"
@@ -214,31 +214,31 @@ useless = "Useless hints"
 [shuffle.choice_help]
 Chest = "Chests across the remake. Finding a different item in a chest, including a large reward in a small chest, has been tried in game. Trap chests and the Treasure Chest Game's ordinary boxes stay as usual."
 Shop = "Shelves in ordinary shops, using items the shop can display properly. Refills, ammo, bottle contents, hearts and magic sold in shops only ever appear on shop shelves. Kokiri purchases and affordable prices have been tried in game. Mask loans stay as usual."
-Gift = "Gifts from characters and song rewards, including Great Fairies, frogs and minigames. Fairy rewards that can be collected only once and the supported frog rewards have been tried in game. Other gifts stay as usual."
-Scrub = "One-time Deku Scrub purchases. Repeat vendors do not change. Buying a shuffled reward has not yet been checked in game."
+Gift = "Gifts from characters and song rewards, including Great Fairies, frogs and minigames. Fairy rewards that can be collected only once, the supported frog rewards and the shuffled 40-token House reward have been tried in game. Not every gift or replacement item has been played; held checks stay unchanged."
+Scrub = "One-time Deku Scrub purchases. Repeat vendors do not change. The adult Mirror Shield purchase that previously froze now finishes in game; not every reward or age combination has been played."
 BossHeart = "Heart containers after bosses can become hearts, heart pieces, shields or a red rupee. King Dodongo's replacement shield was collected without adding a heart and did not return in Kareem's test."
 Freestanding = "Heart pieces lying around the world can become the same items as boss hearts. The ranch tower's replacement shield was collected and equipped without adding a heart piece in Kareem's test."
 Token = "Gold Skulltulas can give other rewards, and tokens can be found in shuffled chests; needs Chest shuffle, off in both presets. All 100 native sources take part. Played families allow tokens, fixed majors/equipment, new bottles, all rupee colours, hearts/capacity, ordinary ammo/Bombchus, magic jars/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed and Ocarina of Time. Each member still needs its own native structural check. Ammo needs an existing container; Bombs/Bombchus need a Bomb Bag (D25), never a free bag or weapon. Fairy Ocarina, songs, progressive copies/tiers, keys/maps/compasses, Buy*/shop stock, trade items and Gerudo Pass stay excluded at Skulltulas. Field/ranch trees work by day; tower needs night/retrieval; wetlands needs child kill then adult crate. Seed use without buying does not consume it."
 [dungeon_items.choice_help]
 own_dungeon = "Find a dungeon's keys, maps and compasses only inside that dungeon."
-anywhere = "Small keys can be in any shuffled chest, including the Well floor key. Its floor pickup gives its own key or a red rupee and retains a key-shaped model; this adapter is built, not yet played. Shadow's floor key stays vanilla: built, held until a natural pre-room save exists. Needs Chest shuffle. Fortress jail keys have a separate switch. Pickup messages name the target dungeon; counters show only the dungeon you are in."
-all_anywhere = "Experimental: small keys (including the Well floor key), boss keys (Ganon's Castle's too), maps and compasses can be in any shuffled chest. The Well replacement keeps a key-shaped model and needs play checks; Shadow's floor key stays vanilla: built, held until a natural pre-room save exists. Fortress jail keys have a separate switch. Both pickup messages name the target dungeon. Needs Chest shuffle."
+anywhere = "Small keys can be in any shuffled chest, including the Well floor key. Its floor pickup gives its own key or 20 rupees and keeps a key-shaped model. Recovery and once-only leave/return/Continue passed in game. Shadow's floor key always stays vanilla. Needs Chest shuffle. Fortress jail keys have a separate switch. Messages name the key's dungeon; counters show only the dungeon you are in."
+all_anywhere = "Experimental: small keys (including the Well floor key), boss keys (Ganon's Castle's too), maps and compasses can be in any shuffled chest. Map/compass display and the Well replacement's recovery and once-only pickup passed in game; not every combination has been played. Shadow's floor key always stays vanilla. Fortress jail keys have a separate switch. Pickup messages name the target dungeon. Needs Chest shuffle."
 [songs.choice_help]
 song = "Find songs only at the usual song rewards."
 anywhere = "Songs can appear in the other places you shuffle. Song of Storms and Minuet of the Forest have been played after finding them in chests."
 [forest.choice_help]
 closed = "Mido needs your sword and shield, and the forest bridge opens after Gohma, like the usual route."
-closed_deku = "Open the forest bridge immediately. Mido still needs your sword and shield before you enter the Deku Tree. The bridge change has been tried in game."
+closed_deku = "Open the forest bridge immediately. Mido still needs your sword and shield before you enter the Deku Tree, including after an early Zelda visit. The passage and tree mouth stayed open after reload in the repaired check."
 open = "Open the forest bridge immediately and let you past Mido without showing a sword and shield."
 [door_of_time.choice_help]
-closed = "Open the door with the Spiritual Stones, Ocarina of Time and Song of Time, like the usual route. Its first in-game check passed."
-song_only = "Meet Zelda and finish Impa's field send-off, then open the Door with the learned Song of Time and either ocarina, without stones. The escape and both moat rewards remain available after pulling early. These updated protections await their in-game check."
-open = "The Door stays shut until you meet Zelda as a child and finish Impa's field send-off, then opens without stones, an ocarina or songs. The escape and both moat rewards remain available after pulling early. These protections prevent new clock freezes, not repair frozen saves; the in-game check is pending."
+closed = "Use the Spiritual Stones, Ocarina of Time and Song of Time after Impa's send-off. With dungeon reward shuffle, the three owned Stones replace the usual boss-completion requirement. That opening passed; refusal with two Stones is still pending."
+song_only = "Meet Zelda and finish Impa's field send-off, then use the learned Song of Time and either ocarina, without stones. The escape and both moat rewards remain available after pulling early. That return/escape order was played in Open mode, not every Song-only combination."
+open = "The Door stays shut until you meet Zelda as a child and finish Impa's field send-off, then opens without stones, an ocarina or songs. The send-off gate, early return and preserved escape/moat rewards passed on Longshot rc.7. This prevents new clock freezes, not repairs an old save."
 [fast_start.choice_help]
 intro = "Remove the opening movie entirely. New-game setup and Navi waking Link still run. Movie removal passed a new-game check."
 saria = "Skip Saria's opening scene while keeping the forest visited so its pause map remains available. This does not give an item or change forest access."
 deku_tree = "Skip the Deku Tree's opening talk. With Mido kept, you must still equip your sword and shield and talk to him to clear the path."
-kaepora = "Skip the selected Kaepora introductions. Routes and item requirements stay the same."
+kaepora = "Skip the selected Kaepora introductions without changing routes or item requirements. The castle owl had no speech but kept a short fly-away in game. Added Field, summit and Lake flight checks are still pending."
 [shop_prices.choice_help]
 vanilla = "Keep the usual prices on the shop shelves you shuffle."
 affordable = "Pay 10 rupees for each shelf you shuffle. Other shelves keep their usual prices."

@@ -1,5 +1,17 @@
 # Generator defaults. Logic defaults remain in data/world/{settings,world}.toml;
 # a settings string stores overrides against this version's defaults.
+#
+# Played on Longshot rc.7, 2026-11-19 (Kareem via Claude): returning to child no longer
+# gives an unowned Kokiri Sword; the adult Mirror Shield scrub purchase finishes;
+# the 40-token gift gives its shuffled reward; dungeon map/compass display works.
+# The Well replacement can be left, recovered and collected once across return/Continue.
+# One Fortress rescue and its once-only 20-rupee drop passed, not all four rescues,
+# the card or Training Ground. Fortress keys stay experimental; Shadow's floor key stays vanilla.
+# First-pull reward shuffle, medallion bridge below/at its count and the owned-three-Stones
+# Door passed; two-Stone refusal and the remaining story/owl checks are still pending.
+# Fairy after Time keeps Time selected. Adult Sun's Song also worked with Fairy in the
+# control; no broader adult-song permission or lesson-safety change follows from that check.
+# These are evidence notes only: defaults, pools and logic permissions are unchanged.
 [defaults]
 shuffle = ["Chest"]
 dungeon_items = "own_dungeon"

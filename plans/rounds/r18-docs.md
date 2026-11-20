@@ -86,3 +86,46 @@ No tests or gates were run.
 Repository documentation is committed on this branch; READY (docs) posts the resulting head and both
 external proof paths to `cs-r18`. Remaining: Claude reviews/merges item 1, reviews/installs item 2,
 and writes the overall Round 18 outcome. No play check belongs to this documentation track.
+
+## Release-documentation follow-up — 0.2.3
+
+Claude's new request, 2026-11-19: branch `r18/docs-release` from main
+`d9deb65cedf841495ef3bbe2fb2d1083fa42bb43`. The original no-tests instruction above belongs
+to the preservation job; this follow-up explicitly authorizes focused help/docs tests, not full gates.
+
+Updated README, settings/logic guides and app setting help from Claude's supplied Longshot rc.7
+played results: child sword return, adult Mirror Shield scrub, forty-token gift, map/compass display,
+Well recovery/once-only pickup, one Fortress rescue/drop, first-pull reward, medallion bridge,
+owned-three-Stones Door, Dampé refusal, partial Talon skip, castle owl, Time-after-Fairy and Mido.
+The generator's `data/settings.toml` has no help fields; added evidence comments only, leaving every
+parsed default, destination policy and source string unchanged.
+
+Limits retained: Fortress stays experimental (all four rescues/card/Training Ground unplayed);
+Shadow floor remains vanilla; the physical no-instrument lesson freeze remains, with no bypass shipped.
+Adult Sun's Song worked with Fairy in the control, not proof of every adult song or lesson.
+Zelda, Impa, Field/summit/Lake owls and two-Stone refusal stay pending until Claude reports results.
+No version bump, game, generation, sweep, gate lock, full gate, merge or push.
+
+Drafted `r18-overview.md` for Claude's review and linked it from the roadmap. It identifies linear-history
+implementation/landing SHAs from `git log 2ba2f9a..d9deb65`, distinguishes played evidence from receipts,
+and lists Round 19 deferrals without deciding new product scope. Earlier track handoff prose remains
+historical, not rewritten into a false played pass.
+
+Focused command:
+
+```sh
+CLAWSHOT_WORKERS=1 uv run pytest tests/test_app_schema.py \
+  tests/test_app.py::test_schema_is_exhaustive_and_replay_preserves_values tests/test_settings.py -q --tb=short
+```
+
+**45 passed in 58.99 s.** No stale help-text assertion failed, so no expectation changes or new
+wording-pinning tests were needed.
+
+Final standalone smoke used the real local UI in **Chrome headless**, an empty external seed library
+and in-memory preferences. Six help rows rendered their actual schema text: dungeon items, Fortress
+keys, rewards, bridge, free time travel and story dialogue. Screenshots of Fortress and reward help
+were inspected; both panels show the partial acceptance and pending limits without clipping.
+No DOM/app-state edits, game, generation or personal-seed access. Server/browser closed normally.
+It also checked **84 local document links/anchors**, all passing, including the outcome's track links.
+Receipt: `E:/OOTRemake/work/r18-docs/release-proof/result.json`; screenshots alongside.
+The throwaway `release_help_smoke.py` was removed after proof. No permanent tests or product code added.

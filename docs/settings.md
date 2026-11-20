@@ -49,7 +49,7 @@ in chests only; see [Progressive items](#progressive-items).
 | `Chest` | 178 of 184 ordinary chests; changed chest grants work in game. Includes the played bridge bean, ranch Hookshot, late windmill Longshot, Field/Lake, four-torch Lake grotto, Valley grottos, Fortress underground, Fountain scarecrow, Well hidden-hole and sign-puzzle routes. The Well requires the Lens conservatively. Duplicate/failure copies and repeat chests stay unchanged. Treasure Chest Game reward swap is built but untested and held; its 11 game boxes stay unchanged. |
 | `Shop` | Ordinary shop shelves, native-display items only; slot swaps, restock and Castle Town purchases have in-game evidence. Bought goods (refills, ammo, Bombchus, bottle contents, hearts and magic jars) go only to shop shelves in every seed; no setting moves one to a chest, gift, scrub, floor pickup or Skulltula. Mask loans stay unchanged. |
 | `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper and all seven frog checks. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the unaccepted checks below. |
-| `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. Implementation tested; not every sale has recorded in-game acceptance. |
+| `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. The adult Mirror Shield purchase that previously froze now finishes; other item/age combinations are not all played. |
 | `BossHeart` | Eight boss-heart checks, off by default. Limited to the five native floor pickups below. King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
 | `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
 | `Token` | All 100 native Gold Skulltulas, off in both presets; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, all rupee colours, Heart Pieces/Containers, fixed Nut/Stick capacity, ordinary arrow/bomb/nut/stick bundles, Bombchus, magic jars/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed and Ocarina of Time. Core, packets1–3 and the separate first-Time-ocarina part passed on rc.3; each catalogue member still needs its own native structural check, not every member/boundary was played. See `src/clawshot/data/token_rewards.toml`. Tokens spill only into shuffled chests; non-token grants add no token. The Field tree works by day, the ranch tower needs night/retrieval, and wetlands needs the child wall kill before the adult crate. |
@@ -175,11 +175,11 @@ Market expert wins pay 30 rupees and Kakariko expert wins 70, including the firs
 held first-expert-check experiment would add a new once-only prize; it is off under every setting.
 
 Merchant sale experiments (Medigoron, Granny, desert carpet) remain held. The Skulltula House's
-10-token swap passed, with the 20-token preview observed; that does not certify the later thresholds.
+10- and 40-token reward swaps passed; the 20-token preview was observed, not every later threshold.
 With `Gift`, the 40-token reward contributes **Bombchus (20)** to the pool and gives its
-assigned item, using the native forty-token threshold and collected flag. Without `Gift`,
-it stays the native twenty-Bombchu bundle. This correction is built, not yet played;
-its candidate and main control await the round-18 in-game check.
+assigned item, using the usual forty-token requirement and collected state. Without `Gift`,
+it stays the usual twenty-Bombchu bundle. Kareem passed the changed reward on Longshot rc.7
+on 2026-11-19; this does not certify every House reward or every possible replacement.
 The Weird Egg, Zelda's Letter and the adult trading items stay at their native checks.
 All fourteen share one trade inventory cell that shows a single owned item,
 adult items first (a child sees an owned adult item instead of the Cucco Talon must be shown), and every
@@ -225,12 +225,13 @@ digging rewards and Deku Scrub purchases exclude both instruments before fill, i
 placements. Chests and direct story grants remain allowed; Ocarina of Time also has its separately
 played Skulltula pickup. The show-item crash is not established to be age-specific.
 
-Ocarinas remain separate fixed items, **not progressive copies**. Newly generated seeds keep the
-native Fairy Ocarina inventory grant, but preserve the selected Ocarina of Time when Time is already
-owned, in either age. Fairy-then-Time stays native. This prevents issue #34's lower-item selection
-overwrite without changing placements, stock, ownership flags or source completion. Built; the paired
-child/adult play check is pending. Existing seed folders/saves are not retroactively repaired, Fairy
-remains child-only, and this is not a no-instrument song-lesson bypass.
+Ocarinas remain separate fixed items, **not progressive copies**. Newly generated seeds still give the
+Fairy Ocarina when found, but keep the Ocarina of Time selected if it is already owned, at either age.
+Kareem passed the child and adult checks on Longshot rc.7 on 2026-11-19: adult Sun's Song worked,
+and Time stayed selected after Continue. In the unchanged adult check, Sun's Song also worked while
+holding Fairy. That result covers Sun's Song, not every adult song or the automatic song lessons.
+Logic still requires Time for adult songs and lessons. Existing seed folders and saves are not repaired;
+this is not a no-instrument song-lesson bypass.
 
 ### Cross-age equipment receipts
 
@@ -242,8 +243,9 @@ Newly generated scrub shield sales keep the native inventory grant and one-frame
 finish without requiring any shield to equip. This covers an adult owning only the unusable Deku
 Shield, as in issue #33, and opposite-age Mirror/Deku receipts. The patch does **not request forced
 auto-equip** or enable wrong-age shield use. Inventory, native auto-selection and equipment are
-separate; manual equipment remains available at the usable age. Built/native-data-tested,
-**not played yet**; old generated folders are not repaired.
+separate; manual equipment remains available at the usable age. Kareem passed the adult Mirror Shield
+purchase on Longshot rc.7 on 2026-11-19. Other shield/age combinations are not all played;
+old generated folders are not repaired.
 
 Other chest/gift/pickup paths do not use that scrub-only equipment wait. They retain their existing
 native grants and admission rules, not a claim that every item/age pair has been played.
@@ -252,8 +254,9 @@ and unverified boundaries. Wrong-age item-bar precautions remain [below](#hints-
 
 Lessons retain main's native ocarina sequence. Round18's attempted no-usable-ocarina bypass was withdrawn
 after Kareem's adult/Fairy-only Minuet check froze following the demonstration (2026-11-19).
-This includes every child/Impa and adult bypass; the physical fix is deferred to round19.
-Logic requires an age-usable ocarina for lessons: Fairy as child only, Ocarina of Time at either age.
+This includes every child/Impa and adult bypass; the physical repair is deferred.
+Logic requires an ocarina for lessons: either as child, Ocarina of Time as adult. Walking into an automatic
+lesson without the required instrument can still freeze the game, even though logic avoids that route.
 
 ## Shops and scrub prices
 
@@ -297,8 +300,9 @@ With Mido kept, his post-Zelda schedule waits until his saved wall blocker has a
 This preserves the native sword-and-shield conversation after an early castle visit instead of moving
 him beyond a still-closed wall ([#35](https://github.com/hiKareeem/Clawshot/issues/35)).
 Only that completed-castle schedule is guarded; open/Mido-skipped mode is unchanged.
-The repair is **unplayed** pending the candidate/control check in
-[`r18-mido.md`](../plans/rounds/r18-mido.md). Do not regenerate a played seed or reset story quests to repair it.
+Kareem passed the repair on Longshot rc.7 on 2026-11-19: sword-only Link was refused, adding the shield
+opened the passage and tree mouth, and both stayed open after reloading. Do not regenerate a played seed
+or reset story quests to repair it.
 
 The opening-movie skip is on by default. It removes the movie entirely, not just its skip-button
 restriction; Navi waking Link and normal new-game initialization still run. Movie removal
@@ -388,9 +392,13 @@ are refused. These settings open **only the bridge**: they give no Light Arrows,
 complete no sages and skip none of the six native Light Arrow trial cores.
 With Gift shuffle, the native Light Arrow story still runs even if its gift moved.
 
-Both features are **built, not played**. Native data identifies the bridge's story
-trigger and saved event latch; it does not prove an isolated Longshot check.
-Maintainer reader table and controls: [Round 18 rewards](../plans/rounds/r18-rewards.md).
+Kareem's Longshot rc.7 checks on 2026-11-19 confirmed the shuffled first-pull reward, a medallion-count
+bridge staying closed below its count and opening at the count, and the closed Door opening with all
+three Stones owned while Dodongo and Jabu were unfinished. The Door stayed open; no escape or moat
+scene played. The two-Stone refusal check is still pending.
+Other shuffled boss rewards, stones/combined bridge counts, late story order and a full playthrough
+are not certified by those checks. Both options remain experimental.
+Detailed evidence: [dungeon rewards and bridge](../plans/rounds/r18-rewards.md).
 
 ## Door of Time and returning to child
 
@@ -447,11 +455,11 @@ An open-bridge, early-door seed can validly require adult Link before Gohma. Its
 explains when no child-only opening guide exists instead of rejecting the beatable seed.
 
 Free travel keeps Temple Sheik through both first-arrival scenes, then hides him until Forest quest
-completion. Forest rewards remain native; Prelude follows quest completion, **not medallion ownership**.
+completion. Forest completion, not its medallion, controls Prelude even when rewards are shuffled.
 Early return, repeated age changes, the post-Forest Prelude and the fixed first adult arrival have
 recorded in-game acceptance (R9-FREE-TRAVEL, R9-PRELUDE-PATCHED, R10-FIRST-PULL-FIXED). Default stays off.
-Adult song logic requires the Ocarina of Time; that age restriction comes from the game's inventory
-metadata, **not a played adult Fairy Ocarina test**.
+Adult song logic still requires the Ocarina of Time. Adult Sun's Song worked with Fairy in the
+2026-11-19 check; that does not establish other adult songs or safe Fairy-only lessons.
 
 The app shows this override as the **Free time travel (experimental)** switch under World, not as a
 separate generator setting. On writes the same settings string as `--logic free_time_travel=true`;
@@ -471,8 +479,9 @@ and the overworld. An off-dungeon key is delivered as a named chest grant; no ot
 Both release modes include the Well floor key and require Chest shuffle.
 Its floor source keeps its own key or gives a red rupee; the replacement retains a key-shaped
 model and native room retirement wiring. Other dungeons' keys, majors, hearts and shields
-are not floor-key rewards. Kareem observed silent +20 rupees and uncollected recovery;
-post-pickup saves contain both native source flags. Kareem passed collected re-entry on v3 (2026-11-19).
+are not floor-key rewards. On Longshot rc.7 on 2026-11-19, Kareem left the Well replacement,
+recovered it, collected its silent +20 rupees, and confirmed it stayed collected after leaving,
+returning and Continue. This proves the checked Well pickup, not every scripted floor key.
 Own-dungeon mode leaves it untouched. The Shadow Temple floor key stays vanilla under every setting:
 **built, held until a natural pre-room save exists**. Its adapter is not admitted to generation.
 
@@ -482,10 +491,12 @@ Fortress guard floor keys into supported shuffled chests. Default **off** in bot
 drop, staged event pickup and resting pickup remain one check. Replacement rewards are red rupees
 with the native key-shaped floor display and the key's get-event/window, not silent rupee collection.
 That completion writes the source's native once-only Bool; the initial silent candidate repeated
-after re-entry and is superseded. Kareem passed v3 collection, re-entry and Continue (2026-11-19). Chest keys credit only
+after re-entry and is superseded. Kareem passed one guard/rescue and the repaired 20-rupee drop,
+including leaving/returning and Continue, on Longshot rc.7 on 2026-11-19. Chest keys credit only
 Fortress inventory, not guard defeat, source collection, carpenter rescues or Spirit progress.
-Talk to the Valley carpenter boss and answer Yes before the jailed carpenters. Free all four and
-receive the captain's unchanged card (D39); the card alone does not clear guards.
+Talk to the Valley carpenter boss and answer Yes before the jailed carpenters; this enabled the
+guard in the played check. All four rescues, the captain's unchanged card (D39) and Training Ground
+remain **unplayed with this option**, so it stays experimental. The card alone does not clear guards.
 
 The four jail sources use stable native actor/Hash identities, not a guessed torch-room match.
 Until that correspondence is verified, logic conservatively requires access to all four guard
@@ -496,8 +507,10 @@ releases maps, compasses and boss keys, including Ganon's Castle's boss key, int
 shuffled chests. It is off in defaults and both presets. Source-bound grants write only the
 intended dungeon's saved ownership flag, never the standing dungeon's. Both pickup messages
 name the item and its target dungeon in English in every language. An off-area boss key
-does not animate the standing dungeon's boss-key indicator. This new mode is **built,
-untested in game**; it does not shuffle dungeon-completion rewards or change the bridge.
+does not animate the standing dungeon's boss-key indicator. Map/compass display passed Kareem's
+Longshot rc.7 check on 2026-11-19; an earlier remote Forest boss key opened its normal door.
+These checks do not cover every source/target combination or a whole playthrough. The option remains
+experimental; it does not shuffle dungeon-completion rewards or change the bridge.
 
 In either anywhere mode, the statue's two hand chests may hold a named small key.
 Only `all_anywhere` allows named maps, compasses and boss keys there.

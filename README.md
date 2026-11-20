@@ -69,10 +69,11 @@ The [Tracker tab](docs/tracker.md) reads saved inventory and per-dungeon keys, w
 
 - **Shuffled now:** chests, shop shelves, NPC gifts and songs, one-time Deku Scrub sales.
 - **Optional:** boss Heart Containers, floor Heart Pieces, Gold Skulltulas (requires chests),
-  and small keys outside their own dungeon (opt-in **Small keys anywhere**, now including Well/Shadow floor keys;
-  those sources are built, not played). **Fortress jail keys** are a separate experimental, default-off option;
-  the card scene stays vanilla. Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys.
-- **Experimental, default off:** dungeon rewards shuffled among their nine native slots (Rauru included), and a stones/medallions/rewards-count bridge. Built, not played; native completion scenes and Light Arrow trials stay intact.
+  and small keys outside their own dungeon (opt-in **Small keys anywhere**, including the Well floor key).
+  Shadow's floor key stays unchanged. **Fortress jail keys** are a separate experimental, default-off option;
+  one rescue and its once-only replacement passed, but all four rescues, the card and Training Ground remain untested.
+  Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys.
+- **Experimental, default off:** dungeon rewards shuffled among their nine usual rewards (Rauru included), and a stones/medallions/rewards-count bridge. First-pull reward delivery and the medallion-count bridge passed in game; this is not a full shuffled playthrough.
 - **Not shuffled yet:** cows, pots, crates and loose rupees.
 
 Choose the kinds you want. The UI starts with Recommended; the generator's Defaults shuffle chests
@@ -89,7 +90,7 @@ that proves the model, not that every route has been verified in the game.
 | Chests | Changed chest rewards work in game. 178 of 184 ordinary chests are shuffled; duplicate/failure copies and repeat rewards stay unchanged. Includes the played Field/Lake routes, four-torch Lake grotto, Valley grottos, Fortress underground, Fountain scarecrow and Well hidden-hole routes; the Well conservatively requires the Lens. |
 | Shops | Shuffled native shop items and purchases work in game. Arbitrary major items cannot use a stand-in shelf display. |
 | NPC gifts and songs | Gift swaps and Great Fairy once-only rewards work in game, as does the Kokiri shopkeeper's extended gift window. All seven frog checks have passed their in-game experiment. Not every gift or item combination has been played. |
-| One-time Business Scrubs | Four kinds of one-time Deku Scrub sale are enabled; repeat vendors stay unchanged. The implementation is tested, but the recorded results do not establish every shuffled sale in game. |
+| One-time Business Scrubs | Four kinds of one-time Deku Scrub sale are enabled; repeat vendors stay unchanged. The adult Mirror Shield purchase that previously froze now finishes. Not every shuffled sale or item/age combination has been played. |
 | Boss hearts and floor Heart Pieces | Optional, off by default. A Hylian Shield worked at King Dodongo and the ranch tower. Only native floor pickups are allowed; other locations and pickup combinations are not all verified. |
 | Gold Skulltulas | Optional, off in both presets; requires Chest shuffle. All 100 native sources are admitted, including the played Field tree, ranch tower and cross-age wetlands route. The lone tree works by day; tower retrieval remains night-only. Played reward families now include container-backed ammo/Bombchus, magic, special upgrades and Ocarina of Time; Fairy Ocarina and the [other explicit exclusions](docs/settings.md#what-enters-the-shuffle) remain held. Each member still needs its native structural check. |
 | Hints and convenience options | Gossip Stones speak hints without the Mask of Truth by default; this, fast start, the forest option that opens only the exit bridge (`--forest closed_deku`) and 10-rupee Kokiri prices have in-game evidence. |
@@ -108,20 +109,25 @@ digging prize now give shuffled rewards. Both passed their in-game checks on 202
 (`R10-MARKET-BOTTLE-FIX`, `R10-DIGGING`). The shop's corrected swap passed re-entry and shopping;
 Dampé still shows a heart prize but gives the shuffled item.
 
-Expert galleries, merchant experiments and some Skulltula House rewards stay unchanged;
-the 10-token swap alone has been observed, not every threshold.
+Expert galleries, merchant experiments and some Skulltula House rewards stay unchanged.
+The 10- and 40-token reward swaps have been observed, not every threshold.
 The Door of Time's earlier song-only and open modes passed a first door/sword-pull check.
 Both wait for Field-arrival clock state and Zelda/Impa's real send-off. The open-mode gate and
 later escape/moat order repair and immediate child-return clock clear passed on Longshot rc.7.
-The first-arrival lighting repair awaits v5 play checks. For new seeds; no save-repair or older-seed compatibility guarantee.
+The first-arrival lighting repair passed on rc.7 on 2026-11-17. For new seeds; no save-repair or older-seed compatibility guarantee.
 
 Cows, pots, crates and loose rupees are not shuffled. Dungeon reward shuffle is a separate experimental option, off by default; it does not move rewards outside their nine slots.
-**Small keys anywhere** puts dungeon chest keys and the Well/Shadow floor keys in supported shuffled chests,
-including other dungeons and the overworld. The two new floor sources give their own key or a red rupee and keep a
-key-shaped model; built, not played. **Fortress jail keys** is a separate default-off switch with the same source
-reward limit; all four rescues and the captain's vanilla card scene remain. Experimental **All dungeon items anywhere**
-also releases maps, compasses and boss keys, including Ganon's Castle's boss key; that new
-mode is built and untested in game. Defaults and both presets keep every dungeon item home.
+With reward shuffle on, the closed Door opened with all three Stones owned while Dodongo and Jabu were
+unfinished, stayed open, and triggered no escape/moat scene. Refusal with only two Stones is still pending.
+**Small keys anywhere** puts dungeon chest keys and the Well floor key in supported shuffled chests,
+including other dungeons and the overworld. The Well replacement keeps a key-shaped model; leaving it,
+recovering it, collecting it once, returning and Continue passed in game. Shadow's floor key stays vanilla.
+**Fortress jail keys** is a separate experimental, default-off switch. After answering Yes to the carpenter
+boss, one guard encounter, rescue and 20-rupee drop passed; the drop stayed collected after returning and Continue.
+All four rescues, the captain's card and Training Ground still need play checks.
+Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys, including
+Ganon's Castle's boss key. Map/compass display and a remote boss key opening its door have passed in game.
+Defaults and both presets keep every dungeon item home.
 A dungeon item found outside its dungeon names that dungeon in its pickup messages
 (English in every language); the game's key counters still show only the dungeon you are in. The
 played gates cover key chests in and out of dungeons, correct credit, door spending and reloads,
@@ -130,11 +136,26 @@ playthrough has been played.
 All eight upgrade chains—Hookshot, strength, scale, wallet, bomb bag, quiver,
 slingshot bag and magic—are always progressive. Copies are chest-only; the get-item
 name/text and grant follow the selected tier, while the rising model stays the base.
-Built and native-data-tested; the Longshot check is unplayed.
+The eight chains have played Longshot checks; that is not every collection order or pickup combination.
 Entrance shuffle and Archipelago are not supported.
 See [settings and restrictions](https://github.com/hiKareeem/Clawshot/blob/main/docs/settings.md) for the detailed reference.
 Evidence: [the roadmap index](https://github.com/hiKareeem/Clawshot/blob/main/plans/00-roadmap.md)
 plus the linked round files, and [playtest answers](https://github.com/hiKareeem/Clawshot/blob/main/plans/playtest/answers.md).
+
+### Recent in-game checks
+
+Kareem played these on Longshot rc.7 on 2026-11-19:
+
+- **New seeds fix the free child sword on returning from adult.** Kareem passed the return check on Longshot rc.7.
+- **Taking the Fairy Ocarina after the Ocarina of Time keeps Time selected in new seeds.** Child and adult checks
+  passed, including adult Sun's Song and Continue. Adult Sun's Song also worked with Fairy in the control;
+  that does not establish every adult song or a safe no-ocarina lesson.
+- **Mido still checks sword and shield after an early Zelda visit.** The repaired passage and Deku Tree mouth
+  stayed open after reloading in Kareem's check.
+- **Dampé will not start a race without Hookshot or Longshot.** The no-Hookshot check faded back in front of
+  Dampé, with normal movement and the existing warp back up usable; it did not return Link to the surface.
+- **Optional speech skips:** Talon's wake-up passed with a few lines still unskippable. The castle owl had no
+  speech, but kept a short fly-away. Zelda, Impa and the additional Field/summit/Lake owl checks remain pending.
 
 ### Known issues
 
@@ -142,6 +163,8 @@ plus the linked round files, and [playtest answers](https://github.com/hiKareeem
   other items; changing areas does not clear the old item-bar jam. Newly generated seeds initialize an empty
   nut slot (0/20). Kareem verified child Bow first, then Boomerang use without a reload on 2026-11-12.
   Existing saves are not modified. `play-note.md` lists age-locked rewards but reveals item locations.
+- **Song lessons can still freeze without a usable ocarina.** Logic requires one before the lesson, but cannot
+  protect you if you walk into an automatic scene without it. The attempted lesson-skip repair is not shipped.
 - **Trading items share one displayed slot.** An adult trade item can hide the child's Cucco; Save and Continue
   does not fix that. Wake Talon and show Zelda's Letter before taking Anju's adult Pocket Egg. Newly generated
   seeds keep trading items vanilla; older Gift seeds may contain shuffled adult trade items.

@@ -168,7 +168,9 @@ through the same age/instrument rules as normal travel. Farore's Wind ownership 
 
 **One-way arrivals (Round 18).** Dampé's whole grave descent requires usable Hookshot before entry;
 neither race reward can supply it. There is no reverse race return, and the windmill climb uses Hookshot,
-not the N64 Song of Time. Ordinary windmill access from Kakariko is unchanged.
+not the N64 Song of Time. Ordinary windmill access from Kakariko is unchanged. Kareem's no-Hookshot
+check on Longshot rc.7 (2026-11-19) refused the race and faded back in front of Dampé, with normal
+movement and the existing warp back up usable. It did not return Link to the surface.
 
 Child Bolero and both-age Requiem arrivals require an already playable Minuet, Serenade, Nocturne or
 Prelude. The final Wasteland leg into Colossus has the same guard, before its one-way boundary.
@@ -179,7 +181,8 @@ This affects all new seeds, including Defaults, without changing settings.
 
 New seeds also validate the incoming native era-change Kokiri Sword equipment candidate against pouch
 ownership before equipping it. An absent sword clears only that candidate; no item is granted and logic
-does not gain a sword from time travel. Built/native-data-tested, not yet played in game.
+does not gain a sword from time travel. Kareem passed the child-return repair on Longshot rc.7
+on 2026-11-19; this is not a claim that every equipment/age combination has been played.
 
 Imported Gerudo Fortress rules treat `Gerudo_Membership_Card` as friendly access. In the remake the guards,
 desert gate, Training Ground entrance and horseback archery check Spirit quest progress, which the
@@ -190,6 +193,18 @@ must model completing the captain's source instead: a moved card writes no quest
 route that accepts Longshot where the game checks the Hookshot itself is a separate open review.
 Sources: `src/clawshot/data/world/remake/gifts.toml`; D39 in `plans/decisions.md`;
 `plans/rounds/r13-gerudo-card.md` (static data trace, not a played route check).
+
+With Fortress jail-key shuffle enabled, one guard/rescue and the repaired once-only 20-rupee drop
+passed on Longshot rc.7 (2026-11-19), after the carpenter boss's Yes. All four rescues, the card and
+Training Ground are still unplayed with that option; no new pre-rescue access is inferred.
+The Well floor replacement passed recovery and once-only leave/return/Continue checks.
+Shadow's floor key stays native under every setting. See [key placement limits](settings.md#door-of-time-and-returning-to-child).
+
+With dungeon rewards shuffled, the closed Door uses the three owned Stones rather than child boss
+completion, retaining the instrument/song/send-off prerequisites. Kareem opened it before Dodongo and
+Jabu were done, with no escape/moat scene; two-Stone refusal is still pending. The first-pull shuffled
+reward and a medallion-count bridge below/at its count also passed. These are bounded checks, not a
+complete reward-shuffled playthrough. Other completion gates stay native; see [reward settings](settings.md#dungeon-rewards-and-ganons-castle-bridge).
 
 The persistent `Met Child Zelda` event models the **whole courtyard/Impa lesson and accepted
 send-off through DoorOfTime Step02**, not first courtyard contact. Both moat rewards, Saria's
@@ -213,14 +228,17 @@ softlock and passed its Ocarina control on 2026-11-18. Shuffled gifts still run 
 The post-lesson Impa send-off and Ice Cavern Water-quest event share the requirement; the moat Ocarina
 and Iron Boots chest rewards are given before their lessons, so those reward rules are not gated.
 This is a logic safeguard, not a fix for walking into an automatic scene without an instrument.
-Track G owns scene safety. Native sources and fail-first proof: [Round 18 logic](../plans/rounds/r18-logic.md).
+The attempted no-instrument bypass failed in play and was removed; the physical freeze remains.
+Native sources and regression proof: [song-lesson requirements](../plans/rounds/r18-logic.md).
 
 The fixed `Ocarina` alias MAX-combines Fairy tier1 and Time tier2; it is not a count of two progressive
 copies. Issue #34 showed that a later Fairy receipt can overwrite the native selected instrument while
 logic retains tier2. New outputs preserve Time selection after the genuine Fairy grant when Time is
-owned; stock, `IsGet`, source flags and the age rules remain native. The implementation awaits its paired
-play check. Older outputs can still violate this active-instrument invariant; owning Time historically
-does not by itself prove that an older save currently selects it.
+owned; stock, `IsGet` and source flags remain native. Kareem passed the child and adult checks on
+Longshot rc.7 on 2026-11-19: adult Sun's Song worked and Time remained selected after Continue.
+Adult Sun's Song also worked with Fairy in the control. That single song does not establish every
+adult melody or safe Fairy-only lessons; the conservative adult Time requirement stays in logic.
+Older outputs can still select Fairy after Time; ownership history alone does not prove the active instrument.
 
 The independent adult-return proof retains compulsory child story events using the same
 count-cap test as items; optional history is excluded. Both early-door construction bounds include

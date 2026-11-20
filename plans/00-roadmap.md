@@ -45,7 +45,7 @@ The standing Settings backlog below was separated from round 8, not discarded.
 | 15 | 2026-11-14–15 | Contributor PRs, compact tracker/free-travel UI, scrub guard and token shuffle. | [Round 15](rounds/r15-overview.md) |
 | 16 | 2026-11-16–17 | Softlock entry guard, clock chain, NUP cap, minimap and Water precaution; released 0.2.2. | [Round 16](rounds/r16-overview.md) |
 | 17 | 2026-11-17–18 | Warp guards, unproven sword guard, options copy, tracker counts, experimental dungeon mode, three chests and Token holds; main `2ba2f9a`. | [Round 17](rounds/r17-overview.md) |
-| 18 | 2026-11-18–19 | In progress; outcome belongs to Claude. Documentation track records this index and the staged skill split. | [Track H](rounds/r18-docs.md) |
+| 18 | 2026-11-18–19 | Repairs, more checks, key/reward options and bounded played acceptance; 0.2.3 outcome draft for Claude's review, not a release announcement. | [Round 18](rounds/r18-overview.md) |
 
 
 ## Settings backlog (Ship of Harkinian's lists, shown by Kareem 2026-11-09)
