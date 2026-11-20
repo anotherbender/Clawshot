@@ -8,7 +8,6 @@ hoping its native cleanup removes it. Travel, scene history and era writes stay.
 from collections.abc import Callable, Mapping
 from dataclasses import replace
 
-from clawshot.census.gifts import reachable
 from clawshot.formats import evfl
 from clawshot.patch import equipment
 from clawshot.patch.items import load as item_actors
@@ -39,12 +38,6 @@ def _write(doc: evfl.EventFlowFile) -> bytes:
     if evfl.read(result) != doc:
         raise PatchError("Master Sword: edited flow does not read back")
     return result
-
-
-def _register(fc: evfl.Flowchart, call: int) -> None:
-    for entry in fc.entry_points:
-        if call in reachable(fc, entry.main_event) and call not in entry.sub_flow_events:
-            entry.sub_flow_events.append(call)
 
 
 def _operation(fc: evfl.Flowchart, actor: str, operation: str, *, query: bool = False) -> tuple[int, int]:
@@ -152,10 +145,6 @@ def era_transform(data: bytes) -> bytes:
     empty.cases = [(pin, candidate_guard if pin == 1 else target) for pin, target in empty.cases]
     age.cases = [(pin, default_guard if pin == 0 else target) for pin, target in age.cases]
     era.cases = [(pin, stash_guard if pin == 1 else target) for pin, target in era.cases]
-    held, absent = len(fc.events), len(fc.events) + 1
-    fc.events.extend([evfl.ReturnEvent(f"{PREFIX}Held", 0), evfl.ReturnEvent(f"{PREFIX}Absent", 1)])
-    gate = _owned(fc, f"{PREFIX}ReadOwnership", MASTER, held, absent)
-    fc.entry_points.append(evfl.EntryPoint(f"{PREFIX}Owned", gate))
     return _write(doc)
 
 
@@ -214,22 +203,40 @@ def pose_transform(flow: str, before: str, target: str) -> Callable[[bytes], byt
 
 def arrival_transform(data: bytes) -> bytes:
     doc, fc, named = _chart(data, "Dm_TimeTemple_0085")
-    event = fc.events[named["Event37"]]
-    if not isinstance(event, evfl.SwitchEvent) or dict(event.cases) != {1: named["Event9"]}:
-        raise PatchError(f"Master Sword: changed adult arrival pose boundary: {event!r}")
-    # This movie has no GameDataActor; query in the already-used era helper
-    # rather than add an unpreloaded actor to a cinematic context.
-    guard = len(fc.events)
-    fc.events.append(
-        evfl.SubFlowSwitchEvent(
-            f"{PREFIX}ArrivalOwned",
-            "ReplaceEquipmentForEraChange",
-            f"{PREFIX}Owned",
-            [(0, named["Event9"]), (1, evfl.NONE)],
+    create = fc.events[named["Event37"]]
+    wait = fc.events[named["Event0"]]
+    restore = fc.events[named["Event5"]]
+    finished = fc.events[named["Event19"]]
+    if (
+        not isinstance(create, evfl.SwitchEvent)
+        or dict(create.cases) != {1: named["Event9"]}
+        or equipment._op(fc, create) != ("query", "Player_Event", "EventQueryPlayerIsEquipWeapon")
+        or equipment._op(fc, wait) != ("action", "EventSystemActor", "EventWait")
+        or wait.next != named["Event10"]
+        or equipment._op(fc, restore) != ("action", "Player_Event", "EventTriggerPlayerEquipDynamicEquipmentFromPouch")
+        or restore.next != named["Event19"]
+        or equipment._op(fc, finished) != ("action", "Player_Event", "EventWaitCreationFinishedEquipment")
+        or finished.next != evfl.NONE
+    ):
+        raise PatchError(f"Master Sword: changed adult arrival equipment boundaries: {create!r}, {wait!r}, {restore!r}")
+    # Era replacement has already validated the incoming selected blade against
+    # canonical IsGet and StockNum. Use this movie's native selected-weapon query:
+    # no new actor or cross-flow dependency while its screen is white.
+    first = len(fc.events)
+    for name, yes in (("ArrivalSelected", named["Event9"]), ("RestoreSelected", named["Event10"])):
+        fc.events.append(
+            evfl.SwitchEvent(
+                f"{PREFIX}{name}",
+                create.actor,
+                create.query,
+                [(0, yes), (1, evfl.NONE)],
+                {"ArmorName": MASTER, "WeaponSlot": 0},
+            )
         )
-    )
-    event.cases = [(1, guard)]
-    _register(fc, guard)
+    create.cases = [(1, first)]
+    # Preserve the native animation wait, fade, camera and fork join. Only the
+    # sword cleanup (including restore + creation wait) ends early when unarmed.
+    wait.next = first + 1
     return _write(doc)
 
 

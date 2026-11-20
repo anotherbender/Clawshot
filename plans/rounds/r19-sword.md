@@ -1,7 +1,7 @@
 # Round 19 — sword (cs19c)
 
 Branch `r19/sword`, original base `d9deb65cedf841495ef3bbe2fb2d1083fa42bb43`; rebased onto release main `f5c679d532b688ea1a98a5ffb158a821454ce07d` after the v3 build.
-Model: `openai-codex/gpt-6.1-sol`. **NOT READY: Kareem played v2 and hit a white-screen freeze.** Initial gate/READY below are historical; the native-receipt repair requires boot-check and replay.
+Model: `openai-codex/gpt-6.1-sol`. **NOT READY: v3 passed the first unowned pull and return to child, then froze on its second pull.** V4 repeat-arrival repair and registration coverage are under development; replay is required.
 
 ## Contract and questions
 
@@ -107,3 +107,30 @@ Rebased the four sword commits onto `f5c679d` as directed. Two conflicts resolve
 Inspected `d9deb65..f5c679d` in generate/fill.py, generate/prepare.py and world data: the only fill-module delta is the reserved-field comment and enabled-story validation refusal. No placement algorithm, pool, source selection, world rule or goal changed. Per the rebase steer, no new sweep; prior300/300 cohorts had story off and remain applicable.
 
 V3's archived packet source/hash receipts remain truthful (pre-rebase repair `4ab3cc5b4c`); its native-receipt mechanism is unchanged by this rebase. **After this evidence commit**, rerun focused native/runtime/logic/settings/child tests, then ONE full gate under the owned lock on that exact rebased HEAD. Fresh receipts/logs go under `work/r19-sword/gate-f5c679d/`, preserving the original gate and its withdrawn readiness. Passing this new gate will still **not** mean READY: v3 boot-check and Kareem replay remain required.
+
+## 2026-11-20 v3 played repeat-pull failure / approved v4
+
+Kareem played v3 at14:17–14:24. B.1 first pull **PASS**: all scenes completed, adult control, Master absent; saved adult slots have Master=false/stock0, equipped empty, other-era Kokiri, first_pull=true. Real return to child **PASS** and saved in slot03: child/Kokiri, Master=false, first_pull=true. Second child→adult pull **FROZE white**; window closed14:24. River chest was not reached. This is a different failure from the fixed first-pull receipt; no agent reran it.
+
+Read-only trace accepted by Claude before edits/build: non-first `DoorOfTime_Draw` → `Market_Child_Field_ChildToAdult` → native era swap → adult Banc reservation → `Dm_TimeTemple_0085`. V3 log9549 proves the0085 mod loaded;9620 proves adult Market load.0088 did not load in this run. Snapshots `2026-11-20_141734/...`, `_142208/...` and `_142237/...` distinguish pre-pull, adult and saved child states.
+
+Two demonstrated0085 defects, **not proof of the unlogged suspended node**:
+
+1. V3 adds an external ownership subflow in the white-faded `other` cut, but0085's actual `GameAnalyzedEventInfo.SubFlowList` declares only `Common_Camera_Pln`, not `ReplaceEquipmentForEraChange`. Earlier claim that the era helper was already declared in this movie was wrong; it is declared in the *parent* field/age event.
+2. Even if that guard returns, native C01 still reaches Event5 `EquipDynamicFromPouch` → Event19 `WaitCreationFinishedEquipment`. The initial create guard does not guard that later restore/wait path. Existing coverage executed `other` only and treated creation waits as plain effects.
+
+Claude approved v4: no added calls; local native selected-Master predicates after era's canonical ownership validation; skip both create/wait and later cleanup/restore/wait for the unarmed case, retain native owned path and all fade/camera/animation. `era_transform`'s now-unused branch-return helper is removed. No new movie actor, item window, saved flag, retry or timer.
+
+0085's native vocabulary has only the player's equip predicate, not a canonical stock query. V4 reuses that exact actor/query at the create boundary and after C01's native300-frame wait, **before** its sword-state/restore chain. Valid repeat arrivals have already passed the era guard's IsGet+positiveStock check; no selected Master is therefore the unarmed case. Owned Master retains the original native actions; large-blade exclusions remain native.
+
+The superseded0d05a626 gate retained focus268PASS, format/lintPASS and the original synthetic3944PASS533SKIP plus one20s startup error. Exact `[extra-mod]` isolated **3/3 PASS** under own lock at workers1 (4.921s,2.438s,9.406s command times). Dump started n4/workers1 with the game running and was **cancelled** for the newly approved v4 source change. Partial dump/three isolated logs retained; own job stopped and owned lock released, `LOCK RELEASED` posted14:32. **Not a completed full gate.**
+
+V3 launchers archived as `OLD v3 (2nd pull froze) - Test - sword candidate v3.bat` and `OLD v3 - Test - sword main v3.bat`; played users/mods/logs/snapshots preserved. V4 must start fresh, with checklist order: first pull → child → second pull → child → third pull → River chest/equip → child → owned pull. Separate full-cut coverage for0085/0088 and a generic registration oracle over all Clawshot-modified flows are required before the v4 boot-check handoff. **NOT READY until replayed.**
+
+### V4 native slice verified
+
+Focused `test_master_sword.py`, `test_child_sword.py` and new `test_master_sword_cuts.py`: **415 passed in43.84s**, explicit subprocess exit0, all four source/test hashes unchanged during execution. `v4-native-focus.log`, `.xml` and `v4-native-focus-result.json` retain the result. An earlier harness invocation returned only partial dots without summary/exit; no pass was claimed. Process inspection found no live pytest and Windows recorded no Python application crash. A fault-enabled, unbuffered wrapper added durable per-node output, JUnit and explicit exit capture; no production/test timeout changed.
+
+The210 new native-cut cases cover all four0085 entries and all three0088 entries; owned/unowned, stale ownership/candidates, large blades and both live-actor/selected-string query interpretations. Inputs pass the actual era transform first. Frame-stepped fork/local-subflow execution requires a valid creation request at each creation wait; the native unarmed C01/whole0085 counterfactual fails at Event19, proving the oracle is not a no-op. Owned safe paths match native action/cut/state outcomes; other paths retain native fade/camera/animation effects without unsafe sword requests. Scope and model inferences are in the test, not a claim about an observed runtime stack.
+
+Scoped formatter/lint for the runtime and both native-test files passed. Generic all-modified-flow registration coverage is still being completed/verified separately; this native result does not stand in for it. V4 main control built13 resources in its new profile. Candidate packet will be pinned to the verified implementation commit, and no boot-check handoff/READY claim will precede the required registration proof.

@@ -424,10 +424,11 @@ maintainer decision ([round 19 sword](../plans/rounds/r19-sword.md)):
   logic has `free_time_travel=true`. `--print-settings` only encodes the string and does not check
   this requirement, so a printed string can still be refused when you generate.
 
-**Play-held after a played failure.** Kareem's main control granted the Light Medallion and Master
-Sword as expected; the original candidate froze under a white screen after the pull movie. The
-native-receipt repair requires replay: first pull without owning the sword, equipping it after finding
-it in a chest, and a real age round trip that neither loses nor creates it. Design, deviation and
+**Play-held after played failures.** The main control granted Light Medallion and Master Sword.
+Candidate v3's native-receipt repair passed the first pull without Master Sword and the return to
+child, but froze on the next child-to-adult pull. The repeat-arrival repair requires replay:
+three unowned pulls with real returns to child, then chest acquisition/equip and an owned pull.
+The pedestal remains silent; no item window is inserted into the scene. Design, deviation and
 evidence: [round 19 sword](../plans/rounds/r19-sword.md) and
 [round 18 Master Sword design](../plans/rounds/r18-master-sword-design.md).
 

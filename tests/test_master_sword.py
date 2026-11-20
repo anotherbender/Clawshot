@@ -74,8 +74,8 @@ def native(romfs, flow):
     return zsdic.Dictionaries.from_romfs(romfs).decompress(path, (romfs / path).read_bytes())
 
 
-def execute(fc, entry, state, *, owned, dream=False, charts=None, stop=None):
-    """Execute native setup effects; resolve the actual shared ownership helper too."""
+def execute(fc, entry, state, *, owned, dream=False, stop=None):
+    """Execute native setup effects; full cut/request-wait coverage lives in test_master_sword_cuts."""
 
     def query_pin(chart, event):
         params = event.params or {}
@@ -113,19 +113,6 @@ def execute(fc, entry, state, *, owned, dream=False, charts=None, stop=None):
             continue
         if isinstance(e, evfl.JoinEvent):
             active.append(e.next)
-            continue
-        if isinstance(e, evfl.SubFlowSwitchEvent):
-            shared = charts[e.flowchart]
-            target = shared.entry_point(e.entry_point).main_event
-            for _ in range(10):
-                event = shared.events[target]
-                if isinstance(event, evfl.ReturnEvent):
-                    active.append(dict(e.cases)[event.value])
-                    break
-                assert isinstance(event, evfl.SwitchEvent), event
-                target = dict(event.cases)[query_pin(shared, event)]
-            else:
-                raise AssertionError(("shared ownership query did not return", e))
             continue
         if isinstance(e, evfl.SubFlowEvent):
             if e.flowchart in ("", fc.name):
@@ -168,12 +155,8 @@ def test_actual_pose_never_creates_unowned_equipment(romfs, flow, entry, patch, 
     before = native(romfs, flow)
     after = patch(before)
     state = {EQUIPPED: selected}
-    shared = evfl.read(
-        master_sword.era_transform(equipment.transform(native(romfs, "ReplaceEquipmentForEraChange")))
-    ).flowchart
-    effects = execute(evfl.read(after).flowchart, entry, state, owned=owned, charts={shared.name: shared})
-    expected = MASTER if owned and flow == "Dm_TimeTemple_0085" and not selected else selected
-    assert state[EQUIPPED] == expected, (flow, state, effects)
+    effects = execute(evfl.read(after).flowchart, entry, state, owned=owned)
+    assert state[EQUIPPED] == selected, (flow, state, effects)
     if not owned and not selected:
         control = {EQUIPPED: selected}
         execute(evfl.read(before).flowchart, entry, control, owned=False)
