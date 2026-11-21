@@ -3,7 +3,7 @@
 Agent `openai-codex/gpt-6.1-sol`; branch `r20/hints`, base main `acbb903`.
 Scope: static text only, no new saved flags, grants, item windows, fill/logic/destination changes.
 Research and staging: `E:/OOTRemake/work/r20-hints/`; dump and natural save backups read-only.
-No game or boot check started. Implementation focused proofs pass; staging/gate pending. Nothing played.
+No game or boot check started. Focused proofs and paired packet staged; ordered full gate pending. Nothing played.
 
 ## Contract and coordination
 
@@ -72,14 +72,16 @@ Selector, D29 and settings focus: **28 passed in3.50s**. Actual CLI accepted
 
 ## Verification / staging
 
-Pending focused synthetic/native checks and paired main/candidate Longshot 3.0.0 packet.
-Each changed message must have a checklist row, load-log proof and observation; split
-checklists above30 minutes at natural breaks. Prefer natural saves; any unavoidable single
-fixture edit must be documented and applied identically to both arms.
+Every changed message has a checklist row and a required candidate load-log/visual check.
+**Claude's play-budget decision, 2026-11-20:** candidates required; controls optional
+only if the candidate result is unclear. Priority: scrubs, Great Fairies, altar, House,
+Ganondorf. Per-stage times below; nothing over30 minutes. Natural saves preferred;
+the sole unavoidable token-stock fixture is documented below and identical in both arms.
 
 No sweep is required unless this track changes fill, destinations, locations or logic.
-Full gate and any seed generation serialize under `work/rounds/r20/gate.lock`; focused
-checks use `CLAWSHOT_WORKERS=1` and at most2 pytest workers. Rebase current local main and
+Full gates, sweeps and many-seed jobs serialize under `work/rounds/r20/gate.lock`;
+one private packet seed, like focused checks, uses `CLAWSHOT_WORKERS=1`. Focused
+checks use at most2 pytest workers. Rebase current local main and
 rerun focus before the one exact-head full gate. No merge, push, version bump or personal
 seed/save access.
 
@@ -168,6 +170,98 @@ adult, active Time Ocarina,50 tokens,350 rupees,10–40 claimed/50 unclaimed,
 Castle boss key owned, battle-intro history false, native Ganon Step04.
 This is also an unedited pending-battle candidate: enter the Tower normally from
 the hub so its native progression runs, not by teleporting into the boss trigger.
-To cover father-human child variants promptly, one documented token-stock edit
-50→100 in a separate fixture is necessary; applied identically to both arms.
+Natural50 stays **unedited**. The sole shipped fixture copies the natural19 fire-temple
+save and changes only `PouchData.Item_Token_Gold.StockNum`19→100, at byte89588
+(`0x04735978`, Int section2). Exactly that byte changes; source SHA-256
+`152d53d2…d05`, fixture `b60d3258…0a`. Both arms use the identical fixture.
+An initial unshipped50→100 draft was deleted before any launcher was created;
+the19→100 source also exposes the unclaimed20/30/40 previews before talking to Dad.
 Original backups remain read-only. No story/era/key/item edit is authorized.
+
+Claude challenged necessity because all sons are freed at50. That is correct;
+the edit is for **father-human-only** dialogue, not freeing sons. Native Talk graph
+walk, overapproximating every unrelated switch both ways, proves these changed
+labels unreachable with `GatheringTokenGold_Father_BacktoHuman=false`:
+
+| Child | Changed father-human-only labels | Example native path |
+|---|---|---|
+| `Npc_Hylia_025` | `Talk_01` | Event29→34→2→0→7→14 |
+| `Npc_Hylia_026` | `Talk_14`, `Talk_12` | Event11→36→38→41; then42→40→39 for12 |
+| `Npc_Hylia_027` | `Talk_14` | Event3→21→23→38 |
+| `Npc_Hylia_028` | `Talk_14`, `Talk_01` | Event4→47→48→7→28→21→37; then17 for01 |
+
+`GatheringTokenGold:Reward100` Event254 sets that Bool true. It is false in the
+natural50 source. The fixture does not force it: Kareem talks to Dad at100 and the
+native sequence sets it. Research `father-human-proof.json` records both reachable
+label sets and paths. The fixed-state witness `child-coverage.json` covers **31/31**
+changed son labels across natural10, natural29 after Dad20, natural50, fixture100
+before Dad and fixture100 after Dad. Unknown recent-talk/random/mask switches are
+overapproximated, not claimed played. The first staging witness missed028 Talk09/10
+because50 skips those under50 lines; adding the **unedited** natural29 plus an ordinary
+Dad20 visit reaches them. No second fixture edit.
+
+### Rebase and focused refresh
+
+Rebased cleanly onto local main `479ed443` (kept the additive gift helper).
+Post-rebase `-n2`, `CLAWSHOT_WORKERS=1` focus: **38 passed in5.86s**, covering the
+three native static-text files and selector/D29/settings tests above. Scoped Ruff:
+**4 files already formatted; all checks passed**. No game process at stage start.
+An initial private placement preparation overlapped that rebase; its receipt is
+superseded, not evidence for the final packet. Final packet preparation pins and
+rechecks the source head before recording its oracle receipt.
+
+### Paired packet and reduced play budget
+
+Private seed **20200121** prepared on source `398e0c006e`: **248 shuffled checks,
+22 solo-oracle spheres**. Both actual-source arms reconstruct that identical map
+through the production external-placement API; these reconstructions are diagnostic
+outputs, not two newly certified solo fills. Control source is real local main
+`479ed44360`; candidate source `398e0c006e`. **177 resources per arm**.
+
+Native comparison: **40 message identities ×16 archives =640 language-message
+deltas**. After restoring just those messages, every other Mals member is identical.
+After restoring the seven scrub `SellerMessageId` fields, the entire flow is
+identical. All other game resources are identical except the required size table.
+The first comparison attempt assumed every file was Zstandard: it printed the
+uncompressed `Logic/GanonCastle_Level_Field_00_Prefab_14ba.logic.module.ainb` path.
+Fix: decompress only `.zs`, otherwise compare raw bytes. The cause-targeted run passes.
+
+Packet root: `E:/OOTRemake/work/r20-hints/ingame/`.
+Start with **`Check - START HERE.md`**. Ten candidate launchers required;
+ten paired controls optional only for unclear results, per Claude. Actual texts and
+all40 message IDs are in the per-stage checklists. Candidate-only estimate
+**60–95 minutes including loading/travel**, rather than the rejected2–4h paired plan:
+
+| Priority / stage | Candidate estimate |
+|---|---|
+| 01 Scrubs, Lost Woods | 5–8min |
+| 02 Scrubs, Crater and Field | 8–15min |
+| 03 Great Fairy, before Fire quest | 3–5min |
+| 04 Great Fairy, after Fire quest | 5–8min |
+| 05 Altar | 3–5min |
+| 06 House,10 tokens pending | 2–3min |
+| 07 House, natural29 plus normal Dad20 visit | 5–8min |
+| 08 House, unedited natural50 | 6–10min |
+| 09 House, one stock100 fixture before/after Dad | 8–12min |
+| 10 Ganondorf intro | 8–12min |
+
+All **20 template-based launchers dry-run successfully**; copied progress bytes
+equal their specified source in every arm. Longshot **3.0.0 stable** is pinned,
+only the selected arm mod loads, `HOS_FS_OVERLAY` is empty; launcher grep finds
+no `hookshot.exe`. No game or boot check. No original save, seed or game folder written.
+Required proof remains the runtime's own `mods: <file> <- <candidate path>` plus
+the visible result. Identical randomized029 endings17/18/19 cannot be individually
+distinguished on screen; native per-label readback covers all three. Ganondorf's
+native pending-intro route is inferred, not played; never force story flags to repair it.
+
+### Ordered final gate
+
+Claude assigned **turn5, after cs20c** in
+`E:/OOTRemake/work/rounds/r20/gate-order.txt`. Acquire **only after cs20c explicitly
+posts LOCK RELEASED**, not merely when the directory disappears. No waiter can
+acquire it, and no sweep is required for this text-only track. Before that turn:
+rebase current local main and refresh the focused checks. Freeze the evidence commit
+before the full gate so the gated head is exactly the merge head. The gate receipt is
+`E:/OOTRemake/work/r20-hints/gate/<head-first10>/results.json`; readiness requires
+all four stages passing on that head. Final counts will also be posted on the thread.
+
