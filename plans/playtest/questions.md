@@ -176,7 +176,7 @@ Current totals: 197 ledger IDs = 186 routed checks, 9 already-asked pending chec
 ### HF06 — Hyrule Field
 
 - Age/progress: adult then child; Free return to child; password note unread on control copy. Session 10.
-- Do/watch: Read the Fairy Note by the Gerudo-side heart-piece scrub as adult. Try buying as adult, then return as child who has not spoken to it. Can that child buy for 100? Also try opening the note chest as adult, then child.
+- Do/watch: At the castle-gate grotto (cracked spot by the river), read the Fairy Note on the tree beside the hole as adult. Try buying as adult, then return as child who has not spoken to this scrub and give the password. Can that child buy for 100? Separately, try opening the Gerudo-side Fairy Note chest as adult, then child; it is not the password scrub's note.
 - Target: `remake/child_hyrule_field.toml` — locations HF Deku Scrub Grotto; fact: note chest 2967378296224661060.
 - Answer changes: Confirms age-memory prerequisite and chest access; do not convert this into simple shared inventory.
 - Source: `plans/rounds/r4-logic-child:365-377`.

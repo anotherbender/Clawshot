@@ -9,7 +9,7 @@ IDs are for Claude to enter in [answers.md](answers.md); no need to read the tec
 - **AO10** — Field cow/bomb holes: try Hammer alone. Record actual cover, not just grotto name.
 - **XC12** — Northern Field red chest near Poe/drawbridge-Kakariko approach: baseline presence, exact note/ghost/puzzle trigger and path. Preserve before-state.
 - **XC11** — Southern Field red chest near Poe on Lake approach: same observations for this separate chest; no assumed Fairy Note trigger.
-- **HF06** — Adult read Gerudo-side Fairy Note; try scrub/chest as adult, then child who has not spoken to scrub. Does child buy for 100?
+- **HF06** — Castle-gate grotto by the river: adult reads the Fairy Note on the tree beside the hole; try buying as adult, then return as child who has not spoken to this scrub and give the password. Does child buy for 100? Separately, test the Gerudo-side Fairy Note chest in both ages.
 - **PAIR01** — Upgrade scrub: buy as child, then adult; on separate copy reverse if possible. Note tier/price and whether second reward pays.
 - **GE08** — Compare opposite-age Valley Lens chest and Kakariko alternate-state purple chest after first opening. Can pair pay twice?
 

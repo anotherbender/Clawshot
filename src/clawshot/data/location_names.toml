@@ -2912,7 +2912,7 @@ ids = ["Dm_FairyFountain_Wisdom/Event144"]
 [[location]]
 location = "HF Deku Scrub Grotto"
 name = "Hyrule Field Password Grotto Scrub"
-where = "Hyrule Field, fenced grotto on the Gerudo Valley side: solve the Deku Scrubs' password fight, then buy from the Business Scrub."
+where = "Hyrule Field, castle-gate grotto: bomb the cracked spot beside the drawbridge by the river. As adult, read the Fairy Note on the tree beside the hole; return as child and give the Business Scrub its password."
 oot_randomizer_name = "HF Deku Scrub Grotto"
 source = "cs6d, cs-r6 integration contract 2026-11-08; plans/rounds/r6-tokens.md; census Hashes 1888007325063123154, 10364468093017215295. Four reviewed once-sale families only; repeated vendors remain vanilla."
 ids = ["1888007325063123154", "10364468093017215295"]

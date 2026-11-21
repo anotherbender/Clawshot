@@ -128,7 +128,7 @@ Round 6 adds direct observation R6F-GOHMA (not a scheduled register question). P
 | RES08 | [ 9 ](session-9.md) | On this route, note any old pot/crate/heart/wonderitem source that is absent or has a… | not yet played | — |
 | AO09 | [ 10 ](session-10.md) | Test Lost Woods bridge Hover and Longshot routes separately, then one timed… | not yet played | — |
 | AO10 | [ 10 ](session-10.md) | At the old Field cow/bomb holes, test Hammer as adult without Bombs | not yet played | — |
-| HF06 | [ 10 ](session-10.md) | Read the Fairy Note by the Gerudo-side heart-piece scrub as adult | not yet played | — |
+| HF06 | [ 10 ](session-10.md) | Adult reads the castle-gate grotto's tree note; child gives the password. Separately, test the Gerudo-side Fairy Note chest in both ages | not yet played | — |
 | PAIR01 | [ 10 ](session-10.md) | Buy Kokiri/Lost Woods stick/nut upgrade as child, then visit same scrub as adult;… | not yet played | — |
 | GE08 | [ 10 ](session-10.md) | Open Valley Lens chest before age change, then compare opposite-age chest; compare… | not yet played | — |
 | GE01 | — | Valley underwater Seed chest; same question as XC04 | alias → XC04; answer once | — |
