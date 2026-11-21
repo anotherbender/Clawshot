@@ -1,7 +1,7 @@
 # Round 20 — Logic/data audit and docs (cs20h)
 
 Agent/model: `cs20h`, `openai-codex/gpt-6.1-sol`; branch `r20/audit`.
-Base: `acbb903` (0.2.4 + PR #36). Status: implementation/research in progress, not READY.
+Base: `acbb903` (0.2.4 + PR #36). Status: source audit complete; awaiting ordered gate, not READY.
 No version bump, runtime patch, game launch, player seed/save access or game-folder write.
 
 ## Evidence boundary and method
@@ -217,7 +217,150 @@ unplayed alternative, not a freshly verified route.
 
 ## 4. Distance switches
 
-Native switch audit in progress; per-rule evidence and contradiction dispositions will be recorded here.
+Read-only SwitchAudit inventory, integrated/corrected by cs20h. Detailed scratch matrix:
+`E:/OOTRemake/work/r20-audit/switch-audit.md`; effective loaded-rule inventory:
+`effective-ranged-rules.json` beside it. No OoTR/SoH code, game, seed or save was opened.
+The table distinguishes actor admission from a particular room's range/timing; unknown is not played.
+
+### Native target contracts
+
+- **E (eye):** `Obj_EyeSwitch_A_02`, `_A_03`, `_A_05`, `_GlassTruth_A_02` share
+  `Obj_EyeSwitch_A_02.root.ainb` (`828aa92ba43c…`); the timed `_A_05` graph (`e069065dbf3e…`)
+  has the same filter. External damage types 6/14/15 pass, type16 is gated by `isHitHookShot`,
+  and `IsFreeze` blocks the hit. Numeric weapon/type mapping is not proved merely by counting
+  accepted enum values. Parent pack decoding resolves the scout's missing default:
+  **all four packs set `isHitHookShot=true`**, overriding the graph's false default.
+  No instance override was found in the cited placements. This establishes the named Hookshot
+  gate's default, not a new physical Hookshot route. Played Boomerang on the room-2 Deku eye:
+  [game-data section 12](../03-game-data.md), [DT01](../playtest/answers.md).
+- **K (crystal):** `Obj_SwitchHit_*`, Jabu hit switches and the Lake entrance switch share
+  `SwitchHitOnce.root.ainb` (`802968ce4930…`); attack admission reaches native
+  `_LocalModule_8237c653e758`, not a decoded graph predicate. Parent decoding of the common
+  SwitchHit pack adds no weapon-type whitelist; **do not invent one**.
+  Played Jabu tonsil: bombs failed, Slingshot/Boomerang worked, Bombchus untested
+  ([answers](../playtest/answers.md)). Lake Hookshot latch has the separately played
+  [Ice end-chest gate](r16-water-gate.md).
+- **F (fire):** candle graphs `BurnAndLockOnAttentionControlCandlestick` (`0145b909a66d…`)
+  and `Obj_CandleStick_TimeExtinguish_A_01` (`c99030c10e49…`) use fire-contact and
+  lit-Deku-Stick requests, not sword ownership or age. Ordinary arrows need an existing flame.
+  Played Lake grotto: Din's lights three; child Sticks or adult Bow through a lit torch
+  lights the fourth; adult Fire Arrows also works (`remake/extra_hyrule_field.toml`).
+  That proves the mechanism there, not every other room's geometry/timer.
+- **U (sun):** `Obj_Sun_A_01` graph (`b07f1a3df9f2…`) controls sun position/effect but has no
+  decoded damage filter. The Fire Arrows trigger chain remains unmapped; no new route.
+
+### Per-rule matrix
+
+Paths are under `src/clawshot/data/world/`; remake filenames under `remake/`.
+“Kept” means no new contradiction established, **not** full played certification.
+Key counts, traversal and age conditions outside the named ranged clause remain unchanged.
+
+| ID / rule (source) | Effective ranged clause / native evidence / disposition |
+|---|---|
+| DT1 Lobby → Slingshot Room (`deku_tree.toml`; `child_deku_tree.toml`) | Shield + usable Slingshot/Boomerang/Bow; E, room2 eye Hash9080063866993537303. Played Boomerang. Existing escape-tool tightening kept. |
+| DT2 Slingshot Room → Lobby (`child_deku_tree.toml`) | Same tools/eye, ladder2096903280161003875. Played Boomerang return; Bow retained, not newly played. |
+| DT3 Basement → Back Room (`child_deku_tree.toml`) | Fire + usable Slingshot/Boomerang/Bow; E, room5 eye10433048972954508847, same pack/filter/event as room2. Existing Boomerang clause kept; room5 range unplayed (Q1). |
+| JB1 Beginning → Main (`child_jabu_jabus_belly.toml`) | Usable Slingshot/Boomerang/Bow/Hookshot replaces `can_use_projectile`; K, tonsil2499231676847862528. Played Slingshot/Boomerang; failed bombs already removed. Adult clauses cannot currently reach Jabu; no new certification (Q2). |
+| JB2 Before Boss → Barinade (`jabu_jabus_belly.toml`) | Boomerang; ranged/explosive tricks remain disabled. K, barrier switch15394400859097041900; guide says curve around barrier. Kept. |
+| DC1 Lobby → Torch Room (`dodongos_cavern.toml`) | Adult room admission unchanged; do not conflate entering with solving its exit. |
+| **DC2 Lobby → Staircase Room** (`child_dodongos_cavern.toml`, formerly `master_sword.toml`) | **Tightened:** at Torch Room, child Sticks or usable Din's or (`adult_sword` + usable Fire Arrows). F, exact three-candle/shutter chain below. Adult sword/age alone removed; existing shuffled-sword guard retained. |
+| DC3 Before Upper Lizalfos → Upper Lizalfos (`dodongos_cavern.toml`) | Child Slingshot (disabled skip trick) or usable Bow; E, timed eye16825617597899075770, room14, LimitTime10. Kept; Boomerang is Q4, not added. |
+| DC4 Upper Lizalfos → Bomb Bag Ledge (`child_dodongos_cavern.toml`) | Existing combat clause + usable Slingshot/Bow; E, room17 eyes12790243399538496729 and13951311116548645685, LimitTime10, two fire walls. Kept. |
+| DC5 Ledge → Upper Lizalfos (`child_dodongos_cavern.toml`) | Usable Slingshot/Bow through the same two eyes; kept. |
+| FT1 Central Area → NE Outdoors (`forest_temple.toml`) | Usable Bow/Slingshot; site not mapped to a remake actor. E is only the generic filter; kept as Q5, not proof of child temple access. |
+| FT2 Eye Switch Chest (`forest_temple.toml`) | Strength + usable Bow/Slingshot; census guide identifies gold eye behind metal grating (`location_names.toml`). E; kept. |
+| FT3 Block Push Room → Straightened Hall (`adult_forest_temple.toml`) | Existing3 keys + usable Bow; guide eye above twisted-corridor entrance. E; kept. |
+| FT4 Frozen Eye Room → Falling Room (`adult_forest_temple.toml`) | Usable Bow; native frozen-eye gate E, guide arrow through lit torch F. Din's alternative already removed; Q6, not restored. |
+| FT5 Basement → Before Boss (`adult_forest_temple.toml`) | Usable Bow added by existing override for rotating-basement eye; kept. |
+| FR1 Elevator → Boulder Maze Lower (`adult_fire_temple.toml`) | Existing3 keys/Strength + explosives/Bow/Hookshot. Ranged-switch actor not mapped; K weapon acceptance not established. Kept/Q7. |
+| FR2 Compass Chest (`adult_fire_temple.toml`) | Narrow Path Room + usable Bow, guide thin-walkway eye, chest16713240760352215634 room16. E; kept. |
+| FR3 Map Chest (`adult_fire_temple.toml`) | Existing override is True in Boulder Maze Lower; N64 Bow/6-key alternative already replaced. No ranged claim retained. |
+| WT1 Raise Water Level (`adult_water_temple.toml`) | Hookshot + Lullaby +2 keys; old Bow/projectile alternatives already replaced by remake routing. Kept. |
+| WT2 Lowered → Middle (`adult_water_temple.toml`) | Hookshot + Lullaby +1 key; old Bow/Din's alternatives already replaced. Kept. |
+| WT3 Central Bow Target, Lowered/Middle (`adult_water_temple.toml`) | Lowered False; Middle Bow + Longshot + Iron Boots + Strength. Guide north eye then Longshot target; E plus traversal. Kept; disabled child-Slingshot trick adds no route. |
+| WT4 Torches Chest (`water_temple.toml`) | Bow/Din's or child Stick/Sword/Magic branch retained. F requires a flame, but remake room/lit-torch source is unmapped; Q8, no speculative removal. |
+| WT5 Dragon Statue/exit (`water_temple.toml`) | Existing Bow + survival/Boots conditions; remake notes mention eye-gate exit but exact counterpart unmapped. Kept/Q9. |
+| WT6 River Chest (`adult_water_temple.toml`) | N64 Bow check already `n64_only`: no chest in remodeled rapids. |
+| SP1 Lobby → Child Beyond Bridges (`spirit_temple.toml`) | Boomerang/Slingshot (Bombchu trick off), plus combat/silver-rupee conditions. Guide gap crystal lowered as bridge by Boomerang; K. Slingshot range unproved; kept/Q10. |
+| SP2 Early Adult → Boulder Room (`spirit_temple.toml`) | Bow/Hookshot/Bombchus; Bombs trick off. Guide ceiling crystal; K acceptance for Bombchus unknown. Kept/Q11. |
+| SP3 Child Climb North Chest (`spirit_temple.toml`) | `has_projectile(child/adult/both)` branches remain. Guide high crystal; K does not prove explosive rejection. Proposed key-branch deletion rejected below; Q12. East chest already N64-only. |
+| SP4 Map Chest (`spirit_temple.toml`) | Existing age/key/fire/Sticks clauses; ordinary-Bow trick disabled. F, guide “any fire” on unlit torch. Kept. |
+| SP5 Sun Block Chest (`adult_spirit_temple.toml`) | Existing window-light override replaces N64 torch/Bow branches; no ranged clause retained. |
+| SP6 Anubis → Big Mirror Room (`spirit_temple.toml`) |5 keys + Longshot/Bombchu or explosive/stun + Bow/Hookshot/Hammer combination (wall trick off). Exact remake target unmapped; kept/Q13. |
+| SP7 Boss Key Chest (`spirit_temple.toml`) | Lullaby + Bow + Hookshot; E for eye, guide says **Longshot** to lowered platform. That discrepancy is Q14; no geometry-by-eye fix. |
+| SH1 Beyond Boat → Before Boss (`adult_shadow_temple.toml`) | Existing Bombs bridge override replaces N64 Bow/statue trick. Kept. |
+| SH2 Spike Walls Left / Boss Key Chest (`adult_shadow_temple.toml`) | Existing5 keys + Din's, F. Fire Arrow/chain alternatives are Q15, not added. |
+| SH3 Shadow entry (`graveyard.toml`) | Din's; Fire Arrow trick disabled. F; Q15. |
+| GT1 Lobby Left/Right Chests (`adult_gerudo_training_ground.toml`) | Bow/Slingshot + Lens; E eye11495024771723587729, chest2436665354602612279. Existing conservative union for Lens west/Bow east kept. |
+| GT2 Near Scarecrow Chest (`adult_gerudo_training_ground.toml`) | Bow + distant Scarecrow or Tunic/Hookshot/Lens route; guide floor eye-statue puzzle. E; kept. |
+| GT3 Eye Statue Chest / Eye Statue Lower (`gerudo_training_ground.toml`) | Bow / Hammer+Bow; guide shoot statue eyes. E; kept. |
+| GT4 Heavy Block → Like Like (`adult_gerudo_training_ground.toml`) | Silver Gauntlets + Bow + Lens; Lens-only eye10731754838093134223. E; kept. |
+| GT5 Room10 seed chest (`extra_gerudo_training_ground.toml`) | Bow; E eye13939821958157812040. Hookshot default now resolved, but physical route not added (Q16). |
+| GC1 Shadow First Gap (`adult_ganons_castle.toml`) | Longshot or Bow through existing lit torch; F, guide plus played Lake mechanism. Existing override kept; not new site play. |
+| GC2 Shadow Second Gap (`ganons_castle.toml`) | Hover Boots or fire source; F. Bow chain not claimed. Kept. |
+| GC3 Forest Wind Room (`ganons_castle.toml`) | Fire Arrows or Din's+(Bow/Hookshot); exact switch/torch site unmapped. Kept/Q17. |
+| GC4 Spirit Crystal Chest (`ganons_castle.toml`) | Jumpslash or explosives; K, crystal6129545652928979383 room17; guide instead describes Torch Slugs. Trigger identity remains Q18. |
+| GC5 Spirit Second Room Back (`ganons_castle.toml`) | Bombchus, grated switch; r4 adult audit kept it. K acceptance opaque; kept/Q11. |
+| GC6 Spirit Ending (`adult_ganons_castle.toml`) | Existing adult Bow/Mirror + fire-source tightening for web; fire gate kept, not a new projectile-hit assertion. |
+| OW1 LH Sun (`adult_lake_hylia.toml`) | Water Temple Clear + Bow, replacing Scarecrow alternative; U, guide dawn sun then swim. Existing rule kept/Q19. |
+| OW2 Lake → Water Lobby (`adult_lake_hylia.toml`) | Hookshot + Iron Boots + Ice end-chest access; K plus played source gate. Kept. |
+| OW3 Lake grotto chest (`extra_hyrule_field.toml`) | Din's+(child Sticks/adult Bow) or Fire Arrows; F, **played there** 2026-11-18. Kept. |
+| OW4 Wasteland Chest (`haunted_wasteland.toml`) | Fire source; F general contract, site unmapped. Kept, no new route. |
+| OW5 Royal Tomb chest (`graveyard.toml`) | N64 torch chest already excluded; real song-source combat is separate. |
+
+Shared helpers: `can_use_projectile` includes explosives; its active token users are in the pickup
+table, and its Jabu/Water switch users are already overridden above. `has_projectile(for_age)`
+has an unconditional explosives disjunct; its only remaining non-excluded switch-check user is
+Spirit Climb North (SP3); East is N64-only, Sun-on-Floor token has its remake override.
+There is no `can_hit_switch`/`can_hit_eye_switches` helper.
+
+Excluded from **switch** classification, not forgotten: DC mouth “eyes” are bombable
+`Obj_DodongoCave_CrackWall_A_02` sockets (disabled Bombchu trick), DC staircase is a bomb-flower
+chain, combat/painting/Poe/minigame targets are not switches, and pots/crates/wonderitems are
+not freestanding retrieval. Tokens are inventoried in section3. Jabu's room13 chest has the
+existing Boomerang-stopped swaying-floor rule, not a crystal-switch weapon claim.
+
+### Applied tightening and rejected inference
+
+**DC room8, proposed by SwitchAudit, corrected/integrated by cs20h:** parent readback follows
+three timed-candle hashes7766157973751052842/3412578102610136516/1677399996748274653
+to shutter18414161731649864422 and AiGroup13744671784328157797.
+`DodongoCavern_Level_Room_08_Prefab_c4aa` (`1aadc586f8d5…`) ANDs their Burning outputs,
+requests `DodongoCavern_Gimmick_CandleStickShutter` through actor13693449133434520250,
+then saves `DodongoCavern_CandleStick`. Room entry remains unchanged.
+The scout missed r19's effective `adult_sword` override; the first focused run printed that
+duplicate-owner cause. The final override is owned once by `child_dodongos_cavern.toml`;
+the obsolete sword-only placeholder is removed from `master_sword.toml`.
+This is no longer a pure sword-on/off equivalence rewrite, so it belongs with native DC logic,
+not in that test's source-enumerated rewrite inventory. No existing test was edited/deleted.
+Dedicated reachability tests cover default fire/no-fire and shuffled-sword refusal/ownership.
+Fire Arrows retain `adult_sword` as a conjunct: **subset of the prior effective rule even with
+Master Sword shuffle on**. Swordless Fire Arrows and ordinary-Bow torch chaining require a
+separate loosening decision; neither is added.
+
+**Spirit key-free branch, proposed by SwitchAudit, rejected by cs20h:** owning projectiles for
+both ages may represent cross-age solving; the region already needs its entry key. The native
+attack filter/physical door chain does not establish that this branch is invalid or that3/5
+keys are required for every route. Do not delete an inherited branch from syntactic suspicion
+or guide prose alone. No key-count, helper or explosive-admission change made.
+
+### Questions (nonblocking; no loosening applied)
+
+- **Q1–Q4:** Can Boomerang physically hit Deku basement room5 and DC timed eyes within their
+  timers? Do Bombchus hit Jabu's tonsil? What do Jabu room18/14 switches11882875599582784398/
+  14718944193576846777 open? Existing conservative rules remain.
+- **Q5–Q9:** Identify Forest NE courtyard eye, Fire elevator ranged switch, Water Torches Chest
+  and dragon-statue targets; establish their native routes. Is there a lit flame for the Water
+  bare-Bow branch? Does Din's melt Forest eye ice? No newly certified route.
+- **Q10–Q14:** Confirm Spirit gap Slingshot range; Bombchu acceptance on Spirit/Ganon crystal
+  switches; North Climb explosive/cross-age route; Anubis→mirror target; Boss Key Hookshot
+  versus guide Longshot requirement. No range estimate or public-prose correction substituted.
+- **Q15–Q19:** Shadow fire-arrow/torch-chain alternatives; physical Hookshot eye routes (the
+  pack default itself is now resolved true); Forest Trial target; Spirit chest crystal versus
+  Slug trigger; Lake dawn-sun native trigger. All retained as questions, not new access.
+- **Q20:** Can ordinary adult Bow chain the DC timed candles in time? Can swordless Fire
+  Arrows solve this path when Master Sword is shuffled? Native fire admission is not a played
+  room traversal, so both possible loosenings stay out of scope.
 
 ## 5. Docs alignment
 
@@ -242,9 +385,32 @@ tests/test_ranged_pickups.py tests/test_world_remake_play.py -q`: **31 passed in
 Game process check: no exact `hookshot.exe` or `longshot.exe` image. No unchanged rerun.
 Read-only Markdown target/fragment check: **173 relative links, zero errors** before the final
 switch/doc additions. Final link check follows source freeze.
+Final four-document check after switch integration: **177 relative links, zero errors**.
+
+DC regression follow-through (only cause-directed reruns):
+- First combined run:37 loader failures, printed duplicate torch-exit owner
+  `remake/master_sword.toml`; no unrelated failure diagnosis substituted.
+- After single-owner correction:86 passed,2 failed. Printed one child fixture lacking usable
+  explosives and the pure sword-rewrite off-equivalence assertion for a now-native fire rule.
+- Native fire override moved to the DC owner; obsolete sword-only override removed.
+  Existing Master Sword test source was not changed. Six cause-targeted nodes passed;
+  remaining child fixture still failed because remake bombs also require Strength.
+- Printed compact Search counts/rule reads and `remake/bombs.toml` established that prerequisite.
+  The child torch scenario now uses real Goron Bracelet + Sticks (no bogus `Bombs` item);
+  its isolated node **passed in1.37s**. No production bomb/search behavior changed.
+- The88-node combined focus is rerun after the required current-main rebase, before gate admission.
 
 Pending current-main rebase, serialized full gate and 200 Broad + 50 Defaults +
 50 Recommended sweep. No new pack input resource or game-behavior patch: no paired launcher needed
 for these model tightenings. Nothing requires Kareem overnight. No new check is called played here.
 Logic and catalogue changes can change newly generated placements/spoilers/play notes for the same
 recipe; existing outputs and saves are untouched. Maintainers own the next version bump.
+
+### Gate admission order (Claude, 2026-11-20 23:02)
+
+`work/rounds/r20/gate-order.txt`: cs20b exclude, then cs20d trials, then cs20h audit.
+Audit acquires only after **cs20d posts LOCK RELEASED**, not from observing a missing lock.
+No audit auto-retry waiter was running when this rule arrived; only read-only SwitchAudit remained.
+The external runner exits rather than retries a held lock and now requires a manual
+`--after-cs20d-lock-released` admission argument after that thread receipt is read.
+Source freeze/current-main rebase/focused verification still precede the gate.

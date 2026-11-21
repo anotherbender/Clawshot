@@ -1,13 +1,14 @@
-"""Reported windmill retrieval failure and native non-liftable heart-piece routes."""
+"""Reported pickup and native distance-switch false reachability."""
 
 import pytest
 
 from clawshot.world import ADULT, CHILD, Search, build_world, load_spec
 
 
-def starting_at(region, age):
+def starting_at(region, age, **settings):
     spec = load_spec()
     spec["settings"]["starting_age"] = age
+    spec["settings"].update(settings)
     spec["start"] = "Pickup Audit Start"
     spec["regions"].append({"name": "Pickup Audit Start", "exits": {region: "is_starting_age"}})
     return build_world(spec)
@@ -54,3 +55,32 @@ def test_cow_shed_pickup_keeps_its_separate_rooftop_route():
     assert not search.can_access(pickup, ADULT)
     search.collect("Hookshot")
     assert search.can_access(pickup, ADULT)
+
+
+@pytest.mark.parametrize(
+    ("age", "items", "reachable"),
+    [
+        (ADULT, [], False),
+        (ADULT, ["Bow"], False),
+        (ADULT, ["Deku Stick Drop"], False),
+        (ADULT, ["Dins Fire", "Magic Meter"], True),
+        (ADULT, ["Fire Arrows", "Bow", "Magic Meter"], True),
+        (CHILD, ["Goron Bracelet", "Deku Stick Drop"], True),
+    ],
+)
+def test_dodongo_torch_exit_requires_a_usable_fire_source_not_adult_age(age, items, reachable):
+    world = starting_at("Dodongos Cavern Lobby", age)
+    search = Search(world, items)
+    assert search.can_reach("Dodongos Cavern Torch Room", age)
+    assert search.can_reach("Dodongos Cavern Staircase Room", age) is reachable
+
+
+@pytest.mark.parametrize("has_sword", [False, True])
+def test_dodongo_fire_arrows_do_not_bypass_existing_shuffled_sword_guard(has_sword):
+    world = starting_at("Dodongos Cavern Lobby", ADULT, shuffle_master_sword=True)
+    items = ["Fire Arrows", "Bow", "Magic Meter"]
+    if has_sword:
+        items.append("Master Sword")
+    search = Search(world, items)
+    assert search.can_reach("Dodongos Cavern Torch Room", ADULT)
+    assert search.can_reach("Dodongos Cavern Staircase Room", ADULT) is has_sword

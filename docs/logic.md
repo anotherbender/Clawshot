@@ -52,6 +52,9 @@ removed. The cow-shed pickup does exist, with its own actor and map anchor in al
 variants; its owl/Hookshot roof route is unchanged. The nonexistent Ice Cavern loose blue rupee
 is excluded. Native tokens have a different, liftable pickup contract: this is not a blanket
 Boomerang ban. [Per-rule evidence and unplayed alternatives](../plans/rounds/r20-audit.md).
+Dodongo's torch-room exit also needs usable fire rather than adult age/sword ownership alone.
+Child Sticks and Din's remain valid; the adult Fire Arrows branch retains the existing shuffled-sword
+guard. Ordinary-Bow torch chaining there remains unplayed and is not newly admitted.
 
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
