@@ -154,7 +154,11 @@ def main(argv: list[str] | None = None) -> int:
         choices=hint_choices.MODES,
         help="Gossip Stones speak without the Mask of Truth (always, default) or only to child Link wearing it (mask)",
     )
-    parser.add_argument("--hint-distribution", choices=hint_choices.distributions(), help="kinds of hint (balanced)")
+    parser.add_argument(
+        "--hint-distribution",
+        choices=hint_choices.distributions(),
+        help="Gossip Stone distribution (default: balanced)",
+    )
     parser.add_argument("--logic", nargs="*", default=[], metavar="NAME=VALUE", help="logic setting overrides")
     parser.add_argument("--areas", nargs="+", metavar="AREA", help="census areas of a slice")
     parser.add_argument("--goal", help="the slice's goal (a rule); needs --areas")

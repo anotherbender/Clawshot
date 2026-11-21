@@ -24,9 +24,17 @@ def test_skulltula_previews_name_assigned_items_without_erasing_stone_hints(romf
     changed = sarc.read(transforms[path](with_stone))
     before = sarc.read(with_stone)
     file = "EventFlowMsg/Npc_SkullDad.msbt"
-    assert {name for name in before if before[name] != changed[name]} == {file}
+    assert {name for name in before if before[name] != changed[name]} == {
+        file,
+        "EventFlowMsg/Npc_Hylia_029.msbt",
+        "EventFlowMsg/Npc_Hylia_026.msbt",
+    }
     old, new = msbt.read(before[file]), msbt.read(changed[file])
     assert {label for label in old.messages if old.messages[label] != new.messages[label]} == {"Talk_28", "Talk_25"}
-    assert visible(new.messages["Talk_28"]) == "For 10 tokens, the reward is Boomerang."
-    assert visible(new.messages["Talk_25"]) == "For 40 tokens, the reward is Hookshot."
+    assert "Boomerang" in visible(new.messages["Talk_28"])
+    assert "Hookshot" in visible(new.messages["Talk_25"])
+    son = msbt.read(changed["EventFlowMsg/Npc_Hylia_029.msbt"])
+    assert "Boomerang" in visible(son.messages["Talk_13"]) and "500" not in visible(son.messages["Talk_13"])
+    son = msbt.read(changed["EventFlowMsg/Npc_Hylia_026.msbt"])
+    assert "Hookshot" in visible(son.messages["Talk_06"]) and "Bombchu" not in visible(son.messages["Talk_06"])
     assert visible(msbt.read(changed["EventFlowMsg/GossipStone.msbt"]).messages[stone]) == stone_text

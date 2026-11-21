@@ -3,7 +3,7 @@
 Agent `openai-codex/gpt-6.1-sol`; branch `r20/hints`, base main `acbb903`.
 Scope: static text only, no new saved flags, grants, item windows, fill/logic/destination changes.
 Research and staging: `E:/OOTRemake/work/r20-hints/`; dump and natural save backups read-only.
-No game or boot check started. Status: tracing; not READY and nothing played.
+No game or boot check started. Implementation focused proofs pass; staging/gate pending. Nothing played.
 
 ## Contract and coordination
 
@@ -64,9 +64,11 @@ tests/test_static_hints_dump.py tests/test_hints_lines.py tests/test_gifts_rewar
 all16 languages, a junk reward, fixed17 price, unchanged existing messages/members and
 unchanged whole flow after restoring only its message IDs. This is built, not played.
 
-Stretch investigation: generator already accepts `strong` and `useless` (verified through
-actual `Settings` construction); app currently exposes only `balanced`. `very_strong`
-would be the only new generator distribution. Higher-priority static groups come first.
+Generator-only stretch: existing `strong`/`useless` retained; added `very_strong` with
+original Clawshot weights (woth8, barren4, item4, sometimes1, random1; no weighted junk;
+dungeon caps6). Balanced/default and fill RNG stay unchanged; app remains Balanced-only.
+Selector, D29 and settings focus: **28 passed in3.50s**. Actual CLI accepted
+`--hint-distribution very_strong --print-settings` and emitted a CS1 string.
 
 ## Verification / staging
 
@@ -80,3 +82,92 @@ Full gate and any seed generation serialize under `work/rounds/r20/gate.lock`; f
 checks use `CLAWSHOT_WORKERS=1` and at most2 pytest workers. Rebase current local main and
 rerun focus before the one exact-head full gate. No merge, push, version bump or personal
 seed/save access.
+
+## Completed native message trace and implementation
+
+The table was posted in short parts on `cs-r20` before each group's implementation;
+all labels below were resolved in **all16** language archives listed above.
+These are native message identifiers, not copied game dialogue.
+
+| Group | Member / labels | Source and formatting envelope |
+|---|---|---|
+| Altar | `EventFlowMsg/SignboardWood.msbt:TempleOfTime_000` | Both-age `Obj_TimeTemple_SpiritStoneBase_A_01`, Name `TempleOfTime_000`; `Check_SpiritStoneBase` registration → `DoorOfTime` Event172 → sign camera → Event35/36 `EventTalk`. Native3 rows, max48 characters; new40×2 paginated. |
+| Ganondorf | `EventFlowMsg/Dm_InsideGanonCastle_BossIn.msbt:Dm_InsideGanonCastle_BossIn_Text_013_b` | Actual Ganondorf speaker, `VoicePlayActor.EventStartVoice` clip38, start4703/duration296 native frames. Native2 rows/max35; new text hard-bounded to2×35 with no page break. Timeline unchanged. |
+| House10 / extra30 advice | `EventFlowMsg/Npc_Hylia_029.msbt:Talk_12,13,14,15,16,17,18,19` | 12–14 describe10;15/16 describe30;17–19 describe both selected rewards rather than wallet spending/capacity. |
+| House20 | `EventFlowMsg/Npc_Hylia_028.msbt:Talk_11,14,08,02,03,01,09,10,07` | Removes stale Echo Gem/equip/use advice. |
+| House30 | `EventFlowMsg/Npc_Hylia_027.msbt:Talk_06,14,05,03,04` | Removes stale1000-rupee wallet claims. |
+| House40 | `EventFlowMsg/Npc_Hylia_026.msbt:Talk_09,14,06,05,12,10` | Removes stale Bombchu tutorial text; native yes/no branches unchanged. |
+| House50 | `EventFlowMsg/Npc_Hylia_025.msbt:Talk_00,01,11` | Appends reward name to otherwise-correct curse/family dialogue. |
+| Five Fairy refusals | `EventFlowMsg/Dm_FairyFountain_Power.msbt:Talk_00,01,02` | `TriForcePoint` Event132 ability2 bypasses; abilities1/3/4/5/6 → Event8 `IsGet.Item_DinFire`; absent → Event150/144 → Event9/145(00/01) after Fire completion, Event147(02) before it. One shared text surface for all five, not five invented Fairy talks. |
+
+Altar correction: round6's `Dm_TimeTemple_0020` lead is the Master Sword reveal
+timeline, **not** the readable altar. Parent printed its parsed `EventFlowFile` after
+the first `read_flow` probe rejected a timeline; the helper was corrected to read
+timelines, then the actual sign's native registration/actor/action chain was traced.
+Research: `altar-search.json`, `altar-native.json`, `altar-dispatch.json`.
+
+**Ganondorf availability risk:** no interactive pre-finale talk surface was found.
+cs20a chose the existing battle-intro subtitle requested by speaker, not a new event.
+It is late (the native trials normally require Light Arrows already), and it does
+not change that logic. No pretend earlier hint or barrier-message takeover.
+`Dm_InsideGanonCastle_0003_Text_002_b` stays cs20d's. Audio/timing remain native;
+subtitle legibility and audio mismatch are player-check limits, not automated claims.
+
+House limits: native relevant lines reach3 rows/page and52 characters in some
+languages; new child text uses40×2. Existing father10–50 previews keep their60×2
+format and are not replaced by a second writer. Pending generic child lines and
+House50's generic lines retain native English content plus the preview; reward-specific
+vanilla effects are replaced. Leading voice/emotion tags are retained. Native choices
+ask whether to hear the reward again and keep the same branches. Cursed
+`Npc_SkullChild_001..005` messages and father's100/repeat text remain untouched.
+No child corresponds to the100 reward. Thirty-one child labels change.
+
+Fairy limits: the shared native01 refusal reaches2 pages/3 rows/max51 characters
+across languages; new text uses40×2. Only selected Gift fairy sources enable this
+correction. Death Mountain Trail's ability2 bypass and all gift gating stay native.
+The refusal is Navi speaking before a Fairy appears, not a new Fairy event.
+Research: `house-fairy-native.json`, `children-native.json`.
+
+No MSBT box-limit metadata exists in these archives; observed native envelopes are
+not a proven engine hard character limit. The timed Ganondorf clue is explicitly
+bounded; other new text conservatively paginates and remains play-held.
+
+### Focused implementation proof
+
+`OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run --with pytest-xdist
+pytest -n2 tests/test_static_hints_dump.py tests/test_gifts_rewards_dump.py
+tests/test_hints_lines.py -q`: **10 passed in3.23s**.
+This covers all16 languages, all31 son labels, mixed10/30 wallet-source identity,
+junk previews, retained generic/emotion text, unchanged unrelated messages/archive
+members, nine shuffled reward regions, no check-level/junk location disclosure,
+bounded Ganondorf subtitle, Gift-only Fairy changes and DMT exclusion.
+Restoring only the selected message labels inverse-equals the native MSBT/archive.
+New static-hint outputs are Mals archives only; the scrub writer additionally edits
+only seven existing message-ID arguments. No native registration dependency changes.
+
+External `condition-proof.json`: **18 actual USen Door/bridge combinations** passed
+(all3 Door modes; vanilla, stones0/1/3, medals6, rewards9), default altar unchanged,
+starting Light Arrow truthful. First smoke recipe incorrectly paired vanilla bridge
+with count4; Settings printed its native supported range0..0. Changed only that
+recipe to0 and the aimed rerun passed. No production validation was weakened.
+Scoped Ruff printed five overlong new lines; applied its exact formatting diffs
+through the edit tool. Final format/lint proof belongs to the full gate.
+
+### Natural-save staging evidence
+
+Read-only backup survey: **735 distinct contents**, **73 classified natural**,
+natural maximum **50 tokens** (not100). No path component containing `seed` was read.
+`late-save-survey.json` records hashes/flags. Natural early backup
+`2026-11-08_1114-main-dodongo`, slot01: child, active Fairy Ocarina, Lullaby,
+no Din's Fire/stock0,103 rupees,10 tokens, all five House rewards unclaimed,
+Fire quest incomplete. Natural fire-temple backup slot01: adult19 tokens,10 claimed,
+20–50 unclaimed, no Din's Fire, Fire complete. These cover both Fairy refusal arms.
+
+Latest natural profile copy `2026-11-20_real-longshot-profile-copy`, slot00:
+adult, active Time Ocarina,50 tokens,350 rupees,10–40 claimed/50 unclaimed,
+Castle boss key owned, battle-intro history false, native Ganon Step04.
+This is also an unedited pending-battle candidate: enter the Tower normally from
+the hub so its native progression runs, not by teleporting into the boss trigger.
+To cover father-human child variants promptly, one documented token-stock edit
+50→100 in a separate fixture is necessary; applied identically to both arms.
+Original backups remain read-only. No story/era/key/item edit is authorized.

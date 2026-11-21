@@ -22,14 +22,19 @@ Where the game's text comes from (``03-game-data.md`` section 22):
 
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from clawshot.census import hints
 from clawshot.formats import byml, evfl, msbt, sarc, zsdic
 from clawshot.formats.msbt import Part, Tag
+from clawshot.generate import hints as stone_hints
 from clawshot.generate.hints import FIELD_END, FIELD_START
 from clawshot.patch.items import ItemActors
 from clawshot.patch.plan import PatchError
 from clawshot.patch.write import FileChanges
+
+if TYPE_CHECKING:
+    from clawshot.generate import Seed
 
 ARCHIVE = "Mals/{language}.Product.110.sarc.zs"
 POUCH_TEXT = "ActorMsg/PouchContent.msbt"
@@ -46,6 +51,18 @@ RESET = b"\xff\xff"
 PAGE_BREAK = Tag(0, 4, b"")
 SHEIK_MESSAGES = "EventFlowMsg/Npc_Hylia_Sheik_Adult.msbt"
 SHEIK_TOOL_LABELS = ("Talk_01", "Talk_03")
+ALTAR_MESSAGES = "EventFlowMsg/SignboardWood.msbt"
+ALTAR_LABEL = "TempleOfTime_000"
+GANONDORF_MESSAGES = "EventFlowMsg/Dm_InsideGanonCastle_BossIn.msbt"
+GANONDORF_LABEL = "Dm_InsideGanonCastle_BossIn_Text_013_b"
+FAIRY_MESSAGES = "EventFlowMsg/Dm_FairyFountain_Power.msbt"
+GATED_FAIRY_CHECKS = (
+    "HC Great Fairy Reward",
+    "ZF Great Fairy Reward",
+    "DMC Great Fairy Reward",
+    "Colossus Great Fairy Reward",
+    "OGC Great Fairy Reward",
+)
 
 
 def archive_path(language: str) -> str:
@@ -361,3 +378,95 @@ def scrub_hint_changes(
         **{archive_path(language): transform for language in languages(romfs)},
         **scrubs.offer_changes(tuple(selected)),
     }
+
+
+def static_hint_changes(romfs: str | Path, seed: "Seed", table: ItemActors) -> FileChanges:
+    """Altar reward regions/conditions and Ganondorf's bounded battle-intro clue.
+
+    Both existing hint modes keep NPC/sign text readable normally; only stones require
+    the mask. No event/timeline, saved state, grant or window is changed here.
+    """
+    from clawshot.generate.rewards import catalog
+
+    lines: dict[str, dict[str, str]] = {}
+
+    def region(name: str) -> str:
+        location = seed.world.locations[name]
+        area = stone_hints.hint_area(seed.world, location.region)
+        if area is None:
+            raise PatchError(f"{name}: no region-level hint area")
+        return stone_hints.area_name(area)
+
+    if seed.settings.dungeon_rewards or seed.settings.bridge != "vanilla":
+        rewards = {slot["item"] for slot in catalog()["slots"].values()}
+        placed = [(name, item) for name, item in seed.placements.items() if item in rewards]
+        names = item_names(romfs, (item for _, item in placed), table)
+        pages = [f"{names[item]}: {region(name)}." for name, item in placed]
+        if seed.settings.door_of_time == "closed":
+            stones = (
+                "own all three Spiritual Stones" if seed.settings.dungeon_rewards else "complete the three stone quests"
+            )
+            door = (
+                f"Door: {stones}, obtain the Ocarina of Time and Song of Time, "
+                "finish Impa's send-off, then play the song here."
+            )
+        else:
+            door = "Door: finish Impa's send-off and reach Hyrule Field."
+            if seed.settings.door_of_time == "song_only":
+                door += " Then play the Song of Time here with an ocarina."
+            else:
+                door += " No items are needed."
+        pages.append(door)
+        if seed.settings.bridge == "vanilla":
+            pages.append("Bridge: awaken the Shadow and Spirit sages, then return here for Zelda's story.")
+        elif seed.settings.bridge_count == 0:
+            pages.append("Bridge: no items required.")
+        else:
+            nouns = {
+                "stones": ("Spiritual Stone", "Spiritual Stones"),
+                "medallions": ("medallion", "medallions"),
+                "rewards": ("dungeon reward", "dungeon rewards"),
+                "tokens": ("Gold Skulltula token", "Gold Skulltula tokens"),
+            }
+            noun = nouns[seed.settings.bridge][seed.settings.bridge_count != 1]
+            pages.append(f"Bridge: own {seed.settings.bridge_count} {noun}.")
+        lines[ALTAR_MESSAGES] = {ALTAR_LABEL: " ".join(pages)}
+
+    if any(name in seed.shuffled for name in GATED_FAIRY_CHECKS):
+        # TriForcePoint's no-Din branch shares these Navi lines across all five
+        # fountains. SpecialAbility2 (Death Mountain Trail) bypasses that branch.
+        lines[FAIRY_MESSAGES] = {
+            "Talk_00": "There is power here, but this fountain's gift must wait.",
+            "Talk_01": "Return once you own Din's Fire. It may be among any of this seed's shuffled rewards.",
+            "Talk_02": "You need to own Din's Fire before this fountain can offer its gift. Return once you find it.",
+        }
+
+    if "Light Arrows" in seed.world.start_items:
+        light = "You began with the Light Arrow."
+    else:
+        sources = [name for name, item in seed.placements.items() if item == "Light Arrows"]
+        light = f"Light Arrow: {region(sources[0])}." if sources else None
+    if light is not None:
+        # This is a timed subtitle (native clip38, 296 frames), not a paginated NPC box.
+        if len(_rows(light, 35)) > 2:
+            raise PatchError("Ganondorf's Light Arrow clue exceeds its two-row subtitle")
+        lines[GANONDORF_MESSAGES] = {GANONDORF_LABEL: light}
+    if not lines:
+        return {}
+
+    def transform(data: bytes) -> bytes:
+        archive = sarc.read(data)
+        edits = {}
+        for file, labels in lines.items():
+            if file not in archive:
+                raise PatchError(f"no message file {file} in the archive")
+            originals = msbt.read(archive[file]).messages
+            if missing := sorted(labels.keys() - originals.keys()):
+                raise PatchError(f"{file}: no messages labelled {missing}")
+            width = 35 if file == GANONDORF_MESSAGES else 40
+            edits[file] = {
+                label: stone_line(originals[label], line, width=width, rows=2) for label, line in labels.items()
+            }
+        return edit_messages(edits)(data)
+
+    return {archive_path(language): transform for language in languages(romfs)}

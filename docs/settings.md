@@ -724,6 +724,18 @@ allows more dungeon-area hints. Useless gives only original joke lines. No distr
 changes placements, item eligibility or D29's no-junk location clues; an exhausted useful
 hint pool still falls back to jokes. The app currently exposes only Balanced.
 
+**Static text (built, not played):** with dungeon rewards shuffled or a count-mode
+bridge, the Temple of Time altar lists reward regions and the selected Door/bridge
+conditions. Ganondorf's battle-intro subtitle names the Light Arrow's region; this is
+not an earlier interactive hint, and the unchanged native trials normally need the
+Light Arrow already. Its timed subtitle stays within two 35-character rows.
+With Gift shuffle, the freed Skulltula sons name their actual 10–50 rewards instead
+of describing vanilla wallets, the Echo Gem or Bombchus. Those item previews may name
+junk; they are not D29 location clues. The five non-Death-Mountain-Trail fountains'
+shared refusal now says their gift waits on owning Din's Fire, not a visit to the
+summit. Both existing hint modes retain normal NPC/sign access. New custom text is
+English in every language; spoken audio and all event timing remain native.
+
 **Wrong-age pickups:** the note lists shuffled age-locked rewards reachable by the wrong age at their
 first search frontier, including ties. Optional later pickups can differ from that order. Progressive
 Hookshot, Quiver and Slingshot warn like their weapon, which any copy can give.
