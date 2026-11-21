@@ -872,11 +872,39 @@ SKULLTULA_HINTS = {
     for count, label in ((10, "Talk_28"), (20, "Talk_23"), (30, "Talk_24"), (40, "Talk_25"), (50, "Talk_26"))
 }
 
+# Freed sons, not the still-cursed SkullChild actors. The first son also discusses
+# the later wallet reward; both must stop describing native wallet capacities.
+SKULLTULA_CHILDREN = {
+    10: ("Npc_Hylia_029", ("Talk_12", "Talk_13", "Talk_14")),
+    20: (
+        "Npc_Hylia_028",
+        ("Talk_11", "Talk_14", "Talk_08", "Talk_02", "Talk_03", "Talk_01", "Talk_09", "Talk_10", "Talk_07"),
+    ),
+    30: ("Npc_Hylia_027", ("Talk_06", "Talk_14", "Talk_05", "Talk_03", "Talk_04")),
+    40: ("Npc_Hylia_026", ("Talk_09", "Talk_14", "Talk_06", "Talk_05", "Talk_12", "Talk_10")),
+    50: ("Npc_Hylia_025", ("Talk_00", "Talk_01", "Talk_11")),
+}
+SKULLTULA_CHILD_CHOICES = {
+    "Npc_Hylia_029": ("Talk_12", "Talk_16"),
+    "Npc_Hylia_028": ("Talk_11",),
+    "Npc_Hylia_027": ("Talk_06", "Talk_14"),
+    "Npc_Hylia_026": ("Talk_09", "Talk_14"),
+}
+SKULLTULA_APPEND = {
+    "Npc_Hylia_029": ("Talk_14",),
+    "Npc_Hylia_028": ("Talk_07",),
+    "Npc_Hylia_027": ("Talk_04",),
+    "Npc_Hylia_026": ("Talk_10",),
+    "Npc_Hylia_025": ("Talk_00", "Talk_01", "Talk_11"),
+}
+
 
 def skulltula_hint_changes(romfs: str | Path, placements: Mapping[str, str]) -> dict[str, Callable[[bytes], bytes]]:
-    """Name the actual actor at each shuffled 10–50 reward, in the native preview lines.
+    """Name shuffled 10–50 rewards in Dad's previews and the freed sons' advice.
 
-    English in every language archive follows D26. The repeat 100-token rupee is not a new check.
+    English in every language follows D26. Both pending and claimed advice describes
+    the seed's item, never its vanilla effect. The separate first/repeat 100 reward
+    has no child and is outside these existing 10–50 preview lines.
     """
     from clawshot.formats import msbt, sarc
     from clawshot.patch import text
@@ -889,19 +917,45 @@ def skulltula_hint_changes(romfs: str | Path, placements: Mapping[str, str]) -> 
     path = text.archive_path(text.NAME_LANGUAGE)
     archive = sarc.read(dicts.decompress(path, (romfs / path).read_bytes()))
     pouch = msbt.read(archive[text.POUCH_TEXT])
-    lines = {}
+    lines: dict[str, dict[str, str]] = {"EventFlowMsg/Npc_SkullDad.msbt": {}}
+    reward_lines = {}
+
+    def child_lines(actor: str, labels: Sequence[str], line: str) -> None:
+        file = f"EventFlowMsg/{actor}.msbt"
+        originals = msbt.read(archive[file]).messages
+        for label in labels:
+            shown = line
+            if label in SKULLTULA_APPEND.get(actor, ()):
+                shown = msbt.plain(originals[label]) + " " + line
+            if label in SKULLTULA_CHILD_CHOICES.get(actor, ()):
+                shown += " Hear that again?"
+            lines.setdefault(file, {})[label] = shown
+
     for name, actor in selected.items():
         count, label = SKULLTULA_HINTS[name]
         key = text.read_text_key(romfs, actor, dicts)
-        item = "".join(p for p in text.item_name(pouch, key) if isinstance(p, str))
-        lines[label] = f"For {count} tokens, the reward is {text.FIELD_START}{item}{text.FIELD_END}."
+        item = msbt.plain(text.item_name(pouch, key))
+        marked = f"{text.FIELD_START}{item}{text.FIELD_END}"
+        lines["EventFlowMsg/Npc_SkullDad.msbt"][label] = f"For {count} tokens, the reward is {marked}."
+        reward_lines[count] = f"{count}-token reward: {marked}."
+        child, labels = SKULLTULA_CHILDREN[count]
+        child_lines(child, labels, reward_lines[count])
+    if 30 in reward_lines:
+        child_lines("Npc_Hylia_029", ("Talk_15", "Talk_16"), reward_lines[30])
+    wallet = " ".join(reward_lines[count] for count in (10, 30) if count in reward_lines)
+    if wallet:
+        child_lines("Npc_Hylia_029", ("Talk_17", "Talk_18", "Talk_19"), wallet)
 
     def transform(data: bytes) -> bytes:
-        archive = sarc.read(data)
-        file = "EventFlowMsg/Npc_SkullDad.msbt"
-        messages = msbt.read(archive[file])
-        edits = {label: text.stone_line(messages.messages[label], line) for label, line in lines.items()}
-        return text.edit_messages({file: edits})(data)
+        files = sarc.read(data)
+        edits = {}
+        for file, labels in lines.items():
+            messages = msbt.read(files[file]).messages
+            width = text.HINT_WIDTH if file == "EventFlowMsg/Npc_SkullDad.msbt" else 40
+            edits[file] = {
+                label: text.stone_line(messages[label], line, width=width, rows=2) for label, line in labels.items()
+            }
+        return text.edit_messages(edits)(data)
 
     return {text.archive_path(language): transform for language in text.languages(romfs)}
 

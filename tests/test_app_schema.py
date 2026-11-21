@@ -55,6 +55,12 @@ def test_effective_gift_string_can_be_loaded_back_into_player_controls():
     assert validate(text=restored.to_string()) == restored
 
 
+def test_very_strong_cli_settings_can_be_selected_in_the_app(capsys):
+    assert main(["--hint-distribution", "very_strong", "--print-settings"]) == 0
+    text = capsys.readouterr().out.strip()
+    assert validate(text=text).hint_distribution == "very_strong"
+
+
 def test_inactive_prices_keep_their_values_and_activate_only_with_their_check_kind():
     inactive = Settings(shuffle=("Chest",), shop_prices="affordable", scrub_prices="fixed", scrub_price=75)
     payload = settings_payload(inactive)

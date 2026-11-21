@@ -64,7 +64,7 @@ def test_required_locations_are_the_ones_the_goal_needs():
     assert hints.required_locations(seed(1)) == ["Forest Chest", "Cliff Chest"]
 
 
-@pytest.mark.parametrize("distribution", ["balanced", "strong"])
+@pytest.mark.parametrize("distribution", ["balanced", "strong", "very_strong"])
 def test_every_stone_gets_one_hint_and_none_needs_the_item_it_names(distribution):
     for number in range(30):
         chosen = hints.choose(seed(number), "always", distribution)

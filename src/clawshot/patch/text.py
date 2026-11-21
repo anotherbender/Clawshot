@@ -22,14 +22,19 @@ Where the game's text comes from (``03-game-data.md`` section 22):
 
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from clawshot.census import hints
 from clawshot.formats import byml, evfl, msbt, sarc, zsdic
 from clawshot.formats.msbt import Part, Tag
+from clawshot.generate import hints as stone_hints
 from clawshot.generate.hints import FIELD_END, FIELD_START
 from clawshot.patch.items import ItemActors
 from clawshot.patch.plan import PatchError
 from clawshot.patch.write import FileChanges
+
+if TYPE_CHECKING:
+    from clawshot.generate import Seed
 
 ARCHIVE = "Mals/{language}.Product.110.sarc.zs"
 POUCH_TEXT = "ActorMsg/PouchContent.msbt"
@@ -46,6 +51,18 @@ RESET = b"\xff\xff"
 PAGE_BREAK = Tag(0, 4, b"")
 SHEIK_MESSAGES = "EventFlowMsg/Npc_Hylia_Sheik_Adult.msbt"
 SHEIK_TOOL_LABELS = ("Talk_01", "Talk_03")
+ALTAR_MESSAGES = "EventFlowMsg/SignboardWood.msbt"
+ALTAR_LABEL = "TempleOfTime_000"
+GANONDORF_MESSAGES = "EventFlowMsg/Dm_InsideGanonCastle_BossIn.msbt"
+GANONDORF_LABEL = "Dm_InsideGanonCastle_BossIn_Text_013_b"
+FAIRY_MESSAGES = "EventFlowMsg/Dm_FairyFountain_Power.msbt"
+GATED_FAIRY_CHECKS = (
+    "HC Great Fairy Reward",
+    "ZF Great Fairy Reward",
+    "DMC Great Fairy Reward",
+    "Colossus Great Fairy Reward",
+    "OGC Great Fairy Reward",
+)
 
 
 def archive_path(language: str) -> str:
@@ -267,6 +284,20 @@ def stone_line(original: Sequence[Part], text: str, width: int = HINT_WIDTH, row
     return parts
 
 
+def _altar_line(original: Sequence[Part], lines: Sequence[str]) -> list[Part]:
+    """Keep rewards/conditions atomic within the observed native 48-character, three-row sign envelope."""
+    if any(len(line) > 48 for line in lines):
+        raise PatchError(f"altar line exceeds the 48-character envelope: {lines}")
+    lead = keep_style(original, [])
+    style = [tag for tag in lead if isinstance(tag, Tag) and tag.group == 0]
+    parts = list(lead)
+    for offset in range(0, len(lines), 2):
+        if offset:
+            parts.extend([PAGE_BREAK, *style])
+        parts.append("\n".join(lines[offset : offset + 2]))
+    return parts
+
+
 def stone_lines_transform(lines: Mapping[str, str]) -> Callable[[bytes], bytes]:
     """The transform of one language archive giving each stone label in ``lines`` its new line (:func:`stone_line`,
     in that archive's style of the stone)."""
@@ -321,5 +352,152 @@ def sheik_hint_changes(romfs: str | Path, hookshot_locations: Sequence[str]) -> 
             raise PatchError(f"{SHEIK_MESSAGES}: no message labelled {missing}")
         edits = {label: stone_line(messages[label], line) for label in SHEIK_TOOL_LABELS}
         return edit_messages({SHEIK_MESSAGES: edits})(data)
+
+    return {archive_path(language): transform for language in languages(romfs)}
+
+
+def scrub_hint_changes(
+    romfs: str | Path, placements: Mapping[str, str], table: ItemActors, prices: Mapping[str, int]
+) -> FileChanges:
+    """Source-specific sale previews, English in every language, with no vanilla-item claims.
+
+    Only selected once-sales participate. Repeat merchants keep their native text and gates.
+    Prices are the same effective fixed prices used by the sale writer, not inferred from text.
+    """
+    from clawshot.patch import scrubs
+
+    selected = {name: item for name, item in placements.items() if name in scrubs.SALES}
+    if not selected:
+        return {}
+    names = item_names(romfs, selected.values(), table)
+    lines = {
+        scrubs.OFFER_LABELS[name]: f"I offer {FIELD_START}{names[item]}{FIELD_END} for {prices[name]} rupees. Buy it?"
+        for name, item in selected.items()
+    }
+    file = f"{scrubs.OFFER_FILE}.msbt"
+
+    def transform(data: bytes) -> bytes:
+        archive = sarc.read(data)
+        if file not in archive:
+            raise PatchError(f"no message file {file} in the archive")
+        messages = msbt.read(archive[file]).messages
+        native = "Enemy_Scrub_Business_Heart_01"
+        if native not in messages:
+            raise PatchError(f"{file}: no message labelled {native}")
+        # Conservative NPC envelope: two rows of forty English characters per page.
+        additions = {label: stone_line(messages[native], line, width=40, rows=2) for label, line in lines.items()}
+        return add_messages({file: additions})(data)
+
+    return {
+        **{archive_path(language): transform for language in languages(romfs)},
+        **scrubs.offer_changes(tuple(selected)),
+    }
+
+
+def static_hint_changes(romfs: str | Path, seed: "Seed", table: ItemActors) -> FileChanges:
+    """Altar reward regions/conditions and Ganondorf's bounded battle-intro clue.
+
+    Both existing hint modes keep NPC/sign text readable normally; only stones require
+    the mask. No event/timeline, saved state, grant or window is changed here.
+    """
+    from clawshot.generate.rewards import catalog
+
+    lines: dict[str, dict[str, str]] = {}
+
+    def region(name: str) -> str:
+        location = seed.world.locations[name]
+        area = stone_hints.hint_area(seed.world, location.region)
+        if area is None:
+            raise PatchError(f"{name}: no region-level hint area")
+        return stone_hints.area_name(area)
+
+    if seed.settings.dungeon_rewards or seed.settings.bridge != "vanilla":
+        rewards = {slot["item"] for slot in catalog()["slots"].values()}
+        placed = [(name, item) for name, item in seed.placements.items() if item in rewards]
+        names = item_names(romfs, (item for _, item in placed), table)
+        pages = [f"{names[item]}: {region(name).removeprefix('the ')}" for name, item in placed]
+        if seed.settings.door_of_time == "closed":
+            stones = "all 3 Spiritual Stones," if seed.settings.dungeon_rewards else "the 3 stone quests completed,"
+            door = [
+                "To open the Door of Time, you need",
+                stones,
+                "the Ocarina of Time, Song of Time,",
+                "and Impa's send-off finished.",
+                "Then play the Song of Time here.",
+            ]
+        else:
+            door = ["To open the Door of Time, finish", "Impa's send-off and reach"]
+            door.extend(
+                ["Hyrule Field. Then play the", "Song of Time with an ocarina."]
+                if seed.settings.door_of_time == "song_only"
+                else ["Hyrule Field. No items are needed."]
+            )
+        if seed.settings.bridge == "vanilla":
+            bridge = [
+                "Rainbow Bridge: awaken the",
+                "Shadow and Spirit sages, then",
+                "return here for Zelda's story.",
+            ]
+        elif seed.settings.bridge_count == 0:
+            bridge = ["Rainbow Bridge: no items required."]
+        else:
+            nouns = {
+                "stones": ("Spiritual Stone", "Spiritual Stones"),
+                "medallions": ("Medallion", "Medallions"),
+                "rewards": ("Dungeon Reward", "Dungeon Rewards"),
+                "tokens": ("Gold Skulltula Token", "Gold Skulltula Tokens"),
+            }
+            noun = nouns[seed.settings.bridge][seed.settings.bridge_count != 1]
+            prefix = f"Rainbow Bridge: own {seed.settings.bridge_count}"
+            sentence = f"{prefix} {noun}."
+            bridge = [sentence] if len(sentence) <= 36 else [prefix, f"{noun}."]
+        if any(len(line) > 36 for line in (*door, *bridge)):
+            raise PatchError(f"altar condition line exceeds 36 characters: {door}, {bridge}")
+        # Start each cumulative condition block on a fresh page, not beside a reward.
+        for block in (door, bridge):
+            if len(pages) % 2:
+                pages.append("")
+            pages.extend(block)
+        lines[ALTAR_MESSAGES] = {ALTAR_LABEL: "\n".join(pages)}
+
+    if any(name in seed.shuffled for name in GATED_FAIRY_CHECKS):
+        # TriForcePoint's no-Din branch shares these Navi lines across all five
+        # fountains. SpecialAbility2 (Death Mountain Trail) bypasses that branch.
+        lines[FAIRY_MESSAGES] = {
+            "Talk_00": "There is power here, but this fountain's gift must wait.",
+            "Talk_01": "Return once you own Din's Fire. It may be among any of this seed's shuffled rewards.",
+            "Talk_02": "You need to own Din's Fire before this fountain can offer its gift. Return once you find it.",
+        }
+
+    if "Light Arrows" in seed.world.start_items:
+        light = "You began with the Light Arrow."
+    else:
+        sources = [name for name, item in seed.placements.items() if item == "Light Arrows"]
+        light = f"Light Arrow: {region(sources[0])}." if sources else None
+    if light is not None:
+        # This is a timed subtitle (native clip38, 296 frames), not a paginated NPC box.
+        if len(_rows(light, 35)) > 2:
+            raise PatchError("Ganondorf's Light Arrow clue exceeds its two-row subtitle")
+        lines[GANONDORF_MESSAGES] = {GANONDORF_LABEL: light}
+    if not lines:
+        return {}
+
+    def transform(data: bytes) -> bytes:
+        archive = sarc.read(data)
+        edits = {}
+        for file, labels in lines.items():
+            if file not in archive:
+                raise PatchError(f"no message file {file} in the archive")
+            originals = msbt.read(archive[file]).messages
+            if missing := sorted(labels.keys() - originals.keys()):
+                raise PatchError(f"{file}: no messages labelled {missing}")
+            width = 35 if file == GANONDORF_MESSAGES else 40
+            edits[file] = {
+                label: _altar_line(originals[label], line.splitlines())
+                if file == ALTAR_MESSAGES
+                else stone_line(originals[label], line, width=width, rows=2)
+                for label, line in labels.items()
+            }
+        return edit_messages(edits)(data)
 
     return {archive_path(language): transform for language in languages(romfs)}

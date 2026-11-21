@@ -62,13 +62,16 @@ def test_whole_seed_assigns_one_item_to_every_tier_and_copy_without_changing_pri
     written = dicts.decompress(scrubs.PATH, (tmp_path / "seed" / "romfs" / scrubs.PATH).read_bytes())
     before, after = evfl.read(data), evfl.read(written)
     index = {e.name: e for e in after.flowchart.events}
+    native = {e.name: e for e in before.flowchart.events}
     assert set(output.seed.shuffled) & scrubs.SALES.keys() == scrubs.SALES.keys()
     for check, sale in scrubs.SALES.items():
         item = actors.actor(output.seed.placements[check])
         for name, old in sale.grants:
             assert index[name].params["ActorName"] == item
             assert index[name].params["Price"] == sale.price
+            assert index[name].params["SellerMessageId"] == f"{scrubs.OFFER_FILE}:{scrubs.OFFER_LABELS[check]}"
             index[name].params["ActorName"] = old
+            index[name].params["SellerMessageId"] = native[name].params["SellerMessageId"]
         if sale.selection:
             assert index[sale.selection].params["Value"] == item
             index[sale.selection].params["Value"] = "Obj_Heart_Piece"

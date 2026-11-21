@@ -176,7 +176,7 @@ help = "Let Gossip Stones speak without the Mask of Truth, or require you to wea
 [hint_distribution]
 label = "Hint distribution"
 kind = "choice"
-choices = ["balanced"]
+choices = ["balanced", "strong", "very_strong", "useless"]
 group = "Hints"
 help = "Choose how helpful the Gossip Stone clues are."
 [logic]
@@ -250,6 +250,7 @@ mask = "Mask of Truth required"
 [hint_distribution.labels]
 balanced = "Balanced"
 strong = "Strong"
+very_strong = "Very strong"
 useless = "Useless hints"
 
 # Sources: plans/playtest/answers.md R7-BOSSHEART, R8-FREESTANDING, R8-FROGS;
@@ -295,4 +296,5 @@ mask = "Wear the Mask of Truth as a child to hear a Gossip Stone."
 [hint_distribution.choice_help]
 balanced = "A mix of clues about useful items, areas and routes."
 strong = "More helpful clues about useful items."
+very_strong = "New in this round: more clues about required routes and useful areas, with fewer random clues."
 useless = "Clues deliberately chosen not to help you find useful items."

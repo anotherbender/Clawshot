@@ -65,12 +65,15 @@ def test_partial_shelves_and_fixed_scrub_fees_preserve_unselected_stock_and_nati
 
     before, after = evfl.read(raw(scrubs.PATH, False)), evfl.read(raw(scrubs.PATH))
     events = {event.name: event for event in after.flowchart.events}
+    native = {event.name: event for event in before.flowchart.events}
     for name, sale in scrubs.SALES.items():
         item = actors.actor(output.seed.placements[name])
         for event, old in sale.grants:
             assert events[event].params["ActorName"] == item
             assert events[event].params["Price"] == settings.scrub_price
+            assert events[event].params["SellerMessageId"] == f"{scrubs.OFFER_FILE}:{scrubs.OFFER_LABELS[name]}"
             events[event].params.update(ActorName=old, Price=sale.price)
+            events[event].params["SellerMessageId"] = native[event].params["SellerMessageId"]
         if sale.selection:
             assert events[sale.selection].params["Value"] == item
             events[sale.selection].params["Value"] = "Obj_Heart_Piece"
@@ -81,7 +84,7 @@ def test_partial_shelves_and_fixed_scrub_fees_preserve_unselected_stock_and_nati
         counts["Progressive Wallet"] = 1
         assert rule(counts, "child", 1)
     restore_offer_guard(after.flowchart)
-    assert after == before  # Every offer, payment, cancellation branch and saved gate is unchanged.
+    assert after == before  # All native branches and saved gates are unchanged outside the selected fields.
     oracle = Search(output.seed.world)
     oracle.collect_spheres(output.seed.placements)
     assert oracle.won()

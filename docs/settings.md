@@ -360,9 +360,10 @@ gates. These fields replay through CS1. The 10-rupee Kokiri shield/nuts purchase
 observed (R6-PRICES); partial shelves and fixed scrub fees are built/tested, not independently
 certified in game by that observation.
 
-**Scrub offer wording:** shuffled one-time sales still describe their vanilla item, even
-when their actual reward differs. Check the get window/inventory or spoiler, not that sales
-pitch ([recorded since round 6](../plans/rounds/r6-tokens.md#purchase-and-patch-contract)).
+**Scrub offer wording:** newly generated shuffled one-time sales name their actual
+reward and effective price (English in all16 languages). HF and DMC have separate
+offers even though their native pitch shares one message. Built/read-back-tested,
+not yet played on Longshot 3.0.0; [round20 hints](../plans/rounds/r20-hints.md).
 Repeat vendors are not shuffled; their native weapon/magic/bottle gates can hide every offer.
 The no-offers guard for [#26](https://github.com/hiKareeem/Clawshot/issues/26) ends that
 conversation before opening an empty shop menu. It applies even without Scrub shuffle.
@@ -716,6 +717,32 @@ reset were observed in game; that is not certification of every distribution. Bo
 Hookshot-direction lines are replaced with a seed location holding the Hookshot or a Progressive
 Hookshot (any copy is the Hookshot while none is owned), or omit the tool if none exists in a
 partial world. This text is built/read-back-tested, not separately player-accepted.
+
+The generator also accepts `--hint-distribution strong`, `very_strong` and `useless`.
+Strong favors required routes and barren areas; Very strong raises those weights and
+allows more dungeon-area hints. Useless gives only original joke lines. No distribution
+changes placements, item eligibility or D29's no-junk location clues; an exhausted useful
+hint pool still falls back to jokes. All four are app choices; Very strong is new this round
+and remains built, not played.
+
+**Static text (partially played):** with dungeon rewards shuffled or a count-mode
+bridge, the Temple of Time altar lists reward regions and the selected Door/bridge
+conditions. Ganondorf's battle-intro subtitle names the Light Arrow's region; this is
+not an earlier interactive hint, and the unchanged native trials normally need the
+Light Arrow already. Its timed subtitle stays within two 35-character rows.
+With Gift shuffle, the freed Skulltula sons name their actual 10–50 rewards instead
+of describing vanilla wallets, the Echo Gem or Bombchus. Those item previews may name
+junk; they are not D29 location clues. The five non-Death-Mountain-Trail fountains'
+shared refusal now says their gift waits on owning Din's Fire, not a visit to the
+summit. Both existing hint modes retain normal NPC/sign access. New custom text is
+English in every language; spoken audio and all event timing remain native.
+Each reward and region stays on one complete altar line. Door requirements form one
+cumulative sentence across pages, followed by the Rainbow Bridge condition; these
+condition lines are at most36 characters. Page breaks never split a reward/region.
+Kareem passed the staged Fairy refusals, House advice (including after the cure),
+legible Ganondorf subtitle, and bridge-scrub price/grant. Three other scrub offers
+were not located. The altar's reward rows were readable; revised cumulative
+condition wording remains built, not played.
 
 **Wrong-age pickups:** the note lists shuffled age-locked rewards reachable by the wrong age at their
 first search frontier, including ties. Optional later pickups can differ from that order. Progressive
