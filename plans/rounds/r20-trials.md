@@ -460,8 +460,47 @@ Claude's fixed-candidate **boot PASS** is
 `E:/OOTRemake/work/r20-trials/bootcheck-lift-fixed.txt`: Longshot3.0.0/source87cb36aa,
 160 RomFS entries, crash0/fatal0, save mounted, one mod; modded GameData and initializer
 both loaded. Cited in `ingame/START HERE.md` and `CHECKLIST.md`. Boot is not lift gameplay.
-The approved short route still requires Continue -> normal entrance/call area -> ride up
--> Save/Continue -> repeat. No debug age, forged inventory/quest/core changes, New Game,
-or teleport into/above the tower. Do not claim natural adulthood, arbitrary old-save
-migration, partial-trial gameplay or a full playthrough from this fixture.
+**4b gameplay PASS (Kareem, reported by Claude):** elevator is down, works and carries
+Link up; it can be sent up unoccupied and returns down; the working state persists
+after Save/Continue. This completes the approved fixed TEST-COPY's lift/persistence
+check. No debug-age rerun or longer natural-adult route is needed for this question.
+Do not infer natural adulthood, arbitrary old-save migration, partial-trial gameplay
+or a full playthrough from this fixture.
+
+### Integration with merged starting inventory (main5ed31bc)
+
+Claude moved main to `5ed31bc` after starting inventory's played PASS and requested a
+feature-preserving rebase, light trials/starting-inventory focus, an actual combined
+count0/starting-items seed and a new full game-free gate after cs20a; no sweep.
+The rebase completed. Conflicts were additive/compositional, resolved retaining:
+
+- `Settings.as_dict`: both starting-items/health/wallet and non-default trials count.
+- Generated play notes/imports: both starting inventory and remaining-trials sections.
+- Preparation imports: both starting pool replacement and seeded trial selection.
+- Native initialization: both starting-item initial values and trial initial values;
+  `prepare` receives the seed so native and logic trial choices remain aligned.
+
+Integration source head: `1260abf9a5b08063fd735dfebad6a51f04254dab`.
+Both features are retained and the requested light proofs passed, with game absence
+checked before each stage:
+
+- `OOT_ROMFS=E:/Games/Hookshot/romfs CLAWSHOT_WORKERS=1 uv run --with pytest-xdist pytest
+  -n2 tests/test_ganon_settings.py tests/test_starting_inventory.py`: **41 passed in36.69s**,
+  including the native tests from both files. Receipt:
+  `E:/OOTRemake/work/r20-trials/start-integration/focused.log`.
+- Actual `make_seed`/`write_seed`, seed20202034, count0, starting Kokiri Sword, Slingshot,
+  Giant Wallet and Zelda's Lullaby, plus2 extra hearts and full wallet: **118 files built**.
+  Settings string round-trips with both sets of options. Built GameData reads0090 history
+  true, rupees1000, Zelda lesson-history false. Initial ownership contains all four choices;
+  the written native initializer grants Kokiri Sword, Zelda's Lullaby, the wallet tiers
+  and Bullet Bag before Slingshot, and supplies20 quarter-hearts. This checks the actual
+  composed output, not independent patches or a fake build. Receipt/file hashes:
+  `E:/OOTRemake/work/r20-trials/start-integration/combined-results.json`.
+
+The combined seed is proof-only outside the repository; it does not replace Kareem's
+played mod/profile or claim combined-settings gameplay. No new sweep or runtime change.
+Gate-order line10 queues cs20d after cs20a's explicit LOCK RELEASED; no lease is taken
+until that post. The new full gate retains per-stage no-game checks and600-second waits.
+This pre-gate evidence commit changes only the round note; integrated source/tests are
+those checked at1260abf9.
 
