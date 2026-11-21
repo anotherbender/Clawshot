@@ -125,7 +125,7 @@ def _rows() -> list[dict]:
                 **info,
                 "labels": {item: item for item in starting.CHOICES},
                 "choice_help": {
-                    item: f"Own {item} at New Game. Progressive tiers include their earlier tiers; source/story stays."
+                    item: f"Own {item} at New Game. Progressive tiers include earlier tiers; later lessons stay native."
                     for item in starting.CHOICES
                 },
             }

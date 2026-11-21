@@ -64,6 +64,20 @@ def game_data_with_string():
     return tree
 
 
+@pytest.mark.parametrize("items", [(), ("Slingshot",), ("Kokiri Sword",)])
+def test_starting_sword_keeps_the_bypassed_door_and_pause_map_state(items):
+    saria_state = gamedata.load()["saria"].game_data
+    tree = game_data_list()
+    tree["Data"]["Bool"].extend(flag(name, False) for name in saria_state)
+    tree["Data"]["Bool"].append(flag("HavePlayedEvent.Dm_MelodyGet_Zelda", False))
+    patched = byml.read(
+        gamedata.patch_initial_values(byml.write(tree), start_items.initial_values(Settings(starting_items=items)))
+    )
+    actual = {name: gamedata._find(patched, name)[1]["DefaultValue"] for name in saria_state}
+    assert actual == (saria_state if "Kokiri Sword" in items else dict.fromkeys(saria_state, False))
+    assert gamedata._find(patched, "HavePlayedEvent.Dm_MelodyGet_Zelda")[1]["DefaultValue"] is False
+
+
 def test_post_setup_sequence_runs_original_before_ordered_native_grants():
     original = synthetic_sequence()
     pushes = (
@@ -176,9 +190,11 @@ def test_starting_strength_does_not_assume_the_bypassed_darunia_song():
 
 
 @pytest.mark.dump
-def test_native_initialization_has_bags_before_weapons_health_and_wallet(romfs):
+@pytest.mark.parametrize("sword", [False, True])
+def test_native_initialization_has_bags_before_weapons_health_and_wallet(romfs, sword):
     settings = Settings(
-        starting_items=(
+        starting_items=(("Kokiri Sword",) if sword else ())
+        + (
             "Slingshot",
             "Bow",
             "Magic Meter (Double)",
@@ -214,6 +230,7 @@ def test_native_initialization_has_bags_before_weapons_health_and_wallet(romfs):
         "DungeonInfo.InsideTheDekuTree.IsGetCompass": True,
         "PlayerStatus.CurrentRupee": 1000,
         "PlayerStatus.EquipOcarina": "Item_Ocarina_Time",
+        **(gamedata.load()["saria"].game_data if sword else {}),
     }
     assert gamedata._find(tree, "HavePlayedEvent.Dm_MelodyGet_Zelda")[1]["DefaultValue"] is False
 

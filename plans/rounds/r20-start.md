@@ -237,3 +237,34 @@ requires n2/internal1. Exact commands, process snapshots, exits, counts and elap
 Release is **READY (play-held)** only after that exact-head receipt reports PASS; both gameplay arms above
 still need Kareem. No setting, quest flag, native lesson or scene is called played by a successful build,
 oracle, browser test or headless boot.
+
+## Post-play: starting Sword bypasses Saria's event door
+
+Kareem via Claude, 2026-11-21: candidate A/B passed six hearts,500 rupees,both songs,usable items,
+Time staying active after Saria,Continue persistence,Impa without freezing,normal adult Temple/Hookshot/Time,
+and the first Storms lesson. Actual candidate runtime log loads GameData, the New Game module and the
+modified adult Windmill flow. Pause full dungeon/world maps were missing; that observation is not a pass.
+
+Read-only diagnosis: all six candidate saves retained Deku map/compass and Deku/Hyrule visit=true;
+Kokiri visit,door-open and0045/0050/0060 histories=false. Five saved adult states have0065=true.
+Both actual packet arms use fast_start=[intro],forest=open,skip_saria_farewell=false; the Saria skip is off.
+Native `Land_Kokiri_House_A_Prefab_5d58` node2 reads `IsGet.Weapon_Sword_Kokiri`; its true value creates
+the plain door through0/11 and retires the event door through12/5/3. Thus the starting Sword itself
+bypasses the missing first Saria greeting/banner. This specific bypass is not caused by intro,open forest
+or Navi wake; main's no-Sword new game does not take it. No generic main/intro fix or control rerun is justified.
+Native map UI also reads the missing Kokiri visit in its Kokiri/empty-context readiness branch.
+Detailed node polarity, hashes and saved values remain outside Git in `played-kokiri-cause.md`.
+
+Seed20032021 has shuffle=[Chest]; Impa and Windmill remain fixed Lullaby/Storms, both already started.
+They appear in fixed sphere entries, not the178 shuffled placements: no randomized reward was lost.
+The provisional policy still replaces pool copies only and leaves fixed native lessons/rewards.
+
+**Approved by Claude:** starting Kokiri Sword inherits the entire existing `saria` table's game_data,
+not a second list:0045/0050/0060 histories,open door,HaveTalked Saria and Kokiri visit. This completes
+only the opening encounter native ownership has already bypassed; later lessons/farewell stay native.
+The hook reuses `gamedata.load()["saria"].game_data`. No-Sword starts keep their original values and metadata.
+Focused regression/native checks, renewed option-off parity, candidate-A-only restaging and a game-free
+gate verify this follow-up; previous gates above certify the previous source, not this change.
+The v1 candidate B/control packets and their profiles remain untouched. Restaged A needs a fresh private
+New Game profile and a boot check before Kareem checks both full maps; do not edit his played save.
+

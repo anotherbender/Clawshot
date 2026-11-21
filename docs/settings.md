@@ -170,9 +170,13 @@ one initial magic copy and removes one pooled magic copy too.
 Starting ownership does **not** complete the corresponding lesson, source, dungeon or story quest.
 Impa's real send-off, Malon's source for Epona, the Ice Cavern chest, Forest completion/Prelude and
 pedestal age transitions remain separate. A prelearned Storms song retains the Windmill's first lesson.
+Starting with the Kokiri Sword natively replaces Saria's first event door with a plain door.
+That start therefore inherits the existing Saria fast-start state (opening histories, open door,
+talked-to flag and Kokiri map visit). Later song lessons and Saria's bridge farewell remain separate.
 Trade items, bottles, masks, Lens, raw ammo, keys, tokens, dungeon rewards and arbitrary names are refused;
 they need additional source/slot/active-equipment contracts, not guessed save values.
-Built and native-data-tested, **not played**; the broad New Game check remains play-held.
+The broad inventory, Continue and Time-ocarina lessons passed Kareem's check. The starting-Sword
+map-visit compensation still requires its restaged A check; other choices retain their documented evidence limits.
 Evidence and provisional pool policy: [round 20 starts](../plans/rounds/r20-start.md).
 
 ### Progressive items

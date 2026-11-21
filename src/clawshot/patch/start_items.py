@@ -300,7 +300,12 @@ def changes(settings=None) -> FileChanges:
 
 
 def initial_values(settings) -> list[gamedata.FastStartSetting]:
+    starting_sword = "Kokiri Sword" in settings.starting_items
     values = {starting.MAP_FLAGS[item]: True for item in settings.starting_items if item in starting.MAP_FLAGS}
+    if starting_sword:
+        # The native house door treats Sword ownership as a completed Saria greeting.
+        # Keep the same skipped-scene state as the explicit Saria option, including its map visit.
+        values.update(gamedata.load()["saria"].game_data)
     if settings.starting_full_wallet:
         values["PlayerStatus.CurrentRupee"] = starting.wallet(settings.starting_items)[1]
     if selected := starting.ocarina(settings.starting_items):
@@ -311,8 +316,12 @@ def initial_values(settings) -> list[gamedata.FastStartSetting]:
         gamedata.FastStartSetting(
             name="starting_inventory",
             default=False,
-            skips="No story or lesson",
-            state="Selected native New Game inventory",
+            skips=("Saria's initial greeting; later lessons stay native" if starting_sword else "No story or lesson"),
+            state=(
+                "Selected native New Game inventory and its implied opening state"
+                if starting_sword
+                else "Selected native New Game inventory"
+            ),
             source="plans/rounds/r20-start.md",
             logic=None,
             game_data=values,

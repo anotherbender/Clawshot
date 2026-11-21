@@ -386,6 +386,11 @@ def play_note(seed: Seed, log: Mapping[str, Any] | None = None) -> str:
         lines.append(f"Starting health: {3 + seed.settings.starting_hearts} full hearts.")
         if seed.settings.starting_full_wallet:
             lines.append(f"Starting rupees: {starting.wallet(seed.settings.starting_items)[1]} (full wallet).")
+        if "Kokiri Sword" in seed.settings.starting_items:
+            lines.append(
+                "The native starting Sword bypasses Saria's first door greeting; its normal skipped-scene state "
+                "(door, talk history and Kokiri map visit) is supplied. Later lessons and farewell stay native."
+            )
         lines.extend(
             [
                 "Progressive choices include their earlier tiers and weapon containers. Native bag ammunition applies.",
