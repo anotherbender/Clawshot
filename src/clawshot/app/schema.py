@@ -6,10 +6,13 @@ from functools import cache
 from pathlib import Path
 
 from clawshot.generate import FillError, Settings, hints, prepare
+from clawshot.generate.exclusions import validate_exclusions
 from clawshot.generate.fill import DUNGEON_ITEM_CHOICES, return_guarantee_conflict
+from clawshot.generate.names import load as load_names
 from clawshot.patch import gamedata, gifts
 from clawshot.settings import CATALOG, validate_logic_overrides
-from clawshot.world.load import WorldError, load_spec
+from clawshot.world.load import WorldError, build_world, load_spec
+from clawshot.world.model import World
 
 METADATA_PATH = Path(__file__).with_name("settings.toml")
 
@@ -21,6 +24,27 @@ def _world_logic_default(name: str):
     return {**spec.get("settings", {}), **spec.get("tricks", {}), **spec.get("flags", {})}.get(name)
 
 
+@cache
+def _location_metadata() -> dict[str, dict]:
+    """Choices for a ``display = "locations"`` row: every item check of the bundled world (not N64-only), with its
+    readable catalog name and directions (``generate.names``) and the tracker's area. Described checks come first, each
+    part in world order: most undescribed ones are pots, crates and loose rupees that no setting shuffles yet.
+    Presentation only: ``validate`` leaves names to ``prepare`` and the selected world, which may be a caller's own."""
+    from clawshot.tracker import location_index  # the tracker's logic view imports this module
+
+    catalog, places = load_names(), location_index()
+    world = build_world(load_spec())
+    live = [loc for loc in world.locations.values() if loc.n64_only is None and loc.vanilla is not None]
+    labels, choice_help, option_info = {}, {}, {}
+    for loc in sorted(live, key=lambda check: check.name not in catalog):
+        readable, area = catalog.get(loc.name), places[loc.name].area
+        labels[loc.name] = readable.name if readable else loc.name
+        undescribed = f"{loc.type} check in {area}. No player description yet: shown by its world name."
+        choice_help[loc.name] = readable.where if readable else undescribed
+        option_info[loc.name] = {"area": area, "type": loc.type}
+    return {"labels": labels, "choice_help": choice_help, "option_info": option_info}
+
+
 def _row(key: str, metadata: dict, default, choices: list, names: set[str]) -> dict:
     info = dict(metadata)
     for part in ("label", "kind", "group", "help"):
@@ -30,6 +54,7 @@ def _row(key: str, metadata: dict, default, choices: list, names: set[str]) -> d
     labels = info.pop("labels", {})
     unavailable = info.pop("unavailable", {})
     choice_help = info.pop("choice_help", {})
+    option_info = info.pop("option_info", {})
     if set(choice_help) != set(info["choices"]) or any(not text.strip() for text in choice_help.values()):
         raise ValueError(f"Choice help missing/stale for {key}")
     for condition in info.get("enabled_when", []):
@@ -45,6 +70,7 @@ def _row(key: str, metadata: dict, default, choices: list, names: set[str]) -> d
             "help": choice_help[choice],
             "disabled": choice in unavailable,
             "reason": unavailable.get(choice, ""),
+            **option_info.get(choice, {}),
         }
         for choice in info["choices"]
     ]
@@ -70,7 +96,12 @@ def _rows() -> list[dict]:
     result = []
     for field in fields(Settings):
         info = metadata[field.name]
-        options = choices.get(field.name, info.get("choices", []))
+        if info.get("display") == "locations":
+            # The bundled world's checks, labelled from its data at load rather than copied into this metadata.
+            info = {**info, **_location_metadata()}
+            options = list(info["labels"])
+        else:
+            options = choices.get(field.name, info.get("choices", []))
         result.append(_row(field.name, info, defaults[field.name], options, names))
     for key in switches:
         override = metadata[key]["logic_override"]
@@ -124,7 +155,11 @@ def validate(values: dict | None = None, *, text: str | None = None, spec: dict 
             raise ValueError(f"{info['label']} must be an integer from {info['min']} to {info['max']}")
         if kind == "choice" and value not in info["choices"]:
             raise ValueError(f"{info['label']} must be one of {info['choices']}")
-        if kind == "multi" and (not isinstance(value, (list, tuple)) or any(v not in info["choices"] for v in value)):
+        if kind == "multi" and info.get("display") == "locations":
+            # Names belong to the selected world, possibly a caller's own: ``prepare`` refuses unknown ones.
+            if not isinstance(value, (list, tuple)) or not all(isinstance(v, str) for v in value):
+                raise ValueError(f"{info['label']} must be a list of location names")
+        elif kind == "multi" and (not isinstance(value, (list, tuple)) or any(v not in info["choices"] for v in value)):
             raise ValueError(f"{info['label']} must select from {info['choices']}")
         selected = value if kind == "multi" else [value] if kind == "choice" else []
         for option in info["options"]:
@@ -145,9 +180,35 @@ def validate(values: dict | None = None, *, text: str | None = None, spec: dict 
         effective, world = prepare(selected_spec, settings)
         if conflict := return_guarantee_conflict(world, effective):
             raise FillError(conflict)
+        if settings.excluded_locations:
+            _validate_exclusions(selected_spec, settings, effective, world)
     except (FillError, WorldError) as error:
         raise ValueError(str(error)) from error
     return settings
+
+
+def _validate_exclusions(spec: dict, settings: Settings, effective: Settings, world: World) -> None:
+    """Refuse exclusions the seed could not honour, under the generator's own capacity check.
+
+    ``Gift`` is a meta-kind that the dump-backed ``gifts.seed_setup`` expands. Without a dump, every gift type stands
+    in for it, moving the gifts that setup could move (``gifts.movable_checks``) under its default songs-on-songs hold.
+    The dump only keeps more gifts vanilla and holds more items, so nothing is refused here for want of them;
+    generation checks again with the gifts it actually moves.
+    """
+    if gifts.SHUFFLE in settings.shuffle:
+        kinds = (kind for name in settings.shuffle for kind in (gifts.GIFT_TYPES if name == gifts.SHUFFLE else (name,)))
+        settings = replace(settings, shuffle=tuple(kinds))
+        spec = gifts.logic_spec({"locations": {}, **spec}, settings)  # a spec's [locations] table is optional
+        _, world = prepare(spec, settings)
+        effective, world = prepare(gifts.restrict_spec(spec, gifts.movable_checks(world, gifts.load())), settings)
+        if settings.songs == "song":
+            songs = {name: (gifts.SONG_TYPE,) for name, item in world.items.items() if item.type == gifts.SONG_TYPE}
+            effective = replace(
+                effective,
+                item_location_types={**effective.item_location_types, **songs},
+                exclusive_location_types=(*effective.exclusive_location_types, gifts.SONG_TYPE),
+            )
+    validate_exclusions(world, effective)
 
 
 def settings_payload(settings: Settings) -> dict:

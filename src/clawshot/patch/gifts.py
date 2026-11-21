@@ -949,6 +949,22 @@ def logic_spec(spec: Mapping[str, Any], settings: Settings) -> Mapping[str, Any]
     return spec
 
 
+def movable_checks(world: World, rules: Mapping[str, Rule]) -> list[str]:
+    """Dump-free upper bound on movable gifts. Native step/actor checks in ``seed_checks`` can only remove checks."""
+    free = world.settings.get(FREE_TIME_TRAVEL) is True
+    return [
+        name
+        for name, loc in world.locations.items()
+        if loc.type in GIFT_TYPES
+        and name in rules
+        and rules[name].cls != MORE
+        and loc.vanilla is not None
+        and loc.n64_only is None
+        and loc.keep_vanilla is None
+        and not (name in ANCHORS and (world.progressive_copies_only or not free))
+    ]
+
+
 def seed_checks(
     world: World,
     gifts: Iterable[Gift],
@@ -962,15 +978,10 @@ def seed_checks(
     game, 2026-11-08: the game keeps the flag and an older save loads; 03-game-data.md section 19). The
     :data:`ANCHORS` stay vanilla in copy-only seed worlds; direct legacy worlds release them with free travel."""
     steps = check_steps(gifts, definitions)
-    free = world.settings.get(FREE_TIME_TRAVEL) is True
     out = []
-    for name, loc in world.locations.items():
-        rule = rules.get(name)
-        if loc.type not in GIFT_TYPES or name not in steps or rule is None or rule.cls == MORE:
-            continue
-        if loc.vanilla is None or loc.n64_only is not None or loc.keep_vanilla is not None:
-            continue
-        if name in ANCHORS and (world.progressive_copies_only or not free):
+    for name in movable_checks(world, rules):
+        loc = world.locations[name]
+        if name not in steps:
             continue
         # Accepted variable-rupee families contribute fixed20, and always specialize same-item assignments.
         if all(s.call in VARIABLE_RUPEE_CALLS for s in steps[name]) and loc.vanilla == "Rupees (20)":

@@ -90,6 +90,10 @@ def generate(
     bad = sorted(item for item in vanilla.values() if item not in world.items)
     if bad:
         raise FillError(f"vanilla items the world does not know: {bad}")
+    if settings.excluded_locations:
+        from clawshot.generate.exclusions import validate_exclusions
+
+        validate_exclusions(world, settings, vanilla)
     if conflict := return_guarantee_conflict(world, settings, vanilla):
         raise FillError(conflict)
     rng = random.Random(seed)
@@ -101,7 +105,8 @@ def generate(
         except FillError as e:
             errors.append(str(e))
     else:
-        raise FillError(f"no beatable fill in {attempts} attempts; last: {errors[-1]}")
+        context = f" with excluded locations {list(settings.excluded_locations)}" if settings.excluded_locations else ""
+        raise FillError(f"no beatable fill in {attempts} attempts{context}; last: {errors[-1]}")
     spheres = check_beatable(world, placements)
     out = Seed(world, seed, settings, placements, shuffled_locations(world, settings), spheres)
     return replace(out, hints=stone_hints.choose(out, settings.hints, settings.hint_distribution))
@@ -134,6 +139,10 @@ def from_placements(
         for name, loc in world.locations.items()
         if name not in shuffled_set and loc.n64_only is None and (item := vanilla.get(name, loc.vanilla)) is not None
     }
+    if settings.excluded_locations:
+        from clawshot.generate.exclusions import validate_fixed
+
+        validate_fixed(world, settings, fixed)
     pool = {**vanilla, **normalize_pool(world, settings, vanilla)}  # the pool generate would fill with
     own = Counter(pool.get(name, world.locations[name].vanilla) for name in shuffled)
     given = Counter(placements[name] for name in shuffled if placements.get(name) in world.items)
@@ -322,6 +331,7 @@ def spoiler(seed: Seed, item_names: Mapping[str, str] | None = None) -> dict[str
         "seed": seed.seed,
         "settings": seed.settings.as_dict(),
         "settings_string": seed.settings.to_string(),
+        **({"excluded_locations": list(seed.settings.excluded_locations)} if seed.settings.excluded_locations else {}),
         "placements": {name: seed.placements[name] for name in seed.shuffled},
         "item_names": {item: display[item] for item in sorted(display.keys() & named) if display[item] != item},
         "locations": locations,
@@ -355,6 +365,14 @@ def play_note(seed: Seed, log: Mapping[str, Any] | None = None) -> str:
 
     collected = {name: index for index, sphere in enumerate(seed.spheres, 1) for name in sphere}
     lines = [f"# Clawshot seed {seed.seed}", ""]
+    if seed.settings.excluded_locations:
+        catalog = location_names.load()
+        lines.extend(["## Excluded locations", "", "These checks never hold progression in this seed.", ""])
+        for name in seed.settings.excluded_locations:
+            description = descriptions.get(name) or catalog.get(name)
+            label = description["name"] if isinstance(description, dict) else description.name if description else name
+            lines.append(f"- {label}" + (f" (`{name}`)" if label != name else ""))
+        lines.append("")
     lines.extend(
         [
             "## Age-locked items",

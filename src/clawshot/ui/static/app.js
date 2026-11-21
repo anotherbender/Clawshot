@@ -128,10 +128,16 @@ function updateHints() {
     add(["Esc"], "Back");
     return;
   }
-  if (usable && focused.matches("select, .shuffle-card, .switch-control"))
+  if (
+    usable &&
+    focused.matches("select, .shuffle-card, .switch-control, .location-check")
+  )
     add(["←", "→"], "Change");
   add(["Q", "E"], "Tabs");
-  if (usable && focused.matches(".shuffle-card, .switch-control"))
+  if (
+    usable &&
+    focused.matches(".shuffle-card, .switch-control, .location-check")
+  )
     add(["Enter"], "Toggle");
   else if (usable && focused.matches("summary"))
     add(["Enter"], focused.parentElement.open ? "Close" : "Open");
@@ -227,7 +233,7 @@ document.addEventListener("keydown", (event) => {
   }
   if (
     event.key === "Enter" &&
-    target.matches(".shuffle-card, .switch-control")
+    target.matches(".shuffle-card, .switch-control, .location-check")
   ) {
     event.preventDefault();
     changeValue(target, 0);
@@ -248,21 +254,149 @@ function syncSwitch(input) {
   on.classList.toggle("chosen", input.checked);
   toggle.setAttribute("aria-checked", String(input.checked));
 }
+// World checks number in the hundreds: area groups, a search filter and a
+// selected count. Filtering only hides rows; hidden checks stay selected.
+function locationPicker(info, label) {
+  const picker = element("div", "location-picker");
+  picker.setAttribute("role", "group");
+  picker.setAttribute("aria-label", info.label);
+  const search = element("input", "location-search");
+  search.type = "search";
+  search.id = "search-" + info.key;
+  search.placeholder = "Search by check, world name or area";
+  search.autocomplete = "off";
+  search.spellcheck = false;
+  search.setAttribute("aria-label", "Search " + info.label);
+  label.htmlFor = search.id;
+  const count = element("span", "location-count");
+  count.setAttribute("aria-live", "polite");
+  const list = element("div", "location-list");
+  list.id = "locations-" + info.key;
+  search.setAttribute("aria-controls", list.id);
+  const tools = element("div", "location-tools");
+  tools.append(search, count);
+  picker.append(tools, list);
+  const selected = new Set(values[info.key]);
+  const known = new Set(info.options.map((choice) => choice.value));
+  // Keep names outside the bundled list (a custom world's, or a check only some
+  // settings add) so that editing another setting does not drop them.
+  const others = [...selected]
+    .filter((name) => !known.has(name))
+    .map((name) => ({
+      value: name,
+      label: name,
+      help: "Not in this version's location list; validation decides whether it applies.",
+      area: "Other",
+      type: "",
+      disabled: false,
+      reason: "",
+    }));
+  const areas = new Map();
+  [...info.options, ...others].forEach((choice, index) => {
+    let area = areas.get(choice.area);
+    if (!area) {
+      const group = element("details", "location-area");
+      const summary = element("summary", "", choice.area + " ");
+      const tally = element("span", "area-count");
+      const items = element("div", "location-items");
+      summary.append(tally);
+      group.append(summary, items);
+      list.append(group);
+      area = { group, tally, items, rows: [] };
+      areas.set(choice.area, area);
+    }
+    const wrap = element("label", "check-label location-option");
+    const check = document.createElement("input");
+    check.type = "checkbox";
+    check.className = "location-check";
+    check.id = `option-${info.key}-${index}`;
+    check.dataset.control = check.id;
+    check.value = choice.value;
+    check.checked = selected.has(choice.value);
+    check.disabled = choice.disabled;
+    check.dataset.unavailable = String(choice.disabled);
+    const renamed = choice.label !== choice.value;
+    const text = element("span", "location-text");
+    text.append(element("span", "location-name", choice.label));
+    if (renamed) text.append(element("small", "location-key", choice.value));
+    wrap.append(check, text);
+    bindHelp(wrap, {
+      label: choice.label,
+      help: choice.help,
+      note: [renamed ? "World name: " + choice.value : "", choice.reason]
+        .filter(Boolean)
+        .join(" "),
+    });
+    area.items.append(wrap);
+    area.rows.push({
+      wrap,
+      check,
+      text: [choice.label, choice.value, choice.area, choice.type]
+        .join(" ")
+        .toLowerCase(),
+    });
+  });
+  const update = (searching) => {
+    const query = search.value.trim().toLowerCase();
+    let chosen = 0,
+      shown = 0,
+      total = 0,
+      hidden = 0;
+    for (const area of areas.values()) {
+      let picked = 0,
+        matches = 0;
+      for (const row of area.rows) {
+        const match = !query || row.text.includes(query);
+        row.wrap.hidden = !match;
+        if (match) matches++;
+        if (row.check.checked) picked++;
+        if (row.check.checked && !match) hidden++;
+      }
+      area.group.hidden = !matches;
+      if (searching && query && matches) area.group.open = true;
+      area.tally.textContent = picked
+        ? `${picked} of ${area.rows.length} excluded`
+        : `${area.rows.length} checks`;
+      chosen += picked;
+      shown += matches;
+      total += area.rows.length;
+    }
+    count.textContent = [
+      `${chosen} excluded`,
+      query ? `${shown} of ${total} shown` : "",
+      hidden ? `${hidden} excluded hidden by search` : "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  };
+  search.addEventListener("input", () => update(true));
+  // Searching is not a settings edit: keep its change event from revalidating.
+  search.addEventListener("change", (event) => event.stopPropagation());
+  list.addEventListener("change", () => update(false));
+  update(false);
+  for (const area of areas.values())
+    area.group.open = area.rows.some((row) => row.check.checked);
+  return picker;
+}
 function control(info) {
   const cards = info.display === "cards";
+  const locations = info.display === "locations";
   const full = cards || info.kind === "multi" || info.kind === "json";
   const field = element(
     "div",
-    "field" + (full ? " full" : "") + (cards ? " cards-field" : " menu-row"),
+    "field" +
+      (full ? " full" : "") +
+      (cards ? " cards-field" : locations ? " locations-field" : " menu-row"),
   );
   bindHelp(field, info);
   field.dataset.setting = info.key;
   const label = element("label", "", info.label);
   label.htmlFor = "setting-" + info.key;
   field.append(label);
-  const valueCell = cards ? null : element("div", "value-cell");
+  const valueCell = cards || locations ? null : element("div", "value-cell");
   let input;
-  if (info.kind === "multi") {
+  if (locations) input = locationPicker(info, label);
+  else if (info.kind === "multi") {
     input = element("div", "options" + (cards ? " cards-grid" : ""));
     input.setAttribute("role", "group");
     input.setAttribute("aria-label", info.label);
@@ -372,7 +506,7 @@ function control(info) {
       clearTimeout(timer);
       timer = setTimeout(() => syncControls(info), 350);
     });
-  if (cards) field.append(input);
+  if (cards || locations) field.append(input);
   else {
     if (info.kind === "integer") {
       const decrease = element("button", "", "−"),

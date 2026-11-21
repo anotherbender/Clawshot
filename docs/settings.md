@@ -38,6 +38,24 @@ A version label alone does not identify the exact source. The generator reads an
 the pack workflow additionally accepts `.nup` and `.nx` input. Output is changed files under `romfs/`, plus
 `spoiler.json` and `play-note.md`, never a copy of the whole game.
 
+## Excluded locations
+
+In the app, **Excluded locations** groups checks by area and supports search. Selected checks
+never hold progression; they still receive ordinary or priority non-progression items. Nothing is
+excluded by default. The CLI accepts exact world check names (quote each name):
+
+```sh
+uv run python -m clawshot --shuffle Chest Gift --exclude-locations "ZR Frogs Ocarina Game" "Kak 100 Gold Skulltula Reward" --print-settings
+```
+
+`--exclude-locations` without names clears a list loaded from `--settings`. The list travels in
+CS1, `spoiler.json` and `play-note.md`. Unknown names and insufficient compatible non-progression
+capacity are refused with an explanation. An unshuffled progression reward cannot be excluded:
+shuffle that kind or remove the check. An unshuffled non-progression reward may stay in the list.
+Existing song, shop, dungeon-item, pickup-palette and delivery holds still apply; exclusions never
+override those restrictions or the adult-return/beatability proofs. Fill failures name the list;
+no output is written for a seed that cannot be proved. This changes generation only, not the game.
+
 ## What enters the shuffle
 
 `--shuffle` selects kinds; default is `Chest`. Checks excluded for unresolved access or unsafe
