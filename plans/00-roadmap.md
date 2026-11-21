@@ -46,7 +46,8 @@ The standing Settings backlog below was separated from round 8, not discarded.
 | 16 | 2026-11-16–17 | Softlock entry guard, clock chain, NUP cap, minimap and Water precaution; released 0.2.2. | [Round 16](rounds/r16-overview.md) |
 | 17 | 2026-11-17–18 | Warp guards, unproven sword guard, options copy, tracker counts, experimental dungeon mode, three chests and Token holds; main `2ba2f9a`. | [Round 17](rounds/r17-overview.md) |
 | 18 | 2026-11-18–19 | Repairs, more checks, key/reward options and bounded played acceptance; released 0.2.3. | [Round 18](rounds/r18-overview.md) |
-| 19 | 2026-11-19–20 | Scene handoffs (no-ocarina lessons, Saria farewell), Light Arrows logic, 100-token reward, Master Sword shuffle, startup-test fix; cows research, fill rejected; 0.2.4 candidate. | [Round 19](rounds/r19-overview.md) |
+| 19 | 2026-11-19–20 | Scene handoffs (no-ocarina lessons, Saria farewell), Light Arrows logic, 100-token reward, Master Sword shuffle, startup-test fix; cows research, fill rejected; released 0.2.4. | [Round 19](rounds/r19-overview.md) |
+| 20 | 2026-11-20– | In progress: hints, exclude locations, starting inventory, trials count and token bridge, open fountain/gate research, cows probe and Fortress packet, fill retry, logic audit. | [Round 20](rounds/r20-overview.md) |
 
 
 ## Settings backlog (Ship of Harkinian's lists, shown by Kareem 2026-11-09)
