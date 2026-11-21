@@ -504,3 +504,42 @@ until that post. The new full gate retains per-stage no-game checks and600-secon
 This pre-gate evidence commit changes only the round note; integrated source/tests are
 those checked at1260abf9.
 
+### Final pre-gate integration: hints49a503fd49 + starting inventory + trials
+
+Claude requested rebasing onto hints before the single final gate, rather than gating
+on5ed31bc and requiring a third gate after hints merge. Rebase onto frozen hints
+`49a503fd49493204da6fad526c03639a9f4a553f` completed cleanly, without conflicts.
+The overlapping settings documentation, CLI, app metadata and patch composition retain
+all three features. Checked integration source: `02b73ff0808f7351324013cdc10e2bb9099e8bc7`.
+
+**102 focused tests passed in127.76s**, `-n2`, internal workers1, native ROMFS enabled,
+with no game running. Coverage files:
+
+- `test_ganon_settings.py`, `test_starting_inventory.py`.
+- `test_hints_settings.py`, `test_app_schema.py`, `test_hints_select.py`.
+- `test_static_hints_dump.py`, `test_gifts_rewards_dump.py`, `test_scrubs_dump.py`,
+  `test_shop_settings_dump.py`.
+
+These include the changed hints CLI/app contract and the native altar/Ganondorf,
+Skulltula reward, scrub preview and shop/fee composition contracts.
+Receipt: `E:/OOTRemake/work/r20-trials/start-integration/hints-49a503fd49/focused.log`.
+
+The combined seed20202034 was rebuilt fresh on this integrated source, with count0,
+the same four starting items/+2hearts/full wallet, and hints `very_strong`: **118 files**.
+Written history=true, rupees1000, Zelda lesson-history=false; the initializer contains
+the native sword/song/wallet grants, Bullet Bag before Slingshot and20 quarter-hearts.
+Settings round-trip and initial ownership checks passed. No staged played mod/save changed.
+Receipt/file hashes:
+`E:/OOTRemake/work/r20-trials/start-integration/hints-49a503fd49/combined-results.json`.
+
+**Final freeze/merge contract (Claude):** hints merges first, trials second, with the
+trials merge tree identical to its gated tree. This note is committed BEFORE gating.
+No repository edits or receipt-only commit follow the gate. Final stage verdicts,
+tasklists and logs are recorded outside the repository in
+`E:/OOTRemake/work/r20-trials/start-integration/hints-49a503fd49/gate/`.
+The final full gate starts only after cs20a explicitly posts LOCK RELEASED, checks for
+a running game before every stage, and waits600seconds if needed; no sweep.
+The runner checks hints still points to49a503fd49 before acquiring and before each
+stage. If hints changes, stop and rebase again before treating the gate as valid.
+
+
