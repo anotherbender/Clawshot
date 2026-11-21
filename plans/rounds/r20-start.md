@@ -1,9 +1,11 @@
 # Round 20 — starting inventory (cs20c)
 
-Branch `r20/start`, base `acbb903df111bb30609baedac35316b22d43700e`.
+Branch `r20/start`, original base `acbb903df111bb30609baedac35316b22d43700e`;
+final source rebased onto main `df6214b35fe06045b7a7f5788a412e2e73ffdf79`.
 Model: `openai-codex/gpt-6.1-sol`. Research and generated artifacts:
-`E:/OOTRemake/work/r20-start/`. **Implemented, built/not played; not READY.**
-No game started; no player seed, original save or runtime folder written.
+`E:/OOTRemake/work/r20-start/`. **Built/not played; gameplay holds merge.**
+cs20c never started the game or wrote any player seed, original save or runtime folder.
+Claude independently boot-checked both staged arms; that is not gameplay proof.
 
 ## Contract and provisional choices
 
@@ -95,16 +97,18 @@ and starting a sword does not set era/pedestal/first-pull history. Gameplay rema
 ## Verification and staging
 
 Native/cache focus: **12 passed** (272.07s, n2/internal1); after current-main rebase, inventory/start/fast-start
-focus: **34 passed** (5.39s, n2/internal1), including the approved exact Bracelet advice.
+focus: **34 passed** (4.16s, n2/internal1), including the approved exact Bracelet advice.
 Actual CLI with two selected starts, +3 hearts and full wallet emitted a CS1 recipe successfully.
-Exact-head byte parity, sweeps and full gate remain pending; assigned gate turn4 follows cs20h's explicit release.
+Byte parity and all 300 starts-on seeds passed. Full gate runs on this sole round-only receipt commit;
+its authoritative outcome is the external gate receipt mapped by `source-test-byte-parity.json`.
 All changed game behavior is **built, not played** until the paired checks below pass.
 
 ### Implemented contract
 
 - CLI, settings codec, shared app schema and actual browser controls expose the same default-off fields.
   Headless Playwright exercised item selection, extra hearts, full wallet and resulting CS1;
-  screenshot `work/r20-start/ui-start-on.png`. Owned browser/server were closed; no visible Chrome remains.
+  screenshot `work/r20-start/ui-start-on.png`. Final df6214b-rebased head also exercised exclusion controls,
+  validated the six selected starts and CS1, and was visually inspected. Headless browser/server were closed.
 - Positive native pouch grants run after the complete original New Game initializer. Bags precede ranged weapons,
   every upgrade prefix is ordered, native MP setup cannot overwrite a starting spell's meter, and native health
   literals become six full hearts for the staged +3 setting. No ordinary get window or new event is added.
@@ -136,8 +140,14 @@ Private seed `20032021`; candidate starts Kokiri Sword, Deku Shield, Boomerang, 
 Goron Bracelet, Hookshot, Ocarina of Time, Zelda's Lullaby, Song of Storms, Adult Wallet,
 Deku Tree map/compass, three extra hearts and a full wallet. Both arms use existing open forest,
 open Door and free time travel to keep the check bounded; this does not grant Zelda/Impa's source history.
-Control is built from exported actual main with the starting fields absent. Output heads/hashes are recorded
-externally by the packet builder; packet build and launcher dry run remain pending.
+Control is built from exported actual main with the starting fields absent. Candidate source:
+`f9e8a434472f1913c5fbf928f51f7951a0d306bb` (127 resources, 178 shuffled, 16 spheres);
+main `df6214b35fe06045b7a7f5788a412e2e73ffdf79` (124 resources, 178 shuffled, 23 spheres).
+Full hashes/effective CS1: `packet-candidate-proof.json` and `packet-main-control-proof.json`.
+All four CRLF launchers passed actual CMD dry runs; no agent game launch. Claude's Longshot 3.0.0
+boot checks passed: main162 / candidate168 RomFS entries, crash/fatal0, save mounted and one mod each.
+`bootcheck-results.txt` records real GameData and New Game module load lines for both arms.
+`START HERE.md` cites that evidence and lists the per-part time estimates.
 
 Launchers under `E:/OOTRemake/work/r20-start/`:
 
@@ -183,4 +193,47 @@ If restarting after a failure, keep the failed profile/log and ask for a new pac
 **Pass evidence:** preserve each launcher's `user-*/longshot_log.txt`; changed resource load lines must show
 `mods: <file> <- <packet path>` for GameData, `SetPouchAndStatusForGameStart` and the candidate Windmill flow
 when exercised. Record inventory/heart/balance, lesson results, scene handoffs and adult transition observations.
-No gameplay result or runtime-load proof is claimed by this staged packet alone.
+Boot/load proof is now recorded above; initial inventory, Continue balance, both lessons and era handoffs
+still require Kareem's observations. In particular the Windmill flow's exercised load line remains play-held.
+
+## Frozen-source parity, sweep and gate receipt
+
+One owned order4 lease, after cs20h's explicit release; source/sweep head
+`f9e8a434472f1913c5fbf928f51f7951a0d306bb`. No source/test change follows the sweep:
+the single permitted receipt commit changes only this round file. The driver compares every source/test
+file's SHA256 against `frozen-source-hashes.json` before starting the final-head gate and records its empty
+changed-path list plus sweep/gate heads in `source-test-byte-parity.json`.
+
+All-output byte parity against an exported, unmodified actual main `df6214b` passed:
+
+| Starting-off recipe | Private seed | Output files compared | Byte differences |
+|---|---:|---:|---:|
+| Defaults | 20032030 | 120 | 0 |
+| Original Broad | 20032031 | 227 | 0 |
+
+This includes settings, spoiler/play notes and generated resources, not merely placements.
+Proof: `parity-main.json`, `parity-candidate.json`, `parity-comparison.json`.
+
+Native-prepared starts-on sweep (six workers; game absence checked at every stage):
+
+| Recipe | Accepted | First-attempt failures | Exhausted | Fill attempts | Maximum attempts |
+|---|---:|---:|---:|---:|---:|
+| Broad | 200 | 0 | 0 | 200 | 1 |
+| Defaults | 50 | 0 | 0 | 50 | 1 |
+| Recommended | 50 | 0 | 0 | 50 | 1 |
+
+Each cohort uses private seeds starting at20030000 and the broad starting set listed in the packet section,
+three extra hearts and full wallet. Defaults additionally starts Saria's Song because it retains that fixed
+child source and the adult-return guarantee; Broad and Recommended retain only the two staged songs.
+Broad starts from the exact `work/r18-fill/settings.txt` CS1; Recommended uses the bundled preset.
+Production `make_seed` supplies native pool/quest/shop preparation, including Gift expansion.
+Every effective CS1, individual attempt/error payload, timing and result is retained in
+`sweep-f9e8a434472f/results.json` and `rows.jsonl`; all 300 accepted on attempt1.
+
+The same lease runs `ruff format --check`, `ruff check`, synthetic pytest n8/internal4,
+then native dump pytest n8/internal3 with the prescribed RomFS/NUP/r19 fixture. A running game instead
+requires n2/internal1. Exact commands, process snapshots, exits, counts and elapsed times live under
+`gate-<receipt-head>/`; `results.json` is authoritative. No gate result is preclaimed here.
+Release is **READY (play-held)** only after that exact-head receipt reports PASS; both gameplay arms above
+still need Kareem. No setting, quest flag, native lesson or scene is called played by a successful build,
+oracle, browser test or headless boot.
