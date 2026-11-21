@@ -503,3 +503,127 @@ checklists, not a logic loosening or a new save edit. No sweep. Full gate remain
 game-idle-only with600-second waits before every stage and starts only under the
 free owned gate lock.
 
+### Verified Lost Woods route and source-access blocker
+
+Native placements/music crossings, with public-guide cross-check, locate the
+two-scrub grotto under the cracked boulder in the final clearing before Sacred
+Forest Meadow. From Kokiri's Lost Woods entrance: **Right, Left, Right, Left,
+Straight, Left**; boulder in the final clearing's far-right corner. The01 checklist
+now distinguishes the Goron-shortcut grotto, blue-rupee rock and Deku Theater pit.
+Inside, the nearer left scrub is the one-time nut-capacity seller targeted by the
+packet, not the farther right repeat seller. Directions are data-backed, not played.
+
+Read-only source-save proof: **all Bomb Bags0/never obtained, Bombs0, Bombchus0,
+Hammer0, child Link**. Native rock accepts Bomb/Hammer damage; there are no Lost
+Woods bomb flowers. Thus current01 copy cannot open this entrance as equipped.
+The passed bridge purchase stands; this is an access blocker, not a text failure.
+No save edit or Noclip permission added. Existing02 copy is being checked for a
+natural child-return alternative, including one-time reward completion state.
+Evidence stays outside the repository: `work/r20-hints/lw-directions/`; walking
+landmarks and source values are in `ingame/Check - 01-scrubs-forest.md`.
+
+Stage05 v3 is staged on `c786100799`, fresh identical natural save copy. Claude's
+`work/r20-hints/bootcheck-altar-v3.txt` confirms Longshot3.0.0,218 RomFS entries,
+one mod, mounted save, zero crashes/fatals and modded USen loaded; cited in START
+HERE and05. Boot-only: new cumulative wording clarity remains unplayed.
+
+### Verified02 directions and natural-access resolution
+
+**Catalog conflict escalated to Claude:** `location_names.toml:2915` and old HF06
+notes say fenced/Gerudo-side/password fight. Native placements/flows instead put
+the password scrub at the **Castle Town gate**, east of the drawbridge, with no
+nearby fence; Nintendo Life's remake password guide independently agrees.
+The Gerudo-side Fairy Note chest is a different target. No frozen catalog/logic
+change made in this text-only track; maintainers were told the exact conflict.
+
+Adult walks out the town gate, turns left before the drawbridge, follows the wall
+about40m to the cracked ground cover; the glowing Note07 tree is about14m farther
+north-east. Read as adult (first note auto-reads; if prompted, first answer).
+Return at the Master Sword pedestal normally; Forest completion allows this on
+the source save. Child bombs the hole and selects the **third** password answer,
+`Sell somethin', will ya?`. Adult gets native sold-out dialogue, not the sale.
+
+DMC's ledge scrub exists **only in child placements**. Child climbs the summit
+trail, enters the crater beside the owl, turns left/downhill past the upper-grotto
+boulder, then drops onto the ledge. It is not the adult Hammer grotto. Child heat
+damage and walking topology remain unplayed; directions distinguish observations
+from placement-derived inference.
+
+Existing02 source/copies are identical: adult,17 rupees,7 hearts,Small Bomb Bag
+with5 bombs,Slingshot8,Nuts20,both shields,Prelude/Time songs. All four once-sale
+flags are false. Thus use this **already-staged02 copy after native child return**
+for the remaining01 grotto too: no new launcher, copied save, inventory edit,
+fixture or Noclip exception. Budget1 bomb HF +1 LW +up to3 summit; preview/decline
+all three offers before choosing at most one purchase with the initial17 rupees.
+Do not repeat the accepted bridge sale. This resolves original01's access blocker
+by an existing natural profile, not a claimed in-game pass.
+
+01/02 checklists and START HERE now give landmarks, normal return, password,
+age restrictions and bomb/money budget.02 is20–30min with a natural break;
+remaining01 is a separate5–8min from Kokiri's woods entrance. Research evidence:
+`work/r20-hints/field-crater-directions/findings.txt` and `lw-directions/`.
+Neither route was played by cs20a. Only05 candidate was restaged; all other mods,
+launchers and accepted dialogue stay unchanged.
+
+### Altar v3 played acceptance and main-base update
+
+Kareem, reported via Claude: **05 v3 PASS, "much better"**. Cumulative conditions
+are accepted; no further05 replay requested. START HERE/05 record the played
+acceptance separately from Claude's boot proof. Other passed text stays unchanged.
+The01 confusion included expecting every grotto to have a boulder; directions now
+explicitly distinguish the exact final-clearing rock, decoy rocks and open pit.
+
+Claude reports main moved to `5ed31bc` (start merged). Finish the running old-base
+gate on `c786100799` first; then rebase onto `5ed31bc` and re-check the merge before
+the final receipt. This is not yet a merged-base gate claim. Existing02 natural
+copy, with five bombs and unsold targets, is the reachable source for all three
+remaining offers after normal child return; native/save-backed, still unplayed.
+
+### Maintainer-approved wording correction and single remaining packet
+
+Claude confirms the **logic is already correct**: HF -> HF Inside Fence Grotto
+uses `can_blast_or_smash`, citing the cracked spot right of the castle gate by the
+river. Only player-facing text is wrong. Approved one separate commit: HF scrub
+`where` in `location_names.toml`, plus HF06 wording in playtest `questions.md`,
+`session-10.md` and `answers.md`. Preserve logic, IDs and unplayed HF06 status.
+Apply/commit after the old-head gate finishes so its production inputs stay frozen.
+
+02 is now the **single remaining hints packet**, on the existing02 save: adult
+reads Note07 -> native child return at Temple -> HF password sale -> child DMC
+ledge sale -> child LW two-scrub-grotto front sale.01 bridge stays PASS; its old
+grotto step is retired, not a second pending test. Exact LW walking/decoy/seller
+directions moved into02. START HERE directs only to02, with natural breaks,
+five-bomb budget and17-rupee single-purchase limit. Only external checklists
+changed for consolidation; no mod/launcher/save change and no new boot required.
+
+### All hints play complete — packet02 accepted
+
+Kareem, reported via Claude: **02 PASS, every offer and text as expected**:
+HF password scrub, DMC child ledge scrub, LW grotto front seller. All hints play
+is complete, including the former01 grotto check in the reachable02 copy.
+05 v3's "much better" acceptance and all previous passes stand; no replays.
+START HERE/01/02 now record completion. No mod change or new boot needed.
+
+Claude's final sequence: finish old-base native stage; commit the separate
+four-file HF/HF06 wording correction; rebase onto `5ed31bc`; full game-free gate
+on the final head; then READY for Claude to merge. **cs20d/trials waits behind
+this turn**, so retain the cooperative gate turn through the final-head gate,
+not just the old-base run. No final receipt before that gate.
+
+### Superseding gate order: old native cancelled, final head only
+
+Claude changed the plan for Kareem's40–65-minute Fortress play: **stop the old
+eight-worker native stage now**, not finish it. cs20a terminated the owned
+gate process tree (root82368), including all eight pytest worker trees:
+23 processes terminated successfully. Old `c786100799` native is cancelled and
+cannot count toward the final merge gate. Its earlier4,180 synthetic pass is
+historical only. Physical/cooperative lock retained; cs20d/trials follows.
+
+Separate wording commit **`303614b474`** changes only HF `where` and the three
+HF06 playtest descriptions. It identifies the castle-gate tree note and child
+password sale while keeping the distinct Gerudo-side chest age question and
+unplayed HF06 ledger status. No logic, IDs or staged mod changed.
+
+Rebase onto `5ed31bc` immediately; focused tests use at most two workers.
+Then **one full gate on the final rebased head**, driver waiting600s while
+either game image exists before each stage. No final READY claim until it passes.
