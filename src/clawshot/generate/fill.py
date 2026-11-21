@@ -1109,7 +1109,7 @@ def fill(
     type_held = [
         item
         for item in unrestricted
-        if (item in held or (world.items[item].dungeon is not None and not world.items[item].progression))
+        if item in held
         and (item not in token_held or not world.items[item].progression)
         and not item.startswith(_BOMB_AMMO_PREFIXES)
     ]
