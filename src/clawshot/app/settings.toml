@@ -44,7 +44,7 @@ label = "Excluded locations"
 kind = "multi"
 display = "locations"
 group = "Items"
-help = "Empty by default. Excluded checks never hold progression, anything a seed may need to finish. A check whose kind you leave unshuffled keeps its usual item: excluding it changes nothing, and one that usually holds progression cannot be excluded, so shuffle its kind or remove it. Choices that leave too little room for progression and held items are refused before generation. Search by check name, world name or area."
+help = "Empty by default. Excluded checks never hold progression, anything a seed may need to finish. Permanently held progression checks are not offered. A check whose kind you leave unshuffled keeps its usual item: excluding it changes nothing, and one that usually holds progression cannot be excluded, so shuffle its kind or remove it. Choices that leave too little room for progression and held items are refused before generation. Search by check name, world name or area."
 [bridge]
 label = "Ganon's Castle bridge (experimental)"
 kind = "choice"

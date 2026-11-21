@@ -40,9 +40,9 @@ the pack workflow additionally accepts `.nup` and `.nx` input. Output is changed
 
 ## Excluded locations
 
-In the app, **Excluded locations** groups checks by area and supports search. Selected checks
-never hold progression; they still receive ordinary or priority non-progression items. Nothing is
-excluded by default. The CLI accepts exact world check names (quote each name):
+In the app, **Excluded locations** groups checks by area and supports search. Permanently held
+progression sources are not offered. Selected checks never hold progression; they still receive
+ordinary or priority non-progression items. Nothing is excluded by default. The CLI accepts exact world check names:
 
 ```sh
 uv run python -m clawshot --shuffle Chest Gift --exclude-locations "ZR Frogs Ocarina Game" "Kak 100 Gold Skulltula Reward" --print-settings

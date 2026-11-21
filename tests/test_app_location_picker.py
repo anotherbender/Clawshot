@@ -46,3 +46,13 @@ def test_realistic_gift_list_is_not_refused_for_gifts_that_stay_vanilla():
     names = [*frogs, "Kak 100 Gold Skulltula Reward"]
     settings = validate({"shuffle": ["Chest", "Gift"], KEY: names})
     assert settings.excluded_locations == tuple(sorted(names))
+
+
+def test_permanently_held_progression_is_not_offered_but_native_junk_can_be_excluded():
+    row = picker()
+    held = "Market Treasure Chest Game Reward"
+    assert held not in row["choices"]
+    assert "Market Treasure Chest Game Room 1 Top" not in row["choices"]
+    assert "Market Shooting Gallery Expert Reward" in row["choices"]
+    with pytest.raises(ValueError, match="unshuffled progression.*Market Treasure Chest Game Reward"):
+        validate({"shuffle": ["Chest", "Gift"], KEY: [held]})

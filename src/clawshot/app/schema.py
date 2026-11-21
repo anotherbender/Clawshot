@@ -7,7 +7,7 @@ from pathlib import Path
 
 from clawshot.generate import FillError, Settings, hints, prepare
 from clawshot.generate.exclusions import validate_exclusions
-from clawshot.generate.fill import DUNGEON_ITEM_CHOICES, return_guarantee_conflict
+from clawshot.generate.fill import DUNGEON_ITEM_CHOICES, return_guarantee_conflict, shuffled_locations
 from clawshot.generate.names import load as load_names
 from clawshot.patch import gamedata, gifts
 from clawshot.settings import CATALOG, validate_logic_overrides
@@ -26,15 +26,37 @@ def _world_logic_default(name: str):
 
 @cache
 def _location_metadata() -> dict[str, dict]:
-    """Choices for a ``display = "locations"`` row: every item check of the bundled world (not N64-only), with its
-    readable catalog name and directions (``generate.names``) and the tracker's area. Described checks come first, each
-    part in world order: most undescribed ones are pots, crates and loose rupees that no setting shuffles yet.
-    Presentation only: ``validate`` leaves names to ``prepare`` and the selected world, which may be a caller's own."""
+    """Live item checks with readable labels/areas, omitting permanently fixed progression sources.
+
+    Use the same preparation/eligibility predicates as generation with every supported shuffle enabled. This is
+    only an upper bound without a dump; recipe-dependent capacity and unshuffled progression remain validated.
+    """
     from clawshot.tracker import location_index  # the tracker's logic view imports this module
 
     catalog, places = load_names(), location_index()
-    world = build_world(load_spec())
-    live = [loc for loc in world.locations.values() if loc.n64_only is None and loc.vanilla is not None]
+    spec = load_spec()
+    world = build_world(spec)
+    all_settings = Settings(
+        shuffle=("Chest", "Shop", *gifts.GIFT_TYPES, "Scrub", "BossHeart", "Freestanding", "Token"),
+        dungeon_items="all_anywhere",
+        dungeon_rewards=True,
+        shuffle_hideout_keys=True,
+        shuffle_master_sword=True,
+        logic={"free_time_travel": True},
+    )
+    preview = gifts.logic_spec(spec, all_settings)
+    _, possible = prepare(preview, all_settings)
+    all_settings, possible = prepare(
+        gifts.restrict_spec(preview, gifts.movable_checks(possible, gifts.load())), all_settings
+    )
+    moving = set(shuffled_locations(possible, all_settings))
+    live = [
+        loc
+        for loc in world.locations.values()
+        if loc.n64_only is None
+        and loc.vanilla is not None
+        and not (possible.items[possible.locations[loc.name].vanilla].progression and loc.name not in moving)
+    ]
     labels, choice_help, option_info = {}, {}, {}
     for loc in sorted(live, key=lambda check: check.name not in catalog):
         readable, area = catalog.get(loc.name), places[loc.name].area
