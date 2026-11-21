@@ -83,14 +83,15 @@ Verification, not play evidence:
   packet mod and pre-staged profile each, never reset at launch. No
   `hookshot.exe` reference.
 
-## Played Continue pair — 2026-11-21 07:57–08:00: ambiguous cow-edge check
+## Played Continue pair — 2026-11-21 07:57–08:00: persistence PASS
 
-**Verdict (cs20f, read-only): do NOT mark the cow Continue/once-only acceptance
-PASS. The saved Bool is retained across Continue/resave, but traversal of the
-patched milk-give edge is not established. A confirmed empty-bottle interaction
-is needed for that gameplay proof; no new build is indicated.**
+**Superseding verdict, based on Kareem's clarification via Claude: PASS.
+The saved Bool survived Continue and its true branch blocked the repeat
++20 grant on a successful milk interaction.** This supersedes the initial
+ambiguity assessment prompted by the saved bottle contents; no rerun or
+fresh visible-edge build is needed for this persistence proof.
 
-Kareem reported **“milk in both, no rupees”**. Claude ran both read-outs:
+Kareem initially reported **“milk in both, no rupees”**. Claude ran both read-outs:
 
 | Arm | Saved R19 Bool | Rupees | BottleA |
 |---|---|---:|---|
@@ -98,8 +99,15 @@ Kareem reported **“milk in both, no rupees”**. Claude ran both read-outs:
 | Native main control | absent | 119 | Lon Lon Milk |
 
 Both started with full Lon Lon Milk in A and Fairy in B; C–E are invalid,
-**not owned empty bottles**. These reported observations are accepted directly;
-the read-outs and game attempt were not repeated to confirm them.
+**not owned empty bottles**. Kareem clarified that in **BOTH arms he drank
+the milk until the bottle was empty BEFORE playing Epona's Song**, then saw
+the normal milk item-get scene and received a **full bottle**. Candidate gave
+no rupees: the +20 did not repeat. He then took **one sip in candidate**, which
+explains its saved Half Milk; main's repeated interaction gave a full bottle.
+He also tried a **different cow with identical results**. Without an empty
+bottle, he observed different dialogue and **no item-get scene**.
+These played observations and Claude's read-outs are accepted directly;
+neither the game nor the read-outs were rerun to confirm them.
 
 ### 1. No empty bottle means the probe edge does not run
 
@@ -117,9 +125,9 @@ That branch reaches **neither Event20 nor the appended saved-Bool query,
 empty bottle is expected even if the diagnostic Bool were false: it does not
 exercise the once-only gate.
 
-This is a condition **at the bottle query**, not a claim proved by the final
-save. Full/half milk at save time cannot tell whether a bottle was temporarily
-emptied and refilled earlier in the session.
+The empty-bottle condition applies **at the query**, not at final Save time.
+Kareem's clarification establishes it was satisfied during these successful
+interactions; full/half milk in the final saves is their aftermath.
 
 ### 2. Half Milk versus full milk is not a candidate reward difference
 
@@ -128,40 +136,39 @@ The cow grant remains `Dm_SY_GetInEvent:GetInEventInBottle` with
 bottle-consumption action. Tracker identities distinguish `MaxMilk` (full)
 from `HalfMilk`; Half Milk is **not Empty**.
 
-**[INFERENCE]** Candidate Half Milk is consistent with drinking one portion
-of the starting full bottle and not drinking its second portion before the
-song. It is also consistent with drinking after a successful refill; the
-saved state does not establish that chronology. Control full milk can be the
-untouched starting bottle or a refill after both portions were consumed.
-Neither final icon alone proves a new cow grant. No corruption or behavioral
-divergence between arms is established by this difference.
+The earlier consumption explanation was an inference from saved contents.
+Kareem has now supplied the chronology: **candidate's Half Milk is one sip
+AFTER the successful full refill**, not a half-full bottle at the song.
+Main's full bottle is also a reported successful refill, not merely the starting
+milk left untouched. The native item-get scenes distinguish these successes
+from the no-empty refusal branch. There is no unexplained bottle-state
+divergence left in this report.
 
-### 3. Scope of the pass and the next bounded check
+### 3. Acceptance and round-21 carry-forward
 
-**Narrow saved-data result: true survived the reported Continue and resave**
-in the candidate; native control omitted the added key as expected.
-That is evidence of saved-Bool retention, not evidence that the cow queried
-that retained true and suppressed its repeat grant. The overall requested
-milk-edge/once-only check remains **AMBIGUOUS**, not failed and not accepted.
-The missing observation is an **owned Empty bottle immediately before the
-song**, followed by a demonstrably new full milk bottle.
+**Persistence PASS, accepted on Kareem's clarified played evidence:** after
+Continue, an empty-bottle interaction reached the normal milk grant, candidate
+gave full milk with **no repeated +20**, and its subsequent save retained the
+new Bool **true** at119rupees. Native control also refilled milk, remained
+at119rupees and omitted the custom Bool, as expected. The successful grant
+path traverses v2's true/false gate; its true branch skips both +20 and the
+Bool writer. Thus this is more than retention of an unqueried saved entry.
+No additional run or build is requested for this proof.
 
-If Claude requests the bounded continuation, keep the existing private arms,
-mods and saves; no reset, inventory edit, fresh probe or rebuild:
+**Round21 — bottle prerequisite:** a cow check on the current native path
+needs a **valid owned Empty bottle at the song/query**, unless a future
+adapter deliberately bypasses the refusal branch and separately proves its
+replacement delivery without that container. Full Milk and Half Milk are
+not Empty; invalid bottle slots are not owned empty bottles. Do not infer
+failure from the different no-empty dialogue/no-get path or require the bottle
+to remain full at final Save when the player reports drinking afterward.
 
-1. Continue each arm. Drink candidate A's remaining portion and control A's
-   two portions, as needed. **Check the inventory says Empty in a VALID owned
-   bottle immediately before Epona's Song**; Half Milk is insufficient.
-2. Note HUD rupees before the song and after the same Impa cow's interaction.
-   Expect119→119 in both arms if no unrelated pickup/spend occurred; candidate
-   must not add20. Confirm that Empty became **full Lon Lon Milk**.
-3. **Do not drink after the refill. Save immediately**, quit and read out:
-   candidate true, control absent,119 rupees, newly full milk in both.
-
-This corrects an identified prerequisite gap rather than replaying an unchanged
-ambiguous attempt. The existing checklist already required both portions to be
-drunk and classified full-bottle attempts as ambiguous. No rerun is started by
-this investigation, and no cow locations are admitted.
+**Round21 — identity limit:** v2 uses **ONE SHARED saved Bool**
+`Clawshot.Research.CowPersistence.R19`, not a flag per cow/actor Hash.
+The same-cow repeat and different-cow result support this shared-latch
+diagnostic only. They do **not** establish independent per-cow completion,
+cross-age identity, a cow census, arbitrary reward delivery or a cow shuffle.
+No cow locations are admitted by this persistence pass.
 
 Read-only verification: decoded the actual native bottle query, both case
 targets, refusal-to-end chain and English refusal label; read back the staged
@@ -169,16 +176,12 @@ v2 Event20/gate/rupee/set nodes. The v2 true case goes directly to Event4;
 false goes through +20 and set-true. No game, read-out rerun, build, mod/save
 edit, test suite or gate was run. Only this verdict updates the repository.
 
-## Fresh visible-edge fallback — held behind the cheaper proof
+## Fresh visible-edge fallback — retained unbuilt research
 
-Original staging steer: defer a fresh probe until the unchanged-v2 Continue
-result. The2026-11-21 verdict above now identifies a cheaper missing prerequisite:
-confirm an owned Empty bottle. **The visible-edge design remains unbuilt;
-the ambiguous report does not itself authorize a new build.** If later needed,
-the design must identify edge entry before any Bool query, distinguish
-preexisting true from a new write/readback, and read that preexisting true
-after Continue without rewriting it. No new get window or rupee-only
-diagnostic is acceptable.
+Original staging steer deferred a fresh probe until the unchanged-v2 Continue
+result. **Kareem's clarified result now passes persistence, so the visible-edge
+fallback remains unbuilt and is not needed for this proof.** The following
+design is retained as research history only, not a pending play/build request.
 
 Concrete design: `E:/OOTRemake/work/r20-cows/FALLBACK.md`; private identity
 2011200603 reserved, **not built**. Fresh R20 Bool hash2604187271 on the
@@ -319,11 +322,11 @@ Only this round record enters the repository. All packets, profiles, decoded
 research, logs and scripts remain outside it. No browser or screenshot was used;
 Claude's headless-only UI steer is satisfied without opening Chrome.
 
-Kareem played the cow Continue pair on2026-11-21; the **saved Bool is retained,
-but the milk-edge/once-only acceptance is ambiguous** as detailed above.
-A confirmed owned Empty bottle is the bounded missing prerequisite, not a
-reason to build a new probe. No rerun or build was started. The complete
-Fortress chain remains play-held; use only main `01A`–`01D` for its40–65minute
-check. No cow locations admitted; Fortress remains experimental/default off.
-Preserve actual HUD readings, new saves and load logs; never edit state to
-force a pass.
+**Cow persistence PASS:** Kareem's clarified empty-bottle interactions, normal
+milk item-get scenes, no repeated candidate +20 and saved true establish the
+Continue proof. One shared Bool is proven, not per-cow checks; round21 must
+retain the empty-bottle prerequisite unless its refusal branch is bypassed
+and replacement delivery separately proven. No rerun or build was started.
+The complete Fortress chain remains play-held; use only main `01A`–`01D` for
+its40–65minute check. No cow locations admitted; Fortress remains experimental/
+default off. Preserve actual game observations, new saves and load logs.
