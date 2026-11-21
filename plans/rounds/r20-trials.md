@@ -1,8 +1,8 @@
 # Round 20 — trials and token bridge (cs20d)
 
-Branch `r20/trials`; base `acbb903`; model `openai-codex/gpt-6.1-sol`.
+Branch `r20/trials`; initial base `acbb903`, integrated base `ade62dc`; model `openai-codex/gpt-6.1-sol`.
 Research/output: `E:/OOTRemake/work/r20-trials/`. Native dump read-only.
-No game launched, runtime folder written, personal seed opened or original save changed.
+Agent launched no game, wrote no runtime folder, opened no personal seed and changed no original save.
 Every behavior change remains **built, not played** until Kareem's paired **Longshot 3.0.0** check.
 
 ## Requested contract
@@ -15,7 +15,7 @@ Every behavior change remains **built, not played** until Kareem's paired **Long
   Counts token items, including shuffled chest tokens, never defeated Skulltula sources; spends nothing.
   Default remains `bridge = vanilla`, count0. cs20a informed on `cs-r20` for altar text.
 - Sweeps with each new value enabled: broad200, Defaults50, Recommended50, zero exhausted;
-  private paired staged checks bridge3 and trials0; one serialized exact-head full gate.
+  private paired staged checks bridge16 (Claude superseded3 to avoid save edits) and trials0; one serialized exact-head full gate.
 
 ## Research prerequisites and coordination
 
@@ -27,7 +27,7 @@ metadata, Struct members), section5.7 (upgrades need matching pouch identity), s
 
 cs20c hook confirmed: append `FastStartSetting(name, default=False, skips, state, source,
 logic=None, game_data={existing_field: typed_value}, flow_edits=())` to `chosen` before
-`gamedata.changes(chosen)`. No separate initial-values writer. Exact entries pending native trace.
+`gamedata.changes(chosen)`. No separate initial-values writer. Native entries are verified below.
 Shared Settings changes are limited to own fields/validation/serialization; fill algorithm untouched.
 
 **Partial-trial selection, provisional decision by Claude (Kareem may overturn in the morning):**
@@ -119,51 +119,105 @@ reconstruction without a seed number while leaving default6 independent of it. Z
 also replaces the native preceding “blocked” line; the scene's six tube actors always exist
 (`Logic_Create=true`), so it does not require a deleted barrier actor. No scene/flow edit added.
 
-### Ordered acceptance plan (Claude, 2026-11-20)
+### Ordered acceptance and completed sweep receipt (2026-11-20/21)
 
 The original2100-seed proposal was cancelled **before acquiring a lock or generating a seed**.
-The auto-retry waiter was cancelled while cs20b owned the lock. New driver never auto-retries;
-turn2 starts only after cs20b explicitly posts LOCK RELEASED.
-Estimated parity+sweep wall time30–40minutes at6workers, unmeasured; report actual time.
+The auto-retry waiter was cancelled while cs20b owned the lock. The driver never auto-retries.
+Claude's final handoff required both cs20b's passing gate/release and MAIN MOVED to `ade62dc`.
+Rebased before acquisition; additive exclusion/trial serialization and note conflicts retained both sides.
+Post-integration focus: **132 passed in19.78s**, native RomFS, `-n2`, internal workers1.
+Frozen parity/sweep head: `125f3a543df33b1f193adf17c07ee1e9083835a7`.
+Estimated parity+sweep30–40minutes; observed **1371.21s (22m51s)**, six workers, no game.
 Claude approved one round-file-only receipt commit after the sweep, then the exact-head full
 gate on that final head if source/test bytes are unchanged. No extra matrix before that gate.
 
-| Recipe | Seeds | trials_count | Token bridge threshold |
-|---|---:|---:|---:|
-| Exact broad CS1 | 200 | 0 | 3 |
-| Exact broad CS1 | 200 | 3 | 40 |
-| Defaults | 50 | 3 | 20 |
-| Recommended | 50 | 3 | 20 |
+| Recipe | Accepted seeds | trials_count | Token threshold | First-attempt failures | Attempts | Exhausted |
+|---|---:|---:|---:|---:|---:|---:|
+| Exact broad CS1 | 200 | 0 | 3 | 9 | 209 | 0 |
+| Exact broad CS1 | 200 | 3 | 40 | 10 | 211 | 0 |
+| Defaults | 50 | 3 | 20 | 0 | 50 | 0 |
+| Recommended | 50 | 3 | 20 | 1 | 51 | 0 |
 
-500 sweep seeds, not2100. Three additional private default seeds20202004/20202014/20202024
-are built through both actual-main and candidate writers; every output file is hashed.
+All500 accepted; maximum3 attempts. Each seed passed production beatability, exact normalized
+item-stock conservation, all100 token items collectible, correct remaining-trial count and
+seed-aware preparation agreement. Broad partial covered all20 possible three-trial subsets;
+each preset covered16. Per-seed attempt/rejection counts and failed-first seed IDs are retained;
+internal retry exception messages are **not** retained. No unchanged rerun or extra matrix.
+Receipts: `sweep-500/results.json`, `sweep-500.log`, `main-moved-focused.log`.
+
+Default6 all-file parity: actual main `ade62dcfa3a3ce14495d52bc5a3ca79a1f029e66`
+versus the frozen candidate above, every output-path SHA256 identical:
+
+| Private default seed | Files per arm |
+|---|---:|
+| 20202004 | 122 |
+| 20202014 | 121 |
+| 20202024 | 120 |
+
 The all101 threshold synthetic test covers numeric comparison boundaries without an oversized sweep.
-Partial selection varies across the200-seed cohort. Sweep receipt records each production attempt,
-first-attempt failures, exhausted seeds, token conservation and exact selected-trial count.
 Driver: `work/r20-trials/sweep.py --ordered-turn`; full gate: `gate.py --continue-owned-lease`.
 The same owned lease continues through the round-file receipt and full gate; no game/build/boot.
 
-### Prepared private paired checks (not yet built or played)
+### Private paired checks (built and boot-checked; castle behavior unplayed)
 
-Production builders run under the ordered lease; both arms use the same explicit placements,
-native admission checks and beatability search. Candidate changes only the tested setting.
-Bridge seed20202014 has one pool-preserving chest/chest swap to put a token in Zora's River's
-open-grotto chest; this exercises chest tokens, not a Skulltula kill counter.
-Its natural first-adult Nov9 save has15 tokens; the sole documented fixture edit is stock15→2
-in a copied save, applied identically to both arms. No other source/era/inventory/quest edit.
+Production builders ran before turn2 at internal workers1, through each actual writer.
+Both arms share explicit placements, native admission checks and beatability search.
+Packet source heads are main `479ed443603b70f43e9e4612da18ad05db5169f9` and candidate
+`89fa90080890094055c047e286ccbe434206a591`, before the exclude integration above.
+Bridge seed20202014 already put a token in Zora's River's open-grotto chest:
+`bridge-shared-recipe.json` records **no placement swap**. This exercises chest token stock,
+not a Skulltula kill counter. Claude changed the staged threshold to16 against the natural
+first-adult Nov9 save's15 tokens; **no save edit ships**. Both fixture copies equal the source
+SHA256 `e63eba9d8173c7c03e1e5338c48ec2dc90cbd2f9b2cad1e487022d5cb46c761c`.
+`bridge-fixture-proof.json`: edited=false, differing_bytes=[]; original source untouched.
+The abandoned15→2 fixture and partial failed output are outside every launch root.
+Initial main staging failed on the writer's unsupported AINB RSTB size formula when serving
+the native bridge module as an identity change. Printed path/error are in `staging.log`.
+The control-only builder now uses `BuiltFile` with the native allocation, as production
+bridge staging already does; the aimed rerun built all four arms successfully.
 Trials seed20202004 starts each profile empty, testing real new-game defaults, not save repair.
 
-Folder `E:/OOTRemake/work/r20-trials/ingame/`; prepared launcher names:
+Folder `E:/OOTRemake/work/r20-trials/ingame/`; launcher names:
 `Test - bridge main.bat`, `Test - bridge candidate.bat`,
 `Test - trials main.bat`, `Test - trials candidate.bat`.
 All pin **Longshot 3.0.0** stable, use one mod and unset HOS_FS_OVERLAY.
 Checklist `ingame/CHECKLIST.md`; **15–22minutes per paired check**, unmeasured, each under30minutes.
-Bridge: closed at2; chest token gives3; native-story control stays closed, candidate rainbow scene
-and bridge open; chest/counter/latch persist through Continue. Trials: one explicitly permitted
+Bridge: closed at15; chest token gives16; native-story control stays closed, candidate rainbow scene
+and bridge should open; chest/counter/latch must persist through Continue. Trials: one explicitly permitted
 debug age change to adult in each new game, entrance teleport, normal tower shutter/barrier approach;
-control blocked, zero-trials candidate passes without a core; save/Continue persists.
+Require control blocked and zero-trials candidate passage without a core; verify save/Continue persistence.
 If stable runtime offers no age change, stop rather than edit a save or invent another fixture.
 Inspector `inspect_packet.py <bridge|trials> --played` checks only these isolated saved states.
 
-Final observed parity/sweep/gate counts, packet hashes and dry-run proof pending.
-No READY or in-game claim.
+All four private launcher dry-runs returned0. `packet-proof.log` establishes paired native-data
+differences and initial fixtures only; it does not establish gameplay. Full per-file SHA256 maps
+are in `packet-{bridge|trials}-{main|candidate}.json`. Representative GameData fingerprints:
+
+| Arm | GameData/GameDataList.Product.110.byml.zs SHA256 |
+|---|---|
+| Both main controls | `2d8ee35ce896597362e799123a2a834597ce19ba62a58209547adb94fd1addc7` |
+| Bridge candidate | `52818e3bc8119ec90b9f4e756db0a9bc0316e1e54f97d95217b487ab29dcb30e` |
+| Trials candidate | `a0e77181b6360031aa4725cb363ceaed1cc7982d0919d4dfcdbca70c39cae413` |
+
+Claude boot-checked all four arms on **Longshot3.0.0**, source `87cb36aa`:
+`work/r20-trials/bootcheck-results.txt`, cited in the checklist.
+Every arm: crash0/fatal0, save mounted, exactly one mod.
+
+| Pair (both arms) | Written output files per arm | Boot RomFS entries per arm |
+|---|---:|---:|
+| Bridge | 150 | 191 |
+| Trials | 121 | 160 |
+
+Logs prove modded GameData loaded in all arms and the native new-game initializer loaded
+in both trials arms. Bridge trigger, barrier/tower passage and save/Continue remain **unplayed**.
+Partial-trial play, late Light Arrow story order, every language's visual layout and a complete
+shuffled playthrough are not claimed.
+
+### Final gate handoff
+
+This is the one approved round-file-only receipt after the sweep. Source/tests must remain
+byte-identical to the frozen sweep head; show `git diff --stat <sweep-head> HEAD -- src tests`
+empty, then run `gate.py --continue-owned-lease` on this receipt commit without releasing.
+Its exact-head command/count/exit evidence belongs in `work/r20-trials/gate/results.json`
+and stage logs. No gate pass or READY is claimed before that run; report its observed result
+without another documentation commit. No agent game launch or player-save edit is authorized.
