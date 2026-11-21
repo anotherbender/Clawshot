@@ -221,6 +221,8 @@ def make_seed(
         dampe_safety.changes(),
     )
     changes += (reward_bridge.changes(mode=settings.bridge, count=settings.bridge_count),)
+    scrub_previews = {name: out.placements[name] for name in out.shuffled if name in scrubs.SALES}
+    changes += (text.scrub_hint_changes(romfs, scrub_previews, table, scrubs.sale_prices(settings)),)
     item_names: dict[str, str] = {}
     if out.hints:
         item_names, hint_changes = hint_step(romfs, out, table)

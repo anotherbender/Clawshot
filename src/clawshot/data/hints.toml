@@ -25,6 +25,12 @@ dungeon_woth_limit = 2
 dungeon_barren_limit = 1
 weights = { woth = 3.0, barren = 3.0, item = 1.0, sometimes = 1.65, random = 2.0, junk = 0.0 }
 
+[distributions.very_strong]
+source = "Clawshot round20: emphasize required routes and useful areas; original weights, no copied distribution"
+dungeon_woth_limit = 6
+dungeon_barren_limit = 6
+weights = { woth = 8.0, barren = 4.0, item = 4.0, sometimes = 1.0, random = 1.0, junk = 0.0 }
+
 [distributions.useless]
 source = "OoT Randomizer data/Hints/useless.json at 526b4c8d: every stone a junk line"
 dungeon_woth_limit = 0

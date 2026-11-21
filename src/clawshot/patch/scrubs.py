@@ -9,7 +9,7 @@ A shield reward also removes the shared get's equipment prerequisite (``patch.sc
 """
 
 import tomllib
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from typing import Any
 
@@ -25,6 +25,21 @@ FLOW = "Enemy_Scrub_Business_Common"
 PATH = f"Event/EventFlow/{FLOW}.bfevfl.zs"
 SHUFFLE = "Scrub"
 CAPACITIES = ("Deku Stick Capacity", "Deku Nut Capacity")
+
+# Both heart-piece sellers share a native message. Seed offers need separate labels.
+OFFER_LABELS = {
+    "HF Deku Scrub Grotto": "Clawshot_Scrub_HF",
+    "DMC Deku Scrub": "Clawshot_Scrub_DMC",
+    "LW Deku Scrub Near Bridge": "Clawshot_Scrub_Stick",
+    "LW Deku Scrub Grotto Front": "Clawshot_Scrub_Nut",
+}
+OFFER_FILE = "EventFlowMsg/Enemy_Event"
+NATIVE_OFFERS = {
+    "HF Deku Scrub Grotto": "Enemy_Scrub_Business_Heart_01",
+    "DMC Deku Scrub": "Enemy_Scrub_Business_Heart_01",
+    "LW Deku Scrub Near Bridge": "Enemy_Scrub_Business_DekuStickPouch_01",
+    "LW Deku Scrub Grotto Front": "Enemy_Scrub_Business_DekuNutsPouch_01",
+}
 
 
 @dataclass(frozen=True)
@@ -206,6 +221,45 @@ def changes(placements: Mapping[str, str], *, prices: Mapping[str, int] | None =
 
     if any(actor in scrub_shields.SHIELDS for actor in placements.values()):
         return {PATH: transform, **scrub_shields.changes()}
+    return {PATH: transform}
+
+
+def offer_changes(checks: Sequence[str]) -> FileChanges:
+    """Bind only shuffled once-sales to their source-specific static offer text."""
+    selected = tuple(checks)
+    if not selected:
+        return {}
+    if unknown := sorted(set(selected) - SALES.keys()):
+        raise PatchError(f"unsupported scrub offers: {unknown}")
+
+    def transform(data: bytes) -> bytes:
+        document = evfl.read(data)
+        fc = document.flowchart
+        if fc is None or fc.name != FLOW:
+            raise PatchError(f"{FLOW}: no matching offer flowchart")
+        events = {event.name: event for event in fc.events}
+        edits = []
+        for check in selected:
+            for name, _ in SALES[check].grants:
+                event = events.get(name)
+                label = NATIVE_OFFERS[check]
+                if name == "Event555":
+                    label = "Enemy_Scrub_Business_DekuStickPouch_02"
+                native = f"{OFFER_FILE}:{label}"
+                if not (
+                    isinstance(event, evfl.SubFlowEvent)
+                    and event.entry_point == "SimpleShopSub_Scrub_Business_OneTime"
+                    and (event.params or {}).get("SellerMessageId") == native
+                ):
+                    raise PatchError(f"{FLOW}/{name}: stale offer {event!r}")
+                edits.append((event.params, f"{OFFER_FILE}:{OFFER_LABELS[check]}"))
+        for params, message in edits:
+            params["SellerMessageId"] = message
+        written = evfl.write(document)
+        if evfl.read(written) != document:
+            raise PatchError(f"{FLOW}: written offers do not read back")
+        return written
+
     return {PATH: transform}
 
 

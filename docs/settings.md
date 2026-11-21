@@ -360,9 +360,10 @@ gates. These fields replay through CS1. The 10-rupee Kokiri shield/nuts purchase
 observed (R6-PRICES); partial shelves and fixed scrub fees are built/tested, not independently
 certified in game by that observation.
 
-**Scrub offer wording:** shuffled one-time sales still describe their vanilla item, even
-when their actual reward differs. Check the get window/inventory or spoiler, not that sales
-pitch ([recorded since round 6](../plans/rounds/r6-tokens.md#purchase-and-patch-contract)).
+**Scrub offer wording:** newly generated shuffled one-time sales name their actual
+reward and effective price (English in all16 languages). HF and DMC have separate
+offers even though their native pitch shares one message. Built/read-back-tested,
+not yet played on Longshot 3.0.0; [round20 hints](../plans/rounds/r20-hints.md).
 Repeat vendors are not shuffled; their native weapon/magic/bottle gates can hide every offer.
 The no-offers guard for [#26](https://github.com/hiKareeem/Clawshot/issues/26) ends that
 conversation before opening an empty shop menu. It applies even without Scrub shuffle.
@@ -716,6 +717,12 @@ reset were observed in game; that is not certification of every distribution. Bo
 Hookshot-direction lines are replaced with a seed location holding the Hookshot or a Progressive
 Hookshot (any copy is the Hookshot while none is owned), or omit the tool if none exists in a
 partial world. This text is built/read-back-tested, not separately player-accepted.
+
+The generator also accepts `--hint-distribution strong`, `very_strong` and `useless`.
+Strong favors required routes and barren areas; Very strong raises those weights and
+allows more dungeon-area hints. Useless gives only original joke lines. No distribution
+changes placements, item eligibility or D29's no-junk location clues; an exhausted useful
+hint pool still falls back to jokes. The app currently exposes only Balanced.
 
 **Wrong-age pickups:** the note lists shuffled age-locked rewards reachable by the wrong age at their
 first search frontier, including ties. Optional later pickups can differ from that order. Progressive

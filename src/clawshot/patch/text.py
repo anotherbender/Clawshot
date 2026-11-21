@@ -323,3 +323,41 @@ def sheik_hint_changes(romfs: str | Path, hookshot_locations: Sequence[str]) -> 
         return edit_messages({SHEIK_MESSAGES: edits})(data)
 
     return {archive_path(language): transform for language in languages(romfs)}
+
+
+def scrub_hint_changes(
+    romfs: str | Path, placements: Mapping[str, str], table: ItemActors, prices: Mapping[str, int]
+) -> FileChanges:
+    """Source-specific sale previews, English in every language, with no vanilla-item claims.
+
+    Only selected once-sales participate. Repeat merchants keep their native text and gates.
+    Prices are the same effective fixed prices used by the sale writer, not inferred from text.
+    """
+    from clawshot.patch import scrubs
+
+    selected = {name: item for name, item in placements.items() if name in scrubs.SALES}
+    if not selected:
+        return {}
+    names = item_names(romfs, selected.values(), table)
+    lines = {
+        scrubs.OFFER_LABELS[name]: f"I offer {FIELD_START}{names[item]}{FIELD_END} for {prices[name]} rupees. Buy it?"
+        for name, item in selected.items()
+    }
+    file = f"{scrubs.OFFER_FILE}.msbt"
+
+    def transform(data: bytes) -> bytes:
+        archive = sarc.read(data)
+        if file not in archive:
+            raise PatchError(f"no message file {file} in the archive")
+        messages = msbt.read(archive[file]).messages
+        native = "Enemy_Scrub_Business_Heart_01"
+        if native not in messages:
+            raise PatchError(f"{file}: no message labelled {native}")
+        # Conservative NPC envelope: two rows of forty English characters per page.
+        additions = {label: stone_line(messages[native], line, width=40, rows=2) for label, line in lines.items()}
+        return add_messages({file: additions})(data)
+
+    return {
+        **{archive_path(language): transform for language in languages(romfs)},
+        **scrubs.offer_changes(tuple(selected)),
+    }
