@@ -99,9 +99,15 @@ def test_altar_and_ganondorf_name_regions_not_checks_or_junk_in_every_language(r
         for source in slots:
             area = stone_hints.area_name(stone_hints.hint_area(world, world.locations[source].region))
             assert f"{names[placements[source]]}: {area.removeprefix('the ')}" in rows
-        assert "Bridge: own 4 medallions." in rows and "Door: 3 Spiritual Stones" in rows
-        assert "Door: Ocarina of Time + Song of Time" in rows
-        assert all(": " in row for row in rows)
+        reward_rows = [row for row in rows if ": " in row and not row.startswith("Rainbow Bridge:")]
+        conditions = [row for row in rows if row not in reward_rows]
+        assert max(map(len, conditions)) <= 36
+        assert not any(row.startswith("Door:") for row in conditions)
+        door = " ".join(row for row in conditions if not row.startswith("Rainbow Bridge:"))
+        assert "all 3 Spiritual Stones" in door
+        assert "Ocarina of Time, Song of Time" in door and "and Impa's send-off" in door
+        assert "Then play the Song of Time here." in door
+        assert "Rainbow Bridge: own 4 Medallions." in conditions
         shown = visible(parts)
         assert "Rupees" not in shown and "Kak 20" not in shown
         original = msbt.read(before[text.ALTAR_MESSAGES])

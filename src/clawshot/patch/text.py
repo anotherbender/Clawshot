@@ -417,35 +417,47 @@ def static_hint_changes(romfs: str | Path, seed: "Seed", table: ItemActors) -> F
         names = item_names(romfs, (item for _, item in placed), table)
         pages = [f"{names[item]}: {region(name).removeprefix('the ')}" for name, item in placed]
         if seed.settings.door_of_time == "closed":
-            stones = "3 Spiritual Stones" if seed.settings.dungeon_rewards else "finish the 3 stone quests"
-            pages.extend(
-                [
-                    f"Door: {stones}",
-                    "Door: Ocarina of Time + Song of Time",
-                    "Door: finish Impa's send-off",
-                    "Door: play Song of Time here",
-                ]
-            )
+            stones = "all 3 Spiritual Stones," if seed.settings.dungeon_rewards else "the 3 stone quests completed,"
+            door = [
+                "To open the Door of Time, you need",
+                stones,
+                "the Ocarina of Time, Song of Time,",
+                "and Impa's send-off finished.",
+                "Then play the Song of Time here.",
+            ]
         else:
-            pages.extend(["Door: finish Impa's send-off", "Door: reach Hyrule Field"])
-            pages.append(
-                "Door: play Song of Time with an ocarina"
+            door = ["To open the Door of Time, finish", "Impa's send-off and reach"]
+            door.extend(
+                ["Hyrule Field. Then play the", "Song of Time with an ocarina."]
                 if seed.settings.door_of_time == "song_only"
-                else "Door: no items needed"
+                else ["Hyrule Field. No items are needed."]
             )
         if seed.settings.bridge == "vanilla":
-            pages.extend(["Bridge: awaken Shadow and Spirit sages", "Bridge: return here for Zelda's story"])
+            bridge = [
+                "Rainbow Bridge: awaken the",
+                "Shadow and Spirit sages, then",
+                "return here for Zelda's story.",
+            ]
         elif seed.settings.bridge_count == 0:
-            pages.append("Bridge: no items required.")
+            bridge = ["Rainbow Bridge: no items required."]
         else:
             nouns = {
                 "stones": ("Spiritual Stone", "Spiritual Stones"),
-                "medallions": ("medallion", "medallions"),
-                "rewards": ("dungeon reward", "dungeon rewards"),
-                "tokens": ("Gold Skulltula token", "Gold Skulltula tokens"),
+                "medallions": ("Medallion", "Medallions"),
+                "rewards": ("Dungeon Reward", "Dungeon Rewards"),
+                "tokens": ("Gold Skulltula Token", "Gold Skulltula Tokens"),
             }
             noun = nouns[seed.settings.bridge][seed.settings.bridge_count != 1]
-            pages.append(f"Bridge: own {seed.settings.bridge_count} {noun}.")
+            prefix = f"Rainbow Bridge: own {seed.settings.bridge_count}"
+            sentence = f"{prefix} {noun}."
+            bridge = [sentence] if len(sentence) <= 36 else [prefix, f"{noun}."]
+        if any(len(line) > 36 for line in (*door, *bridge)):
+            raise PatchError(f"altar condition line exceeds 36 characters: {door}, {bridge}")
+        # Start each cumulative condition block on a fresh page, not beside a reward.
+        for block in (door, bridge):
+            if len(pages) % 2:
+                pages.append("")
+            pages.extend(block)
         lines[ALTAR_MESSAGES] = {ALTAR_LABEL: "\n".join(pages)}
 
     if any(name in seed.shuffled for name in GATED_FAIRY_CHECKS):

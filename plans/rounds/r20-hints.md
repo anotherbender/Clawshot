@@ -3,7 +3,7 @@
 Agent `openai-codex/gpt-6.1-sol`; branch `r20/hints`, base main `acbb903`.
 Scope: static text only, no new saved flags, grants, item windows, fill/logic/destination changes.
 Research and staging: `E:/OOTRemake/work/r20-hints/`; dump and natural save backups read-only.
-No game launched by cs20a. Paired packet and focused proofs staged; Claude's boot checks pass. Dialogue unplayed.
+Kareem's played results are recorded below. Revised cumulative altar conditions remain play-held; cs20a never launched the game.
 
 ## Contract and coordination
 
@@ -461,4 +461,45 @@ round file; gated production/tests remain unchanged.
 **READY (play-held), altar follow-up:** one reward/region per whole line, Door/Bridge
 on their own lines. Stage05 only updated; in-game readability acceptance still
 belongs to Kareem. cs20a did not start the game or write to original saves/game folders.
+
+### Kareem's hints01–10 played results and cumulative-conditions follow-up
+
+Reported by Kareem through Claude; treated as ground truth, not rerun:
+
+| Check | Played result / decision |
+|---|---|
+| 01 bridge scrub | PASS: Green Rupee for17, paid17 and received1 rupee. |
+| 01 two-scrub grotto | NOT FOUND, not a text/grant failure. Directions and copied-save access being verified. |
+| 02 HF and DMC scrub offers | NOT FOUND: locations/route unclear; no pass claimed. |
+| 03 Fairy before Fire | Perfect. |
+| 04 Fairy after Fire | Perfect. |
+| 05 altar | Reward rows readable; repeated `Door:` lines confusing as alternatives. Revise only conditions. |
+| 06 House pending10 | Correct. |
+| 07 House29 | Correct. |
+| 08 House50 | Correct. |
+| 09 House100 / cure | Correct; sons repeating rewards after cure is fine. **Keep unchanged.** |
+| 10 Ganondorf | Legible, during skippable voiced scene like Rauru. **Keep unchanged.** |
+
+**Claude's required correction:** one cumulative Door sentence across pages,
+generated from the selected Door mode; Rainbow Bridge gets its own generated
+sentence. Every condition row is at most36 characters, with explicit conjunctions
+and then/play wording, not repeated `Door:` labels. Each condition block starts
+on a fresh page; the accepted atomic reward/region rows are unchanged.
+Closed mode still distinguishes owned shuffled stones from completed fixed stone
+quests, and still requires Time Ocarina/Song, Impa's send-off and playing the song.
+Song-only/open and vanilla/zero/count bridge variants retain their actual conditions.
+
+Real-RomFS focus: **5 passed in22.90s**. All16 native styles checked,324 atomic
+reward/region pairs/style, plus **576 settings/language cases**:528 generated
+condition rewrites and48 unchanged-default cases. Generated condition rows<=36;
+reward/region envelope unchanged at48 (exhaustive maximum45).
+Scoped Ruff: both files already formatted, all checks passed.
+
+Stage05 alone will use the same seed20200121/settings/placement map with the new
+condition paragraph. New candidate needs Claude's boot proof and Kareem's clarity
+check. Other accepted text, post-cure repetition and Ganondorf timeline stay unchanged.
+Directions for the three not-found offers are native/save-backed work in01/02
+checklists, not a logic loosening or a new save edit. No sweep. Full gate remains
+game-idle-only with600-second waits before every stage and starts only under the
+free owned gate lock.
 

@@ -725,7 +725,7 @@ changes placements, item eligibility or D29's no-junk location clues; an exhaust
 hint pool still falls back to jokes. All four are app choices; Very strong is new this round
 and remains built, not played.
 
-**Static text (built, not played):** with dungeon rewards shuffled or a count-mode
+**Static text (partially played):** with dungeon rewards shuffled or a count-mode
 bridge, the Temple of Time altar lists reward regions and the selected Door/bridge
 conditions. Ganondorf's battle-intro subtitle names the Light Arrow's region; this is
 not an earlier interactive hint, and the unchanged native trials normally need the
@@ -736,8 +736,13 @@ junk; they are not D29 location clues. The five non-Death-Mountain-Trail fountai
 shared refusal now says their gift waits on owning Din's Fire, not a visit to the
 summit. Both existing hint modes retain normal NPC/sign access. New custom text is
 English in every language; spoken audio and all event timing remain native.
-Each reward and region stays on one complete altar line; Door and Bridge requirements
-use separate lines. Page breaks fall only between complete lines.
+Each reward and region stays on one complete altar line. Door requirements form one
+cumulative sentence across pages, followed by the Rainbow Bridge condition; these
+condition lines are at most36 characters. Page breaks never split a reward/region.
+Kareem passed the staged Fairy refusals, House advice (including after the cure),
+legible Ganondorf subtitle, and bridge-scrub price/grant. Three other scrub offers
+were not located. The altar's reward rows were readable; revised cumulative
+condition wording remains built, not played.
 
 **Wrong-age pickups:** the note lists shuffled age-locked rewards reachable by the wrong age at their
 first search frontier, including ties. Optional later pickups can differ from that order. Progressive
