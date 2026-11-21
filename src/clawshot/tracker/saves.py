@@ -144,8 +144,9 @@ def read_complete(data: bytes) -> save_format.Save:
 
 def _marks_key(progress_path: str) -> str:
     """The save folder holding a slot's folder (``<save>/<profile>/slot_NN/progress.sav`` -> ``<save>/<profile>``).
-    The remake writes each save to the next slot of that folder (seed 212067047, maintainer's play, 2026-11-20:
-    slots 05, 01, 00, 02, 03, 04 in six minutes), so a playthrough's marks belong to the folder, not to one slot."""
+    The remake writes each save to the next slot of that folder (seed 212067047, BBender's play on Longshot 3.0.0,
+    2026-11-20: slots 05, 01, 00, 02, 03, 04 in six minutes), so a playthrough's marks belong to the folder, not to
+    one slot."""
     return str(Path(progress_path).parent.parent)
 
 
@@ -253,7 +254,13 @@ class TrackerSession:
                 if check["id"] in marked and check["collected"] is not None
             ]
             if confirmed:
-                store.drop(self._seed_id, marks_folder, confirmed)
+                try:
+                    store.drop(self._seed_id, marks_folder, confirmed)
+                except OSError as error:
+                    state["warnings"].append(
+                        f"{tracker_marks.WARNING_PREFIX} could not be updated ({type(error).__name__}); the save's "
+                        "state is shown, and the marks file is unchanged."
+                    )
             if store.warning:
                 state["warnings"].append(store.warning)
         return state

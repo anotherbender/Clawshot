@@ -44,6 +44,7 @@ from clawshot.world.search import Search
 CHILDHOOD = "Sequence_IsChildhood"
 AGE_KEYS = ("child", "adult", "either")
 MAPPING_TOML = Path(__file__).resolve().parents[1] / "data" / "tracker_logic.toml"
+_FAMILY_PLURALS = {"small_key": "small keys", "boss_key": "boss keys", "map": "maps", "compass": "compasses"}
 
 
 @dataclass(frozen=True)
@@ -275,7 +276,7 @@ def inventory(seed: Seed, save: save_format.Save | None, world: World, mapping: 
         for family, value in values.items():
             if value is None:
                 if families[family].get(dungeon, 0) > 0:
-                    unknown.add(f"{dungeon} {family.replace('_', ' ')}s")
+                    unknown.add(f"{dungeon} {_FAMILY_PLURALS[family]}")
                 continue
             grant({mapping.dungeon_items[family].format(dungeon=dungeon): int(value)})
 

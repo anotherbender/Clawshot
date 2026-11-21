@@ -401,6 +401,41 @@ def test_marks_follow_the_game_into_its_next_save_slot(tmp_path, world, marks_fo
     assert entries(again.snapshot()["state"])["Child Chest"]["marked"] is True
 
 
+def test_a_failed_marks_update_warns_and_the_save_still_wins(tmp_path, world, marks_folder, monkeypatch):
+    """A marks file that can't be rewritten must not freeze the tracker on old data (review of PR #36)."""
+    from clawshot.tracker import marks
+
+    session, progress = session_with_save(tmp_path, unknown_child_chest())
+    session.mark("Child Chest", True)
+
+    def fail(*args, **kwargs):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(marks.os, "replace", fail)
+    resave(progress, {**unknown_child_chest(), CHEST_FLAGS["Child Chest"]: True})
+    snapshot = session.snapshot()
+    assert snapshot["status"] == "ok"
+    assert entries(snapshot["state"])["Child Chest"]["collected"] is True
+    assert any(w.startswith(marks.WARNING_PREFIX) for w in snapshot["state"]["warnings"])
+    resave(progress, {**unknown_child_chest(), CHEST_FLAGS["Child Chest"]: False})
+    assert entries(session.snapshot()["state"])["Child Chest"]["collected"] is False  # still follows new saves
+
+
+def test_obs_leaves_out_marks_warnings(tmp_path, world, marks_folder):
+    from clawshot.tracker import marks
+    from clawshot.ui.tracker import TrackerController
+
+    marks_folder.mkdir()
+    (marks_folder / marks.MARKS_FILE).write_bytes(b"{not json")
+    controller = TrackerController()
+    controller.session, _ = session_with_save(tmp_path, unknown_child_chest())
+    app = controller.snapshot()
+    assert any(w.startswith(marks.WARNING_PREFIX) for w in app["state"]["warnings"] + app.get("warnings", []))
+    obs = controller.snapshot(obs=True)
+    shown = obs["state"]["warnings"] + obs.get("warnings", [])
+    assert not any(str(w).startswith(marks.WARNING_PREFIX) for w in shown)
+
+
 # 10.1 (5.2)
 @pytest.mark.parametrize(("value", "age"), [(True, "child"), (False, "adult"), (None, None)])
 def test_save_age_reads_sequence_is_childhood(tmp_path, world, value, age):

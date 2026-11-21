@@ -137,8 +137,8 @@ count = true
 [cells.kokiri_sword]
 item = "Kokiri Sword"
 
-# Master Sword: the cell reads IsGet.Weapon_Sword_Master (world.toml "Master Sword", r18-master-sword-design.md
-# section 3); progression only with Master Sword shuffle.
+# Master Sword: the cell is held while PouchData.Weapon_Sword_Master.StockNum is above 0 (world.toml "Master Sword",
+# r18-master-sword-design.md section 3); progression only with Master Sword shuffle.
 [cells.master_sword]
 item = "Master Sword"
 
@@ -287,7 +287,7 @@ source = "data/world/remake/child_hyrule_castle.toml, event Time Flows: 'Met Chi
 # Consumables the save holds as a stock (PouchData.<actor>.StockNum). One held grants `item`, the name the logic
 # helper reads (data/world/helpers.toml: Sticks = Buy_Deku_Stick_1 or ..., Nuts = Buy_Deku_Nut_5 or ...); a bought
 # stick leaves no other record. Held now only: a new game sets IsGet.Item_DekuNut with no nut held (seen in the saves
-# of seed 212067047, maintainer's play, 2026-11-20), so the acquired-once flag is not having them. `label` names the
+# of seed 212067047, BBender's play on Longshot 3.0.0, 2026-11-20), so the acquired-once flag is not having them. `label` names the
 # stock in unknown_items when the save lacks it.
 [stock.Item_DekuStick]
 item = "Buy Deku Stick (1)"

@@ -29,6 +29,10 @@ MARKS_FILE = "tracker-marks.json"
 VERSION = 1
 
 
+# Every marks warning starts with this, so the OBS view can leave them out (they name local files, D13).
+WARNING_PREFIX = "Manual marks (tracker-marks.json in Clawshot's preferences folder)"
+
+
 def marks_path() -> Path:
     """``tracker-marks.json`` in the preferences folder."""
     return preferences.user_preferences_path().parent / MARKS_FILE
@@ -60,7 +64,7 @@ class MarkStore:
         except FileNotFoundError:
             return self._data
         except OSError as error:
-            self.warning = f"Manual marks could not be read from {self.path} ({error}); none are shown."
+            self.warning = f"{WARNING_PREFIX} could not be read ({type(error).__name__}); none are shown."
             return self._data
         try:
             data = json.loads(raw.decode("utf-8"))
@@ -71,7 +75,7 @@ class MarkStore:
             }
         except (UnicodeDecodeError, ValueError, KeyError, TypeError, AttributeError) as error:
             self.warning = (
-                f"Manual marks could not be read from {self.path} ({type(error).__name__}); none are shown, and the "
+                f"{WARNING_PREFIX} could not be read ({type(error).__name__}); none are shown, and the "
                 "file is kept until you change a mark."
             )
         return self._data

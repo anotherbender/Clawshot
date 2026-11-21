@@ -4,6 +4,7 @@ import threading
 from pathlib import Path
 
 from clawshot.app.paths import absolute_path
+from clawshot.tracker import marks as tracker_marks
 from clawshot.tracker.icons import IconCache, icon_id
 from clawshot.tracker.saves import TrackerSession
 
@@ -88,6 +89,11 @@ class TrackerController:
                 data.pop("save_folder", None)
                 data.pop("slots", None)
                 data.pop("save_path", None)
+                for holder in (data, state or {}):
+                    if "warnings" in holder:
+                        holder["warnings"] = [
+                            w for w in holder["warnings"] if not str(w).startswith(tracker_marks.WARNING_PREFIX)
+                        ]
             return data
 
     def mark(self, body):

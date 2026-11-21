@@ -72,7 +72,8 @@ def test_an_unreadable_file_warns_reads_as_empty_and_is_kept(folder, content):
     path.write_bytes(content)
     store = marks.MarkStore()
     assert store.marks("seed-1", SLOT_A) == frozenset()
-    assert store.warning and str(path) in store.warning
+    assert store.warning.startswith(marks.WARNING_PREFIX)
+    assert str(folder) not in store.warning  # no local path: it can reach a stream overlay's log or a screenshot
     store.drop("seed-1", SLOT_A, ["A"])  # nothing marked: nothing changes, nothing written
     assert path.read_bytes() == content
     store.set("seed-1", SLOT_A, "A", True)  # the user changed a mark: now it is written
