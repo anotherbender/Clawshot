@@ -1,7 +1,7 @@
 # Round 20, Track exclude — cs20b
 
 Branch `r20/exclude`, base `acbb903df111bb30609baedac35316b22d43700e` (0.2.4 plus PR #36).
-Model: `openai-codex/gpt-6.1-sol`. Status: implementation in progress; not READY yet.
+Model: `openai-codex/gpt-6.1-sol`. Status: implementation complete; merge candidate, frozen-head gate below.
 External receipts: `E:/OOTRemake/work/r20-exclude/`.
 
 ## Scope and agreed design
@@ -30,9 +30,9 @@ No source from either project was opened or copied.
 
 ## Checks and acceptance
 
-Pending focused tests, actual app surface, current-main rebase, locked full gates and sweep:
-200 broad seeds using `work/r18-fill/settings.txt` plus realistic minigame/frog/House exclusions;
-50 Defaults and 50 Recommended, zero exhausted required. Record first-attempt errors as well.
+Focused checks, actual app surface, current-main rebase and the locked300-seed native sweep completed
+below. Acceptance requires zero exhausted seeds and reporting first-attempt failures; the existing
+retry bound is unchanged. Exact-head full-gate receipts are specified below.
 
 No new game resource/patch, no pack input change, no staged game check required. No game started, no
 personal seed/save opened or modified, no writes to a game/runtime directory. This is generator/settings
@@ -80,7 +80,7 @@ No more omp browser calls will be used for this track.
 Claude approved extracting `gifts.movable_checks(world, rules)` as shared dump-free eligibility:
 native `seed_checks` and app capacity validation now use one predicate, not two copies. This is a
 pure refactor of native eligibility. Required **all-output SHA-256 parity** against frozen main for
-two Gift and two Recommended seeds is pending under the gate lock.
+two Gift and two Recommended seeds passed under the gate lock; details below.
 
 The first sweep acquisition found cs20g's paired-sweep lock and exited75; no seeds started and no foreign
 lock was removed. Heavy acceptance will use six sweep workers, then eight xdist workers with internal
@@ -120,3 +120,55 @@ Explicit **Playwright Chrome `headless=True`, `--headless=new`** proof then pass
 controls absent, normal expert prize present, Frog+House100 actual CS1 publication, hidden selection
 retention and zero JS errors. Screenshot: external `headless-picker.png`; receipt: `headless-picker.log`.
 No browser tool was used for this follow-up; the headless browser and isolated in-memory server closed.
+
+## Approved native sweep (completed)
+
+Frozen source `86dafe84c00434616af3388d553d121578774bd2`, after `git rebase main` and the
+post-rebase focused checks. Recipe: supplied broad CS1 with the approved31 exclusions, seeds0–199.
+Native inputs were captured at the production `patch.make_seed` → `generate` boundary, including native
+stock, gift/source exclusions and destination palettes. Each accepted seed additionally checks exact
+normalized shuffled stock, no progression at any excluded check and an independent successful goal search.
+
+| Recipe | Accepted | First-attempt failures | Total attempts | Mean attempts | Max attempts | Exhausted |
+|---|---:|---:|---:|---:|---:|---:|
+| Broad + approved31 exclusions | 200 | 15 | 215 | 1.075 | 2 | 0 |
+| Defaults | 50 | 0 | 50 | 1.000 | 1 | 0 |
+| Recommended | 50 | 3 | 53 | 1.060 | 2 | 0 |
+
+All300 completed, with no reseeding or raised retry bound. Workers6, no running game at preparation/
+each recipe start; one owned round20 gate lock. Main all-output parity also passed.
+External rows and complete first-error payloads: `sweep-v2/sweep-rows.jsonl`, `sweep-v2/sweep-summary.json`.
+
+All15 broad first failures printed `items left unplaced`, including at least one Map/Compass and ordinary
+filler. For seed13: Well/Deku/Fire compasses; for45: Fire map. Failed-first seeds:
+13,15,27,45,68,74,80,85,90,105,113,141,144,192,193. Every one succeeded on attempt2.
+**Claude decided for cs20g: keep constraint-only, no new helper.** Zero exhausted meets acceptance;
+these late Map/Compass filler failures are the class main already has (cs20g's `r20-fill` research).
+Known follow-up for a later fill round: the15 seeds above and their complete assertion/error payloads at
+`E:/OOTRemake/work/r20-exclude/sweep-v2/sweep-rows.jsonl`. No fill algorithm change is made in this track.
+
+## Default-off all-output parity
+
+Main `acbb903df111bb30609baedac35316b22d43700e` versus candidate `86dafe84c00434616af3388d553d121578774bd2`.
+Both arms used the real production writer with identical settings, seed and inputs, with no selected
+exclusions. Every output path and SHA-256 matched; no differing, missing or extra files.
+
+| Recipe | Seed | Output files hashed per arm |
+|---|---:|---:|
+| Gift | 2026112002 | 163 |
+| Gift | 2026112003 | 160 |
+| Recommended | 2026112002 | 173 |
+| Recommended | 2026112003 | 172 |
+
+Receipts: external `sweep-v2/parity-summary.json` and both
+`sweep-v2/parity-{main,candidate}/all-file-hashes.json`; complete generation logs beside them.
+No game was running at either arm's start. These are output-byte checks, not in-game observations.
+
+## Frozen-head full gate and handoff
+
+This evidence is committed before the full gate so the tested head is the merge head. Rebase current
+local main and rerun focused checks immediately before taking the lock. No changes after freezing;
+an exact-head full-gate result and READY handoff live externally, avoiding a post-gate documentation commit.
+External `frozen-gate/source-head.txt` records the tested head; `frozen-gate/gate-{format,lint,synthetic,dump}.log`
+record the four required commands. Gate command/worker/game-state lines are in `frozen-gate.log`.
+Only claim **READY (merge)** after all four pass. No staged play check, game patch or pack-input addition.
