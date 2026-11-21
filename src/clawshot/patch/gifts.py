@@ -940,6 +940,15 @@ def shopkeeper_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
     return {**spec, "regions": regions, "locations": locations}
 
 
+def logic_spec(spec: Mapping[str, Any], settings: Settings) -> Mapping[str, Any]:
+    """Gift/NPC shuffle's reachability change, dump-free: :func:`shopkeeper_spec` when ``Gift`` or ``NPC`` is
+    shuffled (``NPC`` also covers an effective settings string, where ``Gift`` is expanded to :data:`GIFT_TYPES`),
+    else the spec unchanged. Shared with the tracker's logic world (``clawshot.patch.logic_world``)."""
+    if SHUFFLE in settings.shuffle or "NPC" in settings.shuffle:
+        return shopkeeper_spec(spec)
+    return spec
+
+
 def seed_checks(
     world: World,
     gifts: Iterable[Gift],
@@ -1049,8 +1058,8 @@ def seed_setup(
     """For ``--shuffle Gift``: the spec with the gifts that cannot move held vanilla, the settings shuffling the
     gift types in place of ``Gift`` and a placement policy from ``settings.songs`` plus the verified chest
     actor list in ``data/settings.toml``), and the patch step to pass to ``make_seed``."""
+    spec = logic_spec(spec, settings)
     if SHUFFLE in settings.shuffle or "NPC" in settings.shuffle:
-        spec = shopkeeper_spec(spec)
         locations = dict(spec["locations"])
         for name in ("Market Bombchu Bowling Bombchus", "Market Bombchu Bowling Bomb"):
             if name not in locations:

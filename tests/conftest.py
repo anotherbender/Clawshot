@@ -20,6 +20,19 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(skip)
 
 
+@pytest.fixture(autouse=True)
+def _tracker_preferences(request, tmp_path_factory, monkeypatch):
+    """Tracker tests never read or write the real preferences folder (where manual marks live)."""
+    if not request.module.__name__.startswith("test_tracker"):
+        yield
+        return
+    from clawshot.app import preferences
+
+    folder = tmp_path_factory.mktemp("preferences")
+    monkeypatch.setattr(preferences, "user_preferences_path", lambda: folder / "paths.json")
+    yield
+
+
 @pytest.fixture(scope="session")
 def romfs() -> Path:
     root = Path(os.environ["OOT_ROMFS"])

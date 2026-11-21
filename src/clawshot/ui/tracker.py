@@ -4,6 +4,7 @@ import threading
 from pathlib import Path
 
 from clawshot.app.paths import absolute_path
+from clawshot.tracker import marks as tracker_marks
 from clawshot.tracker.icons import IconCache, icon_id
 from clawshot.tracker.saves import TrackerSession
 
@@ -80,12 +81,37 @@ class TrackerController:
                 data["show_locations"] = False
                 if state is not None:
                     state["show_locations"] = False
+                    state.pop("logic", None)  # in-logic and manual marks stay in the app tab (D13)
                 for area in (state or {}).get("areas", []):
                     area.pop("checks", None)
+                    area.pop("marked", None)
+                    area.pop("in_logic", None)
                 data.pop("save_folder", None)
                 data.pop("slots", None)
                 data.pop("save_path", None)
+                for holder in (data, state or {}):
+                    if "warnings" in holder:
+                        holder["warnings"] = [
+                            w for w in holder["warnings"] if not str(w).startswith(tracker_marks.WARNING_PREFIX)
+                        ]
             return data
+
+    def mark(self, body):
+        """Mark a check the save cannot read as done by hand, or unmark it (POST ``tracker-mark``)."""
+        check, marked = body.get("check"), body.get("marked")
+        if not isinstance(check, str) or not check or type(marked) is not bool:
+            raise ValueError("Name a check and whether it is marked done.")
+        with self.lock:
+            self.session.mark(check, marked)
+            return self.snapshot()
+
+    def clear_marks(self, body):
+        """Remove every manual mark of this seed and save folder (POST ``tracker-clear-marks``, after confirmation)."""
+        if body.get("confirmed") is not True:
+            raise ValueError("Confirm clearing every manual mark of this seed and save folder.")
+        with self.lock:
+            self.session.clear_marks()
+            return self.snapshot()
 
     def icon(self, actor):
         with self.lock:
@@ -103,6 +129,10 @@ class TrackerController:
 def call(app, method, route, body):
     if method == "POST" and route == "tracker-configure":
         return app.tracker.configure(app, body)
+    if method == "POST" and route == "tracker-mark":
+        return app.tracker.mark(body)
+    if method == "POST" and route == "tracker-clear-marks":
+        return app.tracker.clear_marks(body)
     if method == "GET" and route in ("tracker", "tracker-obs"):
         return app.tracker.snapshot(obs=route == "tracker-obs")
     if method == "POST" and route == "tracker-browse":

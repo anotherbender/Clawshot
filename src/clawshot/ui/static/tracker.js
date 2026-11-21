@@ -54,7 +54,26 @@ function parseTrackerSections(fragment) {
   const content = node("div", "tracker-content");
   root.append(heading);
   let controls, seedInput, saveInput, slotSelect, reveal, obsUrl, iconToggle, transparent, labelToggle, columnSelect;
+  let ageSelect, logicOnly, clearMarks, lastData = null;
   const sectionToggles = {};
+  // The in-logic age is remembered in this browser only when it is not the default (Either); storage may be absent.
+  const AGE_KEY = "clawshot.tracker.age", AGES = ["either", "save", "child", "adult"];
+  function storedAge() {
+    try {
+      const value = window.localStorage.getItem(AGE_KEY);
+      return AGES.includes(value) ? value : "either";
+    } catch { return "either"; }
+  }
+  function storeAge(value) {
+    try {
+      if (value === "either") window.localStorage.removeItem(AGE_KEY);
+      else window.localStorage.setItem(AGE_KEY, value);
+    } catch { /* storage unavailable: the choice lasts until the page closes */ }
+  }
+  function redraw() {
+    lastRevision = "";
+    if (lastData) render(lastData);
+  }
   if (!standalone) {
     controls = node("form", "tracker-controls");
     function pathRow(label, placeholder, kind) {
@@ -148,6 +167,33 @@ function parseTrackerSections(fragment) {
       });
     }
     controls.append(flags);
+    const logicRow = node("div", "tracker-options tracker-logic-controls");
+    const ageLabel = node("label", "", "In logic for ");
+    ageSelect = node("select");
+    ageSelect.id = "tracker-age";
+    for (const [value, text] of [["either", "Either age"], ["save", "Follow save"], ["child", "Child"], ["adult", "Adult"]])
+      ageSelect.append(new Option(text, value));
+    ageSelect.value = storedAge();
+    ageSelect.addEventListener("change", () => { storeAge(ageSelect.value); redraw(); });
+    ageLabel.append(ageSelect);
+    const onlyLabel = node("label");
+    logicOnly = node("input");
+    logicOnly.type = "checkbox";
+    logicOnly.id = "tracker-logic-only";
+    logicOnly.checked = false;
+    logicOnly.addEventListener("change", redraw);
+    onlyLabel.append(logicOnly, document.createTextNode(" Show only in-logic"));
+    clearMarks = node("button", "", "Clear manual marks");
+    clearMarks.type = "button";
+    clearMarks.id = "tracker-clear-marks";
+    clearMarks.title = "Remove every check you marked done for this seed and save folder";
+    clearMarks.addEventListener("click", async () => {
+      if (!window.confirm("Remove every check you marked done for this seed and save folder? Your save is not changed.")) return;
+      try { render(await request("tracker-clear-marks", {confirmed: true})); }
+      catch (error) { status.textContent = error.message; }
+    });
+    logicRow.append(ageLabel, onlyLabel, clearMarks);
+    controls.append(logicRow);
     const obs = node("div", "tracker-obs-link");
     const obsLabel = node("label", "", "OBS Browser Source URL (private; changes each app start)");
     obsUrl = node("input");
@@ -297,7 +343,51 @@ function parseTrackerSections(fragment) {
     }
     group.append(list);
   }
+  // The in-logic view of the app tab: which age key to read, and the one-line notes to show above the areas.
+  function logicView(state) {
+    const logic = state.logic || {};
+    if (standalone) return {key: null, notes: []};
+    const available = logic.available === true;
+    ageSelect.disabled = logicOnly.disabled = !available;
+    if (!state.logic) return {key: null, notes: []};
+    if (!available) return {key: null, notes: ["In logic unavailable: " + (logic.reason || "unknown reason")]};
+    const notes = [];
+    let key = ageSelect.value;
+    if (key === "save") {
+      key = logic.save_age || "either";
+      if (!logic.save_age) notes.push("Follow save: the save's age could not be read, so either age is shown.");
+    }
+    if (logic.unknown_items?.length) {
+      const labels = Object.fromEntries([...(state.items || []), ...(state.songs || []), ...(state.rewards || [])].map((cell) => [cell.id, cell.label]));
+      notes.push("In logic may be conservative: the save could not read " + logic.unknown_items.map((id) => labels[id] || id).join(", ") + ".");
+    }
+    return {key, notes};
+  }
+  function checkLine(check, key, filtering) {
+    const open = check.collected === false || (check.collected == null && !check.marked);
+    const inLogic = key && open && check.in_logic ? check.in_logic[key] : null;
+    const style = check.collected ? " tracker-check-collected" : check.marked ? " tracker-check-marked" :
+      inLogic === true ? " tracker-check-in-logic" : inLogic === false ? " tracker-check-out-of-logic" : "";
+    const mark = check.collected ? "✓ " : check.marked ? "☑ " : check.collected === false ? "— " : "? ";
+    const line = node("p", "tracker-check" + style, mark + (check.label || check.name || check.id) +
+      (check.marked ? " (marked done by you)" : "") + (check.item ? ": " + (check.item_label || check.item) : ""));
+    line.dataset.check = check.id;
+    if (inLogic != null) line.title = inLogic ? "In logic" : "Out of logic";
+    if (check.collected == null) {
+      const toggle = node("button", "tracker-mark", check.marked ? "Unmark" : "Mark done");
+      toggle.type = "button";
+      toggle.title = check.marked ? "Show this check as unknown again" : "The save cannot show this check: mark it done once you have it";
+      toggle.addEventListener("click", async () => {
+        try { render(await request("tracker-mark", {check: check.id, marked: !check.marked})); }
+        catch (error) { status.textContent = error.message; }
+      });
+      line.append(" ", toggle);
+    }
+    line.hidden = filtering && inLogic !== true;
+    return line;
+  }
   function render(data) {
+    lastData = data;
     const idle = data.status === "idle" || data.status === "unconfigured";
     initialized = initialized || !idle;
     const state = data.state;
@@ -361,13 +451,22 @@ function parseTrackerSections(fragment) {
     if (sections.size === TRACKER_SECTIONS.length) {
       const areas = section("Checks by area");
       areas.classList.add("tracker-areas-group");
-      areas.append(node("p", "tracker-explanation", "Saved collection only; ? means the collection contract is not established. Repeatable shops are not permanent checks."));
+      areas.append(node("p", "tracker-explanation", "Saved collection only; ? means the collection contract is not established. Repeatable shops are not permanent checks." +
+        (standalone ? "" : " Mark a ? check done once you have it; marks never change your save.")));
+      const view = logicView(state);
+      for (const note of view.notes) areas.append(node("p", "tracker-logic-note", note));
+      const filtering = !standalone && view.key !== null && logicOnly.checked;
       const areaGrid = node("div", "tracker-areas");
       for (const area of state.areas || []) {
         const item = node("div", "tracker-area");
-        item.append(node("strong", "", area.name), node("span", "", show(area.collected) + " / " + show(area.total) + (area.unknown ? " · " + area.unknown + " unknown" : "")));
-        if (!standalone && reveal.checked) for (const check of area.checks || []) {
-          item.append(node("p", "tracker-check", (check.collected == null ? "? " : check.collected ? "✓ " : "— ") + (check.label || check.name || check.id) + (check.item ? ": " + (check.item_label || check.item) : "")));
+        const counts = show(area.collected) + " / " + show(area.total) + (area.unknown ? " · " + area.unknown + " unknown" : "") +
+          (!standalone && area.marked ? " · " + area.marked + " marked done" : "") +
+          (view.key && area.in_logic ? " · " + show(area.in_logic[view.key]) + " in logic" : "");
+        item.append(node("strong", "", area.name), node("span", "tracker-area-counts", counts));
+        if (!standalone) {
+          const lines = (area.checks || []).map((check) => checkLine(check, view.key, filtering));
+          item.append(...lines);
+          item.hidden = filtering && !lines.some((line) => !line.hidden);
         }
         areaGrid.append(item);
       }

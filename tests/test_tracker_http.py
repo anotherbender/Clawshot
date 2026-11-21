@@ -281,3 +281,81 @@ def test_dungeon_keys_and_flags_stay_distinct_while_obs_polls_spoiler_free(track
         assert "Synthetic secret reward" not in json.dumps(polled)
         assert polled["state"]["dungeon_icons"] == DUNGEON_ICONS
         assert request(server, "tracker")[2]["state"]["dungeons"] == polled["state"]["dungeons"]
+
+
+@pytest.fixture
+def marks_seed(tracker_seed, monkeypatch):
+    """The tracker seed plus a shop check, which no save records (``collected`` stays unknown)."""
+    import clawshot.tracker.seeds as seeds
+
+    root, slot = tracker_seed
+    places = {name: Place("Test", None, "Chest") for name in ("Test Chest", "Test Key")}
+    places["Test Shop"] = Place("Test", None, "Shop")
+    monkeypatch.setattr(seeds, "location_index", lambda: places)
+    spoiler_path = root / "seed/spoiler.json"
+    spoiler = json.loads(spoiler_path.read_text(encoding="utf-8"))
+    spoiler["placements"]["Test Shop"] = "Synthetic shop reward"
+    spoiler_path.write_text(json.dumps(spoiler), encoding="utf-8")
+    return root, slot
+
+
+def check_entry(snapshot, check):
+    return next(c for area in snapshot["state"]["areas"] for c in area["checks"] if c["id"] == check)
+
+
+# 9.1, 9.3
+def test_mark_endpoint_toggles_unknown_checks_only(marks_seed):
+    root, _ = marks_seed
+    with running_server(Application(preferences=Preferences())) as server:
+        assert request(server, "tracker-mark", {"check": "Test Shop", "marked": True})[0] == 400  # no seed yet
+        assert request(server, "tracker-configure", {"seed": str(root)})[0] == 200
+        status, _, marked = request(server, "tracker-mark", {"check": "Test Shop", "marked": True})
+        assert status == 200, marked
+        assert check_entry(marked, "Test Shop")["marked"] is True
+        assert "Synthetic shop reward" not in json.dumps(marked)
+        assert check_entry(request(server, "tracker")[2], "Test Shop")["marked"] is True
+        unmarked = request(server, "tracker-mark", {"check": "Test Shop", "marked": False})[2]
+        assert "marked" not in check_entry(unmarked, "Test Shop")
+        for body in (
+            {"check": "Test Chest", "marked": True},  # save-confirmed: not collected
+            {"check": "No Such Check", "marked": True},
+            {"check": "Test Shop", "marked": "yes"},
+            {"check": 5, "marked": True},
+        ):
+            assert request(server, "tracker-mark", body)[0] == 400, body
+        assert request(server, "tracker-mark")[0] == 404  # GET: marks change only by POST
+        assert request(server, "tracker-mark", {"check": "Test Shop", "marked": True}, token=False)[0] == 403
+        assert (
+            request(
+                server,
+                "tracker-mark",
+                {"check": "Test Shop", "marked": True},
+                headers={"Origin": "https://evil.example"},
+            )[0]
+            == 403
+        )
+
+
+def test_marks_need_a_save_slot(marks_seed, tmp_path):
+    root, slot = marks_seed
+    slot.unlink()
+    with running_server(Application(preferences=Preferences())) as server:
+        assert request(server, "tracker-configure", {"seed": str(root)})[0] == 200
+        assert request(server, "tracker-mark", {"check": "Test Shop", "marked": True})[0] == 400
+        assert request(server, "tracker-clear-marks", {"confirmed": True})[0] == 400
+
+
+# 9.2, 9.3
+def test_clear_marks_needs_confirmation_and_clears_this_slot(marks_seed):
+    root, _ = marks_seed
+    with running_server(Application(preferences=Preferences())) as server:
+        assert request(server, "tracker-clear-marks", {"confirmed": True})[0] == 400  # no seed yet
+        assert request(server, "tracker-configure", {"seed": str(root)})[0] == 200
+        assert request(server, "tracker-mark", {"check": "Test Shop", "marked": True})[0] == 200
+        assert request(server, "tracker-clear-marks", {})[0] == 400
+        assert request(server, "tracker-clear-marks", {"confirmed": "yes"})[0] == 400
+        assert request(server, "tracker-clear-marks", {"confirmed": True}, token=False)[0] == 403
+        assert check_entry(request(server, "tracker")[2], "Test Shop")["marked"] is True
+        status, _, cleared = request(server, "tracker-clear-marks", {"confirmed": True})
+        assert status == 200, cleared
+        assert "marked" not in check_entry(cleared, "Test Shop")

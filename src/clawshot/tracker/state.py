@@ -561,7 +561,9 @@ def _identity(seed: Seed, save: save_format.Save | None) -> dict[str, Any]:
     }
 
 
-def _check_entry(check: Check, save: save_format.Save | None, show_locations: bool) -> dict[str, Any]:
+def _check_entry(
+    check: Check, save: save_format.Save | None, show_locations: bool, marks: frozenset[str] = frozenset()
+) -> dict[str, Any]:
     state, reason = collected(check, save)
     entry: dict[str, Any] = {
         "id": check.location,
@@ -574,34 +576,50 @@ def _check_entry(check: Check, save: save_format.Save | None, show_locations: bo
     }
     if state is None:
         entry["reason"] = reason
+        if check.location in marks:
+            entry["marked"] = True  # marked done by hand (tracker.marks); never shows the item (D7)
     if show_locations or state is True:
         entry["item"] = check.item
         entry["item_label"] = check.item_label
     return entry
 
 
-def areas(seed: Seed, save: save_format.Save | None, *, show_locations: bool = False) -> list[dict[str, Any]]:
+def areas(
+    seed: Seed, save: save_format.Save | None, *, show_locations: bool = False, marks: frozenset[str] = frozenset()
+) -> list[dict[str, Any]]:
     """Checks grouped by area in the seed's world order. Without ``show_locations`` an entry names its item only once
-    collected; ``collected`` is ``None`` (counted under ``unknown``) wherever the save cannot say."""
+    collected; ``collected`` is ``None`` (counted under ``unknown``) wherever the save cannot say. An unknown check in
+    ``marks`` (marked done by hand) has ``marked: true`` and is counted under ``marked`` as well as ``unknown``; a
+    save-confirmed state wins over a mark (D8)."""
     grouped: dict[str, list[dict[str, Any]]] = {}
     for check in seed.checks:
-        grouped.setdefault(check.area, []).append(_check_entry(check, save, show_locations))
+        grouped.setdefault(check.area, []).append(_check_entry(check, save, show_locations, marks))
     return [
         {
             "name": name,
             "collected": sum(c["collected"] is True for c in checks),
             "total": len(checks),
             "unknown": sum(c["collected"] is None for c in checks),
+            "marked": sum(c.get("marked", False) for c in checks),
             "checks": checks,
         }
         for name, checks in grouped.items()
     ]
 
 
-def build_state(seed: Seed, save: save_format.Save | None, *, show_locations: bool = False) -> dict[str, Any]:
+def build_state(
+    seed: Seed,
+    save: save_format.Save | None,
+    *,
+    show_locations: bool = False,
+    logic: Any = None,
+    marks: frozenset[str] = frozenset(),
+) -> dict[str, Any]:
     """The tracker's whole view, JSON-able. ``save`` may be ``None`` (seed totals with every save value unknown).
     ``tokens`` is the native token stock [S6], never a count of collected Skulltula sources [T]; those are counted in
-    ``skulltula_checks`` (collected, total and unknown source checks; total 0 when the seed shuffles no Skulltula)."""
+    ``skulltula_checks`` (collected, total and unknown source checks; total 0 when the seed shuffles no Skulltula).
+    With ``logic`` (a :class:`clawshot.tracker.logic.SeedLogic`) the state gains ``logic`` and in-logic data;
+    ``marks`` are the check ids marked done by hand (``clawshot.tracker.marks``)."""
     reader = _Reader(save)
     warnings = list(seed.warnings)
     identity = _identity(seed, save)
@@ -615,9 +633,9 @@ def build_state(seed: Seed, save: save_format.Save | None, *, show_locations: bo
     sources = any(c.method == SOURCE_PAIR for c in seed.checks)
     if save is not None and sources and (why := _source_layout(save)):
         warnings.append(f"Gold Skulltula sources show as unknown: {why}.")
-    grouped = areas(seed, save, show_locations=show_locations)
+    grouped = areas(seed, save, show_locations=show_locations, marks=marks)
     skulltulas = [check for area in grouped for check in area["checks"] if check["kind"] == "token"]
-    return {
+    state = {
         "seed": dict(seed.metadata),
         "identity": identity,
         "dungeons": dungeons(seed, save),
@@ -635,3 +653,6 @@ def build_state(seed: Seed, save: save_format.Save | None, *, show_locations: bo
         "show_locations": show_locations,
         "warnings": warnings,
     }
+    if logic is not None:
+        logic.annotate(state, seed, save, marks)
+    return state

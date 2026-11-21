@@ -209,13 +209,17 @@ def changes(placements: Mapping[str, str], *, prices: Mapping[str, int] | None =
     return {PATH: transform}
 
 
-def seed_setup(spec: Mapping[str, Any], settings: Settings):
-    """Four reviewed once-sale families; one pool reward per shared saved flag.
+def sale_prices(settings: Settings) -> dict[str, int]:
+    """Each once-sale's price under ``settings.scrub_prices``."""
+    return {
+        name: settings.scrub_price if settings.scrub_prices == "fixed" else sale.price for name, sale in SALES.items()
+    }
 
-    Public Scrub covers the two translated scrub types without exposing an internal
-    alias in the settings string. Capacities use fixed Medium actors (D16), held to
-    these destinations until their grants have been tested in chests.
-    """
+
+def logic_spec(spec: Mapping[str, Any], settings: Settings) -> dict[str, Any]:
+    """Scrub shuffle's spec change, dump-free: the once-sales become Scrub checks whose rules add the wallet tier
+    their price needs, and repeat/rotating vendors stay vanilla. Shared with the tracker's logic world
+    (``clawshot.patch.logic_world``)."""
     locations = {}
     for name, info in spec["locations"].items():
         if name in SALES:
@@ -223,9 +227,7 @@ def seed_setup(spec: Mapping[str, Any], settings: Settings):
         elif info.get("type") in ("Scrub", "GrottoScrub") and not info.get("keep_vanilla"):
             info = {**info, "keep_vanilla": "scrub shuffle: repeat/rotating vendor, not a saved one-time family"}
         locations[name] = info
-    prices = {
-        name: settings.scrub_price if settings.scrub_prices == "fixed" else sale.price for name, sale in SALES.items()
-    }
+    prices = sale_prices(settings)
     with SHOPS_TOML.open("rb") as stream:
         wallets = tomllib.load(stream)["wallet"]
     regions = []
@@ -246,7 +248,7 @@ def seed_setup(spec: Mapping[str, Any], settings: Settings):
                 ),
             }
         regions.append({**region, "locations": rules})
-    spec = {
+    return {
         **spec,
         "regions": regions,
         "locations": locations,
@@ -255,6 +257,17 @@ def seed_setup(spec: Mapping[str, Any], settings: Settings):
             "scrub_sale_prices": prices,
         },
     }
+
+
+def seed_setup(spec: Mapping[str, Any], settings: Settings):
+    """Four reviewed once-sale families; one pool reward per shared saved flag.
+
+    Public Scrub covers the two translated scrub types without exposing an internal
+    alias in the settings string. Capacities use fixed Medium actors (D16), held to
+    these destinations until their grants have been tested in chests.
+    """
+    spec = logic_spec(spec, settings)
+    prices = sale_prices(settings)
     held = dict(settings.item_location_types)
     for item in CAPACITIES:
         held[item] = (SHUFFLE,) if item not in held else tuple(t for t in held[item] if t == SHUFFLE)

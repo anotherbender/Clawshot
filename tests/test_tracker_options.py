@@ -42,7 +42,8 @@ console.log(JSON.stringify(fragments.map(value => context.parseTrackerSections(v
 RENDER = r"""
 const fs = require('node:fs');
 const vm = require('node:vm');
-const {fragment, obs, snapshot} = JSON.parse(fs.readFileSync(0, 'utf8'));
+const input = JSON.parse(fs.readFileSync(0, 'utf8'));
+const {fragment, obs, snapshot, actions = [], storage = {}, confirm = false, after = null} = input;
 
 class Element {
   constructor(tag, text = '') {
@@ -55,6 +56,7 @@ class Element {
     this.style = {setProperty() {}};
     this.hidden = false;
     this.ownText = text;
+    this.listeners = {};
   }
   get classList() {
     const names = () => this.className.split(/\s+/).filter(Boolean);
@@ -91,7 +93,8 @@ class Element {
   get textContent() { return this.ownText + this.childNodes.map((child) => child.textContent).join(''); }
   set textContent(value) { this.replaceChildren(); this.ownText = String(value); }
   setAttribute(name, value) { this.attributes[name] = String(value); }
-  addEventListener() {}
+  addEventListener(type, listener) { (this.listeners[type] ||= []).push(listener); }
+  dispatch(type) { for (const listener of this.listeners[type] || []) listener({preventDefault() {}}); }
   focus() {}
   select() {}
   descendants() { return this.childNodes.flatMap((child) => [child, ...child.descendants()]); }
@@ -116,27 +119,63 @@ const document = {
   createElement: (tag) => new Element(tag),
   createTextNode: (text) => new Element('#text', text),
 };
-const requested = [];
-async function fetch(url) {
+const requested = [], posts = [];
+async function fetch(url, init = {}) {
   const route = url.slice(url.lastIndexOf('/api/') + 5);
   requested.push(route);
-  const data = route === 'schema' ? {dialogs_available: false} : snapshot;
+  if (init.method === 'POST') posts.push({route, body: JSON.parse(init.body)});
+  const data = route === 'schema' ? {dialogs_available: false} : init.method === 'POST' && after ? after : snapshot;
   return {ok: true, json: async () => data};
 }
+// localStorage: a plain store, or (storage null) one whose every access throws, as in a private window.
+const stored = storage === null ? null : {...storage};
+const localStorage = {
+  getItem(key) { if (!stored) throw new Error('storage unavailable'); return key in stored ? stored[key] : null; },
+  setItem(key, value) { if (!stored) throw new Error('storage unavailable'); stored[key] = String(value); },
+  removeItem(key) { if (!stored) throw new Error('storage unavailable'); delete stored[key]; },
+};
 const location = {
   pathname: obs ? '/s/secret/tracker.html' : '/s/secret/', hash: fragment, origin: 'http://127.0.0.1:9',
 };
 const context = {
   document, location, fetch, URL, URLSearchParams, Option, console, navigator: {},
-  window: {addEventListener() {}, confirm: () => false}, setInterval: () => 1, clearInterval() {},
+  window: {addEventListener() {}, confirm: () => confirm, localStorage}, setInterval: () => 1, clearInterval() {},
 };
 (async () => {
   vm.runInNewContext(fs.readFileSync(process.argv[2], 'utf8'), context);
   for (let turn = 0; turn < 100 && documentElement.dataset.trackerReady !== 'true'; turn++) {
     await new Promise((resolve) => setImmediate(resolve));
   }
+  const settle = async () => {
+    for (let turn = 0; turn < 20; turn++) await new Promise((resolve) => setImmediate(resolve));
+  };
+  const byId = (id) => root.descendants().find((el) => el.id === id);
+  for (const action of actions) {
+    const target = action.id
+      ? byId(action.id)
+      : root.descendants().filter((el) => el.classList.contains(action.class))[action.index || 0];
+    if ('value' in action) target.value = action.value;
+    if ('checked' in action) target.checked = action.checked;
+    target.dispatch(action.event);
+    await settle();
+  }
   const text = (name) => root.descendants().filter((el) => el.classList.contains(name)).map((el) => el.textContent);
+  const shown = (el) => { for (let at = el; at; at = at.parentElement) if (at.hidden) return false; return true; };
+  const control = (id) => {
+    const el = byId(id);
+    return el ? {value: el.value, checked: el.checked, disabled: !!el.disabled} : null;
+  };
   console.log(JSON.stringify({
+    checks: root.descendants().filter((el) => el.classList.contains('tracker-check')).map((el) => ({
+      id: el.dataset.check, text: el.textContent, className: el.className, shown: shown(el),
+    })),
+    areaHeads: root.descendants().filter((el) => el.classList.contains('tracker-area-counts')).map((el) => ({
+      text: el.textContent, shown: shown(el),
+    })),
+    notes: text('tracker-logic-note'),
+    controls: {age: control('tracker-age'), only: control('tracker-logic-only'), clear: control('tracker-clear-marks')},
+    posts,
+    storage: stored,
     ready: documentElement.dataset.trackerReady === 'true',
     requested,
     compact: body.classList.contains('tracker-no-labels'),
@@ -148,15 +187,18 @@ const context = {
 """
 
 
-def render_tracker(tmp_path, snapshot, *, obs, fragment=""):
+def render_tracker(tmp_path, snapshot, *, obs, fragment="", **page):
     """The shipped renderer drawing one tracker ``snapshot``: the app tab, or (``obs``) the OBS page opened with URL
     ``fragment``. Returns the rendered text by element class (``status``, ``counts``, ``areas``) and the routes it
-    polled."""
+    polled; for the in-logic controls also ``checks``, ``areaHeads``, ``notes``, ``controls``, ``posts`` and
+    ``storage``. ``page`` may give ``actions`` (``{id or class, value/checked, event}``, dispatched in order after the
+    first render), ``storage`` (localStorage's contents; None makes every access throw), ``confirm`` (what
+    ``window.confirm`` answers) and ``after`` (the snapshot a POST answers)."""
     runner = tmp_path / "tracker-render.cjs"
     runner.write_text(RENDER, encoding="utf-8")
     result = subprocess.run(
         [NODE, str(runner), str(ASSETS / "tracker.js")],
-        input=json.dumps({"fragment": fragment, "obs": obs, "snapshot": snapshot}),
+        input=json.dumps({"fragment": fragment, "obs": obs, "snapshot": snapshot, **page}),
         capture_output=True,
         encoding="utf-8",  # the rendered text has non-ASCII separators; Windows' locale default would garble them
         timeout=10,

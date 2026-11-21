@@ -82,3 +82,11 @@ body.tracker-transparent, body.tracker-transparent .tracker-cell { background: t
   .tracker-path { grid-template-columns: minmax(0, 1fr) auto; }
   .tracker-path label { grid-column: 1 / -1; }
 }
+/* In logic (Tracker tab only): open checks reachable now, out of reach, and checks marked done by hand. */
+.tracker-logic-note { color: var(--muted); font-size: 12px; margin: 4px 0; }
+.tracker-check-in-logic { color: var(--success); font-weight: 600; }
+.tracker-check-out-of-logic { color: var(--muted); opacity: .75; }
+.tracker-check-collected { color: var(--muted); }
+.tracker-check-marked { color: var(--muted); font-style: italic; }
+.tracker-mark { padding: 0 6px; font-size: 11px; margin-left: 4px; }
+.tracker-area[hidden], .tracker-check[hidden] { display: none; }
