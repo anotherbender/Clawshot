@@ -236,10 +236,10 @@ All four chests read **false** using `save.flag('IsTreasureBoxOpen.<Hash>')`:
 | `18413589940135955604` | SAME grotto, invisible adult chest four metres beside visible; no Lens route played |
 | `16619432200060282313` | Fortress curtained-doorway/open-hole grotto, behind Skulltula; route played |
 
-The latter three **named Fortress-key grants remain unplayed**, as do the
-complete four-source/captain/card/Training chain. The checklist puts all FOUR
-chests before fights and states prominently that guard drops give20rupees,
-**not keys**. Valley/DMT HUD is not the Fortress inventory counter.
+All FOUR named Fortress-key chest grants and the four-rescue/captain/card/
+Training chain now have Kareem's played PASS recorded below. The checklist
+put all four chests before fights and distinguished guard20-rupee rewards
+from keys. Valley/DMT HUD is not the Fortress inventory counter.
 
 ### Longshot 3.0.0 checklist and duration
 
@@ -304,6 +304,38 @@ Only external diagnostic output adds these resources. No production writer,
 recipe registration or pack working-set change; `test_pack_nup_dump.py`,
 full gates and fill sweep are not applicable and were **not run**, per scope.
 
+### Played acceptance — 2026-11-21: main-control 01A–01D PASS
+
+**Kareem, relayed and accepted by Claude: PASS on Longshot 3.0.0.** He played
+the **main-control arm only**, checking main's existing experimental option;
+main and candidate packets are byte-identical, so no second arm is needed.
+He obtained the four keys from the four pinned chests, defeated the guards
+and received their **20-rupee drops**, spent the keys to free **all four
+carpenters**, received the native captain's **Gerudo Membership Card once**,
+then opened the Training Ground gate for its **30-rupee fee and entered**.
+
+Claude ran `04 - Read control fortress save.bat`. Read-out:
+`E:/OOTRemake/work/r20-cows/fortress/control-current-readout.json`.
+Final saved evidence: **4 keys found / 0 held**, **4 helped / 0 remaining**;
+all four guard-defeated, source-collected and rescued Bools true;
+**card_stock1**, Spirit **Step02**; both Training Ground gate Bools true;
+all four pinned chest-open Bools true. Final rupees **189**.
+This is the bounded four-rescue/card/entry acceptance, not a full shuffled
+playthrough or a reason to change the experimental default.
+
+**Source01 apparent +0 anomaly: CLOSED — measurement gap, not a bug.**
+Kareem went back and confirmed that the fourth guard **did give20rupees**.
+Floating pots also broke and gave **at least three blue rupees**, and he
+**reloaded slots**. Consequently the saves ordered by slot time are **not one
+continuous transaction timeline**:199→219→219→219→189 cannot isolate each
+guard's grant or establish a missing20/offsetting20-rupee expense.
+The recorded native30-rupee gate payment is accepted from the played report.
+The source01 net-zero inference is withdrawn; no main fix is indicated.
+
+Further currency tracing was stopped on Claude's clarification. The pending
+read-only scan had already completed when cancellation was requested; no
+additional trace, game launch, build, mod/save edit, gate or rerun was started.
+
 ## Source policy and handoff status
 
 Read the round-19 cows/keys records and required architecture/format/round
@@ -316,7 +348,7 @@ pouch stock, active String64 equips and runtime-only cow state; no GPL code
 copied. `plans/03-game-data.md` §19 and D22 record historical fairy persistence;
 that is not a newly played cow Continue check.
 
-## Handoff — READY (play-held)
+## Handoff — READY (merge)
 
 Only this round record enters the repository. All packets, profiles, decoded
 research, logs and scripts remain outside it. No browser or screenshot was used;
@@ -327,6 +359,9 @@ milk item-get scenes, no repeated candidate +20 and saved true establish the
 Continue proof. One shared Bool is proven, not per-cow checks; round21 must
 retain the empty-bottle prerequisite unless its refusal branch is bypassed
 and replacement delivery separately proven. No rerun or build was started.
-The complete Fortress chain remains play-held; use only main `01A`–`01D` for
-its40–65minute check. No cow locations admitted; Fortress remains experimental/
-default off. Preserve actual game observations, new saves and load logs.
+**Fortress four-rescue main-control PASS**, including all four key chests,
+guard20-rupee rewards, rescues, card once and Training Ground entry/30-rupee
+fee. The source01 anomaly is closed as a reload/measurement gap, not a bug.
+Both requested played checks are complete within their documented scope;
+only this research/acceptance record merges. No cow locations admitted;
+Fortress remains experimental/default off. No product code or version change.
