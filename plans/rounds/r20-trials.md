@@ -402,9 +402,66 @@ Proof `lift-followup/fixed-testcopy-proof.json`. This also supplies the correcte
 state to an existing save, because new-game defaults do not migrate played saves.
 No inventory, quest, core/counter/all-clear or other saved field was changed.
 
-Only the trials candidate will be rebuilt with its SAME seed/settings/placement inputs.
-Natural-adult/open-Door settings are not added. Bridge and control arms stay untouched.
-Gate order is now cs20a -> cs20c -> cs20d: acquire only after cs20c explicitly posts
-LOCK RELEASED; every gate stage checks no game, waits600s and rechecks while one is active.
-No gate lease has been acquired for this follow-up yet. Runtime lift retest remains pending.
+Only the trials candidate was rebuilt with its SAME seed/settings/placement inputs:
+121 files, seed20202004. Natural-adult/open-Door settings were not added. Bridge and
+control arms stayed untouched; the played packet is archived outside the repository.
+The canonical `ingame/Test - trials candidate.bat` now selects the fixed TEST-COPY;
+Longshot3.0.0 DRYRUN passed. Normal lift ride and Save/Continue remain unplayed.
+
+### Rebased lift follow-up: ordered parity and full gate PASS
+
+Claude requested the rebase, no new sweep (placements unchanged), three default6 seeds,
+one count0 difference proof and a full game-free gate. Fix/source head
+`b234e3e0e00364b9cc934b83dfb4a5248fe86f53` is based on main
+`be0e288b1adce87db512dd162435da37f140e52b`. Post-rebase focused native checks:14 passed.
+
+Actual main and candidate outputs were rebuilt at one worker, checking game absence
+before every seed. **Every output file**, including metadata, matches by relative path
+and SHA256 for each default6 seed:
+
+| Seed | Identical files per arm |
+|---|---:|
+| 20202004 | 124 |
+| 20202014 | 122 |
+| 20202024 | 119 |
+
+For count0 seed20202004, actual pre-fix code
+`0b665b0ee77adc26c580184e3be77dc46df1483b` on the SAME main was also built.
+Across121 files only `romfs/GameData/GameDataList.Product.110.byml.zs` changes.
+Its only tree difference is `HavePlayedEvent.Dm_InsideGanonCastle_0090.DefaultValue`
+false->true; restoring that Bool makes the entire BYML tree identical.
+Receipt: `E:/OOTRemake/work/r20-trials/lift-followup/parity-results.json`.
+
+**Older played-packet distinction:** rebasing also changes `spoiler.json` because the
+unchanged Windmill heart-piece placement moves from reachable sphere1 to10 under main's
+logic correction. No placement moved. The receipt preserves both played-packet hashes;
+stale spoiler bytes were NOT copied back to manufacture an all-file identity claim.
+The fix-only history proof above uses actual old code on the same corrected baseline.
+
+cs20c explicitly posted LOCK RELEASED at13:09. cs20d acquired only afterward, retained
+one lease through parity and all four gate stages, and posted LOCK RELEASED at14:15.
+All stages ran on frozen `b234e3e0`; per-stage tasklists show no Hookshot/Longshot game.
+The600-second game-wait policy remained enabled; no waits were needed. No new sweep.
+
+| Full gate | Observed result |
+|---|---|
+| `uv run ruff format --check` | 527 files already formatted |
+| `uv run ruff check` | All checks passed |
+| Synthetic `uv run --with pytest-xdist pytest -n8` | 4196 passed,819 skipped,24 warnings;440.25s |
+| Dump `uv run --with pytest-xdist pytest -m dump -n8` | 816 passed,24 warnings;3099.46s |
+
+Synthetic internal workers4; dump internal workers3. Dump used the read-only native
+ROMFS/NUP and r19 layered-dump paths recorded by the gate script.
+Receipt: `E:/OOTRemake/work/r20-trials/lift-followup/gate/results.json`; stage logs alongside.
+This final round-note update is receipt-only, after the gate; source/tests remain those
+of the gated fix commit.
+
+Claude's fixed-candidate **boot PASS** is
+`E:/OOTRemake/work/r20-trials/bootcheck-lift-fixed.txt`: Longshot3.0.0/source87cb36aa,
+160 RomFS entries, crash0/fatal0, save mounted, one mod; modded GameData and initializer
+both loaded. Cited in `ingame/START HERE.md` and `CHECKLIST.md`. Boot is not lift gameplay.
+The approved short route still requires Continue -> normal entrance/call area -> ride up
+-> Save/Continue -> repeat. No debug age, forged inventory/quest/core changes, New Game,
+or teleport into/above the tower. Do not claim natural adulthood, arbitrary old-save
+migration, partial-trial gameplay or a full playthrough from this fixture.
 
