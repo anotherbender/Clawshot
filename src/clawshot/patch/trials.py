@@ -15,6 +15,7 @@ COUNT = "InsideGanonCastle_Dungeon_Barrier_Count"
 ALL_CLEAR = "InsideGanonCastle_IsAllBarrierClear"
 MESSAGE_FILE = "EventFlowMsg/Dm_InsideGanonCastle_0003.msbt"
 MESSAGE = "Dm_InsideGanonCastle_0003_Text_002_b"
+ZERO_MESSAGE = "Dm_InsideGanonCastle_0003_Text_001_b"
 
 
 def initial_values(seed: int, count: int) -> list[gamedata.FastStartSetting]:
@@ -47,8 +48,10 @@ def changes(romfs, *, seed: int, count: int) -> FileChanges:
 
     def transform(data: bytes) -> bytes:
         files = sarc.read(data)
-        original = msbt.read(files[MESSAGE_FILE]).messages[MESSAGE]
-        parts = text.stone_line(original, line)
-        return text.edit_messages({MESSAGE_FILE: {MESSAGE: parts}})(data)
+        messages = msbt.read(files[MESSAGE_FILE]).messages
+        edits = {MESSAGE: text.stone_line(messages[MESSAGE], line)}
+        if not active:
+            edits[ZERO_MESSAGE] = text.stone_line(messages[ZERO_MESSAGE], "The way into the tower has been opened.")
+        return text.edit_messages({MESSAGE_FILE: edits})(data)
 
     return {text.archive_path(language): transform for language in text.languages(romfs)}

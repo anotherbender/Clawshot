@@ -112,6 +112,11 @@ def test_partial_seed_tracker_rebuild_matches_generator_and_discloses_names(monk
     generated_gate = out.world.regions["Root"].exits[0].rule
     for flags in (Counter(), Counter({name + " Trial Clear": 1 for name in active})):
         assert actual_gate(flags, "adult", 1) == generated_gate(flags, "adult", 1)
+    missing = replace(tracker_seed, metadata={**tracker_seed.metadata, "seed": None})
+    unavailable = tracker_logic.load_world(missing)
+    assert not unavailable.available and "seed number" in unavailable.reason
+    native = replace(missing, metadata={**missing.metadata, "settings_string": Settings().to_string()})
+    assert tracker_logic.load_world(native).available
 
 
 @pytest.mark.parametrize("value", [-1, 7, True, 1.5])
@@ -241,6 +246,9 @@ def test_native_trial_defaults_and_barrier_message_change_only_selected_state(ro
         assert all(name in visible for name in active)
         assert all(name not in visible for name in TRIALS if name not in active)
         new.messages[trials.MESSAGE] = old.messages[trials.MESSAGE]
+        if not active:
+            assert "opened" in msbt.plain(new.messages[trials.ZERO_MESSAGE])
+            new.messages[trials.ZERO_MESSAGE] = old.messages[trials.ZERO_MESSAGE]
         assert new == old
         after[trials.MESSAGE_FILE] = files[trials.MESSAGE_FILE]
         assert after == files

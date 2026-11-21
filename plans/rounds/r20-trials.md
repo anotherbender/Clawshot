@@ -113,5 +113,57 @@ settings string, with clear new-game/built-not-played help. Screenshot inspected
 `work/r20-trials/ui-settings.png`; receipt `ui-proof.json`. Browser/server closed.
 No omp browser tool, visible Chrome window, user preferences or player seed paths used.
 
-Sweeps, paired packets, default all-file parity and exact-head full gate still pending.
+Post-rebase focus on local main176c2f4: **132/132 passed** in20.63s, native RomFS set,
+`-n2`, `CLAWSHOT_WORKERS=1`. Subsequent narrow boundary correction refuses partial-trial tracker
+reconstruction without a seed number while leaving default6 independent of it. Zero-trial text
+also replaces the native preceding “blocked” line; the scene's six tube actors always exist
+(`Logic_Create=true`), so it does not require a deleted barrier actor. No scene/flow edit added.
+
+### Ordered acceptance plan (Claude, 2026-11-20)
+
+The original2100-seed proposal was cancelled **before acquiring a lock or generating a seed**.
+The auto-retry waiter was cancelled while cs20b owned the lock. New driver never auto-retries;
+turn2 starts only after cs20b explicitly posts LOCK RELEASED.
+Estimated parity+sweep wall time30–40minutes at6workers, unmeasured; report actual time.
+Claude approved one round-file-only receipt commit after the sweep, then the exact-head full
+gate on that final head if source/test bytes are unchanged. No extra matrix before that gate.
+
+| Recipe | Seeds | trials_count | Token bridge threshold |
+|---|---:|---:|---:|
+| Exact broad CS1 | 200 | 0 | 3 |
+| Exact broad CS1 | 200 | 3 | 40 |
+| Defaults | 50 | 3 | 20 |
+| Recommended | 50 | 3 | 20 |
+
+500 sweep seeds, not2100. Three additional private default seeds20202004/20202014/20202024
+are built through both actual-main and candidate writers; every output file is hashed.
+The all101 threshold synthetic test covers numeric comparison boundaries without an oversized sweep.
+Partial selection varies across the200-seed cohort. Sweep receipt records each production attempt,
+first-attempt failures, exhausted seeds, token conservation and exact selected-trial count.
+Driver: `work/r20-trials/sweep.py --ordered-turn`; full gate: `gate.py --continue-owned-lease`.
+The same owned lease continues through the round-file receipt and full gate; no game/build/boot.
+
+### Prepared private paired checks (not yet built or played)
+
+Production builders run under the ordered lease; both arms use the same explicit placements,
+native admission checks and beatability search. Candidate changes only the tested setting.
+Bridge seed20202014 has one pool-preserving chest/chest swap to put a token in Zora's River's
+open-grotto chest; this exercises chest tokens, not a Skulltula kill counter.
+Its natural first-adult Nov9 save has15 tokens; the sole documented fixture edit is stock15→2
+in a copied save, applied identically to both arms. No other source/era/inventory/quest edit.
+Trials seed20202004 starts each profile empty, testing real new-game defaults, not save repair.
+
+Folder `E:/OOTRemake/work/r20-trials/ingame/`; prepared launcher names:
+`Test - bridge main.bat`, `Test - bridge candidate.bat`,
+`Test - trials main.bat`, `Test - trials candidate.bat`.
+All pin **Longshot 3.0.0** stable, use one mod and unset HOS_FS_OVERLAY.
+Checklist `ingame/CHECKLIST.md`; **15–22minutes per paired check**, unmeasured, each under30minutes.
+Bridge: closed at2; chest token gives3; native-story control stays closed, candidate rainbow scene
+and bridge open; chest/counter/latch persist through Continue. Trials: one explicitly permitted
+debug age change to adult in each new game, entrance teleport, normal tower shutter/barrier approach;
+control blocked, zero-trials candidate passes without a core; save/Continue persists.
+If stable runtime offers no age change, stop rather than edit a save or invent another fixture.
+Inspector `inspect_packet.py <bridge|trials> --played` checks only these isolated saved states.
+
+Final observed parity/sweep/gate counts, packet hashes and dry-run proof pending.
 No READY or in-game claim.
