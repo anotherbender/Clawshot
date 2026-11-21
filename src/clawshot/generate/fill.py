@@ -126,6 +126,7 @@ class Settings:
     shuffle_100_token_reward: bool = DEFAULTS["shuffle_100_token_reward"]
     dungeon_rewards: bool = DEFAULTS["dungeon_rewards"]
     shuffle_master_sword: bool = DEFAULTS["shuffle_master_sword"]
+    excluded_locations: tuple[str, ...] = tuple(DEFAULTS["excluded_locations"])
     bridge: str = DEFAULTS["bridge"]
     bridge_count: int = DEFAULTS["bridge_count"]
     logic: dict[str, Any] = field(default_factory=dict)
@@ -150,7 +151,7 @@ class Settings:
     hint_distribution: str = DEFAULTS["hint_distribution"]
 
     def __post_init__(self) -> None:
-        for name in ("shuffle", "areas", "fast_start", "exclusive_location_types"):
+        for name in ("shuffle", "areas", "fast_start", "exclusive_location_types", "excluded_locations"):
             values = getattr(self, name)
             if not isinstance(values, (tuple, list)) or not all(isinstance(value, str) for value in values):
                 raise ValueError(f"{name} must be a list of names")
@@ -276,6 +277,8 @@ class Settings:
             out["shuffle_master_sword"] = True
         if self.shuffle_100_token_reward:
             out["shuffle_100_token_reward"] = True  # absent when off, like shuffle_hideout_keys
+        if self.excluded_locations:
+            out["excluded_locations"] = list(self.excluded_locations)
         if self.item_location_types:
             out["item_location_types"] = {
                 k: list(self.item_location_types[k]) for k in sorted(self.item_location_types)

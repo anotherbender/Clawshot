@@ -21,6 +21,7 @@ shuffle_hideout_keys = false # Round 18, Kareem: the four Fortress jail keys get
 shuffle_100_token_reward = false # Round 19, issue #12: opt-in progression at the first 100-token House reward; needs Gift shuffle
 dungeon_rewards = false # Kareem, r18: shuffle only the nine reward slots, including Rauru
 shuffle_master_sword = false # Round 19, Kareem: opt-in; cs19c proposal: Master Sword chest-only, needs Chest and free_time_travel
+excluded_locations = [] # Round 20: player-selected locations never hold progression; empty preserves existing seeds
 bridge = "vanilla"
 bridge_count = 0 # explicit stones 0..3, medallions 0..6 or rewards 0..9; vanilla uses 0
 fast_start = ["intro"]
