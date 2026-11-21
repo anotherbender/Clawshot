@@ -328,3 +328,25 @@ stone read is **built, not played**, not claimed covered by that packet.
 Claude retained turn5; one corrected frozen full gate, including dump, follows
 these cause-targeted proofs. No unchanged rerun and no sweep.
 
+### Native inverse contracts repaired on the real dump
+
+Gate `89d31ae476`: format/lint pass; synthetic **4180 passed,805 skipped,24 warnings
+in433.57s**. Native dump: **800 passed,2 failed,24 warnings in2930.73s**.
+Printed first difference: native Event293's shared `Enemy_Scrub_Business_Heart_01`
+message ID versus the intended per-sale `Clawshot_Scrub_DMC` ID. The two old whole-flow
+inverse tests restored item/price/offer-guard edits but not the new message IDs.
+
+Claude approved a narrow **test-contract update**, not a production change:
+`tests/test_scrubs_dump.py` and `tests/test_shop_settings_dump.py` explicitly assert
+the correct selected message ID for every grant/tier/copy, then restore that event's
+exact native ID before retaining the **entire whole-flow equality**. No saved gate,
+payment/cancellation branch or unrelated field is permitted to differ.
+Ruff format diff: both files already formatted.
+
+The **two exact failed nodes**, isolated against the **real**
+`OOT_ROMFS=E:/Games/Hookshot/romfs`, `-n2`, `CLAWSHOT_WORKERS=1`:
+**2 passed in69.70s**. No fixture-only claim and no unchanged rerun.
+These files join the focused set. Production remains unchanged from `89d31ae476`.
+Per Claude, freeze this test/round receipt and run **all four full-gate stages again**,
+including the complete native dump tier, before the final packet rebuild/hash.
+
