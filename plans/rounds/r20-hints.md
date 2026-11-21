@@ -422,3 +422,43 @@ After article trimming: **5 native tests passed in11.31s**. Exhaustive proof:
 **288 actual native archive Door/Bridge readbacks** (18 cases per language),
 each row atomic and every page1–2 rows. Evidence `work/r20-hints/altar-layout-proof.json`.
 
+### Altar v2 final gate, boot and provenance
+
+Stage05 v2 was rebuilt from **`7ed1eafc861cded497b284b5060f6066e1402251`**,
+same private seed20200121, settings and placement map. Native delta proof across
+all16 archives permits only `SignboardWood:TempleOfTime_000` and the required size
+table to differ from v1; every other file is identical. Actual staged text:
+**7 pages, at most2 atomic rows/page, maximum36 characters/row**. The existing
+stage05 candidate launcher alone now selects `r20-hints-altar-v2` and a fresh v2
+private profile; dry-run passed and copied progress bytes equal the natural source.
+Other nine stage launchers remain unchanged.
+
+**Claude boot PASS** on Longshot3.0.0: crash0/fatal0, save mounted, one mod,
+177 RomFS files/218 entries, modded USen archive loaded. Evidence
+`work/r20-hints/bootcheck-altar-v2.txt` is cited in START HERE and the05 checklist.
+No played readability/pixel-clipping acceptance is claimed.
+
+**Full exact-head gate `7ed1eafc86` PASS**:
+
+| Stage | Result |
+|---|---|
+| Ruff format / lint | both exit0 |
+| Synthetic, `-n8`, internal4 | 4180 passed,805 skipped,24 warnings;547.12s |
+| Complete native dump, `-n8`, internal3 | 802 passed,24 warnings;3407.50s |
+
+Every stage began with `game_running=false`. Driver honored **four600-second
+waits**: three before format, one before dump. No failures/reruns, no sweep.
+Owned lock released and explicit LOCK RELEASED posted; gate receipt
+`work/r20-hints/gate/7ed1eafc86/results.json` records all exits0 and `passed=true`.
+
+**After the passed gate**, rebuilt again from that exact head at one worker.
+Every file compared to Claude-booted stage05 v2: **179/179 SHA-256 and sizes
+identical**, no added/removed/changed paths and no exclusions. Complete manifests:
+`work/r20-hints/ingame/gated-altar-v2-hashes.json`. No restage or repeat boot needed.
+START HERE and05 checklist cite this identity. This final receipt changes only this
+round file; gated production/tests remain unchanged.
+
+**READY (play-held), altar follow-up:** one reward/region per whole line, Door/Bridge
+on their own lines. Stage05 only updated; in-game readability acceptance still
+belongs to Kareem. cs20a did not start the game or write to original saves/game folders.
+
