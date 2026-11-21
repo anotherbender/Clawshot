@@ -1,8 +1,8 @@
 """Skip selected trial cores through existing new-game state; no new saved flags.
 
 Native evidence: plans/rounds/r20-trials.md. Partial counts retain the real last-core
-scene, counter decrement and all-clear writer. Zero initializes the native all-clear
-Bool because no last core will run. Scene history and quest steps are never forged.
+scene, counter decrement and all-clear writer. Zero initializes the native terminal
+barrier and movie-history state so the lift call area exists without a last core.
 """
 
 from clawshot.formats import msbt, sarc
@@ -13,6 +13,7 @@ from clawshot.patch.write import FileChanges
 REMOVAL = "InsideGanonCastle_Dungeon_BarrierRemove_"
 COUNT = "InsideGanonCastle_Dungeon_Barrier_Count"
 ALL_CLEAR = "InsideGanonCastle_IsAllBarrierClear"
+CLEAR_MOVIE = "HavePlayedEvent.Dm_InsideGanonCastle_0090"
 MESSAGE_FILE = "EventFlowMsg/Dm_InsideGanonCastle_0003.msbt"
 MESSAGE = "Dm_InsideGanonCastle_0003_Text_002_b"
 ZERO_MESSAGE = "Dm_InsideGanonCastle_0003_Text_001_b"
@@ -26,13 +27,14 @@ def initial_values(seed: int, count: int) -> list[gamedata.FastStartSetting]:
     values[COUNT] = count
     if count == 0:
         values[ALL_CLEAR] = True
+        values[CLEAR_MOVIE] = True
     return [
         gamedata.FastStartSetting(
             name="ganon_trials",
             default=False,
             skips="Selected Ganon's Castle trial cores",
-            state="Existing skipped-core completion Bools and matching remaining count; zero also clears the barrier",
-            source="plans/rounds/r20-trials.md: native Defeat_Ganon core writes and room01 barrier/door readers",
+            state="Existing core Bools/count; zero also completes native barrier-clear and lift-call history",
+            source="plans/rounds/r20-trials.md: native last-core scene and room01 barrier/lift/pot readers",
             logic="The native tower rule requires only the selected remaining trials",
             game_data=values,
             flow_edits=(),

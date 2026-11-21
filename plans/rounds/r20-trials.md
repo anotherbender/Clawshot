@@ -3,7 +3,16 @@
 Branch `r20/trials`; initial base `acbb903`, integrated base `ade62dc`; model `openai-codex/gpt-6.1-sol`.
 Research/output: `E:/OOTRemake/work/r20-trials/`. Native dump read-only.
 Agent launched no game, wrote no runtime folder, opened no personal seed and changed no original save.
-Every behavior change remains **built, not played** until Kareem's paired **Longshot 3.0.0** check.
+Historical acceptance/staging receipts below are superseded by the current played verdict and follow-up.
+
+**Current played verdict (Kareem via Claude, 2026-11-21):** bridge PASS: closed at15,
+native scene at16, persisted; saved stock16, River chest open, bridge history=true.
+Zero-trial check is **BLOCKED**: barrier gone, central elevator unavailable. Saved Count0,
+all six removals=true, AllBarrierClear=true,0090 history=false. The old checklist's debug-age
+toggle left `Sequence_IsChildhood=true`; Claude confirms this known incomplete toggle.
+Treat age as a confound, not proof the lift bug is count0. Old assertions below that the
+last-core movie was unneeded cover barrier/pots only and are withdrawn for tower access.
+Claude cancelled the age-only probe; the next check uses the zero-only history fix and an explicitly approved short two-Bool TEST-COPY, pending restage/boot/gate.
 
 ## Requested contract
 
@@ -250,4 +259,152 @@ Both sets are byte-identical. Staged mods, launchers and profiles were left unto
 no restage or replacement-byte boot check is needed. `ingame/START HERE.md` now cites this
 proof alongside Claude's four-arm boot receipt and per-arm time budgets. Existing boots
 cover the same candidate bytes; bridge/barrier/tower/Continue behavior remains **unplayed**.
+
+
+### Played follow-up: natural adulthood and voice alternatives (Claude requested)
+
+Natural-adult staging uses existing supported settings `forest=open`, `door_of_time=open`,
+`fast_start=[intro,saria,kaepora]`, `trials_count=0`, Master Sword unshuffled.
+Open Door is **not** immediate: its existing CLOCK_READY expression requires both
+`HyruleField_ArriveEntrance` (supplied by Kaepora skip) and the real Impa field send-off
+`HavePlayedEvent.Dm_HrlField_0020` (not forged by any chosen skip).
+Leave the forest normally to receive Saria's Fairy Ocarina; Saria wake-up skip grants no instrument.
+Play Malon's fixed Egg/Chicken -> Talon -> courtyard -> Zelda/Impa lesson -> real send-off;
+then enter the Temple and pull the Master Sword. Native DoorOfTime Event115 grants the sword,
+Event98 swaps era equipment, Event103 writes `Sequence_IsChildhood=false`; finish Rauru and
+adult Sheik scenes. Verify the saved age flag before the castle approach. Do not transplant the
+failed debug-age save into this check, write an age flag, or skip the real send-off.
+Sources: `plans/rounds/r16-time.md`, `plans/rounds/r18-master-sword-design.md`,
+`src/clawshot/patch/door_stage.py`, `src/clawshot/data/fast_start.toml`.
+Allow **30–50 minutes**, unmeasured: approximately15–30 to become adult, then10–15 for
+castle/lift/persistence checks plus launch/loading margin. No under30-minute claim.
+
+**Voiced first-view text — maintainer options, not a silent product change:**
+
+1. **Keep the current replacement.** It correctly reports the selected trials, but Kareem
+   confirmed Rauru's existing voice-over says different words. Voice is not stored in MSBT;
+   changing text does not change the native movie's audio. This preserves the present patch
+   and presentation mismatch; it is not fixed by an MSBT tag.
+2. **Move “no trials remain” to a non-voiced message, restoring the movie's native text.**
+   A concrete existing candidate is Navi balloon407: Defeat_Ganon's FromDoor first-view tail
+   Event483 already calls `Npc_Navi.EventNaviRequestBallonMessage(Index=407)`. Its standard
+   Navi bubble is non-voiced. Its exact message label is not yet decoded: r12 documents the
+   512-key lookup method but did not resolve407. Also it is door-route/first-view-only;
+   the area route has no such balloon. Resolve its key and choose equivalent coverage before
+   implementing this option. Do not invent a message ID or claim current code uses it.
+
+No voice option is selected by this investigation. The lift/age fix and candidate restage
+must not silently move hints, mute the native scene, or bypass story/era transitions.
+
+
+### Lift predicate and five-minute TEST-COPY isolate (latest Claude instruction)
+
+The actual lift is `Obj_InsideGanonCastle_ElevatedFloor_A_01`, actor
+Hash16225864798665712662 in `Banc/InsideGanonCastle/InsideGanonCastle_Static.bcett.byml.zs`.
+Room01 AI group16848031393208115130 uses module `_e183`, binding lift instance `_f1b6`.
+Its placement is Y128.42958, direction(0,-1,0), distance26.4; this is not the barrier or shutter.
+
+Fresh decode of the current native `_e183` module confirms the exact missing gate:
+node9 `HoldGameDataGetBoolSimple(HavePlayedEvent.Dm_InsideGanonCastle_0090)` output0
+drives node4 `ActorLogicAreaActor(Area_725e).Logic_Create`. That is the **call/target-floor
+sensor**, Hash5467824123512662099, not creation of the lift itself. Node4 SensorHitInfo
+feeds node5's player observer; node5 IsHit output0 feeds node1
+`ActorLogicElevatorLift_A_00.IsTargetFloor`. Node1 Logic_Create is independently defaulttrue.
+Other contact/pulse gates drive force-warp/boarding behavior. History=false disables the
+call area even though Count0 and AllBarrierClear remove the central barrier.
+
+The history field is an existing saved Bool (Hash2809946991, native defaultfalse,
+reset8/save0). No named age/era field appears in the castle scene-module/flow scan;
+the lift actor parameter tables contain no age condition, and its root AINB contains no
+`Sequence_IsChildhood`, `IsAdult`, `EventQueryPlayerIsChild`, `GameDataNameBool` or `CurrentEra`.
+This does not prove absence of an opaque engine-era cache. The standalone unmodified
+research decoder hit its own ParseWarning constructor bug on that root's expression
+section; no library/engine code was patched to hide the failure. Scene-module edges were
+decoded successfully from the current native file; do not confuse string evidence with
+a successful root-expression decode.
+Facts: `lift-followup/lift-predicate-proof.json`, `lift-node-evidence.json`,
+`lift-placement-pack.json`, `lift-actor-parameters.json`, `lift-actor-decoder-facts.json`.
+
+Partial counts retain the real final core: native `_All` tail Event774->606 accepts Count<=0,
+then Event778 sets AllBarrierClear and Event27 plays0090 before Step04. With at least one
+real core, history can become true natively; count0 runs no core. A zero-only initialization
+of the existing history Bool is the minimal candidate fix **if the age-isolate probe fails**;
+do not apply it or claim sufficiency before the requested probe.
+
+**TEST-COPY ready, not played:** copied the entire played candidate profile to new
+`ingame/user-r20-trials-TEST-COPY-adult`. Modified only latest castle save's
+`Sequence_IsChildhood=true->false`, byte offset72068. Parsed entry diff is exactly that
+one Bool; raw diff exactly one byte; all other copied files and original profile hashes
+are unchanged.0090 history remains false. No production mod, source behavior, inventory,
+quest flag or original save was changed. Proof: `lift-followup/age-testcopy-proof.json`.
+Launcher `ingame/Test - trials TEST-COPY adult flag.bat` pins Longshot3.0.0 and the unchanged
+original candidate mod, passed DRYRUN; Claude boot-checks, Kareem Continues the latest
+castle save and tests the normal entrance->tower lift route, about5 minutes.
+No New Game, debug age or teleport into/above the tower. `START HERE.md` points to this probe.
+
+Gate policy for any later fix: each stage checks for a running Hookshot/Longshot process;
+if one is active, wait10 minutes and check again, never start that stage during the game.
+No production fix, new-game rebuild or gate has been started while this probe is pending.
+
+
+### Exhaustive reader census and zero-only fix (supersedes age-only probe)
+
+Claude cancelled the age-only probe after the lift predicate was established. Its launcher
+was renamed `.bat.disabled`; the unused copy/proof remain research evidence.
+The short replacement route was explicitly approved in the form (`short_test_copy`):
+a NEW copy of the played profile, with only `Sequence_IsChildhood=false` and0090 history=true.
+This avoids the30–50minute replay but does not claim to prove natural adulthood.
+
+Parent closed the scouts' execution/coverage gaps with a **complete current-ROMFS scan**:
+186583 files,340076 decompressed leaf resources,10454 archives,102185 zstd frames,
+51053366981 bytes scanned, zero errors. No large-file skip; plain large files streamed.
+All914 EVFL files were parsed freshly (653 flowcharts,261 timelines). All884 BoolExp
+rows and their transitive BoolExp references were checked: no history-expression alias.
+The only numeric GameData occurrences are the Bool definition and
+Struct `HavePlayedEvent` member `Dm_InsideGanonCastle_0090` pointing at that SAME Bool,
+not another expression or independent reader.
+
+**Every data-defined reader of the history field:**
+
+| Reader | Effect of zero's new true initial value |
+|---|---|
+| `Room_01_Prefab_e183`, node9 -> node4 `Area_725e.Logic_Create` -> node5 -> lift node1 `IsTargetFloor` | Creates the lift call/target-floor sensor; normal player contact can request descent/boarding. Does not create the always-present lift actor. |
+| `Room_01_Prefab_75af`, node1 -> nodes2–5 `Logic_Create` | Creates the four native post-finale pots `Obj_Pot_A_06_b559`, `_aea3`, `_f0f5`, `_f42d` at room load. Their existing loot becomes available earlier; contents are untouched. Not merely a cosmetic effect. |
+
+No other loose or packed asset contains the full saved-field name. Bare0090 matches are
+movie, voice, camera, effect, animation, sound/message resources and registry records,
+plus Defeat_Ganon Event27's transition; they are not additional field-reading gates.
+Native0090 itself has no history query. The engine's generic event-history recording is
+not an explicit event-flow writer. This census covers native data, not an assertion that
+arbitrary engine C++ never consults history. Receipts:
+`lift-followup/history-asset-inventory.json`, `history-flow-and-hash-inventory.json`,
+`history-expression-aliases.json`, plus the decoded node evidence above.
+
+**Implemented minimal fix:** only `count==0` additionally initializes existing
+`HavePlayedEvent.Dm_InsideGanonCastle_0090=true` through the shared new-game hook.
+This completes the skipped barrier-clear presentation state; no barrier-clear movie
+plays when there is no barrier. Existing AllBarrierClear/removal/count handling stays.
+Counts1–6 do not change this history or AllBarrierClear default; partial counts therefore
+wait for the real last core, whose native count<=0 tail sets clear before playing0090.
+No new flag, quest step, production age value, event flow, actor binding or runtime patch.
+
+**Focused native/synthetic proof:139 passed in29.83s**, game-free, `-n2`, internal workers1.
+The extended saved-state regression catches missing zero history and premature partial
+history. New native regression covers0–6, checks the actual GameData history/age defaults,
+and for1–5 traverses the native count<=0 all-tail to the clear writer then0090 transition.
+The production age row remains byte/tree-identical; TEST-COPY repair is separate.
+Receipt `lift-followup/focused.log`; no unchanged failing rerun.
+
+Approved fixed TEST-COPY prepared separately at `user-r20-trials-TEST-COPY-lift-fixed`:
+original profile hashes unchanged; only latest castle progress.sav changed, exactly two
+Bool entries/two bytes: age offset72068 true->false, history offset1884 false->true.
+Proof `lift-followup/fixed-testcopy-proof.json`. This also supplies the corrected zero
+state to an existing save, because new-game defaults do not migrate played saves.
+No inventory, quest, core/counter/all-clear or other saved field was changed.
+
+Only the trials candidate will be rebuilt with its SAME seed/settings/placement inputs.
+Natural-adult/open-Door settings are not added. Bridge and control arms stay untouched.
+Gate order is now cs20a -> cs20c -> cs20d: acquire only after cs20c explicitly posts
+LOCK RELEASED; every gate stage checks no game, waits600s and rechecks while one is active.
+No gate lease has been acquired for this follow-up yet. Runtime lift retest remains pending.
 

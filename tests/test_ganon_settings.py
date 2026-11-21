@@ -10,7 +10,7 @@ from test_reward_bridge import synthetic_game_data
 
 from clawshot.__main__ import main
 from clawshot.app.schema import validate
-from clawshot.formats import byml, msbt, sarc, zsdic
+from clawshot.formats import byml, evfl, msbt, sarc, zsdic
 from clawshot.generate import Settings, generate, play_note, prepare, spoiler
 from clawshot.generate.trials import TRIALS, remaining
 from clawshot.patch import gamedata, reward_bridge, trials
@@ -47,7 +47,8 @@ def trial_tree():
 
     return {
         "Data": {
-            "Bool": [row(trials.REMOVAL + name, False) for name in TRIALS] + [row(trials.ALL_CLEAR, False)],
+            "Bool": [row(trials.REMOVAL + name, False) for name in TRIALS]
+            + [row(trials.ALL_CLEAR, False), row("HavePlayedEvent.Dm_InsideGanonCastle_0090", False)],
             "Int": [row(trials.COUNT, byml.I32(6))],
             "Enum": [],
         },
@@ -73,6 +74,12 @@ def test_skipped_native_cores_match_tower_logic_and_saved_count(count):
         assert tree["Data"]["Int"][0]["DefaultValue"] == count
         clear = next(row["DefaultValue"] for row in tree["Data"]["Bool"] if row["Hash"] == key(trials.ALL_CLEAR))
         assert clear is (count == 0)
+        movie_seen = next(
+            row["DefaultValue"]
+            for row in tree["Data"]["Bool"]
+            if row["Hash"] == key("HavePlayedEvent.Dm_InsideGanonCastle_0090")
+        )
+        assert movie_seen is (count == 0)
         gate = world.regions["Root"].exits[0].rule
         completed = Counter({name + " Trial Clear": 1 for name in active})
         assert gate(completed, "adult", 1)
@@ -86,6 +93,60 @@ def test_skipped_native_cores_match_tower_logic_and_saved_count(count):
             old = next(row for row in before["Data"][kind] if row["Hash"] == key(change.name))
             row["DefaultValue"] = old["DefaultValue"]
         assert byml.same(tree, before)
+
+
+@pytest.mark.dump
+@pytest.mark.parametrize("count", range(7))
+def test_native_zero_trial_lift_history_and_partial_last_core_movie(romfs, count):
+    dictionaries = zsdic.Dictionaries.from_romfs(romfs)
+    path = gamedata.GAME_DATA_LIST
+    raw = dictionaries.decompress(path, (romfs / path).read_bytes())
+    before = byml.read(raw)
+    after = byml.read(gamedata.patch_initial_values(raw, trials.initial_values(20202004, count)))
+
+    def flag(tree, name):
+        return next(row for row in tree["Data"]["Bool"] if row["Hash"] == key(name))
+
+    history = "HavePlayedEvent.Dm_InsideGanonCastle_0090"
+    assert flag(before, history)["DefaultValue"] is False
+    assert flag(after, history)["DefaultValue"] is (count == 0)
+    assert flag(after, "Sequence_IsChildhood") == flag(before, "Sequence_IsChildhood")
+    if count == 0 or count == 6:
+        return
+    # Partial seeds must not unlock the lift or suppress the real last-core movie.
+    assert flag(after, trials.ALL_CLEAR)["DefaultValue"] is False
+    path = "Event/EventFlow/Defeat_Ganon.bfevfl.zs"
+    flow = evfl.read(dictionaries.decompress(path, (romfs / path).read_bytes())).flowchart
+    entry = next(point for point in flow.entry_points if point.name == "InsideGanonCastle_Dungeon_BarrierRemove_All")
+    wait = flow.events[entry.main_event]
+    assert isinstance(wait, evfl.ActionEvent)
+    gate = flow.events[wait.next]
+    assert isinstance(gate, evfl.SwitchEvent)
+    assert flow.actors[gate.actor].queries[gate.query] == "EventQueryIsGameDataInt"
+    assert gate.params == {"GameDataName": trials.COUNT, "Value": 0, "Index": -1}
+    cases = dict(gate.cases)
+    assert set(cases) == {0, 1} and cases[0] == cases[1]
+    # Native equal/less-than-zero branch after the final decrement must clear the
+    # barrier before invoking the same movie that enables the lift's call area.
+    index = cases[0]
+    visited = set()
+    cleared = False
+    while index != evfl.NONE:
+        assert index not in visited, index
+        visited.add(index)
+        event = flow.events[index]
+        assert isinstance(event, evfl.ActionEvent), event
+        action = flow.actors[event.actor].actions[event.action]
+        params = event.params or {}
+        if action == "EventTriggerSetGameDataBool" and params.get("GameDataName") == trials.ALL_CLEAR:
+            assert params["Value"] is True
+            cleared = True
+        if action == "EventTransition" and params.get("EventName") == "Dm_InsideGanonCastle_0090":
+            assert cleared
+            break
+        index = event.next
+    else:
+        pytest.fail("Native last-core tail did not invoke the lift-enabling movie")
 
 
 def test_partial_seed_tracker_rebuild_matches_generator_and_discloses_names(monkeypatch):
