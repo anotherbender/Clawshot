@@ -154,8 +154,10 @@ chests before fights and states prominently that guard drops give20rupees,
 ### Longshot 3.0.0 checklist and duration
 
 `CHECKLIST.md` is beside the launchers, not hidden in a separate research note.
-`01A`–`01D`: main control; `02A`–`02D`: candidate. Each arm's four launchers
-resume **the same persistent profile**; no fabricated advanced snapshots or
+**Claude's follow-up steer:** play **ONE arm, main `01A`–`01D` only**; this checks
+main's **existing experimental option**, not a candidate product delta.
+`02A`–`02D` are retained as **optional duplicate artifacts, not requested**.
+Each set resumes one persistent profile; no fabricated advanced snapshots or
 resets. Natural breaks:
 
 | Segment | Estimated minutes | Required outcome |
@@ -165,12 +167,13 @@ resets. Natural breaks:
 | C: front upper015 and far upper014 | 12–20 | four rescued, held0/found4, native captain/card once; Save |
 | D: Continue/revisit/Training entry | 8–12 | all four drops retired, no repeated scene, card retained; pay30 and enter |
 
-**40–65 minutes per full arm**, unmeasured conservative estimate; every
-segment under30. Both full arms **80–130 minutes**. Control and candidate
-are byte-identical existing experimental behavior, not a candidate fix:
-the checklist offers an **8–12-minute single-key/guard/rescue control baseline**;
-a second full run is only needed if Claude requests it. All four candidate
-rescues can be played in one sitting, or resumed at the natural breaks.
+**40–65 minutes TOTAL for the requested single-arm check**, unmeasured
+conservative estimate; every segment under30. Main and candidate are
+byte-identical, so **no second full arm or separate short control baseline
+is requested**. Use main `01A`–`01D` throughout and
+`04 - Read control fortress save.bat`; optional duplicate artifacts are only
+for a separate comparison explicitly requested by Claude. Cow arms differ
+(v2 versus native main), so **both cow arms remain requested**.
 Cell landmarks are placement-derived, not a walked route. A two-minute
 fruitless search is a route blocker, not a key-grant failure; stop/report it.
 
