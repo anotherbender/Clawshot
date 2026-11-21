@@ -268,3 +268,47 @@ gate verify this follow-up; previous gates above certify the previous source, no
 The v1 candidate B/control packets and their profiles remain untouched. Restaged A needs a fresh private
 New Game profile and a boot check before Kareem checks both full maps; do not edit his played save.
 
+
+### Starting-Sword follow-up verification
+
+Rebased source `5f37734fbb9c` is based on approved main `be0e288`; the staged A2 source is
+`721e238fc5`. `candidate-A-v2-source-continuity.json` records unchanged compensation/table bytes
+across rebase; it covers those two files, not every generated output. No new sweep: fill and logic are unchanged.
+
+After cs20a's explicit 12:00 release and Claude's GO, the follow-up owns one lease for final focus,
+renewed all-output parity and the exact receipt-head full gate. Every stage requires game absence.
+Final focus: **44 passed in 13.59 s**, n2/internal1; process snapshot has no running game.
+Proof: `work/r20-start/followup-5f37734fbb9c/focus.log`, `focus.json` and `focus-processes.json`.
+
+Candidate A2 keeps seed20032021, settings and shuffled placements unchanged. Its only changed game file
+versus played v1 is GameDataList; all six inherited Saria fields read back true. The play note also
+changes to disclose the implied opening state. V1 B/control and all played profiles remain untouched;
+A2 has a fresh private New Game profile. Proof/checklist: `candidate-A-v2-proof.json`,
+`candidate-A-v2-dry-run.json` and `CANDIDATE-A-V2.md`, outside Git under `work/r20-start/`.
+
+Claude's A2 boot check **PASS** on Longshot3.0.0:168 RomFS entries, crash/fatal0, save mounted,
+one mod; the runtime log confirms the candidate GameDataList and New Game module loaded.
+Evidence: `work/r20-start/bootcheck-A-v2.txt`. This is boot/load proof, not a map-play pass.
+Kareem still needs to walk the native Deku Tree/Field entrances and check full maps and Continue
+using the A2 checklist; no debug transport, save repair or B/control rerun is requested.
+
+Renewed all-output byte parity passed:
+
+| Recipe | Private seed | Baseline | Files compared | Byte differences |
+|---|---:|---|---:|---:|
+| Defaults, starting options off | 20032030 | Actual main `be0e288` | 120 | 0 |
+| Original Broad, starting options off | 20032031 | Actual main `be0e288` | 227 | 0 |
+| Played A recipe without starting Sword | 20032032 | Previous start `f98ddff7bdc7` | 131 | 0 |
+
+Both baselines are unmodified Git exports; each arm records its imported module path and game-free
+snapshot. Six generated folders include every resource, spoiler and play note. Proof:
+`work/r20-start/followup-5f37734fbb9c/comparison.json`, `main-off.json`,
+`previous-no-sword.json`, `candidate.json` and their logs.
+
+This sole receipt commit changes only the round file. Before its full gate, the driver verifies every
+source/test hash still equals the parity source and writes `source-continuity.json`.
+The exact receipt-head gate runs format/lint, synthetic n8/internal4 and dump n8/internal3 with
+the prescribed RomFS/NUP/r19 fixture. `gate-<receipt-head>/results.json` is authoritative; PASS is
+not preclaimed here. Once it finishes, a separate one-worker rebuild will compare every A2 output
+to the booted packet without overwriting that packet, its profile or B/control.
+Release remains **play-held** until Kareem's A2 full-map/Continue observations pass.
