@@ -130,6 +130,7 @@ class Settings:
     excluded_locations: tuple[str, ...] = tuple(DEFAULTS["excluded_locations"])
     bridge: str = DEFAULTS["bridge"]
     bridge_count: int = DEFAULTS["bridge_count"]
+    trials_count: int = DEFAULTS["trials_count"]
     logic: dict[str, Any] = field(default_factory=dict)
     areas: tuple[str, ...] = ()
     goal: str | None = None
@@ -221,11 +222,13 @@ class Settings:
             raise ValueError("Master Sword shuffle needs Chests set to Shuffled.")
         if SWORD_PEDESTAL_SOURCE in self.shuffle:
             raise ValueError("SwordPedestal is not a shuffle kind: use shuffle_master_sword")
-        limits = {"vanilla": 0, "stones": 3, "medallions": 6, "rewards": 9}
+        limits = {"vanilla": 0, "stones": 3, "medallions": 6, "rewards": 9, "tokens": 100}
         if not isinstance(self.bridge, str) or self.bridge not in limits:
-            raise ValueError("bridge must be vanilla, stones, medallions or rewards")
+            raise ValueError("bridge must be vanilla, stones, medallions, rewards or tokens")
         if type(self.bridge_count) is not int or not 0 <= self.bridge_count <= limits[self.bridge]:
             raise ValueError(f"bridge_count for {self.bridge} must be an integer from 0 to {limits[self.bridge]}")
+        if type(self.trials_count) is not int or not 0 <= self.trials_count <= 6:
+            raise ValueError("trials_count must be an integer from 0 to 6")
         if self.goal is not None and not self.areas:
             raise ValueError("a goal is given only with the areas of a slice")
         if self.songs not in ("song", "anywhere"):
@@ -301,6 +304,8 @@ class Settings:
             out["starting_hearts"] = self.starting_hearts
         if self.starting_full_wallet:
             out["starting_full_wallet"] = True
+        if self.trials_count != 6:
+            out["trials_count"] = self.trials_count
         if self.item_location_types:
             out["item_location_types"] = {
                 k: list(self.item_location_types[k]) for k in sorted(self.item_location_types)

@@ -5,7 +5,7 @@ from collections.abc import Mapping
 from dataclasses import replace
 from typing import Any
 
-from clawshot.generate import key_families, rewards, swords, tokens
+from clawshot.generate import key_families, rewards, swords, tokens, trials
 from clawshot.generate import start as starting_inventory
 from clawshot.generate.fill import SHOP_ONLY_PREFIX, FillError, Settings
 from clawshot.generate.progressive import prepare_spec, restrict_settings
@@ -28,7 +28,7 @@ def world_spec(spec: Mapping[str, Any], settings: Settings) -> Mapping[str, Any]
     return {**spec, "regions": regions, "locations": locations, "goal": settings.goal or spec["goal"]}
 
 
-def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, World]:
+def prepare(spec: Mapping[str, Any], settings: Settings, *, seed: int = 0) -> tuple[Settings, World]:
     """The settings as a seed uses them, and the world they build.
 
     With ``dungeon_items`` ``anywhere`` or ``all_anywhere`` the logic setting ``keysanity`` is set too, where the
@@ -37,10 +37,12 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
     With ``Token`` shuffled, Gold Skulltulas become Token checks held to their admitted reward families.
     Native setup also uses this compilation before its pool overrides are known. The UI checks return-kit
     construction against the spec; :func:`generate` checks it against the effective native pool before filling.
+    ``seed`` selects partial Ganon trials; zero is the UI/source-contract preview. Six ignores it.
     """
     spec = rewards.prepare_spec(tokens.prepare_spec(prepare_spec(spec), settings), settings)
     spec = key_families.prepare_spec(spec, settings)
     spec = swords.prepare_spec(spec, settings)
+    spec = trials.prepare_spec(spec, settings, seed)
     logic = dict(settings.logic)
     if "open_forest" in spec.get("settings", {}):
         if "open_forest" in logic and logic["open_forest"] != settings.forest:

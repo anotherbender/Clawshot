@@ -78,6 +78,9 @@ shows neither. The maintainers' in-game check of in-logic and marks is still pen
   one rescue and its once-only replacement passed, but all four rescues, the card and Training Ground remain untested.
   Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys.
 - **Experimental, default off:** dungeon rewards shuffled among their nine usual rewards (Rauru included), and a stones/medallions/rewards-count bridge. First-pull reward delivery and the medallion-count bridge passed in game; this is not a full shuffled playthrough.
+- **Experimental, built not played:** a Gold Skulltula token-count bridge (`--bridge tokens --bridge-count N`,
+  0–100, including chest tokens), and 0–6 Ganon trials remaining (`--trials-count N`, default6).
+  Partial trial seeds name the remaining trials in the spoiler, play note and first barrier-view dialogue.
 - **Not shuffled yet:** cows, pots, crates and loose rupees.
 - **Excluded locations:** pick checks by area/search in Settings, or use `--exclude-locations` with exact
   world check names. They never hold progression; impossible lists are refused. [Reference](docs/settings.md#excluded-locations).

@@ -498,6 +498,12 @@ are refused. These settings open **only the bridge**: they give no Light Arrows,
 complete no sages and skip none of the six native Light Arrow trial cores.
 With Gift shuffle, the native Light Arrow story still runs even if its gift moved.
 
+`--bridge tokens --bridge-count N` (0–100) is experimental, **built, not played**.
+It compares the native Gold Skulltula token counter, including tokens found in shuffled
+chests; defeating a Skulltula that gives a different item does not add a token. Tokens
+are not spent. The bridge scene and permanent latch remain native. This setting does
+not skip trials, grant Light Arrows or change the Skulltula House thresholds.
+
 Kareem's Longshot rc.7 checks on 2026-11-19 confirmed the shuffled first-pull reward, a medallion-count
 bridge staying closed below its count and opening at the count, and the closed Door opening with all
 three Stones owned while Dodongo and Jabu were unfinished. The Door stayed open; no escape or moat
@@ -517,6 +523,22 @@ it follows the ordinary boss-key placement rules below. Round 19 corrects the de
 logic to these native readers, without changing the scene or its saved writes.
 This is **static event-data evidence only, not played**
 ([round 19 LACS](../plans/rounds/r19-lacs.md)).
+
+## Ganon's trials remaining
+
+`--trials-count N` (app: **Ganon's trials remaining (experimental)**) accepts 0–6.
+**Six is the native default** and leaves trial state/text unchanged. Zero clears all;
+one to five leaves a deterministic, seed-selected subset. Selection uses a separate
+random stream, so fill retries cannot change it. The spoiler's `ganon_trials.remaining`,
+play note and first tower-barrier-view dialogue name the trials that remain.
+
+This is **new games only, built, not played**. It initializes only existing native
+trial completion flags and the matching remaining counter. Zero also initializes the
+native all-barrier-clear flag; it does not fabricate scene history or a quest step.
+Partial counts retain the real last-core scene. Remaining trials still need their usual
+route and Light Arrows. The tower boss key and finale are unchanged.
+Evidence and pending paired **Longshot 3.0.0** checks: [round20 trials](../plans/rounds/r20-trials.md).
+
 
 ## Master Sword shuffle
 

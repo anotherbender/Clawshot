@@ -1,10 +1,10 @@
-"""Ganon's Castle rainbow bridge: the native story by default, or a count of distinct owned dungeon rewards.
+"""Ganon's Castle rainbow bridge: native story, distinct owned rewards, or native Gold Skulltula token stock.
 
     file_changes = changes(mode="medallions", count=4)   # romfs path -> decompressed transform
     built = build(romfs, mode="medallions", count=4)     # the bridge logic module, same length
 
 ``vanilla`` (count 0) changes nothing. ``stones`` (0..3), ``medallions`` (0..6, Rauru's Light Medallion included)
-and ``rewards`` (0..9) open the bridge's native approach once that many distinct rewards were acquired.
+and ``rewards`` (0..9) count distinct rewards; ``tokens`` (0..100) counts native token stock, including chests.
 
 Native facts, build e0f3ccfa (r17-dungeon-items.md sections 3-4, r18-rewards.md; reproducers in
 ``E:/OOTRemake/work/r18-rewards/``). ``GanonCastle_Level_Field_00_Prefab_14ba``: node4
@@ -58,10 +58,13 @@ MEDALLIONS = (
     "Item_Medal_Light",
 )
 _GROUPS = (("Stones", STONES), ("ForestFireWater", MEDALLIONS[:3]), ("ShadowSpiritLight", MEDALLIONS[3:]))
-MODES = {"vanilla": (), "stones": _GROUPS[:1], "medallions": _GROUPS[1:], "rewards": _GROUPS}
+MODES = {"vanilla": (), "stones": _GROUPS[:1], "medallions": _GROUPS[1:], "rewards": _GROUPS, "tokens": ()}
 ELIGIBLE = "Clawshot.BridgeEligible"  # unsaved BoolExp the bridge module's node4 reads
 FLOW = "Event/EventFlow/AllSage.bfevfl.zs"
 MODULE = "Logic/GanonCastle_Level_Field_00_Prefab_14ba.logic.module.ainb"
+TOKEN_STOCK = "PouchData.Item_Token_Gold.StockNum"
+# Native MiniGame_DampeRace_IsClearLeastOnce uses NOT(Int < 1): r20-trials.md.
+_INT_LESS, _INT_LITERAL = 18, 16
 
 _PREFIX = "Clawshot.Bridge."  # the threshold rows ELIGIBLE reads
 # Native BoolExp postfix opcodes: 0 reads a Bool, 10 a BoolExp; 3 ANDs, 4 ORs, 5 negates.
@@ -114,9 +117,11 @@ _NATIVE_READ = "Defeat_Ganon_IsAfter_Ready_Exp"
 
 
 def max_count(mode: str) -> int:
-    """The largest valid count of ``mode``: 0, 3, 6 or 9."""
+    """The largest valid count of ``mode``: 0, 3, 6, 9 or 100."""
     if mode not in MODES:
         raise PatchError(f"unknown bridge mode {mode!r}")
+    if mode == "tokens":
+        return 100
     return sum(len(actors) for _, actors in MODES[mode])
 
 
@@ -139,6 +144,8 @@ def threshold_rows(mode: str, count: int) -> dict[str, list[list[int]]]:
     ``mode``'s rewards were ever acquired. Empty for ``vanilla``."""
     if not _check(mode, count):
         return {}
+    if mode == "tokens":
+        return {ELIGIBLE: [[_INT_LESS, key(TOKEN_STOCK)], [_INT_LITERAL, count], [_NOT]]}
     groups = MODES[mode]
     if count == 0:
         first = key(f"IsGet.{groups[0][1][0]}")
@@ -190,6 +197,26 @@ def add_eligibility(tree: dict, mode: str, count: int) -> None:
     or a hash already taken. No other row, default or the save layout metadata changes."""
     rows = threshold_rows(mode, count)
     data = tree["Data"]
+    if mode == "tokens":
+        # Resolve the same nested path GameDataActor's native token query reads; no new saved field.
+        name = "PouchData"
+        for member in ("Item_Token_Gold", "StockNum"):
+            found = [row for row in data["Struct"] if row["Hash"] == key(name)]
+            members = [row for row in found[0]["DefaultValue"] if row["Hash"] == key(member)] if len(found) == 1 else []
+            name += "." + member
+            if len(members) != 1 or members[0]["Value"] != key(name):
+                raise PatchError(f"bridge: changed native token path {name}: {found!r}")
+        found = [row for row in data["Int"] if row["Hash"] == key(TOKEN_STOCK)]
+        if len(found) != 1 or not byml.same(
+            found[0],
+            {
+                "Hash": byml.U32(key(TOKEN_STOCK)),
+                "DefaultValue": byml.I32(0),
+                "ResetTypeValue": byml.I32(32),
+                "SaveFileIndex": byml.I32(0),
+            },
+        ):
+            raise PatchError(f"bridge: changed native token counter: {found!r}")
     for actor in identities(mode):
         name = f"IsGet.{actor}"
         found = [row for row in data["Bool"] if row.get("Hash") == key(name)]
@@ -219,7 +246,12 @@ def add_eligibility(tree: dict, mode: str, count: int) -> None:
                 "Hash": byml.U32(key(name)),
                 "ResetTypeValue": byml.I32(0),
                 "SaveFileIndex": byml.I32(-1),
-                "Values": [[byml.U64(word) for word in command] for command in values],
+                "Values": [
+                    [byml.U64(command[0]), byml.I32(command[1])]
+                    if command[0] == _INT_LITERAL
+                    else [byml.U64(word) for word in command]
+                    for command in values
+                ],
             }
         )
 

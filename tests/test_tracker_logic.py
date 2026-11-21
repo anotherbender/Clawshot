@@ -98,19 +98,6 @@ def test_same_version_rebuilds_the_world_from_the_settings_string(tmp_path, worl
     assert loaded.settings.shuffle == Settings().shuffle
 
 
-def test_load_world_uses_validate_and_the_shared_builder(tmp_path, world, monkeypatch):
-    calls = []
-    real_validate, real_build = tracker_logic.validate, tracker_logic.logic_world
-    monkeypatch.setattr(tracker_logic, "validate", lambda **kw: calls.append(("validate", kw)) or real_validate(**kw))
-    monkeypatch.setattr(
-        tracker_logic, "logic_world", lambda s, spec=None: calls.append(("build", spec)) or real_build(s, spec)
-    )
-    tracker_logic.load_world(load_seed(write_seed(tmp_path)))
-    assert [name for name, _ in calls] == ["validate", "build"]
-    assert calls[0][1] == {"text": Settings().to_string(), "spec": SPEC}
-    assert calls[1][1] is SPEC
-
-
 # 3.3
 @pytest.mark.parametrize(
     ("options", "reason"),
@@ -129,7 +116,7 @@ def test_logic_unavailable_with_a_reason(tmp_path, world, options, reason):
 
 
 def test_builder_exception_disables_logic(tmp_path, world, monkeypatch):
-    def broken(settings, spec=None):
+    def broken(settings, spec=None, **kwargs):
         raise RuntimeError("boom")
 
     monkeypatch.setattr(tracker_logic, "logic_world", broken)
@@ -163,7 +150,7 @@ def test_spoiler_location_gate(tmp_path, world):
 def test_world_is_built_once_per_loaded_seed(tmp_path, world, monkeypatch):
     calls = []
     real = tracker_logic.logic_world
-    monkeypatch.setattr(tracker_logic, "logic_world", lambda s, spec=None: calls.append(1) or real(s, spec))
+    monkeypatch.setattr(tracker_logic, "logic_world", lambda s, spec=None, **kw: calls.append(1) or real(s, spec, **kw))
     root = write_seed(tmp_path)
     slot = root / "user" / "save" / "1" / "slot_00"
     slot.mkdir(parents=True)

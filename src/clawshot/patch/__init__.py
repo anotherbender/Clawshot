@@ -22,7 +22,19 @@ from clawshot.generate import hints as stone_hints
 from clawshot.generate import names as location_names
 from clawshot.generate import tokens as token_policy
 from clawshot.generate.fill import SWORD_PEDESTAL_SOURCE, shuffled_locations
-from clawshot.patch import bags, custom_items, darunia, drops, freestanding, gamedata, scrubs, shops, text, tokens
+from clawshot.patch import (
+    bags,
+    custom_items,
+    darunia,
+    drops,
+    freestanding,
+    gamedata,
+    scrubs,
+    shops,
+    text,
+    tokens,
+    trials,
+)
 from clawshot.patch import events as chest_events
 from clawshot.patch import items as item_actors
 from clawshot.patch import receive_event as receive_event_patch
@@ -103,8 +115,9 @@ def make_seed(
         *gamedata.load_always(),
         *gamedata.select(fast_settings, names),
         *start_items.initial_values(settings),
+        *trials.initial_values(seed, settings.trials_count),
     ]
-    _, world = prepare(spec, settings)
+    _, world = prepare(spec, settings, seed=seed)
     table = item_actors.load()
     table.check(world.items)
     shuffled = shuffled_locations(world, settings)
@@ -235,6 +248,7 @@ def make_seed(
         if item in ("Hookshot", "Progressive Hookshot")
     ]
     changes += (text.sheik_hint_changes(romfs, hookshot_locations),)
+    changes += (trials.changes(romfs, seed=seed, count=settings.trials_count),)
     fast_files = (
         *door.build(romfs, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
         *reward_bridge.build(romfs, mode=settings.bridge, count=settings.bridge_count),

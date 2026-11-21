@@ -19,6 +19,7 @@ from clawshot import starting
 from clawshot.generate import hints as stone_hints
 from clawshot.generate import names as location_names
 from clawshot.generate import start as starting_inventory
+from clawshot.generate import trials
 from clawshot.generate.fill import (
     FillError,
     Settings,
@@ -83,7 +84,7 @@ def generate(
     A failed fill is retried with the same generator (so a retry is as deterministic as the first try), up to
     ``attempts`` times; then :class:`FillError` is raised.
     """
-    settings, world = prepare(spec, settings)
+    settings, world = prepare(spec, settings, seed=seed)
     vanilla = dict(vanilla or {})
     vanilla.update(normalize_pool(world, settings, vanilla))
     vanilla.update(starting_inventory.replace_pool(world, settings, vanilla))
@@ -133,7 +134,7 @@ def from_placements(
     a lower tier or a container placed remotely still counts as obtainable, never as guaranteed first. The placer
     proves the goal/age-return across its whole multiworld. Local evidenced physical-trap checks still run; they
     never assume a remote future item is already held."""
-    settings, world = prepare(spec, settings)
+    settings, world = prepare(spec, settings, seed=seed)
     vanilla = dict(vanilla or {})
     shuffled = shuffled_locations(world, settings)
     shuffled_set = set(shuffled)
@@ -336,6 +337,11 @@ def spoiler(seed: Seed, item_names: Mapping[str, str] | None = None) -> dict[str
         "settings": seed.settings.as_dict(),
         "settings_string": seed.settings.to_string(),
         **({"excluded_locations": list(seed.settings.excluded_locations)} if seed.settings.excluded_locations else {}),
+        **(
+            {"ganon_trials": {"remaining": list(trials.remaining(seed.seed, seed.settings.trials_count))}}
+            if seed.settings.trials_count != 6
+            else {}
+        ),
         "placements": {name: seed.placements[name] for name in seed.shuffled},
         "item_names": {item: display[item] for item in sorted(display.keys() & named) if display[item] != item},
         "locations": locations,
@@ -399,6 +405,9 @@ def play_note(seed: Seed, log: Mapping[str, Any] | None = None) -> str:
                 "",
             ]
         )
+    if seed.settings.trials_count != 6:
+        active = trials.remaining(seed.seed, seed.settings.trials_count)
+        lines.extend(["## Ganon's trials", "", "Remaining: " + (", ".join(active) if active else "none") + ".", ""])
     lines.extend(
         [
             "## Age-locked items",
