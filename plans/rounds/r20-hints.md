@@ -1,9 +1,9 @@
 # Round 20 — static hints (cs20a)
 
-Agent `openai-codex/gpt-6.1-sol`; branch `r20/hints`, base main `acbb903`.
+Agent `openai-codex/gpt-6.1-sol`; branch `r20/hints`, rebased onto main `5ed31bc` (original base `acbb903`).
 Scope: static text only, no new saved flags, grants, item windows, fill/logic/destination changes.
 Research and staging: `E:/OOTRemake/work/r20-hints/`; dump and natural save backups read-only.
-Kareem's played results are recorded below. Revised cumulative altar conditions remain play-held; cs20a never launched the game.
+All hints play PASS, including cumulative altar v3 and the consolidated three-scrub packet02; cs20a never launched the game. Final merged-head gate evidence: `E:/OOTRemake/work/r20-hints/merge-gate-receipt.json`.
 
 ## Contract and coordination
 
@@ -619,7 +619,7 @@ gate process tree (root82368), including all eight pytest worker trees:
 cannot count toward the final merge gate. Its earlier4,180 synthetic pass is
 historical only. Physical/cooperative lock retained; cs20d/trials follows.
 
-Separate wording commit **`303614b474`** changes only HF `where` and the three
+Separate wording commit **`9f94b2e787`** (pre-rebase `303614b474`) changes only HF `where` and the three
 HF06 playtest descriptions. It identifies the castle-gate tree note and child
 password sale while keeping the distinct Gerudo-side chest age question and
 unplayed HF06 ledger status. No logic, IDs or staged mod changed.
@@ -627,3 +627,18 @@ unplayed HF06 ledger status. No logic, IDs or staged mod changed.
 Rebase onto `5ed31bc` immediately; focused tests use at most two workers.
 Then **one full gate on the final rebased head**, driver waiting600s while
 either game image exists before each stage. No final READY claim until it passes.
+
+### Rebased integration and final source freeze
+
+Clean twelve-commit rebase onto `5ed31bc`; no conflicts. Separate HF/HF06 wording
+commit is `9f94b2e787`. Focused merged tests: **12 passed in8.05s**, using exactly
+two pytest workers and one internal Clawshot worker: names catalog, presentation
+and native static-hints contracts. No sweep, generated mod change or new boot.
+
+The old native run is explicitly cancelled in its results JSON. Retained gate
+ownership is transferred by the existing owner token, without dropping the lock.
+The final full driver checks HEAD and waits600s for game idle before each stage.
+This round-record commit is included in the final source head; no later source
+mutation is planned. Successful exact-head evidence/counts are published in the
+external `merge-gate-receipt.json` and final cs-r20 READY message, not inferred
+from old-base results. cs20d/trials takes the next turn after that full gate.
