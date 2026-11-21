@@ -2988,7 +2988,7 @@ location = "Graveyard Freestanding PoH"
 name = "Graveyard Upper Ledge Pickup"
 where = "Kakariko Graveyard: the upper ledge above the graves, reached by the adult bean ride or supported grapple route."
 oot_randomizer_name = "Graveyard Freestanding PoH"
-source = "Round 8 anchor/placement audit: Graveyard Hash 2157466067026784951; existing Graveyard rule retained; https://www.nintendolife.com/guides/zelda-ocarina-of-time-heart-piece-locations-switch-2. Distinct from both grave and race chests."
+source = "Round 8 anchor/placement audit: Graveyard Hash 2157466067026784951; round 20 removes non-liftable heart-piece Boomerang retrieval, retaining adult bean/Longshot ledge access; plans/rounds/r20-audit.md. Distinct from both grave and race chests."
 ids = ["2157466067026784951"]
 
 [[location]]
@@ -3010,9 +3010,9 @@ ids = ["9814903750835309225"]
 [[location]]
 location = "Kak Windmill Freestanding PoH"
 name = "Kakariko Windmill Platform Pickup"
-where = "Kakariko windmill: the raised platform beside the rotating mechanism, not the musician."
+where = "Kakariko windmill: the raised platform beside the rotating mechanism, reached as adult from Dampé's grave exit; not the musician or the high chest."
 oot_randomizer_name = "Kak Windmill Freestanding PoH"
-source = "Round 8 anchor/placement audit: KakarikoVillage Hash 13389209437182306002, including Adult Alternative copy; existing Kak Windmill rule retained; https://www.nintendolife.com/guides/zelda-ocarina-of-time-heart-piece-locations-switch-2."
+source = "KakarikoVillage Child/Adult/Adult_Alternative Static: Obj_Heart_Piece Hash 13389209437182306002, anchor 3518965357024502806. BBender, Discord 2026-11-20: child Boomerang retrieval fails; native heart-piece ActorParam clears LiftableRef. Adult Dampé approach retained; plans/rounds/r20-audit.md."
 ids = ["13389209437182306002"]
 
 [[location]]
@@ -3020,7 +3020,7 @@ location = "Kak Impas House Freestanding PoH"
 name = "Kakariko Cow-Shed Roof Pickup"
 where = "Kakariko: the cow shed behind Impa's house, reached by dropping from Impa's roof; this is not the rooftop man's gift."
 oot_randomizer_name = "Kak Impas House Freestanding PoH"
-source = "Round 8 anchor/placement audit: KakarikoVillage Hash 17926402522258180222, all three age/Alternative copies; child_kakariko.toml and plans/03-game-data.md section 11; https://www.eurogamer.net/zelda-ocarina-of-time-kakariko-village. Shed roof replaces N64's indoor pen."
+source = "Round 20 read-only recheck: KakarikoVillage Child/Adult/Adult_Alternative Static all contain Obj_Heart_Piece Hash 17926402522258180222 and anchor 1051454338871863592 linking to it, with no spawn override. Existing owl/Hookshot roof approach retained; plans/rounds/r20-audit.md; child_kakariko.toml; https://www.eurogamer.net/zelda-ocarina-of-time-kakariko-village. Distinct from the rooftop man's gift."
 ids = ["17926402522258180222"]
 
 [[location]]

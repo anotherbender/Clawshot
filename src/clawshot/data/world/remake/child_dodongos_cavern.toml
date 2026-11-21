@@ -12,6 +12,12 @@
 # metres, y up; room = DefaultDungeonRoomIndex (1 main hall, 10 staircase room, 13 blade room with the Bomb Bag
 # ledge, 16 upper Lizalfos, 17 double eye-switch passage, 18 Gold Skulltula side room, 21 cracked floor, 22 boss).
 
+# Round 20 replaces the old sword-only placeholder with the room's actual fire puzzle.
+[exits."Dodongos Cavern Lobby"."Dodongos Cavern Staircase Room"]
+rule = "at('Dodongos Cavern Torch Room', (is_child and Sticks) or can_use(Dins_Fire) or (adult_sword and can_use(Fire_Arrows)))"
+was = "at('Dodongos Cavern Torch Room', is_adult or Sticks or can_use(Dins_Fire))"
+source = "Dodongos Cavern.json:27; r19 Master Sword shuffle guard retained. R20 native room 8: timed candle hashes 7766157973751052842, 3412578102610136516, 1677399996748274653 link to shutter 18414161731649864422. DodongoCavern_Level_Room_08_Prefab_c4aa requires all three Burning before EventRequestActor 13693449133434520250 runs DodongoCavern_Gimmick_CandleStickShutter and saves DodongoCavern_CandleStick. Candle graphs accept fire contact/lit child Sticks, not sword ownership; adults have no Sticks (r18 played Lake grotto). Keep child Sticks/Din's Fire; require usable Fire Arrows in the old adult_sword branch, retaining that guard to avoid a shuffled-sword logic loosening. Ordinary Bow chaining here is unplayed. plans/rounds/r20-audit.md, Distance switches."
+
 # The Bomb Bag ledge. OoT Randomizer's "Far Bridge" holds both the ledge with the Bomb Bag chest (reached from the
 # upper Lizalfos through the double eye-switch passage) and the bridge over the skull with the lift switch. In the
 # remake a bombable wall stands between them: data WallCrack 13202633467597206724 (room 13, (30,115,-23)) just west

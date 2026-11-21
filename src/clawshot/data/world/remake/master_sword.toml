@@ -264,11 +264,6 @@ rule = "adult_sword or can_child_attack"
 was = "is_adult or can_child_attack"
 source = "Deku Tree.json:37. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the Gold Skulltula: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
-[exits."Dodongos Cavern Lobby"."Dodongos Cavern Staircase Room"]
-rule = "at('Dodongos Cavern Torch Room', adult_sword or (is_child and Sticks) or can_use(Dins_Fire))"
-was = "at('Dodongos Cavern Torch Room', is_adult or Sticks or can_use(Dins_Fire))"
-source = "Dodongos Cavern.json:27. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): conservative: the adult branch stands where the child needs sticks or Din's Fire and its adult mechanism is not identified, so it needs adult_sword; sticks are a child weapon."
-
 [locations."Dodongos Cavern GS Side Room Near Lower Lizalfos"]
 rule = "adult_sword or has_explosives or (is_child and (Sticks or Slingshot or Boomerang or Kokiri_Sword))"
 was = "is_adult or has_explosives or Sticks or Slingshot or Boomerang or Kokiri_Sword"

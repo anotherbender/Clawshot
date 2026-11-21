@@ -56,6 +56,10 @@ otherwise reads text between two `_` as italics and drops them, and the string s
 [The UI guide](docs/ui.md) covers loading, saves, shared seeds and troubleshooting.
 Keyboard/mouse only: **gamepad and Steam Deck controller input are not done**.
 The [Tracker tab](docs/tracker.md) reads saved inventory and per-dungeon keys, with a compact OBS view.
+It also highlights the open checks that are in logic for what your save holds, for seeds made by the same
+Clawshot version, and lets you mark checks the save cannot show (shop items, a few gifts) as done; the OBS view
+shows neither. The maintainers' in-game check of in-logic and marks is still pending
+([design record](plans/tracker-in-logic.md)).
 
 <table>
   <tr>
@@ -148,7 +152,9 @@ playthrough has been played.
 All eight upgrade chains—Hookshot, strength, scale, wallet, bomb bag, quiver,
 slingshot bag and magic—are always progressive. Copies are chest-only; the get-item
 name/text and grant follow the selected tier, while the rising model stays the base.
-Built and native-data-tested; the Longshot check is unplayed.
+On Longshot rc.2 (2026-11-13), Kareem passed Mido's Hookshot→Longshot and Silver→Golden Scale chests, then a
+separate-chest retest of every remaining top tier ([round 14 progressive](plans/rounds/r14-progressive.md));
+not every collection order or pickup combination has been played.
 Entrance shuffle and Archipelago are not supported.
 See [settings and restrictions](https://github.com/hiKareeem/Clawshot/blob/main/docs/settings.md) for the detailed reference.
 Evidence: [the roadmap index](https://github.com/hiKareeem/Clawshot/blob/main/plans/00-roadmap.md)
