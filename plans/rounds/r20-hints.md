@@ -3,7 +3,7 @@
 Agent `openai-codex/gpt-6.1-sol`; branch `r20/hints`, base main `acbb903`.
 Scope: static text only, no new saved flags, grants, item windows, fill/logic/destination changes.
 Research and staging: `E:/OOTRemake/work/r20-hints/`; dump and natural save backups read-only.
-No game or boot check started. Focused proofs and paired packet staged; ordered full gate pending. Nothing played.
+No game launched by cs20a. Paired packet and focused proofs staged; Claude's boot checks pass. Dialogue unplayed.
 
 ## Contract and coordination
 
@@ -261,7 +261,37 @@ Claude assigned **turn5, after cs20c** in
 posts LOCK RELEASED**, not merely when the directory disappears. No waiter can
 acquire it, and no sweep is required for this text-only track. Before that turn:
 rebase current local main and refresh the focused checks. Freeze the evidence commit
-before the full gate so the gated head is exactly the merge head. The gate receipt is
+before the full gate; the newly requested packet receipt follows separately. Gate receipt:
 `E:/OOTRemake/work/r20-hints/gate/<head-first10>/results.json`; readiness requires
 all four stages passing on that head. Final counts will also be posted on the thread.
+
+### Final frozen-head gate preparation
+
+Observed **cs20c's explicit04:17 LOCK RELEASED**, then rebased cleanly onto
+current local main **`df6214b35f`**, as Claude directed. Rebased implementation/evidence
+head before this receipt commit: `8a25acc5a0`. No production or test edits after that
+rebase. Fresh required focus (`-n2`, `CLAWSHOT_WORKERS=1`, real RomFS):
+**38 passed in5.47s**; no game process at the stage start.
+
+Claude's supervisor boot checks for **both staged v1 arms** pass on Longshot3.0.0:
+**218 RomFS entries, one mod, save mounted, zero crashes/fatals**; both USen message
+archives load. Evidence `E:/OOTRemake/work/r20-hints/bootcheck-results.txt` is linked
+from `ingame/Check - START HERE.md`. This is load proof, not dialogue play proof.
+cs20a did not boot the game.
+
+The staged packet currently retains its disclosed control `479ed44360` and
+candidate `398e0c006e` heads. **Claude's final packet requirement:** after the full
+gate passes and before READY, rebuild the candidate from that exact gated head,
+same seed/placements, `CLAWSHOT_WORKERS=1`, no lock needed. Hash **every output
+file** against staged `r20-hints-candidate-v1`. Identical: record equality in
+START HERE and this round file. Different: restage the gated candidate, report
+the differing paths and request Claude's new boot check. No gameplay claim.
+No sweep: this track changes no fill, destination, location or logic.
+
+This gate-preparation receipt is committed before the owned turn5 full gate.
+`gate/<gated-head-first10>/results.json` is the authoritative exact-head status;
+the four recorded commands must all exit0. The newly requested after-gate packet
+comparison requires a subsequent **round-only receipt**; publish its head separately
+from the gated code head, with source/tests unchanged. Final evidence and READY
+(play-held) follow only after the full gate and packet comparison pass.
 
