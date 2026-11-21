@@ -166,7 +166,8 @@ both logic and native patches; do not copy the search assumption without that pa
 Sources: `plans/04-world-format.md`, Ages; `src/clawshot/world/search.py`;
 `src/clawshot/data/world/remake/sheik.toml`; `plans/playtest/answers.md`, R9-FREE-TRAVEL and
 R10-FIRST-PULL-FIXED. Open-mode early return and preserved escape/moat rewards passed on rc.7.
-The first-arrival lighting repair awaits v5 play checks; the broader clock-pass claim was
+Kareem reports the Hyrule Field day/night clock working as expected in his seeds (2026-11-21); the
+first-arrival lighting repair has no separate staged v5 check. The earlier broader clock-pass claim was
 retracted in the [round 18 evidence review](../plans/rounds/r18-docs.md#review-corrections-after-3e31f160cb).
 See [settings](settings.md).
 

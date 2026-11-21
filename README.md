@@ -124,7 +124,8 @@ The 10- and 40-token reward swaps have been observed; the separate 100-token opt
 The Door of Time's earlier song-only and open modes passed a first door/sword-pull check.
 Both wait for Field-arrival clock state and Zelda/Impa's real send-off. The open-mode gate and
 later escape/moat order repair and immediate child-return clock clear passed on Longshot rc.7.
-The first-arrival lighting repair awaits v5 play checks. For new seeds; no save-repair or older-seed compatibility guarantee.
+Kareem reports the Hyrule Field day/night clock working as expected in his seeds since then (2026-11-21); the
+first-arrival lighting repair has no separate staged v5 check. For new seeds; no save-repair or older-seed compatibility guarantee.
 
 Cows remain **research only; nothing shipped** ([round 19 cows](plans/rounds/r19-cows.md)).
 Cows, pots, crates and loose rupees are not shuffled. Dungeon reward shuffle is a separate experimental option, off by default; it does not move rewards outside their nine slots.

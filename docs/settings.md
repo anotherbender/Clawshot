@@ -539,7 +539,8 @@ counter until the real Impa send-off, recount there, and ignore calls after esca
 closed mode when shuffled songs allow stones before Zelda. The native courtyard Step01 reset remains;
 early-mode post-pull callbacks do not roll the completed Door quest back.
 Kareem passed the open-mode send-off gate, early-pull escape/moat order repair and immediate
-child-return clock clear on Longshot rc.7. The first-arrival lighting repair below awaits v5 play checks;
+child-return clock clear on Longshot rc.7, and reports the day/night clock working as expected in his later
+seeds (2026-11-21). The first-arrival lighting repair below has no separate staged v5 check;
 the [round 18 evidence review](../plans/rounds/r18-docs.md#review-corrections-after-3e31f160cb) retracted the broader pass claim.
 The late first Forest-exit ordering (send-off before the first bridge departure, panorama never played) has
 no separate played check ([time record](../plans/rounds/r16-time.md#late-first-forest-exit-guard)).
