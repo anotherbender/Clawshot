@@ -267,7 +267,7 @@ def test_the_300_and_500_rupee_fairies_need_the_adult_wallet(region: str, locati
 @pytest.mark.parametrize("shield", ["Hylian Shield", "Deku Shield"])
 def test_a_child_beats_the_kokiri_storms_grotto_scrubs_with_either_shield(shield: str):
     """The grotto's Deku Scrub trio guards the chest; a child reflected their nuts with the Hylian Shield
-    (BBender, 2026-11-20). Only this grotto: the Deku Tree's scrubs still need has_shield."""
+    (BBender, 2026-11-20). The has_shield helper itself stays OoT Randomizer's."""
     world = fountain("KF Storms Grotto")
     chest = world.locations["KF Storms Grotto Chest"]
     search = Search(world, [])
@@ -275,3 +275,20 @@ def test_a_child_beats_the_kokiri_storms_grotto_scrubs_with_either_shield(shield
     search.collect(shield)
     assert search.can_access(chest, CHILD)
     assert load_spec()["helpers"]["has_shield"] == "(is_adult and Hylian_Shield) or (is_child and Deku_Shield)"
+
+
+@pytest.mark.parametrize("shield", ["Hylian Shield", "Deku Shield"])
+@pytest.mark.parametrize(
+    "start,room,items",
+    [
+        ("Deku Tree Lobby", "Deku Tree Slingshot Room", ["Slingshot"]),  # the room's scrub; Slingshot for the exit
+        ("Deku Tree Before Boss", "Queen Gohma Boss Room", []),  # the boss door's scrub trio
+    ],
+)
+def test_a_child_beats_the_deku_tree_scrubs_with_either_shield(shield: str, start: str, room: str, items: list[str]):
+    """A child reflected the Deku Tree scrubs' nuts with the Hylian Shield (BBender, 2026-11-21)."""
+    world = fountain(start)
+    search = Search(world, items)
+    assert not search.can_reach(room, CHILD)
+    search.collect(shield)
+    assert search.can_reach(room, CHILD)
