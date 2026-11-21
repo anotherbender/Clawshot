@@ -36,6 +36,9 @@ def resource_modes():
     yield "fortress-jail-keys", Settings(shuffle_hideout_keys=True)
     yield "mixed-all-key-sources", replace(all_kinds, dungeon_items="anywhere", shuffle_hideout_keys=True)
     yield "dungeon-rewards-bridge", Settings(dungeon_rewards=True, bridge="rewards", bridge_count=9)
+    yield "token-bridge", replace(all_kinds, bridge="tokens", bridge_count=3)
+    yield "zero-trials", replace(all_kinds, trials_count=0)
+    yield "partial-trials", replace(all_kinds, trials_count=3)
     yield "saria-farewell", replace(all_kinds, skip_saria_farewell=True)
     yield "hundred-token-reward", replace(all_kinds, shuffle_100_token_reward=True)
     yield (

@@ -114,10 +114,13 @@ def main(argv: list[str] | None = None) -> int:
             "--logic free_time_travel=true"
         ),
     )
-    parser.add_argument("--bridge", choices=("vanilla", "stones", "medallions", "rewards"))
+    parser.add_argument("--bridge", choices=("vanilla", "stones", "medallions", "rewards", "tokens"))
     parser.add_argument(
-        "--bridge-count", type=int, help="unique rewards to open bridge only; stones 0..3, medals 0..6, rewards 0..9"
+        "--bridge-count",
+        type=int,
+        help="bridge threshold: stones 0..3, medals 0..6, rewards 0..9, token stock 0..100",
     )
+    parser.add_argument("--trials-count", type=int, help="remaining Ganon trials 0..6; default 6, native")
     parser.add_argument(
         "--forest",
         choices=("closed", "closed_deku", "open"),
@@ -212,6 +215,7 @@ def main(argv: list[str] | None = None) -> int:
             ("starting_full_wallet", "starting_full_wallet"),
             ("bridge", "bridge"),
             ("bridge_count", "bridge_count"),
+            ("trials_count", "trials_count"),
             ("areas", "areas"),
             ("goal", "goal"),
             ("skip", "fast_start"),

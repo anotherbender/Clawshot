@@ -48,26 +48,35 @@ help = "Empty by default. Excluded checks never hold progression, anything a see
 [bridge]
 label = "Ganon's Castle bridge (experimental)"
 kind = "choice"
-choices = ["vanilla", "stones", "medallions", "rewards"]
+choices = ["vanilla", "stones", "medallions", "rewards", "tokens"]
 group = "World"
-help = "Vanilla follows the usual Light Arrow story. Count modes open only the bridge with your chosen number of different owned rewards; Light Arrows are still needed inside. The medallion bridge stayed shut below its count and opened at the count in game. Stones and combined-count modes remain unplayed."
+help = "Vanilla follows the usual Light Arrow story. Count modes open only the bridge with owned rewards or native Gold Skulltula token stock. Medallion count passed below/at its threshold in game; token mode is built, not played. This does not skip the remaining trials."
 [bridge.labels]
 vanilla = "Vanilla story"
 stones = "Stones"
 medallions = "Medallions"
 rewards = "Stones and medallions"
+tokens = "Gold Skulltula tokens"
 [bridge.choice_help]
 vanilla = "Keep the native bridge scene after the Temple's Light Arrow story."
 stones = "Require the selected count of unique owned Spiritual Stones, from zero to three."
 medallions = "Require the selected count of unique owned medallions, including Light, from zero to six."
 rewards = "Require the selected count of unique owned stones and medallions, from zero to nine."
+tokens = "Require 0–100 Gold Skulltula tokens in the native counter, including tokens found in shuffled chests. Built, not played; spends no tokens."
 [bridge_count]
-label = "Bridge reward count"
+label = "Bridge count"
 kind = "integer"
 min = 0
-max = 9
+max = 100
 group = "World"
-help = "Vanilla uses zero. Stones allows 0–3; Medallions 0–6; Stones and medallions 0–9. This does not remove the native Light Arrow trials."
+help = "Vanilla uses zero. Stones allows 0–3; Medallions 0–6; Stones and medallions 0–9; Gold Skulltula tokens 0–100. Token mode counts items, including chest tokens, not defeated Skulltulas. This does not skip trials."
+[trials_count]
+label = "Ganon's trials remaining (experimental)"
+kind = "integer"
+min = 0
+max = 6
+group = "World"
+help = "Six keeps vanilla. Zero clears all trials; one to five selects that many remaining trials from a dedicated seeded stream. The spoiler, play note and first barrier-view text name them. New games only. Built, not played."
 [songs]
 label = "Song placement"
 kind = "choice"

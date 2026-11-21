@@ -29,7 +29,7 @@ def logic_spec(spec: Mapping[str, Any], settings: Settings) -> Mapping[str, Any]
     return spec
 
 
-def logic_world(settings: Settings, spec: Mapping[str, Any] | None = None) -> tuple[Settings, World]:
+def logic_world(settings: Settings, spec: Mapping[str, Any] | None = None, *, seed: int = 0) -> tuple[Settings, World]:
     """The settings as the seed uses them and the world its beatability search ran on. Reads no dump."""
     spec = load_spec() if spec is None else spec
-    return prepare(logic_spec(spec, settings), settings)
+    return prepare(logic_spec(spec, settings), settings, seed=seed)

@@ -159,7 +159,7 @@ def load_world(seed: Seed) -> LogicWorld:
     spec = world_spec()
     try:
         settings = validate(text=seed.settings_string, spec=spec)
-        settings, world = logic_world(settings, spec)
+        settings, world = logic_world(settings, spec, seed=seed.metadata["seed"])
     except Exception as error:  # noqa: BLE001 - any failure to rebuild disables logic, never the tracker
         return _unavailable(f"The seed's settings could not be rebuilt into its logic: {error}")
     missing = [check.location for check in seed.checks if check.location not in world.locations]

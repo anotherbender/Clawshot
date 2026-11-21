@@ -100,3 +100,7 @@ source = "Kareem 2026-11-18: unique owned medallions including Light, not comple
 [bridge.rewards]
 rule = "has_dungeon_rewards(clawshot_bridge_count)"
 source = "Kareem 2026-11-18: unique owned stones plus medallions; 0..9"
+
+[bridge.tokens]
+rule = "(Gold_Skulltula_Token, clawshot_bridge_count)"
+source = "r20-trials.md: native PouchData.Item_Token_Gold.StockNum threshold; token items from chests and Skulltulas share this counter, not enemy/source-completion flags"
