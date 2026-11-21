@@ -141,6 +141,40 @@ adapter or Fairy Ocarina admission is implied.
 The floor palette is **Heart Container, Piece of Heart, Deku Shield, Hylian Shield and red rupee**.
 Major items on the floor can crash. Heart Containers from chests have no recorded in-game acceptance.
 
+### Starting inventory (experimental)
+
+Empty/off by default; new games only. Existing saves are never changed.
+`--starting-items "Kokiri Sword" "Slingshot" "Ocarina of Time" "Zeldas Lullaby"`
+chooses audited native items. The app lists the supported choices, including all twelve songs and
+each ordinary dungeon's map/compass. `--starting-items` alone clears a settings string's selection.
+`--starting-hearts 3` adds three hearts to the usual three; valid extras are 0–17.
+`--starting-full-wallet` starts with 200 rupees, or 500/1000 with the selected Adult/Giant Wallet;
+`--no-starting-full-wallet` overrides an imported string.
+
+Choose a concrete upgrade tier, not a number of copies: Longshot includes Hookshot, Golden Gauntlets
+include the child Bracelet and Silver Gauntlets, and Quiver/Bullet Bag upgrades include Bow/Slingshot
+and their containers. Lower selections in the same family do not add extra tiers.
+Native bag grants supply their declared ammunition; a Bomb Bag never invents Bombchu ownership.
+Bombs still require age-appropriate strength. Other equipment is owned, not forcibly worn:
+equip sword/shield in the pause menu. The selected ocarina is active (Time wins if both are chosen).
+With the adult-return guarantee, starting strength no longer proves the child learned Saria's Song.
+If that song remains at its fixed child source, also start with it, enable Gift/song shuffle, or enable
+free time travel; otherwise validation refuses the combination rather than assume a safe return.
+
+Logic owns the initial items before its first check. Each selected item or progressive-prefix copy
+actually present in the shuffled pool becomes a red rupee; extra hearts replace pooled Heart Containers
+when present. Pool size stays fixed; unshuffled native rewards remain. Missing songs leave junk in
+song slots, not extra copies of other songs. A starting spell/arrow's native magic floor counts as
+one initial magic copy and removes one pooled magic copy too.
+
+Starting ownership does **not** complete the corresponding lesson, source, dungeon or story quest.
+Impa's real send-off, Malon's source for Epona, the Ice Cavern chest, Forest completion/Prelude and
+pedestal age transitions remain separate. A prelearned Storms song retains the Windmill's first lesson.
+Trade items, bottles, masks, Lens, raw ammo, keys, tokens, dungeon rewards and arbitrary names are refused;
+they need additional source/slot/active-equipment contracts, not guessed save values.
+Built and native-data-tested, **not played**; the broad New Game check remains play-held.
+Evidence and provisional pool policy: [round 20 starts](../plans/rounds/r20-start.md).
+
 ### Progressive items
 
 Every upgrade chain is progressive, OoT Randomizer style, and there is **no setting** to turn it

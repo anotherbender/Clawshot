@@ -103,6 +103,7 @@ that proves the model, not that every route has been verified in the game.
 | Hints and convenience options | Gossip Stones speak hints without the Mask of Truth by default; this, fast start, the forest option that opens only the exit bridge (`--forest closed_deku`) and 10-rupee Kokiri prices have in-game evidence. |
 | Scene handoffs | Lessons use a normal get only with zero stock of both ocarinas; either instrument retains the native lesson, at either age. Saria's separate farewell skip remains experimental and off by default. [Settings and played evidence](docs/settings.md#scene-handoffs-experimental). |
 | Free time travel | Experimental, off by default. Early adult return, the Prelude scene and the corrected first adult arrival have passed in-game checks. |
+| Starting inventory | Experimental, empty/off by default: chosen native items, songs, extra hearts, full wallet and maps/compasses for New Game only. Starting copies leave the pool as junk; unsafe choices are refused. Built, not played. [Settings](docs/settings.md#starting-inventory-experimental). |
 | Master Sword shuffle | Experimental, default off; requires Chest shuffle and free time travel. The sword goes to a chest; the pedestal still changes age. [Settings and v4 played evidence](docs/settings.md#master-sword-shuffle). |
 
 With Token added to the shipped presets, played bottle, Double Defense, Echo Gem and gold-rupee rewards

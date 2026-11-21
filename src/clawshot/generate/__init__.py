@@ -15,8 +15,10 @@ from dataclasses import asdict, dataclass, replace
 from importlib.metadata import version
 from typing import Any
 
+from clawshot import starting
 from clawshot.generate import hints as stone_hints
 from clawshot.generate import names as location_names
+from clawshot.generate import start as starting_inventory
 from clawshot.generate.fill import (
     FillError,
     Settings,
@@ -84,6 +86,7 @@ def generate(
     settings, world = prepare(spec, settings)
     vanilla = dict(vanilla or {})
     vanilla.update(normalize_pool(world, settings, vanilla))
+    vanilla.update(starting_inventory.replace_pool(world, settings, vanilla))
     unknown = sorted(name for name in vanilla if name not in world.locations)
     if unknown:
         raise FillError(f"vanilla items given for locations the world does not have: {unknown}")
@@ -144,6 +147,7 @@ def from_placements(
 
         validate_fixed(world, settings, fixed)
     pool = {**vanilla, **normalize_pool(world, settings, vanilla)}  # the pool generate would fill with
+    pool.update(starting_inventory.replace_pool(world, settings, pool))
     own = Counter(pool.get(name, world.locations[name].vanilla) for name in shuffled)
     given = Counter(placements[name] for name in shuffled if placements.get(name) in world.items)
     screened = with_screens(world, shuffled, list((own | given).elements()), fixed)
@@ -373,6 +377,23 @@ def play_note(seed: Seed, log: Mapping[str, Any] | None = None) -> str:
             label = description["name"] if isinstance(description, dict) else description.name if description else name
             lines.append(f"- {label}" + (f" (`{name}`)" if label != name else ""))
         lines.append("")
+    if seed.settings.starting_items or seed.settings.starting_hearts or seed.settings.starting_full_wallet:
+        lines.extend(["## Starting inventory (New Game only)", ""])
+        if seed.settings.starting_items:
+            lines.append(
+                "Owned from the start: " + ", ".join(shown(item) for item in seed.settings.starting_items) + "."
+            )
+        lines.append(f"Starting health: {3 + seed.settings.starting_hearts} full hearts.")
+        if seed.settings.starting_full_wallet:
+            lines.append(f"Starting rupees: {starting.wallet(seed.settings.starting_items)[1]} (full wallet).")
+        lines.extend(
+            [
+                "Progressive choices include their earlier tiers and weapon containers. Native bag ammunition applies.",
+                "Starting pool copies become junk; unshuffled rewards and lesson/story completion stay separate.",
+                "Equip sword/shield manually. Starts are built, not played; existing saves stay unchanged.",
+                "",
+            ]
+        )
     lines.extend(
         [
             "## Age-locked items",

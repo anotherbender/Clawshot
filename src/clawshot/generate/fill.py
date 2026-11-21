@@ -168,6 +168,10 @@ class Settings:
                 raise ValueError(f"{name} must be a list of names")
             object.__setattr__(self, name, tuple(sorted(set(values))))
         starting.validate(self.starting_items, self.starting_hearts, self.starting_full_wallet)
+        if "Master Sword" in self.starting_items and not self.shuffle_master_sword:
+            raise ValueError(
+                "Starting with Master Sword requires Master Sword shuffle; the native pedestal owns it otherwise"
+            )
         if not isinstance(self.logic, dict) or not all(isinstance(key, str) for key in self.logic):
             raise ValueError("logic must be a table of setting names to JSON values")
         if self.goal is not None and not isinstance(self.goal, str):
@@ -706,11 +710,19 @@ def return_guarantee_conflict(world: World, settings: Settings, vanilla: Mapping
     sources = [name for name, item in fixed.items() if _age_family(world, item) in withheld]
     checks = ", ".join(sorted(catalog[name].name if name in catalog else name for name in sources))
     kinds = ", ".join(sorted({world.locations[name].type for name in sources}))
+    advice = (
+        "Choose door_of_time = 'closed', or also shuffle those checks "
+        f"(their kinds: {kinds}; the Gift shuffle moves gifts and songs)."
+    )
+    if "Goron Bracelet" in world.start_items and "Sarias Song" in withheld:
+        advice = (
+            "Starting with the Goron Bracelet needs Saria's Song as a starting item, "
+            "song shuffle (the Gift option), or free time travel."
+        )
     return (
         f"{start} Even with every item the fill can place, that assumed start still needs {', '.join(withheld)}, "
         f"which stay at unshuffled checks adult Link cannot reach first ({checks}). "
-        "Choose door_of_time = 'closed', or also shuffle those checks "
-        f"(their kinds: {kinds}; the Gift shuffle moves gifts and songs)."
+        f"{advice}"
     )
 
 

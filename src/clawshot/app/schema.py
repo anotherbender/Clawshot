@@ -5,6 +5,7 @@ from dataclasses import asdict, fields, replace
 from functools import cache
 from pathlib import Path
 
+from clawshot import starting
 from clawshot.generate import FillError, Settings, hints, prepare
 from clawshot.generate.exclusions import validate_exclusions
 from clawshot.generate.fill import DUNGEON_ITEM_CHOICES, return_guarantee_conflict, shuffled_locations
@@ -113,11 +114,21 @@ def _rows() -> list[dict]:
         "hint_distribution": list(hints.distributions()),
         "hints": list(hints.MODES),
         "fast_start": [name for name in gamedata.load() if name not in ("mido", "forest_exit")],
+        "starting_items": list(starting.CHOICES),
     }
     defaults = asdict(Settings())
     result = []
     for field in fields(Settings):
         info = metadata[field.name]
+        if field.name == "starting_items":
+            info = {
+                **info,
+                "labels": {item: item for item in starting.CHOICES},
+                "choice_help": {
+                    item: f"Own {item} at New Game. Progressive tiers include their earlier tiers; source/story stays."
+                    for item in starting.CHOICES
+                },
+            }
         if info.get("display") == "locations":
             # The bundled world's checks, labelled from its data at load rather than copied into this metadata.
             info = {**info, **_location_metadata()}

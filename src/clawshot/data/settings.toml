@@ -99,3 +99,9 @@ door_of_time = ["closed", "song_only", "open"]
 [logic_override_modes]
 age_return_fill_inventory = "age_return_door_inventory"
 age_return_fill_families = "age_return_door_families"
+
+# Initial strength bypasses the native Darunia acquisition, not its song lesson.
+# The inherited closed-door return bound in world/world.toml must not assume Saria
+# merely because the child can lift Dodongo's Cavern's entrance rock.
+[starting_return_bypasses]
+"Goron Bracelet" = ["Sarias Song"]

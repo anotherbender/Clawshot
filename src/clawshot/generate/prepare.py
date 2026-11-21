@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import Any
 
 from clawshot.generate import key_families, rewards, swords, tokens
+from clawshot.generate import start as starting_inventory
 from clawshot.generate.fill import SHOP_ONLY_PREFIX, FillError, Settings
 from clawshot.generate.progressive import prepare_spec, restrict_settings
 from clawshot.world.load import build_world
@@ -77,6 +78,7 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
     world = build_world(world_spec(spec, settings), settings.logic)
     if settings.excluded_locations:
         world = _exclude_locations(world, settings)
+    settings, world = starting_inventory.prepare(world, settings)
     if settings.shuffle_master_sword and swords.PEDESTAL not in world.locations:
         raise FillError("Master Sword shuffle needs the Temple of Time pedestal within the selected areas")
     settings = rewards.restrict_settings(world, tokens.restrict_settings(world, settings))

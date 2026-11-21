@@ -9,7 +9,11 @@ import hashlib
 import struct
 import uuid
 from bisect import bisect_right
+from functools import partial
 
+from clawshot import starting
+from clawshot.formats import evfl
+from clawshot.patch import gamedata, items
 from clawshot.patch.plan import PatchError
 from clawshot.patch.write import FileChanges
 
@@ -28,12 +32,22 @@ def _u32(data: bytes, offset: int) -> int:
     return struct.unpack_from("<I", data, offset)[0]
 
 
-def _splice(data: bytes) -> bytes:
-    """Append an ordered bag/nut branch to a literal-push sequence (no modules).
+def _splice(
+    data: bytes,
+    pushes: tuple[tuple[str, int], ...] = START_PUSHES,
+    *,
+    after_setup: bool = False,
+    wallet: str = "Item_Wallet_Small",
+) -> bytes:
+    """Append literal pushes, optionally after the entire original setup.
 
     Production callers fingerprint the sole native input. This separate structural
     operation also permits wholly synthetic fixtures and an independent oracle.
     """
+    push_count = len(pushes)
+    child_total = push_count + int(after_setup)
+    if not 1 <= child_total < 255:
+        raise PatchError("start items: unsupported initial inventory size")
     if len(data) < _HEADER or data[:8] != b"AIB \x08\x04\x00\x00":
         raise PatchError("start items: expected AINB v0x408")
     count, commands = _u32(data, 0x10), _u32(data, 0x0C)
@@ -109,7 +123,7 @@ def _splice(data: bytes) -> bytes:
         for name, value in (("IsDelayJudge", 0), ("IsLoop", 0), ("IsUpdateNextInFrame", 1))
     )
     int_values_in = b"".join(
-        struct.pack("<IHHiI", intern("Num"), 0xFFFF, 0, 0x01800000, number) for _, number in START_PUSHES
+        struct.pack("<IHHiI", intern("Num"), 0xFFFF, 0, 0x01800000, number) for _, number in pushes
     )
     string_values_in = b"".join(
         struct.pack(
@@ -120,15 +134,32 @@ def _splice(data: bytes) -> bytes:
             0x00800000,
             intern(f"Work/Actor/{actor}.engine__actor__ActorParam.gyml"),
         )
-        for actor, _ in START_PUSHES
+        for actor, _ in pushes
     )
+    wallet_input = None
+    if wallet != "Item_Wallet_Small":
+        native_wallet = "Work/Actor/Item_Wallet_Small.engine__actor__ActorParam.gyml"
+        found = [
+            offset + 12
+            for offset in range(io_offsets[6], io_offsets[7], 16)
+            if string(_u32(data, offset + 12)) == native_wallet
+        ]
+        if len(found) != 1:
+            raise PatchError(f"start items: expected one native initial wallet, got {found}")
+        wallet_input = (found[0], intern(f"Work/Actor/{wallet}.engine__actor__ActorParam.gyml"))
     # Insertions are after their original section's final element. Equal-address
     # inserts preserve order (e.g. an empty parameter table in a synthetic input).
     additions = [
-        (node_end, bytearray(3 * _NODE), "headers"),
-        (link_end, bytearray(4), "root pointer"),
-        (root_end, bytearray(8), "root child"),
-        (props, bytearray(3 * _BODY + 24), "bodies"),
+        (node_end, bytearray((push_count + 1) * _NODE), "headers"),
+        *(
+            []
+            if after_setup
+            else [
+                (link_end, bytearray(4), "root pointer"),
+                (root_end, bytearray(8), "root child"),
+            ]
+        ),
+        (props, bytearray((push_count + 1) * _BODY + child_total * 12), "bodies"),
         (prop_offsets[1], bytearray(int_values), "integer properties"),
         (prop_offsets[2], bytearray(bool_values), "boolean properties"),
         (io_offsets[1], bytearray(int_values_in), "integer inputs"),
@@ -161,7 +192,7 @@ def _splice(data: bytes) -> bytes:
         old = _u32(data, offset)
         if old:
             put(offset, moved(old))
-    put(0x10, count + 3)
+    put(0x10, count + push_count + 1)
     # Existing bodies and every existing plug target remain otherwise unchanged.
     for header in headers:
         old_body = _u32(data, header + 0x14)
@@ -175,15 +206,22 @@ def _splice(data: bytes) -> bytes:
             put(moved(table) + 4 * i, moved(pointer))
     # A boundary's insertion belongs to the preceding parameter type, not to
     # the following one. Their start pointers therefore move past the insert.
-    out[moved(root_body) + 0x94] = child_count + 1
-    for i in range(7, 20, 2):
-        out[moved(root_body) + 0x90 + i] = child_count + 1
-    put(positions["root pointer"], positions["root child"])
-    struct.pack_into("<II", out, positions["root child"], count, empty)
+    if after_setup:
+        put(_HEADER + 0x14, count)
+        out[headers[root] + 6] &= ~4
+    else:
+        out[moved(root_body) + 0x94] = child_count + 1
+        for i in range(7, 20, 2):
+            out[moved(root_body) + 0x90 + i] = child_count + 1
+        put(positions["root pointer"], positions["root child"])
+        struct.pack_into("<II", out, positions["root child"], count, empty)
+    if wallet_input is not None:
+        put(moved(wallet_input[0]), wallet_input[1])
 
     sequential = positions["bodies"]
-    bag, nuts = sequential + _BODY + 24, sequential + 2 * _BODY + 24
-    for i, (node_body, kind) in enumerate(((sequential, 2), (bag, 0), (nuts, 0))):
+    bodies = [sequential] + [sequential + _BODY + child_total * 12 + i * _BODY for i in range(push_count)]
+    for i, node_body in enumerate(bodies):
+        kind = 2 if not i else 0
         header = positions["headers"] + i * _NODE
         if i:
             out[header : header + _NODE] = data[template : template + _NODE]
@@ -191,6 +229,8 @@ def _splice(data: bytes) -> bytes:
         struct.pack_into("<HH", out, header, kind, count + i)
         put(header + 8, empty if not i else _u32(data, template + 8))
         put(header + 0x14, node_body)
+        if not i and after_setup:
+            out[header + 6] = 4
         out[header + 0x2C : header + _NODE] = uuid.uuid5(
             uuid.NAMESPACE_URL, f"clawshot/{PATH}/start-items/{i}"
         ).bytes_le
@@ -198,21 +238,110 @@ def _splice(data: bytes) -> bytes:
             put(node_body + 0x30, int_inputs + i - 1)
             put(node_body + 0x60, string_inputs + i - 1)
     struct.pack_into("<4I", out, sequential, int_props, 4, bool_props, 3)
-    out[sequential + 0x94] = 2
+    out[sequential + 0x94] = child_total
     for i in range(7, 20, 2):
-        out[sequential + 0x90 + i] = 2
-    for i in range(2):
-        target = sequential + _BODY + 8 + i * 8
+        out[sequential + 0x90 + i] = child_total
+    children = ([root] if after_setup else []) + list(range(count + 1, count + push_count + 1))
+    for i, child in enumerate(children):
+        target = sequential + _BODY + child_total * 4 + i * 8
         put(sequential + _BODY + i * 4, target)
-        struct.pack_into("<II", out, target, count + i + 1, empty)
+        struct.pack_into("<II", out, target, child, empty)
     return bytes(out)
 
 
-def patch_sequence(data: bytes) -> bytes:
+def patch_sequence(
+    data: bytes,
+    *,
+    pushes: tuple[tuple[str, int], ...] = START_PUSHES,
+    hearts: int = 0,
+    wallet: str = "Item_Wallet_Small",
+    after_setup: bool = False,
+) -> bytes:
     if hashlib.sha256(data).hexdigest() != SHA256:
         raise PatchError("start items: native new-game sequence fingerprint changed")
-    return _splice(data)
+    if hearts:
+        out = bytearray(data)
+        for offset in (0x11C8, 0x11E8):
+            if _u32(data, offset) != 12:
+                raise PatchError(f"start items: native health literal changed at {offset:#x}")
+            struct.pack_into("<I", out, offset, 4 * (3 + hearts))
+        data = bytes(out)
+    return _splice(data, pushes, after_setup=after_setup, wallet=wallet)
 
 
-def changes() -> FileChanges:
-    return {PATH: patch_sequence}
+def changes(settings=None) -> FileChanges:
+    if settings is None or not (settings.starting_items or settings.starting_hearts or settings.starting_full_wallet):
+        return {PATH: patch_sequence}
+    actors = items.load()
+    pushes = list(START_PUSHES)
+    wallet, _ = starting.wallet(settings.starting_items)
+    if wallet != "Item_Wallet_Small":
+        pushes.append(("Item_Wallet_Small", 1))
+    for item in starting.prefixes(settings.starting_items):
+        if item in starting.MAP_FLAGS:
+            continue
+        if item == "Slingshot":
+            pushes.append(("Item_BulletBag_Small", 1))
+        elif item == "Bow":
+            pushes.append(("Item_Quiver_Small", 1))
+        pushes.append((actors.actor(item), 1))
+    out = {
+        PATH: partial(
+            patch_sequence,
+            pushes=tuple(pushes),
+            hearts=settings.starting_hearts,
+            wallet=wallet,
+            after_setup=True,
+        )
+    }
+    if "Song of Storms" in settings.starting_items:
+        out["Event/EventFlow/Npc_Hylia_009_Adult.bfevfl.zs"] = storms_lesson
+    return out
+
+
+def initial_values(settings) -> list[gamedata.FastStartSetting]:
+    values = {starting.MAP_FLAGS[item]: True for item in settings.starting_items if item in starting.MAP_FLAGS}
+    if settings.starting_full_wallet:
+        values["PlayerStatus.CurrentRupee"] = starting.wallet(settings.starting_items)[1]
+    if selected := starting.ocarina(settings.starting_items):
+        values["PlayerStatus.EquipOcarina"] = selected
+    if not values:
+        return []
+    return [
+        gamedata.FastStartSetting(
+            name="starting_inventory",
+            default=False,
+            skips="No story or lesson",
+            state="Selected native New Game inventory",
+            source="plans/rounds/r20-start.md",
+            logic=None,
+            game_data=values,
+            flow_edits=(),
+        )
+    ]
+
+
+def storms_lesson(data: bytes) -> bytes:
+    """A prelearned song is not the Windmill's completed teaching encounter."""
+    document = evfl.read(data)
+    chart = document.flowchart
+    if chart is None or chart.name != "Npc_Hylia_009_Adult":
+        raise PatchError("start items: expected Windmill adult flow")
+    for name in ("Event9", "Event17", "Event31", "Event69"):
+        matches = [event for event in chart.events if event.name == name]
+        if len(matches) != 1:
+            raise PatchError(f"start items: missing Windmill lesson guard {name}")
+        event = matches[0]
+        if (
+            not isinstance(event, evfl.SwitchEvent)
+            or chart.actors[event.actor].name != "GameDataActor"
+            or chart.actors[event.actor].queries[event.query] != "EventQueryIsGameDataBool"
+            or (event.params or {}).get("GameDataName")
+            not in ("IsGet.Item_Melody_StormSong", "HavePlayedEvent.Dm_MelodyGet_Storm")
+        ):
+            raise PatchError(f"start items: changed Windmill lesson guard {event!r}")
+        event.params["GameDataName"] = "HavePlayedEvent.Dm_MelodyGet_Storm"
+    result = evfl.write(document)
+    if evfl.read(result) != document:
+        raise PatchError("start items: Windmill lesson failed read-back")
+    return result

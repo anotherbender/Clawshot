@@ -67,9 +67,7 @@ MAP_FLAGS = {
     for kind in ("Map", "Compass")
 }
 CHOICES = tuple(
-    dict.fromkeys(
-        (*EQUIPMENT, *(tier.item for tiers in CHAINS.values() for tier in tiers), *SONGS, *MAP_FLAGS)
-    )
+    dict.fromkeys((*EQUIPMENT, *(tier.item for tiers in CHAINS.values() for tier in tiers), *SONGS, *MAP_FLAGS))
 )
 JUNK = "Rupees (20)"
 
