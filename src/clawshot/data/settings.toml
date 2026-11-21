@@ -37,6 +37,9 @@ forest = "closed" # D24, Kareem: defaults close to vanilla; closed_deku/open are
 door_of_time = "closed" # D35; both early modes wait for Zelda/Impa's send-off (round16); free travel is separate
 hints = "always" # D26, Kareem: stones speak without the Mask of Truth (OoT Randomizer's default); "mask" as vanilla
 hint_distribution = "balanced" # Round 7: data/hints.toml; OoT Randomizer's default distribution
+starting_items = [] # Round 20: concrete audited starts, empty keeps existing new-game behavior
+starting_hearts = 0 # extra hearts above three, 0..17
+starting_full_wallet = false # selected native wallet's capacity, New Game only
 
 # Physical transforms are the same audited initial-value patcher as other fast start.
 [forest.closed]
