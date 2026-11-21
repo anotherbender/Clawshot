@@ -1,7 +1,7 @@
 # Round 20 — Logic/data audit and docs (cs20h)
 
 Agent/model: `cs20h`, `openai-codex/gpt-6.1-sol`; branch `r20/audit`.
-Base: `acbb903` (0.2.4 + PR #36). Status: source audit complete; awaiting ordered gate, not READY.
+Base: `ade62dc` (current main, excludes merged; trials play-held/unmerged). Status: sweep PASS; exact-head final gate/READY outcome is in the external receipt and `cs-r20` handoff.
 No version bump, runtime patch, game launch, player seed/save access or game-folder write.
 
 ## Evidence boundary and method
@@ -398,11 +398,11 @@ DC regression follow-through (only cause-directed reruns):
 - Printed compact Search counts/rule reads and `remake/bombs.toml` established that prerequisite.
   The child torch scenario now uses real Goron Bracelet + Sticks (no bogus `Bombs` item);
   its isolated node **passed in1.37s**. No production bomb/search behavior changed.
-- The88-node combined focus is rerun after the required current-main rebase, before gate admission.
+- Post-rebase combined focus: **88 passed in18.58s**, `-n2`, `CLAWSHOT_WORKERS=1`,
+  including `tests/test_master_sword_logic.py`; no game image running.
 
-Pending current-main rebase, serialized full gate and 200 Broad + 50 Defaults +
-50 Recommended sweep. No new pack input resource or game-behavior patch: no paired launcher needed
-for these model tightenings. Nothing requires Kareem overnight. No new check is called played here.
+No new pack input resource or game-behavior patch: no paired launcher needed for these model
+tightenings. Nothing requires Kareem overnight. No new check is called played here.
 Logic and catalogue changes can change newly generated placements/spoilers/play notes for the same
 recipe; existing outputs and saves are untouched. Maintainers own the next version bump.
 
@@ -414,3 +414,42 @@ No audit auto-retry waiter was running when this rule arrived; only read-only Sw
 The external runner exits rather than retries a held lock and now requires a manual
 `--after-cs20d-lock-released` admission argument after that thread receipt is read.
 Source freeze/current-main rebase/focused verification still precede the gate.
+
+### Frozen sweep and sole pre-gate receipt (2026-11-21)
+
+Explicit predecessor admission: cs20d's **01:56 LOCK RELEASED**. Current-main rebase retained
+both exclusion docs and tracker docs in the one additive settings conflict. Frozen source/test head:
+`4bd3dc4f4b38fd240ab5ddebd6f1c9b0597648d9` (rebased audit commits `9abc703`, `4bd3dc4`).
+Focused88/88 passed before atomic acquisition of this track's lease. The notification watcher
+could not acquire the lock; no out-of-turn waiter or additional matrix ran.
+
+Canonical native setup uses `make_seed`'s actual prepared spec/settings/vanilla map and Gift
+setup when selected, then stops before output writing. Same original broad CS1 in
+`work/r18-fill/settings.txt`; no new option was added. Defaults/Recommended are actual app
+presets. Private seeds20200000–20200199 (Broad),20200000–20200049 (each preset).
+Six workers; no game at stage start; one retained lease through sweep, this receipt and gate.
+
+| Recipe | Accepted | Exhausted | First-attempt failures | Attempts |
+|---|---:|---:|---:|---:|
+| Broad |200/200|0|10 (5%)|210|
+| Defaults |50/50|0|2 (4%)|52|
+| Recommended |50/50|0|2 (4%)|52|
+
+All300 accepted, **zero exhausted**, max2 attempts. Sweep work505.969s; canonical setup plus
+sweep stage537.547s, exit0. First failures are retry counts, not retained internal exception
+payloads: no extra rerun was made to reconstruct discarded exceptions.
+Broad retry seeds:20200024,20200032,20200043,20200055,20200093,20200165,20200170,
+20200173,20200185,20200189; Defaults20200040/20200043; Recommended20200027/20200029.
+Full normalized CS1 recipes, per-seed counts and completion receipts remain outside the repo:
+`E:/OOTRemake/work/r20-audit/sweep-results.json`, `sweep-rows.jsonl`, `sweep.log`.
+No output mod folder, player seed or save was written.
+
+This is the **one round-file-only receipt** authorized by Claude at23:07 after the sweep and
+before the full gate. Source/tests remain frozen; the receipt delta is checked before gate.
+The final-head format/lint, synthetic `-n8/internal4`, then native dump `-n8/internal3`
+write exact HEAD, commands, exit codes and durations to `work/r20-audit/gate-results.json`
+and `format.log`, `lint.log`, `synthetic.log`, `dump.log`. The dump uses the required real
+RomFS/NUP and read-only r19 sword-layered fixture; no new resource or fixture file is needed.
+This paragraph does **not** preclaim those future results. Final **READY (merge)** requires
+all four gate stages to pass; the exact tested head/results and LOCK RELEASED are posted on
+`cs-r20`. No gameplay acceptance is being deferred or promoted by this logic-only track.
