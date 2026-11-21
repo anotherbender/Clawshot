@@ -64,9 +64,10 @@ tests/test_static_hints_dump.py tests/test_hints_lines.py tests/test_gifts_rewar
 all16 languages, a junk reward, fixed17 price, unchanged existing messages/members and
 unchanged whole flow after restoring only its message IDs. This is built, not played.
 
-Generator-only stretch: existing `strong`/`useless` retained; added `very_strong` with
-original Clawshot weights (woth8, barren4, item4, sometimes1, random1; no weighted junk;
-dungeon caps6). Balanced/default and fill RNG stay unchanged; app remains Balanced-only.
+Stretch: existing `strong`/`useless` retained; added `very_strong` with original
+Clawshot weights (woth8, barren4, item4, sometimes1, random1; no weighted junk;
+dungeon caps6). Balanced/default and fill RNG stay unchanged. All four are normal
+app choices per Claude's superseding04:30 decision, not generator-only controls.
 Selector, D29 and settings focus: **28 passed in3.50s**. Actual CLI accepted
 `--hint-distribution very_strong --print-settings` and emitted a CS1 string.
 
@@ -294,4 +295,36 @@ the four recorded commands must all exit0. The newly requested after-gate packet
 comparison requires a subsequent **round-only receipt**; publish its head separately
 from the gated code head, with source/tests unchanged. Final evidence and READY
 (play-held) follow only after the full gate and packet comparison pass.
+
+### Printed gate cause and narrow metadata correction
+
+Initial gate `30173d8282`: format/lint pass; synthetic **303 failed,31 errors,
+3845 passed,805 skipped** in427.15s; dump not started. The owned lock was released.
+Printed schema cause, not a fixture/deadline issue (recorded CPU load38%):
+generator choices were `balanced,strong,very_strong,useless`; label/help keys were
+only `balanced,strong,useless`. `app.schema._rows` derives live distribution choices
+from the generator, so the earlier "app Balanced-only" note was wrong.
+
+**Claude's superseding decision:** Very strong is a normal app choice, like the three
+shipped choices; no disabled/unavailable/refusal metadata. The04:29 refusal proposal
+was stopped **before any refusal edit was applied**. Fix adds its label and plain
+"new this round" help, and aligns the TOML choices list. No schema validation weakened.
+Consumer regression: CLI Very strong CS1 is accepted by app validation.
+
+Before retaking the lock, expanded focus:
+`CLAWSHOT_WORKERS=1 uv run --with pytest-xdist pytest -n2 tests/test_settings.py
+tests/test_app*.py tests/test_ui*.py -q`: **149 passed in62.23s**.
+This includes `tests/test_app_schema.py`; these files are now part of this track's
+focus set alongside the six hint/native files above.
+Actual **Chrome headless** surface proof: all four choices enabled; selected
+`very_strong` through the real dropdown; backend returned a validated CS1.
+Screenshot `work/r20-hints/ui-very-strong.png` inspected, proof JSON retained,
+browser/server closed. Only the seed-library root was isolated to an empty folder;
+no personal seed read, no DOM state mutation or game launch.
+
+Very strong uses the existing hint writer. The staged packet stays Balanced to keep
+the required identical seed/settings/placement comparison; a distribution-specific
+stone read is **built, not played**, not claimed covered by that packet.
+Claude retained turn5; one corrected frozen full gate, including dump, follows
+these cause-targeted proofs. No unchanged rerun and no sweep.
 

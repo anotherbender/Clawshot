@@ -722,7 +722,8 @@ The generator also accepts `--hint-distribution strong`, `very_strong` and `usel
 Strong favors required routes and barren areas; Very strong raises those weights and
 allows more dungeon-area hints. Useless gives only original joke lines. No distribution
 changes placements, item eligibility or D29's no-junk location clues; an exhausted useful
-hint pool still falls back to jokes. The app currently exposes only Balanced.
+hint pool still falls back to jokes. All four are app choices; Very strong is new this round
+and remains built, not played.
 
 **Static text (built, not played):** with dungeon rewards shuffled or a count-mode
 bridge, the Temple of Time altar lists reward regions and the selected Door/bridge
