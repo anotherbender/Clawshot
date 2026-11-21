@@ -473,4 +473,32 @@ not this follow-up's verification. Follow-up receipts/scripts live separately un
 `E:/OOTRemake/work/r20-audit/followup/` so previous gate evidence is preserved.
 Focused verification: `CLAWSHOT_WORKERS=1 uv run --with pytest-xdist pytest -n2
 tests/test_ranged_pickups.py -q`: **18 passed in4.97s**; exact game-image check clear.
-Status: source ready; new game-free serialized sweep/full gate pending.
+Status: follow-up sweep PASS; exact-head full-gate/READY outcome is in the separate external
+follow-up receipt and final `cs-r20` handoff, not inferred from the historical gate above.
+
+### Follow-up sweep receipt (sole pre-gate round-only commit)
+
+Frozen source/test head`9f4efe015d34fadfbd9003a27a0f77cd947717c5`, based on requested
+main`f8fb504`. Exact process checks were clear before acquiring the turn6 lease and before
+starting the sweep. Same canonical native preparation, broad CS1 and actual app presets as
+the original audit; no new setting. Private seed ranges20200000–20200199 for Broad and
+20200000–20200049 for each preset. Six workers; no seed output folder or save written.
+
+| Recipe | Accepted | Exhausted | First-attempt failures | Attempts |
+|---|---:|---:|---:|---:|
+| Broad |200/200|0|10|210|
+| Defaults |50/50|0|2|52|
+| Recommended |50/50|0|2|52|
+
+All300 accepted, **zero exhausted**, max2 attempts. Sweep work485.985s; canonical preparation
+plus sweep stage516.547s, exit0. Per-seed rows, retry counts/IDs, normalized recipe strings
+and exact commands are retained in `work/r20-audit/followup/sweep-results.json`,
+`sweep-rows.jsonl`, `sweep.log` and `gate-results.json`. Internal rejection payloads were not
+retained; no unchanged rerun was made to reconstruct them.
+
+This receipt changes only this round file after the frozen sweep. Source/tests stay
+unchanged for the final-head format/lint, synthetic`-n8/internal4` and dump`-n8/internal3`.
+The game guard checks each stage and waits600s whenever either exact game image is present;
+there is no reduced-worker fallback that starts a heavy stage while the game runs.
+One lease remains held through this receipt and the gate. Final results and LOCK RELEASED
+will be posted on `cs-r20`; no future gate result is preclaimed here.
