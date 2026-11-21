@@ -438,6 +438,15 @@ RECIPES: dict[str, tuple[int, Settings, dict]] = {
     # Generator defaults: chests in their dungeons, closed Door of Time without dungeon rewards, Gossip Stone hints
     # without the Mask of Truth, the closed forest, the intro skip.
     "defaults": (1, Settings(), {}),
+    "starting": (
+        1,
+        Settings(
+            starting_items=("Ocarina of Time", "Song of Storms", "Slingshot", "Map (Deku Tree)"),
+            starting_hearts=3,
+            starting_full_wallet=True,
+        ),
+        {},
+    ),
     # Recommended kinds with the song-only Door of Time, the open forest and vanilla Mask of Truth hints.
     "song_door": (1, Settings(shuffle=RECOMMENDED, door_of_time="song_only", forest="open", hints="mask"), {}),
     # Every shuffle kind and opt-in flow writer: released dungeon items and jail keys, dungeon rewards with the
@@ -503,6 +512,7 @@ WRITERS = {
     "defaults": _EVERY_RECIPE | _modules("text"),
     "song_door": _EVERY_RECIPE | _modules("door", "gifts"),
     "broad": _EVERY_RECIPE | _OPT_IN,
+    "starting": _EVERY_RECIPE | _modules("text", "start_items"),
 }
 FLOW_WRITERS = frozenset().union(*WRITERS.values())
 

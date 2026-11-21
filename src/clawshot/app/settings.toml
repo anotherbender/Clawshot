@@ -95,6 +95,23 @@ group = "World"
 logic_override = "free_time_travel"
 clears = { logic = ["free_time_travel"] }
 help = "Experimental, off by default. After Sheik's first adult scene, return to child before the Forest Temple and change age freely. Seeds may expect those early trips. Prelude still follows Forest completion. Early return, repeated age changes, first adult arrival, Prelude and the repaired child sword return have passed in game. This does not repair an old seed or save."
+[starting_items]
+label = "Starting items (experimental)"
+kind = "multi"
+group = "Starting inventory"
+help = "Empty by default. Choose owned items for New Game only. Choose the highest upgrade tier you want; earlier tiers and weapon containers are included. Selected pool copies become junk. Songs do not complete their lessons or story quests. Unsupported trade items, bottles, masks, Lens, keys, tokens and rewards are refused. Built, not played."
+[starting_hearts]
+label = "Extra starting hearts"
+kind = "integer"
+min = 0
+max = 17
+group = "Starting inventory"
+help = "Zero by default: three hearts. Add up to 17 full hearts on New Game only. Matching pooled Heart Containers become junk when present; native unshuffled sources stay."
+[starting_full_wallet]
+label = "Start with a full wallet"
+kind = "boolean"
+group = "Starting inventory"
+help = "Off by default. New Game starts at the chosen wallet's capacity: 200, 500 or 1000 rupees. It never refills an existing save or pretends a wallet upgrade was acquired."
 [fast_start]
 label = "Fast start"
 kind = "multi"

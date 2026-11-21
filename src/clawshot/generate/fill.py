@@ -17,6 +17,7 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field, replace
 from typing import Any
 
+from clawshot import starting
 from clawshot.generate import hints as hint_choices
 from clawshot.settings import CATALOG, DEFAULTS
 from clawshot.world.model import World
@@ -149,13 +150,28 @@ class Settings:
     door_of_time: str = DEFAULTS["door_of_time"]
     hints: str = DEFAULTS["hints"]
     hint_distribution: str = DEFAULTS["hint_distribution"]
+    starting_items: tuple[str, ...] = tuple(DEFAULTS["starting_items"])
+    starting_hearts: int = DEFAULTS["starting_hearts"]
+    starting_full_wallet: bool = DEFAULTS["starting_full_wallet"]
 
     def __post_init__(self) -> None:
-        for name in ("shuffle", "areas", "fast_start", "exclusive_location_types", "excluded_locations"):
+        for name in (
+            "shuffle",
+            "areas",
+            "fast_start",
+            "exclusive_location_types",
+            "excluded_locations",
+            "starting_items",
+        ):
             values = getattr(self, name)
             if not isinstance(values, (tuple, list)) or not all(isinstance(value, str) for value in values):
                 raise ValueError(f"{name} must be a list of names")
             object.__setattr__(self, name, tuple(sorted(set(values))))
+        starting.validate(self.starting_items, self.starting_hearts, self.starting_full_wallet)
+        if "Master Sword" in self.starting_items and not self.shuffle_master_sword:
+            raise ValueError(
+                "Starting with Master Sword requires Master Sword shuffle; the native pedestal owns it otherwise"
+            )
         if not isinstance(self.logic, dict) or not all(isinstance(key, str) for key in self.logic):
             raise ValueError("logic must be a table of setting names to JSON values")
         if self.goal is not None and not isinstance(self.goal, str):
@@ -279,6 +295,12 @@ class Settings:
             out["shuffle_100_token_reward"] = True  # absent when off, like shuffle_hideout_keys
         if self.excluded_locations:
             out["excluded_locations"] = list(self.excluded_locations)
+        if self.starting_items:
+            out["starting_items"] = list(self.starting_items)
+        if self.starting_hearts:
+            out["starting_hearts"] = self.starting_hearts
+        if self.starting_full_wallet:
+            out["starting_full_wallet"] = True
         if self.item_location_types:
             out["item_location_types"] = {
                 k: list(self.item_location_types[k]) for k in sorted(self.item_location_types)
@@ -688,11 +710,19 @@ def return_guarantee_conflict(world: World, settings: Settings, vanilla: Mapping
     sources = [name for name, item in fixed.items() if _age_family(world, item) in withheld]
     checks = ", ".join(sorted(catalog[name].name if name in catalog else name for name in sources))
     kinds = ", ".join(sorted({world.locations[name].type for name in sources}))
+    advice = (
+        "Choose door_of_time = 'closed', or also shuffle those checks "
+        f"(their kinds: {kinds}; the Gift shuffle moves gifts and songs)."
+    )
+    if "Goron Bracelet" in world.start_items and "Sarias Song" in withheld:
+        advice = (
+            "Starting with the Goron Bracelet needs Saria's Song as a starting item, "
+            "song shuffle (the Gift option), or free time travel."
+        )
     return (
         f"{start} Even with every item the fill can place, that assumed start still needs {', '.join(withheld)}, "
         f"which stay at unshuffled checks adult Link cannot reach first ({checks}). "
-        "Choose door_of_time = 'closed', or also shuffle those checks "
-        f"(their kinds: {kinds}; the Gift shuffle moves gifts and songs)."
+        f"{advice}"
     )
 
 

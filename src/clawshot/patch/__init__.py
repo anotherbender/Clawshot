@@ -97,7 +97,13 @@ def make_seed(
 
         extra_steps = (*extra_steps, lambda placements: rewards.changes(romfs, placements))
     names = [*settings.fast_start, *CATALOG["forest"][settings.forest]["fast_start"]]
-    chosen = [*gamedata.load_always(), *gamedata.select(fast_settings, names)]
+    from clawshot.patch import start_items
+
+    chosen = [
+        *gamedata.load_always(),
+        *gamedata.select(fast_settings, names),
+        *start_items.initial_values(settings),
+    ]
     _, world = prepare(spec, settings)
     table = item_actors.load()
     table.check(world.items)
@@ -205,12 +211,11 @@ def make_seed(
         master_sword,
         mido_schedule,
         reward_bridge,
-        start_items,
     )
 
     changes += (
         door.changes(out.placements, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
-        start_items.changes(),
+        start_items.changes(settings),
         equipment.changes(),
         *([master_sword.changes(out.placements)] if settings.shuffle_master_sword else []),
         dampe_safety.changes(),

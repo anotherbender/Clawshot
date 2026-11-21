@@ -36,7 +36,7 @@ OPENING_MOVIE = "Dm_Kokiri_0000"
 OPENING_WAIT = "ClawshotWaitForKokiriForest"
 
 # The GameDataList types a setting may change, and the Python type of the value fast_start.toml gives for each.
-VALUE_TYPES = {"Bool": bool, "Int": int, "Enum": str}
+VALUE_TYPES = {"Bool": bool, "Int": int, "Enum": str, "String64": str}
 # ResetTypeValue bit of the entries a new game resets (every story flag has it: 8 or 24). [Inference from the
 # values: Sequence/NormalTitle resets with ResetType 3 before the opening, and bit 3 is set on all 9338 per-slot
 # story Bools; system entries such as Sequence_* have 0.]
@@ -238,7 +238,7 @@ def _entries(tree: dict, list_type: str) -> list[dict]:
 def _find(tree: dict, name: str) -> tuple[str, dict]:
     """The list type and the entry whose Hash is ``name``'s murmur3 (only the types a setting may change)."""
     key = murmur3_32(name.encode("utf-8"))
-    found = [(t, e) for t in VALUE_TYPES for e in _entries(tree, t) if e.get("Hash") == key]
+    found = [(t, e) for t in VALUE_TYPES if t in tree["Data"] for e in _entries(tree, t) if e.get("Hash") == key]
     if len(found) != 1:
         what = "no entry" if not found else f"{len(found)} entries"
         raise FastStartError(f"GameDataList has {what} named {name!r} (hash 0x{key:08x}) among {list(VALUE_TYPES)}")
@@ -268,7 +268,9 @@ def plan_game_data(tree: dict, chosen: list[FastStartSetting]) -> list[GameDataC
                     raise FastStartError(f"{where}: {value!r} is not one of {entry.get('RawValues')}")
                 old = _value_name(entry, entry["DefaultValue"])
             else:
-                old = entry["DefaultValue"] if list_type == "Bool" else int(entry["DefaultValue"])
+                old = int(entry["DefaultValue"]) if list_type == "Int" else entry["DefaultValue"]
+            if list_type == "String64" and len(value.encode("utf-8")) >= 64:
+                raise FastStartError(f"{where}: String64 value must fit 63 UTF-8 bytes")
             if old == value:
                 raise FastStartError(f"{where} is already {value!r} in the game's GameDataList")
             if name in changes and changes[name].new != value:
@@ -289,6 +291,8 @@ def apply_game_data(tree: dict, changes: list[GameDataChange]) -> None:
             entry["DefaultValue"] = type(old)(new)
         elif list_type == "Bool":
             entry["DefaultValue"] = bool(change.new)
+        elif list_type == "String64":
+            entry["DefaultValue"] = change.new
         else:
             entry["DefaultValue"] = type(old)(change.new)
 

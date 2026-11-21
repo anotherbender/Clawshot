@@ -38,6 +38,29 @@ def resource_modes():
     yield "dungeon-rewards-bridge", Settings(dungeon_rewards=True, bridge="rewards", bridge_count=9)
     yield "saria-farewell", replace(all_kinds, skip_saria_farewell=True)
     yield "hundred-token-reward", replace(all_kinds, shuffle_100_token_reward=True)
+    yield (
+        "starting-inventory",
+        replace(
+            all_kinds,
+            starting_items=(
+                "Kokiri Sword",
+                "Deku Shield",
+                "Boomerang",
+                "Slingshot",
+                "Bomb Bag",
+                "Goron Bracelet",
+                "Hookshot",
+                "Ocarina of Time",
+                "Zeldas Lullaby",
+                "Song of Storms",
+                "Adult Wallet",
+                "Map (Deku Tree)",
+                "Compass (Deku Tree)",
+            ),
+            starting_hearts=3,
+            starting_full_wallet=True,
+        ),
+    )
     skips = tuple(name for name in gamedata.load() if name not in ("mido", "forest_exit"))
     for forest in CATALOG["forest"]:
         yield f"forest-{forest}", replace(all_kinds, forest=forest, fast_start=skips)

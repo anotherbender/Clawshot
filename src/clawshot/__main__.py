@@ -177,6 +177,19 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="experimental: replace Saria's bridge farewell and gift animation with a plain item get (default off)",
     )
+    parser.add_argument(
+        "--starting-items",
+        nargs="*",
+        metavar="ITEM",
+        help="experimental New Game inventory; concrete upgrade tiers include lower tiers; empty by default",
+    )
+    parser.add_argument("--starting-hearts", type=int, help="0..17 extra New Game hearts (default 0)")
+    parser.add_argument(
+        "--starting-full-wallet",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="experimental: full selected wallet on New Game only (default off)",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -190,6 +203,9 @@ def main(argv: list[str] | None = None) -> int:
             ("shuffle_100_token_reward", "shuffle_100_token_reward"),
             ("dungeon_rewards", "dungeon_rewards"),
             ("shuffle_master_sword", "shuffle_master_sword"),
+            ("starting_items", "starting_items"),
+            ("starting_hearts", "starting_hearts"),
+            ("starting_full_wallet", "starting_full_wallet"),
             ("bridge", "bridge"),
             ("bridge_count", "bridge_count"),
             ("areas", "areas"),
