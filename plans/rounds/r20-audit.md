@@ -128,7 +128,7 @@ Evidence keys:
 | `Colossus GS Tree` | `(can_use(Longshot) or can_use(Boomerang)) and (at_night or gold_skulls_ignore_daytime)` | T — 15057756765324812936; DesertColossus. [`adult_desert_colossus.toml`](../../src/clawshot/data/world/remake/adult_desert_colossus.toml). |
 | `Colossus GS Hill` | `is_adult and (at_night or gold_skulls_ignore_daytime) and (here(can_plant_bean) or Longshot or (logic_colossus_gs and Hookshot))` | T — 11160993739666517210; DesertColossus. [`desert_colossus.toml`](../../src/clawshot/data/world/desert_colossus.toml); range unplayed. |
 | `Dodongos Cavern GS Side Room Near Lower Lizalfos` | `adult_sword or has_explosives or (is_child and (Sticks or Slingshot or Boomerang or Kokiri_Sword))` | C/T — 1171854281537584829; DodongoCavern. [`master_sword.toml`](../../src/clawshot/data/world/remake/master_sword.toml). |
-| `Dodongos Cavern GS Scarecrow` | `can_use(Scarecrow) or can_use(Longshot) or (logic_dc_scarecrow_gs and (is_adult or can_child_attack))` | T — 960362013021648957; DodongoCavern. [`dodongos_cavern.toml`](../../src/clawshot/data/world/dodongos_cavern.toml); range unplayed. |
+| `Dodongos Cavern GS Scarecrow` | `can_use(Hookshot) or can_use(Scarecrow) or can_use(Longshot) or (logic_dc_scarecrow_gs and (is_adult or can_child_attack))` | T — 960362013021648957; DodongoCavern. [`dodongos_cavern.toml`](../../src/clawshot/data/world/dodongos_cavern.toml). **Played plain Hookshot: Kareem,2026-11-21, via Claude; follow-up below.** |
 | `Dodongos Cavern GS Vines Above Stairs` | `at('Dodongos Cavern Climb', can_use(Slingshot) or can_use(Boomerang) or can_use(Bow) or can_use(Hookshot)) or (logic_dc_vines_gs and can_use(Longshot))` | C/T — 8470399761714006011; DodongoCavern. [`child_dodongos_cavern.toml`](../../src/clawshot/data/world/remake/child_dodongos_cavern.toml). |
 | `Dodongos Cavern GS Alcove Above Stairs` | `has_explosives` | C/T — 4565265801822094851; DodongoCavern. [`child_dodongos_cavern.toml`](../../src/clawshot/data/world/remake/child_dodongos_cavern.toml). |
 | `Fire Temple GS Scarecrow Climb` | `can_use(Scarecrow) or (logic_fire_scarecrow and Longshot)` | C/T — 5556173334779815044; FireTemple. [`fire_temple.toml`](../../src/clawshot/data/world/fire_temple.toml); range unplayed. |
@@ -208,12 +208,11 @@ Additional regional pickup proxies (not location-rule matches):
 | `Forest Temple NW Outdoors -> NW Outdoors Freestandings`: `logic_forest_courtyard_hearts and can_use(Boomerang)` | Two courtyard recovery-heart rows; R. Trick remains off; upper-ledge walking entrance remains. No remote heart-piece permission. |
 | Remake `LLR GS Tower`: child Boomerang/adult Hookshot | Native Hash 2730878115209290675; `remake/token_routes.toml`, r15 played recovery/retrieval. Kept unchanged; included to distinguish actual remake token evidence from N64-only rows. |
 
-**Question for Kareem (no loosening): can Longshot alone retrieve the Dodongo scarecrow token,
-Hash 960362013021648957, without calling Pierre?** Native marker 6350453570889535478 is beside
-that ledge; r4 guides document Scarecrow + Hookshot and r19's public-prose lead says song required.
-A marker's existence does not prove that direct token line-of-sight/range is impossible, so neither
-that lead nor geometry-by-eye is used as a new contradiction. The existing rule remains an explicitly
-unplayed alternative, not a freshly verified route.
+**Answered by Kareem, remake play2026-11-21 (relayed by Claude): the Dodongo scarecrow
+token, Hash960362013021648957, is reachable with the plain Hookshot.** This supersedes the
+earlier unplayed range question. Add `can_use(Hookshot)`; retain the Scarecrow, Longshot and
+disabled-trick branches. Marker6350453570889535478 and earlier guides do not override the
+player's observed route. This is a narrowly played-supported loosening, not inferred range.
 
 ## 4. Distance switches
 
@@ -453,3 +452,25 @@ RomFS/NUP and read-only r19 sword-layered fixture; no new resource or fixture fi
 This paragraph does **not** preclaim those future results. Final **READY (merge)** requires
 all four gate stages to pass; the exact tested head/results and LOCK RELEASED are posted on
 `cs-r20`. No gameplay acceptance is being deferred or promoted by this logic-only track.
+
+## 7. Played Scarecrow Hookshot follow-up (2026-11-21)
+
+Requested/authorized by Claude from Kareem's played remake answer: the Dodongo's Cavern
+Scarecrow Gold Skulltula is reachable with the **plain Hookshot**. Rebased onto requested
+main`f8fb504`; add only `can_use(Hookshot)` to the translated source rule, preserving every
+existing alternative. The inline source comment cites Kareem/date; generated-file header
+now acknowledges cited remake corrections. No actor/source identity, setting or patch changes.
+`docs/logic.md` names no Longshot requirement for this check, so it is unchanged.
+
+Regression coverage: adult without a retrieval tool remains refused; plain Hookshot works
+without Song/Longshot; existing Longshot works; child cannot use adult Hookshot. No new played
+claim beyond Kareem's answer and no control launcher/game patch is needed.
+
+Gate turn6, nobody ahead (Claude). At **every stage** check exact `longshot.exe`/`hookshot.exe`;
+if present, start no heavy job and wait/retry every10 minutes. Broad200 + Defaults50 +
+Recommended50 and the full gate remain mandatory. Prior audit receipts above are historical,
+not this follow-up's verification. Follow-up receipts/scripts live separately under
+`E:/OOTRemake/work/r20-audit/followup/` so previous gate evidence is preserved.
+Focused verification: `CLAWSHOT_WORKERS=1 uv run --with pytest-xdist pytest -n2
+tests/test_ranged_pickups.py -q`: **18 passed in4.97s**; exact game-image check clear.
+Status: source ready; new game-free serialized sweep/full gate pending.

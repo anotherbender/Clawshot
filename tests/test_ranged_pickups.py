@@ -84,3 +84,18 @@ def test_dodongo_fire_arrows_do_not_bypass_existing_shuffled_sword_guard(has_swo
     search = Search(world, items)
     assert search.can_reach("Dodongos Cavern Torch Room", ADULT)
     assert search.can_reach("Dodongos Cavern Staircase Room", ADULT) is has_sword
+
+
+@pytest.mark.parametrize(
+    ("age", "items", "reachable"),
+    [
+        (ADULT, [], False),
+        (ADULT, ["Hookshot"], True),
+        (ADULT, ["Longshot"], True),
+        (CHILD, ["Hookshot"], False),
+    ],
+)
+def test_dodongo_scarecrow_token_accepts_played_plain_hookshot_route(age, items, reachable):
+    world = starting_at("Dodongos Cavern Lower Right Side", age)
+    search = Search(world, items)
+    assert search.can_access(world.locations["Dodongos Cavern GS Scarecrow"], age) is reachable
