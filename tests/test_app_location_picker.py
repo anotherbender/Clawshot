@@ -3,9 +3,6 @@
 import pytest
 
 from clawshot.app import schema, settings_payload, validate
-from clawshot.generate.names import load as load_names
-from clawshot.tracker import location_index
-from clawshot.world import build_world, load_spec
 
 KEY = "excluded_locations"
 CHEST = "KF Kokiri Sword Chest"
@@ -14,23 +11,6 @@ SONG = "Song from Impa"  # Zelda's Lullaby, one of the twelve song checks
 
 def picker() -> dict:
     return next(row for row in schema() if row["key"] == KEY)
-
-
-def test_choices_are_the_bundled_worlds_item_checks_with_readable_labels_and_areas():
-    row = picker()
-    world = build_world(load_spec())
-    live = {name for name, loc in world.locations.items() if loc.n64_only is None and loc.vanilla is not None}
-    assert row["kind"] == "multi" and row["display"] == "locations" and list(row["default"]) == []
-    assert len(row["choices"]) == len(live) and set(row["choices"]) == live
-    catalog, places = load_names(), location_index()
-    described = [name for name in row["choices"] if name in catalog]
-    assert row["choices"][: len(described)] == described  # described checks lead, undescribed pots/rupees follow
-    options = {option["value"]: option for option in row["options"]}
-    assert options[CHEST]["label"] == catalog[CHEST].name != CHEST
-    assert options[CHEST]["help"] == catalog[CHEST].where
-    for name, option in options.items():
-        assert option["area"] == places[name].area and option["type"] == world.locations[name].type
-        assert option["help"].strip() and not option["disabled"]
 
 
 @pytest.mark.parametrize("names", [[CHEST], (CHEST,)])

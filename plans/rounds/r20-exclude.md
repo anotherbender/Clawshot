@@ -49,3 +49,39 @@ work, not a new claim about played native grants. Intended READY kind: **READY (
   not an exclusion-capacity failure. The fix must use public gift admission/holds for validation and preserve
   the final native-pool check. Search, area expansion, selected counts and hidden checked selections were
   visually observed, but CS1 persistence was **not** successful on this attempt.
+- First integrated focus invocation exited5 with no collection: the historical rejected round-19
+  `tests/test_fill_holds.py` does not exist on main. The printed path inventory established that cause;
+  the corrected file set below did not change or narrow any existing test.
+
+## Focused and browser proof
+
+`git rebase main` on implementation `c1c1ccf36f` reported up to date (`acbb903`).
+Core aimed focus: **11 passed, 4 deselected in 2.50s** (selection skips the app consumers).
+Integrated command, `CLAWSHOT_WORKERS=1`, no running game:
+
+```sh
+uv run --with pytest-xdist pytest tests/test_excluded_locations.py tests/test_app_location_picker.py \
+  tests/test_app_schema.py tests/test_app.py tests/test_ui.py tests/test_fill.py tests/test_house100.py \
+  tests/test_settings_house100.py tests/test_key_families.py tests/test_gifts_fill.py -n 2 -q
+```
+
+**157 passed, 3 dump tests skipped in 54.97s**. Receipt: `integrated-focused-v2.log`.
+Subsequent cleanup removes one newly added metadata-wiring test; consumer regressions remain.
+Scoped Ruff: eight changed Python files already formatted, lint passed.
+
+Actual isolated app surface: area groups, search auto-expansion, readable/canonical names, selected and
+hidden-selected counts, and hidden check retention were observed. Selecting Frog Game plus House100 now
+returned HTTP200 and the decoded actual UI CS1 contained exactly both names. No JS errors. The server
+used in-memory preferences and an empty external library root; no player seed directory was scanned.
+Both servers/tabs were closed. After Claude's new headless-only steering, the browser tool's owned
+browser was closed with `all=true, kill=true`; process inspection found no Chrome matching omp/debug/headless.
+No more omp browser calls will be used for this track.
+
+Claude approved extracting `gifts.movable_checks(world, rules)` as shared dump-free eligibility:
+native `seed_checks` and app capacity validation now use one predicate, not two copies. This is a
+pure refactor of native eligibility. Required **all-output SHA-256 parity** against frozen main for
+two Gift and two Recommended seeds is pending under the gate lock.
+
+The first sweep acquisition found cs20g's paired-sweep lock and exited75; no seeds started and no foreign
+lock was removed. Heavy acceptance will use six sweep workers, then eight xdist workers with internal
+four (synthetic) / three (dump), downshifted if a game is running.
