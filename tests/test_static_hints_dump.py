@@ -87,11 +87,22 @@ def test_altar_and_ganondorf_name_regions_not_checks_or_junk_in_every_language(r
         before, after = sarc.read(raw), sarc.read(transform(raw))
         altar = msbt.read(after[text.ALTAR_MESSAGES])
         parts = altar.messages[text.ALTAR_LABEL]
-        shown = visible(parts)
+        pages = [[]]
+        for part in parts:
+            if part == text.PAGE_BREAK:
+                pages.append([])
+            elif isinstance(part, str):
+                pages[-1].extend(part.splitlines())
+        rows = [row for page in pages for row in page]
+        assert all(1 <= len(page) <= 2 for page in pages)
+        assert max(map(len, rows)) <= 48
         for source in slots:
             area = stone_hints.area_name(stone_hints.hint_area(world, world.locations[source].region))
-            assert f"{names[placements[source]]}: {area}." in shown
-        assert "4 medallions" in shown and "own all three Spiritual Stones" in shown
+            assert f"{names[placements[source]]}: {area.removeprefix('the ')}" in rows
+        assert "Bridge: own 4 medallions." in rows and "Door: 3 Spiritual Stones" in rows
+        assert "Door: Ocarina of Time + Song of Time" in rows
+        assert all(": " in row for row in rows)
+        shown = visible(parts)
         assert "Rupees" not in shown and "Kak 20" not in shown
         original = msbt.read(before[text.ALTAR_MESSAGES])
         altar.messages[text.ALTAR_LABEL] = original.messages[text.ALTAR_LABEL]

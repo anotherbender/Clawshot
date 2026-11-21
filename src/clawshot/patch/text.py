@@ -284,6 +284,20 @@ def stone_line(original: Sequence[Part], text: str, width: int = HINT_WIDTH, row
     return parts
 
 
+def _altar_line(original: Sequence[Part], lines: Sequence[str]) -> list[Part]:
+    """Keep rewards/conditions atomic within the observed native 48-character, three-row sign envelope."""
+    if any(len(line) > 48 for line in lines):
+        raise PatchError(f"altar line exceeds the 48-character envelope: {lines}")
+    lead = keep_style(original, [])
+    style = [tag for tag in lead if isinstance(tag, Tag) and tag.group == 0]
+    parts = list(lead)
+    for offset in range(0, len(lines), 2):
+        if offset:
+            parts.extend([PAGE_BREAK, *style])
+        parts.append("\n".join(lines[offset : offset + 2]))
+    return parts
+
+
 def stone_lines_transform(lines: Mapping[str, str]) -> Callable[[bytes], bytes]:
     """The transform of one language archive giving each stone label in ``lines`` its new line (:func:`stone_line`,
     in that archive's style of the stone)."""
@@ -401,24 +415,26 @@ def static_hint_changes(romfs: str | Path, seed: "Seed", table: ItemActors) -> F
         rewards = {slot["item"] for slot in catalog()["slots"].values()}
         placed = [(name, item) for name, item in seed.placements.items() if item in rewards]
         names = item_names(romfs, (item for _, item in placed), table)
-        pages = [f"{names[item]}: {region(name)}." for name, item in placed]
+        pages = [f"{names[item]}: {region(name).removeprefix('the ')}" for name, item in placed]
         if seed.settings.door_of_time == "closed":
-            stones = (
-                "own all three Spiritual Stones" if seed.settings.dungeon_rewards else "complete the three stone quests"
-            )
-            door = (
-                f"Door: {stones}, obtain the Ocarina of Time and Song of Time, "
-                "finish Impa's send-off, then play the song here."
+            stones = "3 Spiritual Stones" if seed.settings.dungeon_rewards else "finish the 3 stone quests"
+            pages.extend(
+                [
+                    f"Door: {stones}",
+                    "Door: Ocarina of Time + Song of Time",
+                    "Door: finish Impa's send-off",
+                    "Door: play Song of Time here",
+                ]
             )
         else:
-            door = "Door: finish Impa's send-off and reach Hyrule Field."
-            if seed.settings.door_of_time == "song_only":
-                door += " Then play the Song of Time here with an ocarina."
-            else:
-                door += " No items are needed."
-        pages.append(door)
+            pages.extend(["Door: finish Impa's send-off", "Door: reach Hyrule Field"])
+            pages.append(
+                "Door: play Song of Time with an ocarina"
+                if seed.settings.door_of_time == "song_only"
+                else "Door: no items needed"
+            )
         if seed.settings.bridge == "vanilla":
-            pages.append("Bridge: awaken the Shadow and Spirit sages, then return here for Zelda's story.")
+            pages.extend(["Bridge: awaken Shadow and Spirit sages", "Bridge: return here for Zelda's story"])
         elif seed.settings.bridge_count == 0:
             pages.append("Bridge: no items required.")
         else:
@@ -430,7 +446,7 @@ def static_hint_changes(romfs: str | Path, seed: "Seed", table: ItemActors) -> F
             }
             noun = nouns[seed.settings.bridge][seed.settings.bridge_count != 1]
             pages.append(f"Bridge: own {seed.settings.bridge_count} {noun}.")
-        lines[ALTAR_MESSAGES] = {ALTAR_LABEL: " ".join(pages)}
+        lines[ALTAR_MESSAGES] = {ALTAR_LABEL: "\n".join(pages)}
 
     if any(name in seed.shuffled for name in GATED_FAIRY_CHECKS):
         # TriForcePoint's no-Din branch shares these Navi lines across all five
@@ -465,7 +481,10 @@ def static_hint_changes(romfs: str | Path, seed: "Seed", table: ItemActors) -> F
                 raise PatchError(f"{file}: no messages labelled {missing}")
             width = 35 if file == GANONDORF_MESSAGES else 40
             edits[file] = {
-                label: stone_line(originals[label], line, width=width, rows=2) for label, line in labels.items()
+                label: _altar_line(originals[label], line.splitlines())
+                if file == ALTAR_MESSAGES
+                else stone_line(originals[label], line, width=width, rows=2)
+                for label, line in labels.items()
             }
         return edit_messages(edits)(data)
 

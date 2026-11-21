@@ -388,3 +388,37 @@ this round receipt**, not production or tests. The gated code head above and the
 separate receipt head are both disclosed in the handoff; do not describe a new
 code/test revision as gated.
 
+### Altar readability follow-up
+
+Claude reported staged width wrapping split reward/region names across lines and
+pages. Fixed with a dedicated atomic-line formatter: one complete reward/region
+pair per row, page breaks only between rows, at most2 rows/page. Door and Bridge
+requirements each occupy their own complete lines, with no word wrapping.
+Rows are checked against the **observed native48-character envelope** (native3
+rows/page; new2). This is a character/row proof, not measured engine-pixel clipping.
+All16 language archives retain their native opening/style tags.
+
+The exhaustive pair probe printed49 for
+`Forest Medallion: the land outside Ganon's Castle`. Removed only the optional
+leading article from altar region names, preserving the complete region identity;
+the aimed proof then checks all reward/region combinations without splitting names.
+Revised existing all-language regression requires each complete reward/region pair
+on one row, within the native envelope; archive inverse proof stays.
+First focused native run:5 passed in5.82s (`-n2`, internal1), before article trimming.
+
+Only stage05 will point to the rebuilt candidate, private seed20200121 and the same
+placement map. Other stages keep their already boot-checked v1 candidate. The new
+stage05 needs Claude's boot check and Kareem's readability check; no game launched
+by cs20a and no original save/game folder written.
+
+**Morning gate rule (Claude):** no full-gate stage starts while exact image
+`longshot.exe` or `hookshot.exe` exists. Check before every stage; if present, wait
+**600 seconds** and check again. The external driver now waits instead of using the
+old reduced-worker fallback. Both Longshot processes were present at follow-up start;
+focused native work uses at most2 processes/internal1. No sweep.
+
+After article trimming: **5 native tests passed in11.31s**. Exhaustive proof:
+**324 reward/region pairs ×16 native styles**, maximum **45 characters**;
+**288 actual native archive Door/Bridge readbacks** (18 cases per language),
+each row atomic and every page1–2 rows. Evidence `work/r20-hints/altar-layout-proof.json`.
+

@@ -736,6 +736,8 @@ junk; they are not D29 location clues. The five non-Death-Mountain-Trail fountai
 shared refusal now says their gift waits on owning Din's Fire, not a visit to the
 summit. Both existing hint modes retain normal NPC/sign access. New custom text is
 English in every language; spoken audio and all event timing remain native.
+Each reward and region stays on one complete altar line; Door and Bridge requirements
+use separate lines. Page breaks fall only between complete lines.
 
 **Wrong-age pickups:** the note lists shuffled age-locked rewards reachable by the wrong age at their
 first search frontier, including ties. Optional later pickups can differ from that order. Progressive
