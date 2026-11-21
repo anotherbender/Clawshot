@@ -517,7 +517,11 @@ room).
 with a Hylian Shield, no Deku Shield):** the opposite of the note above: the Hylian Shield reflected the scrubs' nuts
 and beat the Kokiri Storms Grotto trio, the scrub before the Slingshot room and the Deku Tree's boss-door trio. The
 logic takes the Hylian Shield at those three places (`remake/child_kokiri_forest.toml`, `remake/child_deku_tree.toml`);
-the `has_shield` helper is unchanged. Awaiting a maintainer play check to settle the disagreement.
+the `has_shield` helper is unchanged.
+
+**Settled (Kareem, Longshot v3.0.0, 2026-11-21):** while running the round 20 grotto scrub checks, Kareem saw a
+child's Hylian Shield deflect Deku Scrub nuts, so BBender's finding holds and the 2026-11-08 note above is wrong on
+this point (kept as history). The rules above take the Hylian Shield (PR #38).
 
 ### Round 6 play findings (cs6f, Kareem via Claude, 2026-11-08)
 
