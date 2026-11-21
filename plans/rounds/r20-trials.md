@@ -221,3 +221,33 @@ empty, then run `gate.py --continue-owned-lease` on this receipt commit without 
 Its exact-head command/count/exit evidence belongs in `work/r20-trials/gate/results.json`
 and stage logs. No gate pass or READY is claimed before that run; report its observed result
 without another documentation commit. No agent game launch or player-save edit is authorized.
+
+### Post-gate candidate identity proof (Claude requested, 2026-11-21)
+
+Claude accepted gate head `79f936419e628a39ad1576ab169ef999f998daad` but holds trials
+unmerged until Kareem plays both bridge and trials pairs. Claude owns any later main-merge
+redo and dump rerun; this request did not authorize another rebase, gate or game launch.
+
+Rebuilt both candidate mods from that exact gated head at **one worker**, no lock, with the
+same seeds, settings strings and saved placement inputs as the staged `89fa900` candidates.
+Compared SHA256 for every actual staged/rebuilt output path, including play note, spoiler,
+all native resources and resource-size table:
+
+| Candidate | Seed | Identical files | Added/removed/changed |
+|---|---:|---:|---:|
+| Bridge | 20202014 | 150 | 0 |
+| Trials | 20202004 | 121 | 0 |
+
+Receipts: `work/r20-trials/gated-candidate-rebuild-79f9364/results.json` (complete old/new
+file digests) and `gated-candidate-rebuild-79f9364.log`. Every supplied placement is unchanged.
+The initial harness incorrectly compared the partial recipe with the complete prepared map.
+Printed bridge values showed278 supplied entries,1334 prepared entries, no missing or changed
+supplied entries; the extras were native/default checks. Corrected the input-preservation
+assertion and performed one aimed rerun; the every-file comparison was not weakened.
+Failed-attempt log and diagnostic are preserved under `gated-candidate-rebuild-failed-placement-invariant*`.
+
+Both sets are byte-identical. Staged mods, launchers and profiles were left untouched;
+no restage or replacement-byte boot check is needed. `ingame/START HERE.md` now cites this
+proof alongside Claude's four-arm boot receipt and per-arm time budgets. Existing boots
+cover the same candidate bytes; bridge/barrier/tower/Continue behavior remains **unplayed**.
+
