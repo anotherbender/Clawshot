@@ -39,6 +39,12 @@ group = "Items"
 # Played evidence: plans/rounds/r19-sword.md, final v4 acceptance (2026-11-20, Longshot 3.0.0 stable).
 help = "Off by default; needs shuffled chests and Free time travel on for now. The pedestal's first pull gives a shuffled item instead of the Master Sword, which can then be found only in a shuffled chest. The pedestal still moves Link between ages, and adult Link has no Master Sword until he finds it. Played on Longshot 3.0.0: pulls without the sword, finding and using it in a chest, and pulls with it."
 enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests to move the Master Sword." }]
+[excluded_locations]
+label = "Excluded locations"
+kind = "multi"
+display = "locations"
+group = "Items"
+help = "Empty by default. Excluded checks never hold progression, anything a seed may need to finish. Permanently held progression checks are not offered. A check whose kind you leave unshuffled keeps its usual item: excluding it changes nothing, and one that usually holds progression cannot be excluded, so shuffle its kind or remove it. Choices that leave too little room for progression and held items are refused before generation. Search by check name, world name or area."
 [bridge]
 label = "Ganon's Castle bridge (experimental)"
 kind = "choice"

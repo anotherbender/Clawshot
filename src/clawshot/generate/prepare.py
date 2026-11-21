@@ -75,11 +75,34 @@ def prepare(spec: Mapping[str, Any], settings: Settings) -> tuple[Settings, Worl
     spec = with_shop_prices(spec, settings.shuffle, settings.shop_prices, settings.cheap_deku_shield)
     settings = _hold_shop_goods(spec, settings)
     world = build_world(world_spec(spec, settings), settings.logic)
+    if settings.excluded_locations:
+        world = _exclude_locations(world, settings)
     if settings.shuffle_master_sword and swords.PEDESTAL not in world.locations:
         raise FillError("Master Sword shuffle needs the Temple of Time pedestal within the selected areas")
     settings = rewards.restrict_settings(world, tokens.restrict_settings(world, settings))
     settings = swords.restrict_settings(world, settings)
-    return key_families.restrict_settings(world, restrict_settings(world, settings)), world
+    settings = key_families.restrict_settings(world, restrict_settings(world, settings))
+    return settings, world
+
+
+def _exclude_locations(world: World, settings: Settings) -> World:
+    """Compile player exclusions into the same immutable destination constraints every placer reads."""
+    unknown = sorted(set(settings.excluded_locations) - world.locations.keys())
+    if unknown:
+        raise FillError(f"Unknown excluded locations: {unknown}. Use exact world location names.")
+    unavailable = [
+        name
+        for name in settings.excluded_locations
+        if world.locations[name].n64_only is not None or world.locations[name].vanilla is None
+    ]
+    if unavailable:
+        raise FillError(f"Excluded locations are not item checks in this world: {unavailable}")
+    progression = tuple(name for name, item in world.items.items() if item.progression)
+    locations = dict(world.locations)
+    for name in settings.excluded_locations:
+        loc = locations[name]
+        locations[name] = replace(loc, excluded_items=tuple(dict.fromkeys((*loc.excluded_items, *progression))))
+    return replace(world, locations=locations)
 
 
 def _hold_shop_goods(spec: Mapping[str, Any], settings: Settings) -> Settings:

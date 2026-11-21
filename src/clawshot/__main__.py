@@ -72,6 +72,12 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     parser.add_argument(
+        "--exclude-locations",
+        nargs="*",
+        metavar="LOCATION",
+        help="exact world check names that must never hold progression; no names clears a settings-string list",
+    )
+    parser.add_argument(
         "--dungeon-items",
         choices=DUNGEON_ITEM_CHOICES,
         help=(
@@ -178,6 +184,7 @@ def main(argv: list[str] | None = None) -> int:
         overrides = {}
         for option, field in (
             ("shuffle", "shuffle"),
+            ("exclude_locations", "excluded_locations"),
             ("dungeon_items", "dungeon_items"),
             ("shuffle_hideout_keys", "shuffle_hideout_keys"),
             ("shuffle_100_token_reward", "shuffle_100_token_reward"),
@@ -228,6 +235,10 @@ def main(argv: list[str] | None = None) -> int:
         validate_logic_overrides(load_spec(), settings.logic)
         if settings.areas and not settings.goal:
             parser.error("--areas needs --goal (the world's goal lies outside most slices)")
+        if settings.excluded_locations:
+            from clawshot.app.schema import validate
+
+            validate(settings.as_dict())
     except ValueError as e:
         parser.error(str(e))
     if args.print_settings:

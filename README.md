@@ -75,6 +75,8 @@ The [Tracker tab](docs/tracker.md) reads saved inventory and per-dungeon keys, w
   Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys.
 - **Experimental, default off:** dungeon rewards shuffled among their nine usual rewards (Rauru included), and a stones/medallions/rewards-count bridge. First-pull reward delivery and the medallion-count bridge passed in game; this is not a full shuffled playthrough.
 - **Not shuffled yet:** cows, pots, crates and loose rupees.
+- **Excluded locations:** pick checks by area/search in Settings, or use `--exclude-locations` with exact
+  world check names. They never hold progression; impossible lists are refused. [Reference](docs/settings.md#excluded-locations).
 
 Choose the kinds you want. The UI starts with Recommended; the generator's Defaults shuffle chests
 only. Some checks stay unchanged pending in-game tests; the evidence and limits are below.
