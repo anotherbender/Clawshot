@@ -350,3 +350,41 @@ These files join the focused set. Production remains unchanged from `89d31ae476`
 Per Claude, freeze this test/round receipt and run **all four full-gate stages again**,
 including the complete native dump tier, before the final packet rebuild/hash.
 
+### Final full gate and exact gated-packet identity
+
+**PASS on frozen code/test head `50a17ff465340a3e5dfe57bca3a68dd518c5f381`**:
+
+| Stage | Result |
+|---|---|
+| `uv run ruff format --check` | exit0 |
+| `uv run ruff check` | exit0 |
+| Synthetic, `-n8`, `CLAWSHOT_WORKERS=4` | 4180 passed,805 skipped,24 warnings;444.61s |
+| Complete dump, `-n8`, `CLAWSHOT_WORKERS=3` | 802 passed,24 warnings;2951.18s |
+
+All stages saw no game process. No failures/reruns in this final gate; no sweep.
+`work/r20-hints/gate/50a17ff465/results.json` records `passed=true`, all exits0.
+Owned lock released; explicit **LOCK RELEASED** posted at06:31.
+
+**After the passed full gate**, rebuilt from that exact gated head at one worker,
+same private seed20200121, identical requested CS1 and placements. Compared
+**every output file** to staged `r20-hints-candidate-v1`: **179/179 SHA-256 and
+size identical**, including all177 RomFS resources and both non-RomFS files;
+**zero added, removed or changed paths**. No normalization, exclusions or metadata
+exceptions. Complete dual manifests:
+`work/r20-hints/ingame/gated-packet-hashes.json`; gated build receipt:
+`ingame/r20-hints-gated-50a17ff465-build.json`.
+
+START HERE now states the identity and links those receipts. No candidate restage
+was needed; Claude's existing Longshot3.0.0 v1 boot proof covers the byte-identical
+gated output. No changed dialogue or Very strong distribution was played.
+
+**READY (play-held)**: candidate checklists required in priority order; controls
+optional only for unclear results. All40 changed message identities are staged.
+The sole19→100-token House fixture remains identical across both arms; natural50
+is unedited. Ganondorf's native pending-intro route remains inferred until played.
+
+Per Claude's after-gate documentation request, this final commit changes **only
+this round receipt**, not production or tests. The gated code head above and the
+separate receipt head are both disclosed in the handoff; do not describe a new
+code/test revision as gated.
+
