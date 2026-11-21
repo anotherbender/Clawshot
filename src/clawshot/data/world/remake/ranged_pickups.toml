@@ -1,0 +1,19 @@
+# Round 20 ranged-collection audit, remake build e0f3ccfa. No gameplay patch or new route.
+# Obj_Heart_Piece explicitly clears Obj_Item_Base's LiftableRef; Boomerang's
+# ExecutePlayerAttractObject cannot establish a heart-piece carry path from that pack.
+# Native tokens/ordinary rupees retain LiftableRef and are not covered by this restriction.
+# Full evidence and remaining played questions: plans/rounds/r20-audit.md.
+
+[locations."Kak Windmill Freestanding PoH"]
+rule = "is_adult and (logic_windmill_poh or 'Dampes Windmill Access')"
+was = "can_use(Boomerang) or (logic_windmill_poh and is_adult) or 'Dampes Windmill Access'"
+source = "BBender, Discord 2026-11-20: child Boomerang cannot retrieve this pickup. KakarikoVillage Child/Adult/Adult_Alternative Static: Obj_Heart_Piece Hash 13389209437182306002, HeartPieceAnchor 3518965357024502806; no Dynamic or AiGroup override. Pack/Actor/Obj_Heart_Piece.pack.zs Actor/Obj_Heart_Piece ActorParam clears LiftableRef. Keep the existing adult Dampé approach (dampe_returns.toml); an adult-only arrival event is not a physical child route. plans/rounds/r20-audit.md."
+
+[locations."Graveyard Freestanding PoH"]
+rule = "is_adult and can_break_crate and (here(can_plant_bean) or Longshot)"
+was = "(is_adult and can_break_crate and (here(can_plant_bean) or Longshot)) or (logic_graveyard_poh and can_use(Boomerang))"
+source = "Banc/Graveyard/Graveyard_Adult_Static.bcett.byml.zs: Obj_Heart_Piece Hash 2157466067026784951 uses the same non-liftable native heart-piece actor as the windmill. Remove the N64 Boomerang retrieval trick, already disabled in native seeds; retain the existing adult bean/Longshot ledge route and crate prerequisite. Pack/Actor/Obj_Heart_Piece.pack.zs Actor/Obj_Heart_Piece ActorParam LiftableRef is empty. plans/rounds/r20-audit.md."
+
+[locations."Ice Cavern Frozen Blue Rupee"]
+n64_only = "no ordinary freestanding rupee in either native IceCavern placement file: only ten Obj_RupeeToken_Silver puzzle actors; red-ice pots are not a loose blue-rupee check"
+source = "Read-only IceCavern_Static/Dynamic.bcett.byml.zs, build e0f3ccfa; child_ice_cavern.toml already excludes the three N64 ledge rupees on the same zero-ordinary-rupee census. plans/rounds/r20-audit.md."

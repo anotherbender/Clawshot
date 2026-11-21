@@ -38,6 +38,12 @@ A version label alone does not identify the exact source. The generator reads an
 the pack workflow additionally accepts `.nup` and `.nx` input. Output is changed files under `romfs/`, plus
 `spoiler.json` and `play-note.md`, never a copy of the whole game.
 
+The [Tracker's in-logic view](tracker.md#in-logic) works within these limits. It rebuilds a seed's logic from
+the spoiler's settings string only when the spoiler's `generator` is this installed Clawshot version and every
+location the spoiler names exists in this version's world, since one version label can cover different world
+data. Otherwise in-logic is off with the reason shown and item tracking continues
+([logic reference](logic.md#tracker-in-logic-contract)).
+
 ## Excluded locations
 
 In the app, **Excluded locations** groups checks by area and supports search. Permanently held
@@ -71,6 +77,11 @@ in chests only; see [Progressive items](#progressive-items).
 | `BossHeart` | Eight boss-heart checks, off by default. Limited to the five native floor pickups below. King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
 | `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
 | `Token` | All 100 native Gold Skulltulas, off in both presets; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, all rupee colours, Heart Pieces/Containers, fixed Nut/Stick capacity, ordinary arrow/bomb/nut/stick bundles, Bombchus, magic jars/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed and Ocarina of Time. Core, packets1–3 and the separate first-Time-ocarina part passed on rc.3; each catalogue member still needs its own native structural check, not every member/boundary was played. See `src/clawshot/data/token_rewards.toml`. Tokens spill only into shuffled chests; non-token grants add no token. The Field tree works by day, the ranch tower needs night/retrieval, and wetlands needs the child wall kill before the adult crate. |
+
+The windmill floor check is in logic only through its adult approach from Dampé's grave, not
+child Boomerang retrieval. The cow-shed roof pickup remains a separate native check, not the
+rooftop man's gift. These source-logic corrections do not expand the floor palette or certify
+every surface ([round 20 audit](../plans/rounds/r20-audit.md)).
 
 With Gift and Token selected, played bottles, Double Defense, the Echo Gem and gold rupees may also reach
 Skulltulas; this does not allow their unverified chest grants. Fixed Nut/Stick upgrades remain Scrub-only.
@@ -528,7 +539,10 @@ counter until the real Impa send-off, recount there, and ignore calls after esca
 closed mode when shuffled songs allow stones before Zelda. The native courtyard Step01 reset remains;
 early-mode post-pull callbacks do not roll the completed Door quest back.
 Kareem passed the open-mode send-off gate, early-pull escape/moat order repair and immediate
-child-return clock clear on Longshot rc.7. The first-arrival lighting repair below awaits v5 play checks.
+child-return clock clear on Longshot rc.7. The first-arrival lighting repair below awaits v5 play checks;
+the [round 18 evidence review](../plans/rounds/r18-docs.md#review-corrections-after-3e31f160cb) retracted the broader pass claim.
+The late first Forest-exit ordering (send-off before the first bridge departure, panorama never played) has
+no separate played check ([time record](../plans/rounds/r16-time.md#late-first-forest-exit-guard)).
 
 **For new seeds; no save-repair pass.** Both early modes read the
 arrival flag and the real send-off history. Kaepora fast start now preserves the skipped owl's

@@ -20,6 +20,8 @@ licences and exact upstream revisions are in [NOTICE](../NOTICE).
 | `src/clawshot/data/locations.toml` | Placement identity definitions and links to world location names. |
 | `src/clawshot/data/location_names.toml` | Player-facing labels, directions, physical IDs and map-floor descriptions. Presentation is not a new identity or access rule. |
 | `src/clawshot/patch/gift_rules.toml` | Event grant identities and patch policies for supported gifts. |
+| `src/clawshot/patch/logic_world.py` | The one dump-free builder of the world a seed's search ran on, shared by the seed pipeline and the tracker; see [Tracker in-logic contract](#tracker-in-logic-contract). |
+| `src/clawshot/data/tracker_logic.toml` | Tracker save cells → logic item names, story-step save flags, and an `unmapped` table giving a reason for every other progression name. |
 
 Sources: `plans/04-world-format.md` sections Files, Overrides, Items/helpers/settings and Replayable
 generator settings; `plans/03-game-data.md` sections Readable location names and Event gifts;
@@ -42,6 +44,14 @@ The current acceptance boundary is in [settings](settings.md), with observations
 `plans/playtest/answers.md` and the [roadmap index](../plans/00-roadmap.md) plus its linked round files.
 Cow work remains research only; no cow shuffle option or production check shipped
 ([round 19 cows](../plans/rounds/r19-cows.md)).
+
+**Ranged pickup audit (round 20):** the windmill platform pickup requires the existing adult
+Dampé approach; child Boomerang retrieval failed in BBender's report and the native Heart Piece
+actor has no liftable component. The Graveyard Heart Piece's disabled Boomerang trick is also
+removed. The cow-shed pickup does exist, with its own actor and map anchor in all three village
+variants; its owl/Hookshot roof route is unchanged. The nonexistent Ice Cavern loose blue rupee
+is excluded. Native tokens have a different, liftable pickup contract: this is not a blanket
+Boomerang ban. [Per-rule evidence and unplayed alternatives](../plans/rounds/r20-audit.md).
 
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
@@ -152,7 +162,10 @@ pull prerequisites and adult checks, without assuming optional child errands. Fr
 both logic and native patches; do not copy the search assumption without that patch contract.
 Sources: `plans/04-world-format.md`, Ages; `src/clawshot/world/search.py`;
 `src/clawshot/data/world/remake/sheik.toml`; `plans/playtest/answers.md`, R9-FREE-TRAVEL and
-R10-FIRST-PULL-FIXED. Open-mode early return and preserved escape/moat rewards passed on rc.7; the clock-state fixes passed the v4/v5 play checks on rc.7 (2026-11-17). See [settings](settings.md).
+R10-FIRST-PULL-FIXED. Open-mode early return and preserved escape/moat rewards passed on rc.7.
+The first-arrival lighting repair awaits v5 play checks; the broader clock-pass claim was
+retracted in the [round 18 evidence review](../plans/rounds/r18-docs.md#review-corrections-after-3e31f160cb).
+See [settings](settings.md).
 
 **No save warp (Round 16).** The remake autosaves room changes; an older manual save is not a logic escape.
 The Slingshot Room's entry now requires its existing usable Slingshot/Boomerang/Bow exit condition as well
@@ -301,7 +314,7 @@ The JSON is local generated output: **do not upload or distribute it**. The prod
 
 | Top-level field | Meaning |
 |---|---|
-| `generator` | Generator name and package version; not an exact source revision by itself. |
+| `generator` | Generator name and package version (`clawshot <version>`); not an exact source revision by itself, so the tracker's in-logic gate also checks the spoiler's locations. |
 | `seed` | Seed number. |
 | `settings` | Effective settings mapping. |
 | `settings_string` | Replayable CS1 representation, requiring the same source/world data. |
@@ -330,6 +343,79 @@ collection order gives other tiers. It is a labelled witness, not a play order o
 Unshuffled ownership-dependent capacity prizes replay their native Medium/Large choice from
 that ownership state; a shuffled fixed reward remains its literal assignment.
 
+## Tracker in-logic contract
+
+The Tracker tab's in-logic view and manual marks (contributed by BBender in PR #36) rebuild a seed's
+logic offline and search it with what the save holds. Design record and decisions D1–D18:
+[tracker in logic](../plans/tracker-in-logic.md); player guide: [tracker](tracker.md#in-logic);
+implementation: `src/clawshot/tracker/logic.py` and `src/clawshot/tracker/marks.py`.
+
+**Shared logic-world builder (D15).** `clawshot.patch.logic_world.logic_world(settings, spec=None)` returns
+`(settings, world)` for the world the seed's beatability search ran on, without the dump. `validate` plus
+`prepare` alone is not that world: before `prepare` the seed pipeline applies two spec steps that change
+reachability. `gifts.logic_spec` (Gift or NPC shuffled) turns the Kokiri shopkeeper's free Deku Shield
+event into a placed check, which the search would otherwise grant on reaching the shop.
+`scrubs.logic_spec` (Scrub shuffled) adds each one-time sale's wallet tier to its rule. The pipeline
+(`gifts.seed_setup`, and `make_seed` through `scrubs.seed_setup`) takes both steps from these same
+functions, so a tracker and the generator cannot drift. The other pre-`prepare` changes only hold checks
+vanilla, exclude items or set fill palettes. A port rebuilding a seed should use this builder, not a copy
+of its steps. Equivalence and no-dump tests: `tests/test_logic_world.py`.
+
+**Version gate (D14).** Logic is rebuilt once per loaded seed, only when the spoiler's `generator` equals
+`clawshot <installed version>`, its `settings_string` validates and builds, and every location the spoiler
+names exists in the rebuilt world. `generator` carries no commit, so two builds with one version label can
+differ in logic. Otherwise `logic.available` is false with a human-readable `logic.reason`, no check
+carries in-logic data, and item tracking is unchanged.
+
+**Inventory (D1–D4, D16–D18).** Built only from the tracker's save-read cells through
+`src/clawshot/data/tracker_logic.toml`, never from the spoiler's placements; the world's starting items are
+added by the search. Per logic name the largest grant of any cell counts, never a sum, and names the world
+lacks are dropped.
+
+- Tier cells grant counted chain copies, as seeds count them: a held Longshot is two Progressive Hookshot.
+  Bow and Slingshot are their chains' first tiers; quiver and bullet-bag tiers count only while that weapon
+  is held. The Ocarina cell grants Fairy Ocarina or Ocarina of Time.
+- Trade items, masks, the three shields, Bombchus and Ruto's Letter count when held now **or** their
+  acquired-once `IsGet` flag is set. Every other item counts only while held. Deku Sticks and Nuts count
+  only as held stock: a new game sets the nut `IsGet` with no nuts held. Magic beans count as held now.
+- Bottles follow `has_bottle`: each owned slot without the letter is one `Bottle`; a slot holding Ruto's
+  Letter is one `Rutos Letter`, never also a bottle. Contents are not mapped.
+- Hearts beyond the starting three count as four `Piece of Heart` each; loose saved pieces are not
+  added. Gold Skulltula tokens use the native stock.
+- Per dungeon, small keys are the found count including spent keys; boss keys, maps and compasses are
+  their saved flags.
+- `Field Owl Arrival` reads `HyruleField_ArriveEntrance` and `Met Child Zelda` reads
+  `HavePlayedEvent.Dm_HrlField_0020` (Impa's send-off). Other events and the remake story steps without an
+  audited save flag are listed in `unmapped` and derived by the search. A test fails when a progression
+  item is neither mapped nor listed there (`tests/test_tracker_logic_data.py`).
+- A cell the save cannot read (`?`) counts as not held and is named in `logic.unknown_items`, so the result
+  can be more cautious than the game.
+
+**Search.** The inventory goes to `Search(world, items)` as constructor items, the way the generator feeds
+assumed items, so the child view behind a closed return gate behaves as in generation. Each name is fed as
+the save's count less the starting count (floored at zero), so it counts as the larger of the two. Each
+open check carries `in_logic`: `child` and `adult` from `can_access(location, age)`, `either` from
+`can_access(location)` with no age; each area counts all three. In the current search `either` equals
+child-or-adult, but a port should keep the no-age call. The search is rebuilt only when the inventory
+changes. The page's age choice (Either by default, Follow save, Child or Adult) drives the styling, area
+counts and **Show only in-logic** filter. Follow save uses `logic.save_age`: `child` or `adult` from the
+saved `Sequence_IsChildhood` Bool, or null when it cannot be read, which shows Either with a note.
+Longshot's debug age switch does not change that Bool.
+
+**Open checks and manual marks (D5–D10).** A check is open when the save reads it as not collected, or
+cannot read it and it is not marked. Only checks the save cannot read (`collected` is null) can be marked,
+through POST `tracker-mark` (`check`, `marked`) and POST `tracker-clear-marks` (`confirmed: true`) behind
+the local server's token/Host/Origin checks. A marked check is `marked: true`, counts as done, carries no
+`in_logic`, adds nothing to the inventory and keeps its item hidden unless spoiler mode is on. When a later
+save reads that check either way, the save wins and the mark is removed. Marks live in `tracker-marks.json`
+in Clawshot's preferences folder, keyed by seed identity (the manifest's `output_sha256`, else the spoiler
+file's SHA-256) and save folder, never in seed, save or game folders. The OBS payload (`tracker-obs`) has
+no logic, marks or marks warnings.
+
+Evidence: synthetic-fixture tests (`tests/test_tracker_logic*.py`, `tests/test_tracker_marks.py`). The
+maintainers' in-game acceptance (design record, plan item 15) is not recorded. In-logic proves reachability
+in **this model**, like every search result here, not a played route.
+
 ## What a multiworld port still needs
 
 Clawshot currently generates a static RomFS mod, not a live multiworld client. Archipelago remains
@@ -342,5 +428,6 @@ semantics. A static RomFS mod cannot receive arbitrary items from a network by i
 a hook/API in the runtime plus a client. Runtime code hooks are explicitly a separate future layer in
 `plans/01-architecture.md`; these requirements are not shipped interfaces. Keep data licensing
 attribution from `NOTICE`, and verify remake routes/grants rather than assuming another runtime or
-N64 behavior supplies them. A read-only tracker likewise needs its own observation/import mechanism;
-the spoiler is an offline description, not a live state feed.
+N64 behavior supplies them. Clawshot's own tracker reads saved games, not live memory
+([contract above](#tracker-in-logic-contract)); any other tracker likewise needs its own observation/import
+mechanism, and the spoiler is an offline description, not a live state feed.
