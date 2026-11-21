@@ -60,12 +60,12 @@ so added progression grants must run **after** all native children complete, not
 |---|---|---|---|
 | `PouchData.<identity>.StockNum` | Native reset5 clears reset32 Ints to0; native pouch push establishes stock | Inventory menu, pouch-existence lesson guard, progressive selection and item use read actual stock; `IsGet` alone is insufficient | Never force through bit8 default hook; native positive pushes after setup |
 | `IsGet.<identity>` | Saved Bool reset8 false; native pouch addition marks acquired | Item menu, world/story gates and progressive bonus checks; not source/scene completion | Let native grant set it; never set `HavePlayedEvent` to manufacture a pickup |
-| `Weapon_Sword_Kokiri`, `Weapon_Sword_Master`, `Weapon_Sword_Biggoron` stock/history | Sword acquisition actor canonicalizes to real weapon | Mido needs equipped Kokiri plus shield; era swap saves/restores owned blades; Master cinematic waits must not request unowned gear | No equipped/temporary sword fabricated; source and age change stay native; Master safety under final trace |
+| `Weapon_Sword_Kokiri`, `Weapon_Sword_Master`, `Weapon_Sword_Biggoron` stock/history | Sword acquisition actor canonicalizes to real weapon | Mido needs equipped Kokiri plus shield; era swap saves/restores owned blades; Master cinematic waits must not request unowned gear | No fabricated equip/history; Master requires the existing experimental shuffle and free-travel policy |
 | `Weapon_Shield_Deku/Hylian/Mirror`; `Armor_Adult_Goron/Zora/HeavyBoot/HoverBoot` stock/history | Native equipment mapping from acquisition actor | Pause equipment and per-age gear use; shield shop tutorial follows purchase, not mere ownership | Pouch ownership, manual menu equip; no purchase/tutorial/story flag precompletion |
 | `Item_Boomerang`, `Item_Hammer`, `Item_Hookshot/Longshot`, `Weapon_Range_SlingShot/Bow` stock/history | Native pushes; ranged weapons need a separate bag | Item menu/bar and combat; wrong-age items must not be assigned to live buttons | Keep the played Nut Bag1/Nuts0 initialization; establish weapon companions before weapon |
 | `PlayerStatus.EquipWeapon/EquipShield/EquipArmor/EquipBoot/EquipOcarina` | Native saved String64 selectors and equipment sync, not acquired history | Live equipment creation, songs and era stash/restore | Ocarina selector needs explicit verified initialization; no unrelated forced equip |
 | `Item_Ocarina_Fairy/Time` stock/history | Native push | Round19 lesson guard accepts either positive stock at either age; active playing uses `EquipOcarina` | Preserve lessons; Time must remain selected after later Fairy; no lesson history initialized |
-| `Item_Melody_ZeldaLullaby/EponaSong/SariaSong/SunSong/TimeSong/StormSong` | `IsGet` saved Bool; songs have no stock cell | Playing, frog checks and dialogue; Epona's quest requires Malon's **source**, not remote song; Windmill vanilla ownership gate needs separate review | Native song ownership only; never precomplete source/quest. All six lesson gates traced before admission |
+| `Item_Melody_ZeldaLullaby/EponaSong/SariaSong/SunSong/TimeSong/StormSong` | `IsGet` saved Bool; songs have no stock cell | Playing, frog checks and dialogue; Epona requires Malon's source, not remote song; Windmill owns four source-local ownership queries | Native ownership only; Windmill queries use existing first-lesson history; all twelve caller continuations retained |
 | `Item_Melody_ForestMinuet/FireBolero/WaterSerenade/SpiritRequiem/ShadowNocturne/LightPrelude` | Same `IsGet` acquisition | Warp access separate from movie history; Serenade source is Ice chest; Prelude source is Forest completion plus real scene | No Ice/Forest completion or Sheik-deletion flags; retain caller continuations |
 | `PouchContentMaxNum.Bomb`, `Item_BombBag_Small/Medium/Large` | Native capacity expansion20/30/40 | Bomb/Bombchu counts; bombs additionally require child Bracelet/adult strength (D30) | Progressive prefix, native bag grant; no new Bombchu ownership from a bag |
 | `PouchContentMaxNum.Arrow`, `Item_Quiver_Small/Medium/Large`, `Item_Arrow_Normal.StockNum` | Native bag30/40/50, native full stock declaration | Bow ownership is independent; ammo refills cannot establish it | Companion bag then Bow; selected upgrade implies complete prefix |
@@ -94,7 +94,10 @@ and starting a sword does not set era/pedestal/first-pull history. Gameplay rema
 
 ## Verification and staging
 
-Focused implementation proof and final native parity are in progress; exact-head sweeps/gate remain pending.
+Native/cache focus: **12 passed** (272.07s, n2/internal1); after current-main rebase, inventory/start/fast-start
+focus: **34 passed** (5.39s, n2/internal1), including the approved exact Bracelet advice.
+Actual CLI with two selected starts, +3 hearts and full wallet emitted a CS1 recipe successfully.
+Exact-head byte parity, sweeps and full gate remain pending; assigned gate turn4 follows cs20h's explicit release.
 All changed game behavior is **built, not played** until the paired checks below pass.
 
 ### Implemented contract
