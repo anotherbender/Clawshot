@@ -1,6 +1,6 @@
 """Compare a save's native gift flags (``gift_rules.toml`` ``track``) with the player's manual marks, read-only.
 
-    python -m clawshot.tracker.audit <seed folder> [--slot N] [--marks <file>] [--spoilers]
+    python -m clawshot.tracker.audit <seed folder> [--save-folder <folder>] [--slot N] [--marks <file>] [--spoilers]
 
 One line per gift of the seed whose rule has ``track``: each flag and its value, the combined result (any true:
 collected; all false: not collected; else unknown), whether the marks file marks it for this seed and save folder,
@@ -49,18 +49,21 @@ def verdict(collected: bool | None, marked: bool) -> str:
     return "no-mark" if collected else "agree"
 
 
-def audit(seed_path: Path, slot: int | None, marks_file: Path | None, spoilers: bool) -> tuple[list[str], int]:
-    """(output lines, disagreements)."""
+def audit(
+    seed_path: Path, slot: int | None, marks_file: Path | None, spoilers: bool, save_folder: Path | None = None
+) -> tuple[list[str], int]:
+    """(output lines, disagreements). ``save_folder`` defaults to the seed's own ``user`` folder, as in the tracker."""
     try:
         seed = load_seed(seed_path)
     except (SeedError, OSError) as error:
         raise AuditError(f"cannot read the seed: {error}") from error
-    if seed.user_path is None:
-        raise AuditError(f"{seed.root}: no save folder beside this seed")
-    chosen = choose_slot(list_slots(seed.user_path), slot)
+    folder = save_folder if save_folder is not None else seed.user_path
+    if folder is None:
+        raise AuditError(f"{seed.root}: no save folder beside this seed (give --save-folder)")
+    chosen = choose_slot(list_slots(folder), slot)
     if chosen is None:
         which = "no save slot" if slot is None else f"no save slot {slot}"
-        raise AuditError(f"{seed.user_path}: {which} with a progress.sav")
+        raise AuditError(f"{folder}: {which} with a progress.sav")
     try:
         parsed = read_complete(Path(chosen["path"]).read_bytes())
     except (save_format.SaveError, OSError) as error:
@@ -95,6 +98,11 @@ def audit(seed_path: Path, slot: int | None, marks_file: Path | None, spoilers: 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m clawshot.tracker.audit", description=__doc__.split("\n\n")[0])
     parser.add_argument("seed", type=Path, help="the seed's output folder (or its seed folder or spoiler.json)")
+    parser.add_argument(
+        "--save-folder",
+        type=Path,
+        help="the folder holding the save slots, as chosen in the Tracker tab (default: the seed's user folder)",
+    )
     parser.add_argument("--slot", type=int, help="the save slot number (default: the newest)")
     parser.add_argument(
         "--marks", type=Path, help="the marks file (default: tracker-marks.json beside the preferences)"
@@ -102,7 +110,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--spoilers", action="store_true", help="also print each gift's reward")
     args = parser.parse_args(argv)
     try:
-        lines, disagreements = audit(args.seed, args.slot, args.marks, args.spoilers)
+        lines, disagreements = audit(args.seed, args.slot, args.marks, args.spoilers, args.save_folder)
     except AuditError as error:
         print(f"error: {error}", file=sys.stderr)
         return 2

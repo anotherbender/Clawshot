@@ -114,6 +114,25 @@ def test_slot_choice(tmp_path, places, capsys):
     assert "=true" in line(run(capsys, root, "--marks", marks_file, "--slot", "0")[1], "LW Skull Kid")
 
 
+def test_save_folder_outside_the_seed(tmp_path, places, capsys):
+    """A test launcher keeps the save beside the runtime, not in the seed's ``user`` folder (the Tracker tab's
+    save-folder choice): ``--save-folder`` reads that folder, and marks keyed by it apply."""
+    root = make_seed(tmp_path)
+    elsewhere = tmp_path / "launcher-user"
+    write_slot(elsewhere, 0, {SKULL_KID: True, SARIA: False})
+    marks_file = tmp_path / "marks.json"
+    store = tracker_marks.MarkStore(marks_file)
+    seed_id = tracker_marks.seed_identity(load_seed(root))
+    store.set(seed_id, str(elsewhere / "user" / "save" / ACCOUNT), "Song from Saria", True)
+    assert audit.main([str(root), "--marks", str(marks_file)]) == 2  # nothing in the seed's own user folder
+    capsys.readouterr()
+    code, out = run(capsys, root, "--marks", marks_file, "--save-folder", elsewhere)
+    assert code == 1, out
+    assert line(out, "LW Skull Kid").endswith("=true -> collected; marked: no; no-mark")
+    assert line(out, "Song from Saria").endswith("=false -> not collected; marked: yes; disagree")
+    assert any(row.startswith("seed ") and str(elsewhere) in row for row in out)
+
+
 @pytest.mark.parametrize("problem", ["no seed", "no save", "bad marks", "no such slot"])
 def test_unreadable_inputs_exit_2_with_one_line(tmp_path, places, capsys, problem):
     root = make_seed(tmp_path)
