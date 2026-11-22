@@ -54,7 +54,9 @@ MAPPING_TOML = Path(__file__).resolve().parents[1] / "data" / "tracker_logic.tom
 _FAMILY_PLURALS = {"small_key": "small keys", "boss_key": "boss keys", "map": "maps", "compass": "compasses"}
 VANILLA_SCOPE = "unique"
 """Which fixed vanilla pick-ups get a row (spec D19, Q3): ``unique``, those whose vanilla item no other world location
-gives (proposed by Claude, awaiting the maintainer), or ``all``, every progression vanilla item."""
+gives, or ``all``, every progression vanilla item; either way only items the seed's logic reads (:func:`vanilla_rows`).
+``unique`` was proposed by Claude and chosen by BBender; accepted, narrowed to items the logic reads, decided by
+Claude for the maintainer, 2026-11-21."""
 VANILLA_SKIPPED_TYPES = frozenset({"Shop", "Event", "Drop"})
 """Location types never listed as vanilla rows: shelves restock (no one-time check), events and drops are derived by
 the search itself."""

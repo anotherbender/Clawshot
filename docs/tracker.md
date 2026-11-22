@@ -97,12 +97,20 @@ logic. So the tracker also lists these places in their area, tagged **vanilla**,
 shown even in spoiler-free mode (your settings decide it, not the seed). They get the same in-logic
 styling, and the area heading counts them separately ("vanilla 0 / 1 · 1 in logic"), leaving the
 seed's own counts unchanged. One counts as collected once the save shows you hold its item (or ever
-had it, for used-up items as above). If the save cannot tell, or a shuffled check could also give that
-item, it shows `?` and you can mark it done. Only items that come from that one place are listed: every
-song, the ocarinas, the trade items, Ruto's and Zelda's Letters, the Weird Egg, the Gerudo card, Great
-Fairy gifts, masks, and stones and medallions when they are not shuffled. Gold Skulltulas, silver rupees,
-Pieces of Heart and other repeated items are not. **Show vanilla pick-ups** turns them off; the choice
-is remembered in this browser. They need in-logic, so they are hidden when in-logic is unavailable.
+had it, for used-up items as above; Saria's Fairy Ocarina also counts once you hold the Ocarina of
+Time). If the save cannot tell, or a shuffled check could also give that item, it shows `?` and you can
+mark it done. A few rows always show `?`, because the save cannot tell which source gave the item: the
+Magic Bean salesman, Darunia's Goron Bracelet, and Talon's bottle of milk when that gift is not
+shuffled.
+
+Only items that come from that one place, and that your seed's logic uses, are listed. For example:
+songs and trade items when they are not shuffled, the ocarinas, Ruto's and Zelda's Letters, the Gerudo
+card, the Great Fairies' spells, the Fire and Light Arrows, masks, and the stones and medallions the
+logic asks for. Items found in many places, such as Gold Skulltula tokens, silver rupees and ordinary
+Pieces of Heart, are not listed. Neither are items your seed's logic never counts, such as a fixed
+Silver Scale, a wallet or a Great Fairy's magic meter: the logic counts only the upgrades your seed
+shuffles, so those are a bonus. **Show vanilla pick-ups** turns the rows off; the choice is remembered
+in this browser. They need in-logic, so they are hidden when in-logic is unavailable.
 
 The OBS view shows none of this: no in-logic data, no vanilla pick-ups and no marks.
 
