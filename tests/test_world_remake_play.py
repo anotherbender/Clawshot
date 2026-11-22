@@ -144,10 +144,13 @@ def test_fairy_only_grave_needs_explosives_and_a_bottle_not_a_redead_weapon(expl
     assert search.holds("Fairy")
 
 
-def test_hammer_alone_does_not_open_the_fairy_grave_wall():
+def test_hammer_opens_the_fairy_grave_wall_but_the_fairies_still_need_a_bottle():
+    # Round 21 (plans/rounds/r21-hammer.md, class cracked wall): the WallCrack takes Hammer 100, like bombs.
     world = graveyard_starting_at("Graveyard Fairy Grave", ADULT)
-    search = Search(world, ["Bottle", "Megaton Hammer"])
+    search = Search(world, ["Megaton Hammer"])
     assert not search.holds("Fairy")
+    search.collect("Bottle")
+    assert search.holds("Fairy")
 
 
 def test_shield_grave_does_not_contain_the_fairy_pool():

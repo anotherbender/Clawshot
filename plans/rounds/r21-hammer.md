@@ -93,6 +93,9 @@ rocks' were checked in round 14].
   a swordless adult fights enemies with the Hammer and bosses still need a blade; off is unchanged.
   `tests/test_world_token_routes.py`: the wetlands contract now expects the adult Hammer to open the cover (it pinned
   the opposite). `tests/test_master_sword_logic.py`: the sword-rewrite collector accepts `adult_weapon`.
+  `tests/test_world_remake_play.py`: the fairy-grave test pinned "Hammer alone does not open the wall"; r7 wrote it
+  for an *unverified* Hammer (r7-play.md: "not an unverified Hammer alternative"), not one seen to fail. It now
+  expects the Hammer to open the `WallCrack` and the fairies to still need a Bottle.
 - `docs/logic.md`: one paragraph (own lines).
 
 ## Beamos-gated rules (Kareem: kept out of the widening)
