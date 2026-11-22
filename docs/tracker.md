@@ -65,6 +65,9 @@ nothing left to show fold away.
 - **Hearts** count whole hearts; loose Pieces of Heart are not added.
 - **Story steps.** Meeting Zelda (Impa's send-off) and the owl's arrival in Hyrule Field are read from
   the save. Other story steps are worked out from the logic itself.
+- **Goron's Bracelet.** The seed's logic counts the child's Bracelet only from Darunia's gift, so the
+  tracker counts it once the save records the cutscene in which Darunia hands it over, not from a
+  Bracelet found in a chest or from the adult gauntlets.
 - **Unknown fields.** Anything the save cannot show counts as not held, and the tab says so in one line
   naming it: in-logic may then be more cautious than the game.
 
@@ -100,8 +103,7 @@ seed's own counts unchanged. One counts as collected once the save shows you hol
 had it, for used-up items as above; Saria's Fairy Ocarina also counts once you hold the Ocarina of
 Time). If the save cannot tell, or a shuffled check could also give that item, it shows `?` and you can
 mark it done. A few rows always show `?`, because the save cannot tell which source gave the item: the
-Magic Bean salesman, Darunia's Goron Bracelet, and Talon's bottle of milk when that gift is not
-shuffled.
+Magic Bean salesman and Talon's bottle of milk when that gift is not shuffled.
 
 Only items that come from that one place, and that your seed's logic uses, are listed. For example:
 songs and trade items when they are not shuffled, the ocarinas, Ruto's and Zelda's Letters, the Gerudo

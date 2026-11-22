@@ -244,6 +244,12 @@ def test_a_tier_is_shared_only_by_a_check_that_can_reach_it(chest_only):
     assert "HF Ocarina of Time Item" not in rows and rows["LW Gift from Saria"].shared is True
 
 
+def bare_seed():
+    """A tracker seed with no shuffled checks, for reading synthetic saves into the logic inventory."""
+    folder = seeds.Path("seed")
+    return seeds.Seed(folder, folder, folder / "spoiler.json", None, "raw", {}, ())
+
+
 # 8.3 (16.4): a fixed tier counts once its chain reaches it. In a seed's world only the Ocarina keeps fixed tiers
 # (Fairy Ocarina = Ocarina 1, Ocarina of Time = Ocarina 2), and the save's ocarina cell shows the highest one held.
 FAIRY, TIME = "PouchData.Item_Ocarina_Fairy.StockNum", "PouchData.Item_Ocarina_Time.StockNum"
@@ -255,11 +261,9 @@ def test_a_fixed_tier_counts_its_chain(chest_only):
     fairy, time = rows["LW Gift from Saria"], rows["HF Ocarina of Time Item"]
     assert world.items[fairy.item].alias == ("Ocarina", 1) and world.items[time.item].alias == ("Ocarina", 2)
     assert world.items[fairy.item].tier and world.items[time.item].tier
-    folder = seeds.Path("seed")
-    held = seeds.Seed(folder, folder, folder / "spoiler.json", None, "raw", {}, ())
 
     def collected(ints):
-        inv = tracker_logic.inventory(held, parse({}, ints), world)
+        inv = tracker_logic.inventory(bare_seed(), parse({}, ints), world)
         return [tracker_logic.vanilla_collected(row, inv, world) for row in (fairy, time)]
 
     assert collected({FAIRY: 0, TIME: 0}) == [(False, None), (False, None)]
@@ -267,6 +271,21 @@ def test_a_fixed_tier_counts_its_chain(chest_only):
     # The Ocarina of Time replaces Saria's ocarina in the save: her row still counts as taken.
     assert collected({FAIRY: 0, TIME: 1}) == [(True, None), (True, None)]
     assert [state for state, _ in collected({})] == [None, None]  # the ocarina cell was not read
+
+
+# Q6: Darunia's row reads the gift's cutscene flag (HavePlayedEvent.Dm_Goron_0030); a copy Bracelet does not count.
+def test_darunias_gift_row_reads_its_cutscene_flag(chest_only):
+    seed, world = chest_only
+    [row] = [row for row in tracker_logic.vanilla_rows(seed, world) if row.location == "GC Darunias Joy"]
+
+    def collected(bools, ints=None):
+        inv = tracker_logic.inventory(bare_seed(), parse(bools, ints or {}), world)
+        return tracker_logic.vanilla_collected(row, inv, world)
+
+    assert collected({"HavePlayedEvent.Dm_Goron_0030": True}) == (True, None)
+    copy_bracelet = {"PouchData.Armor_Child_Gauntlet_Goron.StockNum": 1}
+    assert collected({"HavePlayedEvent.Dm_Goron_0030": False}, copy_bracelet) == (False, None)
+    assert collected({}, copy_bracelet)[0] is None  # the flag was not read
 
 
 # 16.5 (8.3): unknown rows take manual marks like any unknown check, and a save-confirmed state drops the mark.

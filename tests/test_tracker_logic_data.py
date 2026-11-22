@@ -106,3 +106,12 @@ def test_story_steps_map_to_save_flags_or_are_unmapped(mapping):
     assert mapping.story["Met Child Zelda"].flag == "HavePlayedEvent.Dm_HrlField_0020"
     assert mapping.story["Field Owl Arrival"].flag == "HyruleField_ArriveEntrance"
     assert all(step.source for step in mapping.story.values())
+
+
+# Q6: Darunia's gift is read from its cutscene's saved Bool while the gift keeps its vanilla item.
+def test_goron_bracelet_maps_to_darunias_cutscene_flag(mapping):
+    step = mapping.story["Goron Bracelet"]
+    assert (step.flag, step.vanilla_at) == ("HavePlayedEvent.Dm_Goron_0030", "GC Darunias Joy")
+    assert "Goron Bracelet" not in mapping.unmapped
+    assert all("Goron Bracelet" not in cell.names() for cell in mapping.cells.values())
+    assert all(other.vanilla_at is None for name, other in mapping.story.items() if name != "Goron Bracelet")

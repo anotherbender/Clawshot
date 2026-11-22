@@ -284,6 +284,16 @@ source = "data/world/remake/child_hyrule_castle.toml, event Time Flows: 'Field O
 flag = "HavePlayedEvent.Dm_HrlField_0020"
 source = "data/world/remake/child_hyrule_castle.toml, event Time Flows: 'Met Child Zelda' is HavePlayedEvent.Dm_HrlField_0020, Impa's send-off (round16 clock predicate); patch/door.py SENDOFF."
 
+# A gift the save records only as its cutscene's saved Bool: the flag counts as the item. `vanilla_at`: only while that
+# location keeps its vanilla item; shuffled, the flag would mean the check was done, not that the item is held.
+# Seed child logic reads 'Goron Bracelet' from Darunia's gift only, never from a strength copy (world.toml
+# [helpers.Progressive_Strength_Upgrade]; rounds/r14-progressive.md), so the strength cell, whose copies and adult
+# gauntlets are Progressive Strength, never grants it.
+[story."Goron Bracelet"]
+flag = "HavePlayedEvent.Dm_Goron_0030"
+vanilla_at = "GC Darunias Joy"
+source = "patch/darunia.py SOURCE: native saved Bool (progress.sav, default false, reset type 8) written right after the gift's Event127 in Dm_Goron_0030, in every seed (patch/__init__.py); plans/03-game-data.md, Darunia correction: Kareem via Claude (2026-11-14) confirmed the flag in game. Event127's wrapper writes it even when it skips a redundant Bracelet grant, as seed logic credits Darunia's source. Reading it from a real save in the tracker is not yet confirmed (Kareem's tracker test)."
+
 # Consumables the save holds as a stock (PouchData.<actor>.StockNum). One held grants `item`, the name the logic
 # helper reads (data/world/helpers.toml: Sticks = Buy_Deku_Stick_1 or ..., Nuts = Buy_Deku_Nut_5 or ...); a bought
 # stick leaves no other record. Held now only: a new game sets IsGet.Item_DekuNut with no nut held (seen in the saves
@@ -340,7 +350,6 @@ label = "Deku Nuts"
 "Bomb Bag (40)" = "fixed chain tier: the bomb_bag cell grants Progressive Bomb Bag copies"
 "Bow" = "chain counter: the bow and quiver cells grants Progressive Quiver copies"
 "Slingshot" = "chain counter: the slingshot and bullet_bag cells grants Progressive Slingshot copies"
-"Goron Bracelet" = "fixed chain tier: the strength cell grants Progressive Strength copies"
 "Silver Gauntlets" = "fixed chain tier: the strength cell grants Progressive Strength copies"
 "Golden Gauntlets" = "fixed chain tier: the strength cell grants Progressive Strength copies"
 "Progressive Strength Upgrade" = "chain counter: the strength cell grants Progressive Strength copies"

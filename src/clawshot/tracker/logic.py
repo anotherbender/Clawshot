@@ -86,8 +86,12 @@ class CellMap:
 
 @dataclass(frozen=True)
 class StoryStep:
+    """A logic name the save records as one saved Bool (``[story.<name>]``). ``vanilla_at``: the flag counts only while
+    that location keeps its vanilla item (it is not one of the seed's shuffled checks)."""
+
     flag: str
     source: str
+    vanilla_at: str | None = None
 
 
 @dataclass(frozen=True)
@@ -127,7 +131,9 @@ def load_mapping() -> Mapping_:
         )
         for cell_id, info in data["cells"].items()
     }
-    story = {name: StoryStep(info["flag"], info["source"]) for name, info in data["story"].items()}
+    story = {
+        name: StoryStep(info["flag"], info["source"], info.get("vanilla_at")) for name, info in data["story"].items()
+    }
     return Mapping_(
         cells=cells,
         bottles=dict(data["bottles"]),
@@ -295,7 +301,10 @@ def inventory(seed: Seed, save: save_format.Save | None, world: World, mapping: 
                 continue
             grant({mapping.dungeon_items[family].format(dungeon=dungeon): int(value)})
 
+    shuffled = {check.location for check in seed.checks}
     for name, step in mapping.story.items():
+        if step.vanilla_at in shuffled:
+            continue
         value = reader.flag(step.flag)
         if value is None:
             unknown.add(f"story: {name}")

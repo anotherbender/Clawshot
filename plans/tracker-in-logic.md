@@ -25,7 +25,8 @@ Claude, chosen by BBender. Revised 2026-11-21 after a grill-me interview with BB
 maintainer review of PR #37: D19 accepted, Q3 accepted (narrowed: rows only for items the seed's logic reads, 8.1),
 Q4 (on by default) accepted, Q5 accepted for items the logic reads; each decided by Claude for the maintainer,
 2026-11-21; Kareem tests it in the tracker. Rows now depend on the settings only (8.3), and 8.2 and 8.5 describe the
-shipped code.
+shipped code. Q6 answered the same day: the tracker reads the Goron Bracelet from Darunia's gift cutscene flag
+(reading it from a real save is unconfirmed until Kareem's tracker test).
 
 ### Goal
 
@@ -298,13 +299,14 @@ gifts, unset placement-hash pickups, unaudited event gates) can be marked done b
   Goron Bracelet, Q6); eleven on a Chest-only seed before 8.1's filter (also Silver and Golden Scale, Adult and Giant
   Wallet, both Great Fairy magic meters, and Talon's milk bottle). After the filter three remain on Chest-only, all
   read by the logic: the Goron Bracelet (Q6), the Magic Bean salesman and Talon's milk bottle (the save cannot tell
-  that bottle from another); two on Recommended, where Talon's gift is shuffled. **Maintainer: accepted for items the
-  logic reads**; rows whose item no rule reads are left out by 8.1 instead of staying `?`. Decided by Claude for the
-  maintainer, 2026-11-21; Kareem tests it in the tracker.
+  that bottle from another); two on Recommended, where Talon's gift is shuffled. With Q6's mapping the Goron
+  Bracelet row reads Darunia's cutscene flag, leaving two on Chest-only and one on Recommended. **Maintainer: accepted
+  for items the logic reads**; rows whose item no rule reads are left out by 8.1 instead of staying `?`. Decided by
+  Claude for the maintainer, 2026-11-21; Kareem tests it in the tracker.
 - The app tab lists check names with spoilers off, items hidden (6.1 needs something to style): proposed by
   Claude, confirmed by BBender. (Bombchus once found, marks per seed and save folder and the missing marks file are
   the maintainer review's, 2026-11-20, at the top of this file.)
-- Q6, open for the maintainer: the Goron Bracelet. Seed child logic reads `'Goron Bracelet'` from Darunia's native
+- Q6, asked of the maintainer: the Goron Bracelet. Seed child logic reads `'Goron Bracelet'` from Darunia's native
   gift only (`world.toml` `Progressive_Strength_Upgrade`; `rounds/r14-progressive.md`: an early copy Bracelet works
   out of logic and logic never relies on it), while the strength cell grants `Progressive Strength` copies and lists
   the Bracelet unmapped. So the tracker never counts the Bracelet: a child who has Darunia's gift still sees the
@@ -312,6 +314,16 @@ gifts, unset placement-hash pickups, unaudited event gates) can be marked done b
   every strength tier to the Bracelet as well; that was dropped before merge because it lets a copy or adult
   gauntlets stand in for it, against that note. Question: is there a saved record of Darunia's gift that the
   tracker could read for `Goron Bracelet`, or should it stay unmapped?
+  **Maintainer: yes, map it** to `HavePlayedEvent.Dm_Goron_0030` (`data/tracker_logic.toml` `[story."Goron
+  Bracelet"]`), only while `GC Darunias Joy` keeps its vanilla item (`vanilla_at`); decided by Claude for the
+  maintainer, 2026-11-21; Kareem tests it in the tracker. The Bool is native (`progress.sav`, default false, reset
+  type 8); `patch/darunia.py` has Darunia's Event39 read it, and it is written right after the gift's Event127 in
+  `Dm_Goron_0030`, in every seed (`patch/__init__.py`). Kareem via Claude confirmed that flag in game on 2026-11-14
+  (`03-game-data.md`, Darunia correction). Event127's wrapper writes it even when it skips a redundant Bracelet
+  grant, which matches seed logic crediting Darunia's source. The strength cell still never grants the Bracelet,
+  so a copy Bracelet or adult gauntlets do not stand in for it. **Unconfirmed:** that the tracker picks the flag up
+  from a real save after the gift; only synthetic saves are tested, until Kareem's tracker test. Were the gift ever
+  shuffled, the flag would mean the check is done, not that the Bracelet is held; `vanilla_at` then drops it.
 
 ## Part 2: plan
 
@@ -434,7 +446,7 @@ Tests run with `uv run --with pytest-xdist pytest -n auto`; dump tests skip with
     16.1 [x] P16.a Record the maintainer's answers to Q3 (scope) and Q4 (toggle default) in the spec before merging; until then the PR lists them as open. BBender answered Q3 (unique), Q4 (on) and Q5 (keep `?` rows) on 2026-11-21, as built. Recorded 2026-11-21 (spec header, D19, Q3-Q5): D19 accepted, Q3 accepted (narrowed by 8.1's reads filter), Q4 on by default accepted, Q5 accepted for items the logic reads; each decided by Claude for the maintainer, 2026-11-21; Kareem tests it in the tracker.
     16.2 [x] 8.1 Also skips `Shop`, `Event` and `Drop` locations (`VANILLA_SKIPPED_TYPES`, proposed by Claude). `tracker/logic.py` gains `vanilla_rows(seed, world) -> tuple[...]`: world locations not in the spoiler's placements, vanilla item of class progression, not `n64_only`, in the Q3 scope (proposed: the vanilla item is given by no other world location); world order; computed once per loaded seed beside the cached world (1.2). None when logic is unavailable. Maintainer review (2026-11-21): also only items the seed's logic reads (8.1; `logic_reads`, `search_counts`), computed with the rows once per loaded seed.
     16.3 [x] 8.2 Each row has `id` (location name), `label`/`where` from the location catalog when present else the OoT Randomizer name and "", `area` (area via `location_index`, else `OTHER_AREA`, "Other"; no row fell back on the tested seeds), `item`/`item_label` (vanilla item, display name as `seeds.py` does), `vanilla: true`. Item fields are present in spoiler-free mode.
-    16.4 [x] 8.3 Collected from the logic inventory (task 5): `true` when the inventory counts the vanilla item, `false` when every cell that maps to it was read and says not held, `null` when any such cell is unknown, the item is not mapped in `tracker_logic.toml`, or a shuffled check can also give it (8.3; maintainer review: decided from the shuffled locations' own items, which the settings give, not from the spoiler's placed items). Reuse the TOML mapping (inverted: logic name to cells); no new per-item Python branches (AGENTS.md rule 6 spirit). Fixed tiers of a progressive item count once the chain reaches the tier (proposed by Claude). In a seed's world only the Ocarina keeps fixed tiers (Fairy Ocarina = Ocarina 1, Ocarina of Time = Ocarina 2), so Saria's row counts once the save holds the Ocarina of Time. The native chains count only copies there, so their fixed tiers (Silver and Golden Scale and the rest) are plain items no rule reads, and 8.1 leaves them out. Rows that stay `null` for want of a cell: on BBender's seed 2445192976 four before 8.1's filter (Treasure Chest Game heart, Blue Potion, Goron Bracelet, Magic Bean); on a Chest-only seed three after it (Goron Bracelet, Magic Bean salesman, Talon's milk bottle): Q5 and Q6.
+    16.4 [x] 8.3 Collected from the logic inventory (task 5): `true` when the inventory counts the vanilla item, `false` when every cell that maps to it was read and says not held, `null` when any such cell is unknown, the item is not mapped in `tracker_logic.toml`, or a shuffled check can also give it (8.3; maintainer review: decided from the shuffled locations' own items, which the settings give, not from the spoiler's placed items). Reuse the TOML mapping (inverted: logic name to cells); no new per-item Python branches (AGENTS.md rule 6 spirit). Fixed tiers of a progressive item count once the chain reaches the tier (proposed by Claude). In a seed's world only the Ocarina keeps fixed tiers (Fairy Ocarina = Ocarina 1, Ocarina of Time = Ocarina 2), so Saria's row counts once the save holds the Ocarina of Time. The native chains count only copies there, so their fixed tiers (Silver and Golden Scale and the rest) are plain items no rule reads, and 8.1 leaves them out. Rows that stay `null` for want of a cell: on BBender's seed 2445192976 four before 8.1's filter (Treasure Chest Game heart, Blue Potion, Goron Bracelet, Magic Bean); on a Chest-only seed three after it (Goron Bracelet, Magic Bean salesman, Talon's milk bottle): Q5 and Q6. Q6 (2026-11-21) maps the Goron Bracelet to Darunia's cutscene flag `HavePlayedEvent.Dm_Goron_0030` while that gift is unshuffled (`[story."Goron Bracelet"]`, `vanilla_at`), leaving two; tests use synthetic saves, and reading it from a real save is unconfirmed until Kareem's tracker test.
     16.5 [x] 8.3 Marks: vanilla rows with `collected: null` go through the existing mark rules (tasks 7–9); `tracker-mark` accepts their ids; a save-confirmed state drops a mark (4.5).
     16.6 [x] 8.4 `SeedLogic.annotate` gives open vanilla rows `in_logic` from the same `Search` as the shuffled checks (no extra items, no second search).
     16.7 [x] 8.5 Vanilla rows are counted in their own area entries; existing area fields unchanged (test compares them with vanilla rows on and off). Built as a top-level `state["vanilla_areas"]` list (same shape as `areas`, plus `in_logic`) instead of a key inside each area, so areas that hold only vanilla rows need no new `areas` entry and the OBS payload stays equal by dropping one key; the tab merges them by area name (Claude).
