@@ -3808,8 +3808,9 @@ as ungrantable and spoke protocol 2), so its bridge never ran the magic, ocarina
 
 ## 50. Chest ocarinas: why the get model was missing (2026-11-22)
 
-Found in game by Claude with BBender (Longshot v3.1.1 control bridge, dump 1.1.1); implemented in every seed by PR #40
-(`patch/getitem.py` `ocarina_changes`). Full evidence, run table, implementation notes and checklist:
+Found in game by Claude with BBender (Longshot v3.1.1 control bridge, dump 1.1.1); implemented by PR #40
+(`patch/getitem.py` `ocarina_changes`), applied only to seeds that put an ocarina in a chest (round 21 review,
+`rounds/r21-pr40.md` Q1). Full evidence, run table, implementation notes and checklist:
 `plans/chest-ocarina-model.md`.
 
 The model shows (and spins, lying flat like the inventory view) only with **both** changes: `RSDB/ActorInfo` loses

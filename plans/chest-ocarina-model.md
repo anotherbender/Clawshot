@@ -141,6 +141,9 @@ mods didn't include it.
 | D7 | No guessed AnimationParam size entry: stop if no constant fits | Claude, accepted |
 | D8 | One branch, one PR | Claude, accepted |
 
+Round 21 maintainers' review (Claude, 2026-11-22, pending Kareem): D2 changed to seeds that put an ocarina in a chest,
+so other seeds keep the native farewell (`plans/rounds/r21-pr40.md`, Q1).
+
 ## AnimationParam size entry (measured 2026-11-22, plan task 2)
 
 Measured by Claude on dump 1.1.1 (update v131072), Clawshot `b3cd3b8`, with a research script outside the
