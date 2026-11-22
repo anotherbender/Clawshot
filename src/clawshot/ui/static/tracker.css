@@ -91,16 +91,21 @@ body.tracker-transparent, body.tracker-transparent .tracker-cell { background: t
 /* Checks tab: state markers (CSS shapes only), collapsible areas in 2-3 fluid columns, and the side-panel details. */
 .tracker-logic-controls, .tracker-check-tools { margin: 10px 0; }
 .tracker-check-tools button { min-height: 28px; padding: 3px 12px; font-size: 13px; }
-.tracker-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 10px 0 14px; padding: 8px 10px; border: 1px solid var(--border); color: var(--muted); font-size: 12px; }
-.tracker-legend-item { display: inline-flex; align-items: center; gap: 6px; }
-.tracker-legend .tracker-explanation { flex-basis: 100%; margin: 4px 0 0; }
+.tracker-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 8px 0 12px; color: var(--muted); font-size: 12px; }
+.tracker-legend-item { display: inline-flex; align-items: center; gap: 6px; cursor: help; }
 .tracker-logic-note, .tracker-checks-status { color: var(--muted); font-size: 12px; margin: 4px 0; }
 .tracker-checks-status:empty { display: none; }
 .tracker-no-save { margin: 8px 0 18px; padding: 4px 18px 10px; border: 1px solid var(--border); background: var(--value); }
 .tracker-checks-status.tracker-no-save { padding: 8px 12px; color: var(--fg); font-size: 13px; }
 .tracker-no-save p { font-size: 14px; line-height: 1.5; }
 .tracker-no-save code { overflow-wrap: anywhere; }
-#checks-root .tracker-areas { display: block; columns: 300px auto; column-gap: 18px; }
+/* On the Checks tab the side panel is a fixed 390 px column (it never scrolls with the list) and the list gets the
+   rest: 380 px columns give 2 at 1280 wide and 3 at 1920. */
+@media (min-width: 701px) {
+  .workspace:has(#checks:not([hidden])) { grid-template-columns: minmax(0, 1fr) 390px; }
+  .workspace:has(#checks:not([hidden])) .side-panel { padding-top: 27px; }
+}
+#checks-root .tracker-areas { display: block; columns: 380px 3; column-gap: 18px; }
 #checks-root .tracker-area { break-inside: avoid; margin: 0 0 10px; padding: 0 0 0 6px; }
 .tracker-area-head, .tracker-check { display: flex; align-items: baseline; gap: 7px; width: 100%; min-height: 0; border: 0; background: none; text-align: left; color: var(--fg); }
 .tracker-area-head { flex-wrap: wrap; padding: 3px 4px; font-size: 14px; }
@@ -117,7 +122,8 @@ body.tracker-transparent, body.tracker-transparent .tracker-cell { background: t
 .tracker-state-collected { border-color: var(--success); background: var(--success); }
 .tracker-state-marked { border-color: var(--amber); background: var(--amber); }
 .tracker-state-skipped { border-color: var(--muted); background: linear-gradient(135deg, transparent 40%, var(--muted) 40% 60%, transparent 60%); }
-.tracker-state-manual, .tracker-check-manual .tracker-state { border-style: dashed; }
+/* Mark by hand: a square, not a ring, so it stays distinct from out-of-logic rings in a 1080p stream capture. */
+.tracker-state-manual, .tracker-check-manual .tracker-state { width: 12px; height: 12px; border-radius: 0; }
 .tracker-check-in-logic { color: var(--success); font-weight: 600; }
 .tracker-check-out-of-logic { color: var(--muted); opacity: .75; }
 .tracker-check-collected, .tracker-check-marked, .tracker-check-skipped { color: var(--muted); }
