@@ -48,8 +48,9 @@ source = "the upper Lizalfos lead to the Bomb Bag ledge (exit Upper Lizalfos -> 
 
 [exits."Dodongos Cavern Upper Lizalfos"."Dodongos Cavern Bomb Bag Ledge"]
 # Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword, child
-# weapons the child's; it folds to the rule before while shuffle_master_sword is false.
-rule = "(adult_sword or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs) and (can_use(Slingshot) or can_use(Bow))"
+# weapons the child's; it folds to the rule before while shuffle_master_sword is false. Round 21 cs21e: adult_weapon
+# (the Megaton Hammer too; Enemy_MiddleBoss_Lizalfos Hammer 1.0, r21-hammer.md class enemy).
+rule = "(adult_weapon or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs) and (can_use(Slingshot) or can_use(Bow))"
 new = true
 source = "OoT Randomizer's rule for leaving the upper Lizalfos (Dodongos Cavern.json:136, defeat the pair), plus the double eye-switch passage: Nintendo Life, IGN and QuestFern shoot one eye, cross, then the second eye through a window before the fire returns; data: room 17 holds two Obj_EyeSwitch_A_05 with LimitTime 10 and two Obj_DodongoCave_FireWall_A_01. The Slingshot (child) or Bow (adult) is already needed one room before (Before Upper Lizalfos -> Upper Lizalfos)"
 
@@ -59,9 +60,9 @@ new = true
 source = "back through the double eye-switch passage: the two timed eye switches (LimitTime 10) and fire walls of room 17 are on this way too; OoT Randomizer's Far Bridge -> Upper Lizalfos was True"
 
 [exits."Dodongos Cavern Bomb Bag Ledge"."Dodongos Cavern Far Bridge"]
-rule = "here(has_explosives)"
+rule = "here(can_blast_or_smash)"
 new = true
-source = "Nintendo Life: bomb the wall west of the Bomb Bag chest to return to the main area; IGN: place a bomb at the cracked wall behind the chest, the lift switch is dead ahead; QuestFern: bomb the wall behind the chest. Data: WallCrack 13202633467597206724 (30,115,-23), no Bomb Flower on the ledge (the blade room's only one, (49,114,-12), is on the lower platforms). The Megaton Hammer on this wall is not checked"
+source = "Nintendo Life: bomb the wall west of the Bomb Bag chest to return to the main area; IGN: place a bomb at the cracked wall behind the chest, the lift switch is dead ahead; QuestFern: bomb the wall behind the chest. Data: WallCrack 13202633467597206724 (30,115,-23), no Bomb Flower on the ledge (the blade room's only one, (49,114,-12), is on the lower platforms). Round 21 cs21e (plans/rounds/r21-hammer.md, class cracked wall): WallCrack's CrackStoneObject damage table takes Hammer 100 (= Bomb 100); Kareem broke the same actor class on Death Mountain Trail with the Hammer (0.2.5), so the Megaton Hammer opens it too"
 
 [exits."Dodongos Cavern Far Bridge"."Dodongos Cavern Upper Lizalfos"]
 rule = "False"
@@ -69,9 +70,9 @@ was = "True"
 source = "the bridge reaches the upper Lizalfos only through the Bomb Bag ledge (exits Far Bridge -> Bomb Bag Ledge -> Upper Lizalfos)"
 
 [exits."Dodongos Cavern Far Bridge"."Dodongos Cavern Bomb Bag Ledge"]
-rule = "here(has_explosives)"
+rule = "here(can_blast_or_smash)"
 new = true
-source = "the same bombable wall (WallCrack 13202633467597206724), from the main hall's side; that it breaks from this side too is not checked (question in the findings)"
+source = "the same bombable wall (WallCrack 13202633467597206724), from the main hall's side; that it breaks from this side too is not checked (question in the findings). Round 21 cs21e: explosives or the Megaton Hammer, as the ledge side (r21-hammer.md, class cracked wall)"
 
 [exits."Dodongos Cavern Climb"."Dodongos Cavern Far Bridge"]
 rule = "False"
@@ -96,9 +97,9 @@ source = "as Pot 1 (Nintendo Life: leap south from the Bomb Bag ledge onto the t
 # Gold Skulltulas.
 
 [locations."Dodongos Cavern GS Alcove Above Stairs"]
-rule = "has_explosives"
+rule = "can_blast_or_smash"
 was = "can_use(Hookshot) or can_use(Boomerang)"
-source = "moved (plans/rounds/r3-census.md, 'Moved checks'): data Enemy_Skulltula_Gold 4565265801822094851 in room 18 at (21,112,-56), floor height (the room's two Enemy_Dodongo stand at y 112), behind WallCrack 1823997448213534774 (20,113,-44) off the bridge over the skull. Eurogamer and Polygon: Bombs required (child and adult), on the back of the rock spike; IGN: bomb the cracked wall in the hall's north-east corner, a detonating Dodongo can kill it; Nintendo Life, VGC: a bombable wall by the bridge. No guide asks for the Boomerang or Hookshot. The Megaton Hammer on this wall is not checked"
+source = "moved (plans/rounds/r3-census.md, 'Moved checks'): data Enemy_Skulltula_Gold 4565265801822094851 in room 18 at (21,112,-56), floor height (the room's two Enemy_Dodongo stand at y 112), behind WallCrack 1823997448213534774 (20,113,-44) off the bridge over the skull. Eurogamer and Polygon: Bombs required (child and adult), on the back of the rock spike; IGN: bomb the cracked wall in the hall's north-east corner, a detonating Dodongo can kill it; Nintendo Life, VGC: a bombable wall by the bridge. No guide asks for the Boomerang or Hookshot. Round 21 cs21e (plans/rounds/r21-hammer.md, class cracked wall): WallCrack's CrackStoneObject damage table takes Hammer 100 (= Bomb 100); Kareem broke the same actor class on Death Mountain Trail with the Hammer (0.2.5), so the Megaton Hammer opens it too"
 
 [locations."Dodongos Cavern GS Vines Above Stairs"]
 rule = "at('Dodongos Cavern Climb', can_use(Slingshot) or can_use(Boomerang) or can_use(Bow) or can_use(Hookshot)) or (logic_dc_vines_gs and can_use(Longshot))"

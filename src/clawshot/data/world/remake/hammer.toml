@@ -1,0 +1,52 @@
+# Round 21 cs21e (plans/rounds/r21-hammer.md): the Megaton Hammer breaks what bombs break, class by class.
+# Kareem, 0.2.5 in game (2026-11-22): the Hammer broke boulders, bomb grottos, the Death Mountain Trail chest's wall
+# and the Skulltula wall near Kakariko (both generic WallCrack actors, 12869454506934697528 and 1600448280623797586).
+# Data (build e0f3ccfa, Pack/Actor/<actor>.pack.zs): every cracked wall, cracked floor and boulder actor inherits
+# WallCrack and carries Life/DamageParameters/CrackStoneObject, whose DamageRates give Hammer (murmur3 'Hammer' =
+# 85358548) 100.0, the same as Bomb (3237216321), against MaxLife 6; the Hammer's own pack names that enum
+# (Weapon_Hammer EquipmentType 85358548). A wall's death removes it (DeathParam CrackObjectCommon), so the way opens.
+# Each entry below names the actor that its explosives open; translated rules widen here, rules another override file
+# owns widen in that file. has_explosives becomes can_blast_or_smash (OoT Randomizer's explosives-or-Hammer helper).
+# Not here: King Dodongo (Kareem: bombs or Bomb Flowers with the Bracelet), anything the data says the Hammer cannot
+# damage (spider webs, Shadow Temple skull pots, icicles, Bottom of the Well candlesticks, beehives: Hammer 0.0), and
+# explosives whose target is not one of these actors (eye switches, Bomb Flower chains, the Beamos).
+
+[locations."DMC Gossip Stone"]
+rule = "can_blast_or_smash"
+was = "has_explosives"
+source = "Round 21 cs21e (r21-hammer.md, class cracked wall): the stone (Obj_GossipStone_A_01 14925975245241235059 at (43.6,132.3,37.3)) sits inside WallCrack 18030667990041421780 at (42.9,131.7,37.0), Banc/DeathMountainCrater_{Child,Adult}_Static; WallCrack's CrackStoneObject damage table takes Hammer 100 (= Bomb 100), the actor Kareem broke on Death Mountain Trail with the Hammer (0.2.5)."
+
+[events."DMC Upper Local".Fairy]
+rule = "can_blast_or_smash and can_summon_gossip_fairy_without_suns and has_bottle"
+was = "has_explosives and can_summon_gossip_fairy_without_suns and has_bottle"
+source = "Round 21 cs21e (r21-hammer.md, class cracked wall): the fairy is summoned at DMC Gossip Stone, behind WallCrack 18030667990041421780 (see that entry)."
+
+[exits."Zoras Fountain"."ZF Great Fairy Fountain"]
+rule = "can_blast_or_smash"
+was = "has_explosives"
+source = "Round 21 cs21e (r21-hammer.md, class cracked wall): WallCrack 15706960959866666216 at (60.7,103.1,48.2), Banc/ZoraFountain_{Child,Adult}_Static, is the only breakable wall in Zora's Fountain and stands in line with the fountain (Land_GreatFairyFountain_Base_A_05/A_04 at (62.5,103.2,75.8)/(62.5,103.2,101.3)); WallCrack's damage table takes Hammer 100 (= Bomb 100)."
+
+[locations."Fire Temple Big Lava Room Blocked Door Chest"]
+rule = "is_adult and can_blast_or_smash"
+was = "is_adult and has_explosives"
+source = "Round 21 cs21e (r21-hammer.md, class cracked wall): Obj_FireTemple_CrackWall_A_01 3450708986142730000 at (38.9,105.1,39.9), 11.4 from the chest, FireTemple_Static; it inherits WallCrack (CrackStoneObject Hammer 100 = Bomb 100)."
+
+[locations."Fire Temple GS Boulder Maze"]
+rule = "can_blast_or_smash"
+was = "has_explosives"
+source = "Round 21 cs21e (r21-hammer.md, class cracked wall): Obj_FireTemple_CrackWall_A_01 3767799004117692338 at (59.0,147.0,-28.8), 1.8 from the Gold Skulltula, FireTemple_Static; it inherits WallCrack (CrackStoneObject Hammer 100 = Bomb 100)."
+
+[locations."Fire Temple Boulder Maze Shortcut Chest"]
+rule = "can_blast_or_smash"
+was = "has_explosives"
+source = "Round 21 cs21e (r21-hammer.md, class cracked floor): Obj_FireTemple_CrackFloor_A_01 5036984609780716265 at (63.4,151.1,0.0), the floor of the upper maze 10 above the chest (77.4,141.1,0.2), FireTemple_Static; it inherits Obj_DodongoCave_CrackFloor_A_01 and WallCrack (CrackStoneObject Hammer 100 = Bomb 100)."
+
+[exits."Shadow Temple First Beamos"."Shadow Temple Huge Pit"]
+rule = "can_blast_or_smash and (((Small_Key_Shadow_Temple, 1) and not shadow_temple_shortcuts) or (Small_Key_Shadow_Temple, 5) or ((Small_Key_Shadow_Temple, 4) and (logic_lens_shadow_platform or can_use(Lens_of_Truth))))"
+was = "has_explosives and (((Small_Key_Shadow_Temple, 1) and not shadow_temple_shortcuts) or (Small_Key_Shadow_Temple, 5) or ((Small_Key_Shadow_Temple, 4) and (logic_lens_shadow_platform or can_use(Lens_of_Truth))))"
+source = "Round 21 cs21e (r21-hammer.md, class cracked wall): Obj_ShadowTemple_CrackWall_A_03 17091353075401231102 at (90.0,87.2,1.4), ShadowTemple_Dynamic, 6 from the first Beamos (Enemy_Beamos 1748567630123051400 at (83.9,87.2,1.4)); it inherits WallCrack (CrackStoneObject Hammer 100 = Bomb 100). Only the explosives term changes; the key and Lens terms are OoT Randomizer's."
+
+[locations."Shadow Temple After Wind Hidden Chest"]
+rule = "can_blast_or_smash"
+was = "has_explosives"
+source = "Round 21 cs21e (r21-hammer.md, class cracked wall): WallCrack 9285626040364164957 at (118.7,51.6,-17.6), 0.6 from the chest, ShadowTemple_Static; WallCrack's damage table takes Hammer 100 (= Bomb 100)."

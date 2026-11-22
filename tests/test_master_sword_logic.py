@@ -126,7 +126,7 @@ def _entries(spec):
                 out.append((f"{region} -> {name}", fields["rule"], fields["was"], False))
     for (kind, region, name), before in BEFORE.items():
         rule = current(kind, region, name)
-        assert "adult_sword" in rule or "can_kill_" in rule, (region, name, rule)
+        assert any(word in rule for word in ("adult_sword", "adult_weapon", "can_kill_")), (region, name, rule)
         out.append((name if region is None else f"{region} -> {name}", rule, before, name in ADULT_ONLY))
     return out
 

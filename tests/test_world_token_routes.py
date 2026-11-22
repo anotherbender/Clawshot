@@ -116,7 +116,7 @@ def test_tower_requires_age_appropriate_high_reward_retrieval_at_night(age, gear
     assert not rule(counts, age, DAY)
 
 
-def test_wetlands_bag_without_child_lift_and_hammer_alone_cannot_open_the_route():
+def test_wetlands_bag_without_child_lift_cannot_open_the_route_but_the_adult_hammer_can():
     world = route_world()
     search = Search(world, ["Bomb Bag", "Slingshot"])
     assert not search.can_reach(GROTTO, CHILD)
@@ -125,8 +125,11 @@ def test_wetlands_bag_without_child_lift_and_hammer_alone_cannot_open_the_route(
     assert search.can_reach(GROTTO, CHILD)
     assert search.holds(KILL)
     assert not search.can_access(world.locations[WETLAND], CHILD)
+    # Round 21 (r21-hammer.md, class grotto cover): the cover takes Hammer 100, as bombs; Kareem opened bomb grottos
+    # with the Hammer.
     hammer = Search(route_world(adult_start=True), ["Megaton Hammer"])
-    assert not hammer.can_reach(GROTTO, ADULT)
+    assert hammer.can_reach(GROTTO, ADULT)
+    assert not Search(route_world(adult_start=True)).can_reach(GROTTO, ADULT)
 
 
 def test_adult_inventory_does_not_replace_the_earlier_child_kill():

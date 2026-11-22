@@ -200,3 +200,8 @@ source = "Claude, 2026-11-13, Round 14 deliberate child-capability exception: na
 # OoT Randomizer's adult always holds the Master Sword, so its rules read is_adult for an armed adult.
 rule = "is_adult and (not shuffle_master_sword or Master_Sword or Biggoron_Sword)"
 source = "Round 19 cs19c (plans/rounds/r18-master-sword-design.md sections 3 and 7): RSDB/PouchActorInfo and PouchTable mark Weapon_Sword_Master, Weapon_Sword_Biggoron, Weapon_Sword_Giant and Weapon_Sword_BrokenGiant the IsUsableAdult blades, Weapon_Sword_Kokiri IsUsableChild only. Off (shuffle_master_sword false) this folds to is_adult, so every rule naming it compiles to its translated form; on, an adult needs an owned durable blade. Conservative (Main review, 2026-11-19): the Giant's Knife breaks after use (section 8: the break is not modelled), so logic never counts it; the runtime still keeps an owned knife usable."
+
+[helpers.adult_weapon]
+# An armed adult in a fight with ordinary enemies: a durable blade, or the Megaton Hammer. Bosses keep adult_sword.
+rule = "adult_sword or can_use(Megaton_Hammer)"
+source = "Round 21 cs21e (plans/rounds/r21-hammer.md, class enemy): every Enemy_* pack the enemy rules name has a DamageParameters DamageRates entry for Hammer (murmur3 'Hammer' = 85358548) of 1.0 (Freezard 99, Torch Slug 100), equal to its Bomb rate; Kareem played the Hammer as an adult weapon on 0.2.5 (2026-11-22). Off (shuffle_master_sword false) adult_sword is is_adult and can_use(Megaton_Hammer) implies is_adult, so this folds to is_adult and changes nothing. Boss fights (Phantom Ganon, Morpha, Bongo Bongo, Twinrova) keep adult_sword: their reflect/nucleus/eye steps are not damage-table facts and no natural save reaches them unbeaten."

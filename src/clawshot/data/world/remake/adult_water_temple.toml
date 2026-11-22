@@ -23,7 +23,9 @@ was = "(can_play(Zeldas_Lullaby) or Iron_Boots) and Hookshot"
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Finding the Compass): the south bomb wall/underwater passage leads to target platforms and a Like Like guarding the Compass. Banc room 3, Hash 16424266294822218796; not the old N64 compass alcove."
 
 [exits."Water Temple Lowered Water Levels"."Water Temple South Basement"]
-rule = "has_explosives and can_use(Iron_Boots) and can_use(Hookshot)"
+# Round 21 cs21e (plans/rounds/r21-hammer.md, class cracked wall): Obj_WaterTemple_CrackWall_A_01 8886778375471620346
+# inherits WallCrack (CrackStoneObject Hammer 100 = Bomb 100); the guide places a bomb by hand, so Link stands at it.
+rule = "can_blast_or_smash and can_use(Iron_Boots) and can_use(Hookshot)"
 was = "has_explosives and (Iron_Boots or can_dive) and (Hookshot or Hover_Boots)"
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Finding the Compass): bomb wall, sink through passage with Iron Boots, Hookshot over gaps. Scale/Hover alternatives are not verified."
 
@@ -51,7 +53,9 @@ was = "((Longshot or (logic_water_central_gs_fw and Hookshot and can_use(Farores
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Gold Skulltula 76): Longshot reaches the high target inside the unlocked pillar. One acquired key plus the middle-water route, not a fifth key or torch bypass."
 
 [exits."Water Temple Middle Water Level"."Water Temple East Geyser Room"]
-rule = "has_explosives and can_use(Iron_Boots) and can_use(Hookshot)"
+# Round 21 cs21e (plans/rounds/r21-hammer.md, class cracked wall): Obj_WaterTemple_CrackWall_A_01 16397907331581633827
+# on the middle floor, WallCrack's damage table (Hammer 100 = Bomb 100).
+rule = "can_blast_or_smash and can_use(Iron_Boots) and can_use(Hookshot)"
 new = true
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Small Key 3): middle-floor east cracked wall, submerged passage and geyser switch."
 
@@ -63,7 +67,9 @@ source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_
 
 [locations."Water Temple GS Falling Platform Room"]
 region = "Water Temple Cracked Wall"
-rule = "has_explosives"
+# Round 21 cs21e (plans/rounds/r21-hammer.md, class cracked wall): Obj_WaterTemple_CrackWall_A_01 8260753825821756465
+# (5.2 from the token), WallCrack's damage table (Hammer 100 = Bomb 100).
+rule = "can_blast_or_smash"
 was = "can_use(Longshot) or (logic_water_falling_platform_gs_hookshot and can_use(Hookshot)) or (logic_water_falling_platform_gs_boomerang and can_use(Boomerang))"
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Gold Skulltula 74): bomb the middle-level Ruto-side wall to find Shell Blades and the token; census room 25 Hash 4399424945134189769. Not in the falling-platform room and not Longshot-gated."
 
@@ -75,8 +81,9 @@ source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_
 [exits."Water Temple Falling Platform Room"."Water Temple Dark Link Region"]
 # Round 19 Master Sword shuffle (remake/master_sword.toml header; r18-master-sword-design.md section 7): Dark Link is
 # fought with a sword before the Longshot room. adult_sword folds to is_adult, implied by can_use(Hookshot), while
-# shuffle_master_sword is false.
-rule = "can_use(Hookshot) and adult_sword"
+# shuffle_master_sword is false. Round 21 cs21e: adult_weapon (Enemy_MiddleBoss_DarkLink Hammer 1.0; r21-hammer.md
+# class enemy).
+rule = "can_use(Hookshot) and adult_weapon"
 was = "can_use(Hookshot) and (Small_Key_Water_Temple, 5)"
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Finding the Longshot): moving targets and dragon switch puzzle lead directly to Dark Link; no fourth/fifth small-key door here."
 
@@ -105,7 +112,9 @@ was = "(Iron_Boots or can_play(Zeldas_Lullaby)) and (Longshot or (logic_water_no
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Finding the Boss Key): sink to north basement, Longshot across to the fourth locked door."
 
 [exits."Water Temple North Basement"."Water Temple Boss Key Chest Room"]
-rule = "can_use(Iron_Boots) and has_explosives and Progressive_Strength_Upgrade"
+# Round 21 cs21e (plans/rounds/r21-hammer.md, class cracked wall): the three walls are Obj_WaterTemple_CrackWall_A_01
+# 6051618086552241871, 4399777474541748421 and 6104942381128503602 in a row at (-12.3, 96.5), WallCrack's damage table.
+rule = "can_use(Iron_Boots) and can_blast_or_smash and Progressive_Strength_Upgrade"
 was = "(Small_Key_Water_Temple, 5) and (logic_water_bk_jump_dive or Iron_Boots) and (logic_water_north_basement_ledge_jump or Hover_Boots or (has_explosives and Progressive_Strength_Upgrade))"
 source = "https://www.ign.com/wikis/ocarina-of-time-remake/Water_Temple_Dungeon_Walkthrough (Finding the Boss Key): after fourth lock, bomb three walls, move block onto switch and cross geysers to the boulder corridor. There is no fifth lock."
 
