@@ -20,10 +20,11 @@ State fields:
 - each area gains ``in_logic``: ``{child, adult, either}``, the number of its open checks in logic for each.
 - ``state["vanilla_areas"]`` (spec D19, section 8): the fixed vanilla pick-ups, grouped by area like ``areas``
   (``name``, ``total``, ``collected``, ``unknown``, ``marked``, ``in_logic``, ``checks``). These are locations the
-  seed does not shuffle whose vanilla item is progression (:func:`vanilla_rows`, scope :data:`VANILLA_SCOPE`), so the
-  player sees a pick-up such as Ruto's Letter that gates an area. Each row has ``vanilla: true`` and always names its
-  item (the settings decide it, not the seed); ``collected`` comes from the logic inventory
-  (:func:`vanilla_collected`). Absent while logic is unavailable. ``areas`` and its counts are unchanged by them.
+  seed does not shuffle whose vanilla item is progression and read by the seed's logic (:func:`vanilla_rows`, scope
+  :data:`VANILLA_SCOPE`), so the player sees a pick-up such as Ruto's Letter that gates an area. Each row has
+  ``vanilla: true`` and always names its item (the settings decide it, not the seed); ``collected`` comes from the
+  logic inventory (:func:`vanilla_collected`). Absent while logic is unavailable. ``areas`` and its counts are
+  unchanged by them.
 
 Nothing is written anywhere: the seed's spoiler and the save are only read.
 """
@@ -327,15 +328,43 @@ class VanillaRow:
     shared: bool
 
 
+def logic_reads(world: World) -> frozenset[str] | None:
+    """Every item and event name a rule of ``world`` reads (``Rule.reads``): the rules of its locations, exits,
+    events, Gossip Stones and goal. None when some rule's reads are not known, so that nothing can be ruled out."""
+    rules = [world.goal, *(loc.rule for loc in world.locations.values()), *(event.rule for event in world.events)]
+    rules += [exit.rule for region in world.regions.values() for exit in region.exits]
+    rules += [stone.rule for stone in world.hint_stones.values()]
+    reads: set[str] = set()
+    for rule in rules:
+        if rule.reads is None:
+            return None
+        reads |= rule.reads
+    return frozenset(reads)
+
+
+def search_counts(world: World, item: str) -> frozenset[str]:
+    """The counts that collecting ``item`` raises in ``world``'s search (``Search._collect_item``): the item itself
+    and its alias target. Empty for a chain counter that a copies-only world (``World.progressive_copies_only``)
+    keeps for its chain copies, such as a fixed Bow (``Search._copy_only_counters``)."""
+    if world.progressive_copies_only and item in set(world.progressive.values()) - set(world.progressive):
+        return frozenset()
+    info = world.items.get(item)
+    return frozenset({item, info.alias[0]} if info is not None and info.alias else {item})
+
+
 def vanilla_rows(seed: Seed, world: World, scope: str | None = None) -> tuple[VanillaRow, ...]:
     """The seed's fixed vanilla pick-ups in world order (8.1): world locations not in the spoiler's placements whose
-    vanilla item is progression, not N64-only, not of :data:`VANILLA_SKIPPED_TYPES`, and in ``scope``
-    (:data:`VANILLA_SCOPE` by default)."""
+    vanilla item is progression, not N64-only, not of :data:`VANILLA_SKIPPED_TYPES`, in ``scope``
+    (:data:`VANILLA_SCOPE` by default), and read by the seed's logic: collecting it raises a count some rule of the
+    world reads (:func:`logic_reads`, :func:`search_counts`). The search waits only on those counts, so any other
+    item cannot change what is in logic. In a seed's world that leaves out the native chains' fixed tiers (Silver
+    and Golden Scale, the wallets, the Great Fairies' magic meters), which count as a bonus only."""
     from clawshot.generate import names
 
     scope = scope or VANILLA_SCOPE
     if scope not in ("unique", "all"):
         raise ValueError(f"unknown vanilla scope {scope!r}")
+    reads = logic_reads(world)
     placed = {check.location for check in seed.checks}
     placed_items = {check.item for check in seed.checks}
     sources = Counter(loc.vanilla for loc in world.locations.values() if loc.vanilla is not None)
@@ -348,6 +377,8 @@ def vanilla_rows(seed: Seed, world: World, scope: str | None = None) -> tuple[Va
         if name in placed or item is None or not item.progression or loc.n64_only is not None:
             continue
         if loc.type in VANILLA_SKIPPED_TYPES or (scope == "unique" and sources[loc.vanilla] != 1):
+            continue
+        if reads is not None and not search_counts(world, item.name) & reads:
             continue
         place = places.get(name)
         described = catalog.get(name)

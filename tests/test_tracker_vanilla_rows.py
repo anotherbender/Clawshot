@@ -3,12 +3,15 @@ synthetic world. Nothing comes from the game."""
 
 import copy
 import json
+from types import SimpleNamespace
 
 import pytest
 from test_tracker_logic import GENERATOR, PLACES
 from test_tracker_state import build_save, parse
 
 from clawshot.generate import Settings
+from clawshot.generate.fill import shuffled_locations
+from clawshot.patch.logic_world import logic_world
 from clawshot.tracker import TrackerSession, build_state, load_seed, seeds
 from clawshot.tracker import logic as tracker_logic
 from clawshot.tracker.seeds import Place
@@ -16,15 +19,18 @@ from clawshot.tracker.seeds import Place
 BOOMERANG = "PouchData.Item_Boomerang.StockNum"
 
 # test_tracker_logic's world plus fixed pick-ups: the child's Boomerang (which opens the Child Ledge, like Ruto's
-# Letter opens Jabu-Jabu), two Lens pick-ups (an item given twice) and a non-progression trinket.
+# Letter opens Jabu-Jabu), two Lens pick-ups (an item given twice, which an event reads), a non-progression trinket
+# and a progression item no rule reads (like a seed's fixed Silver Scale).
 SPEC = copy.deepcopy(__import__("test_tracker_logic").SPEC)
-SPEC["items"] |= {"Lens of Truth": {}, "Trinket": {"class": "normal"}}
+SPEC["items"] |= {"Lens of Truth": {}, "Trinket": {"class": "normal"}, "Bonus Scale": {}}
 SPEC["regions"][1]["locations"] |= {
     "Boomerang Pickup": {"rule": "age == 'child'", "type": "NPC", "vanilla": "Boomerang"},
     "Lens Pickup A": {"rule": "True", "type": "NPC", "vanilla": "Lens of Truth"},
     "Lens Pickup B": {"rule": "True", "type": "NPC", "vanilla": "Lens of Truth"},
     "Trinket Pickup": {"rule": "True", "type": "NPC", "vanilla": "Trinket"},
+    "Bonus Pickup": {"rule": "True", "type": "NPC", "vanilla": "Bonus Scale"},
 }
+SPEC["regions"][1]["events"] |= {"Truth Seen": "'Lens of Truth'"}
 # The Boomerang is not shuffled: only its vanilla pick-up gives it.
 PLACEMENTS = {
     "Adult Chest": "Key",
@@ -82,6 +88,63 @@ def test_rows_are_unshuffled_unique_progression_pick_ups(tmp_path, world):
     assert [row.location for row in every] == ["Boomerang Pickup", "Lens Pickup A", "Lens Pickup B"]
     with pytest.raises(ValueError, match="scope"):
         tracker_logic.vanilla_rows(seed, logic.loaded.world, "some")
+
+
+# B1: a row only for an item the seed's logic reads; any other cannot change what is in logic.
+def test_an_item_no_rule_reads_gets_no_row(tmp_path, world, monkeypatch):
+    state, seed, logic = state_for(tmp_path, {BOOMERANG: 0})
+    world = logic.loaded.world
+    reads = tracker_logic.logic_reads(world)
+    assert {"Boomerang", "Lens of Truth"} <= reads and "Bonus Scale" not in reads
+    assert "Bonus Pickup" not in vanilla(state)
+    assert "Bonus Pickup" not in {row.location for row in tracker_logic.vanilla_rows(seed, world, "all")}
+    monkeypatch.setattr(tracker_logic, "logic_reads", lambda world: None)  # reads unknown: nothing is ruled out
+    assert "Bonus Pickup" in {row.location for row in tracker_logic.vanilla_rows(seed, world)}
+
+
+@pytest.fixture(scope="module")
+def chest_only():
+    """A Chest-only seed's real logic world (dump-free) and a seed whose checks are its shuffled locations."""
+    settings, world = logic_world(Settings(shuffle=("Chest",)))
+    names = shuffled_locations(world, settings)
+    return SimpleNamespace(checks=[SimpleNamespace(location=name, item="Rupees (5)") for name in names]), world
+
+
+# B1 on a seed's world: the native chains count only copies, so their fixed tiers are a bonus no rule reads.
+IGNORED_TIERS = {
+    "ZD Diving Minigame": "Silver Scale",
+    "LH Adult Fishing": "Golden Scale",
+    "Kak 10 Gold Skulltula Reward": "Adult Wallet",
+    "Kak 30 Gold Skulltula Reward": "Giant Wallet",
+    "HC Great Fairy Reward": "Magic Meter (Single)",
+    "DMC Great Fairy Reward": "Magic Meter (Double)",
+}
+
+
+def test_fixed_native_tiers_the_logic_ignores_get_no_row(chest_only, monkeypatch):
+    seed, world = chest_only
+    assert world.progressive_copies_only
+    reads = tracker_logic.logic_reads(world)
+    assert reads is not None and "Progressive Scale" in reads
+    rows = {row.location: row.item for row in tracker_logic.vanilla_rows(seed, world)}
+    for location, item in IGNORED_TIERS.items():
+        assert world.locations[location].vanilla == item and item not in reads
+        assert location not in rows, location
+    # Fixed gates the logic reads keep their rows.
+    assert rows["LH Underwater Item"] == "Rutos Letter"
+    assert rows["GC Darunias Joy"] == "Goron Bracelet"
+    assert rows["LLR Talons Chickens"] == "Bottle with Milk"  # has_bottle reads every bottle
+    # Without the filter the ignored tiers would be rows: the test is not vacuous.
+    monkeypatch.setattr(tracker_logic, "logic_reads", lambda world: None)
+    assert set(IGNORED_TIERS) <= {row.location for row in tracker_logic.vanilla_rows(seed, world)}
+
+
+def test_search_counts_follow_the_search(chest_only):
+    _, world = chest_only
+    # A fixed Bow is a bonus in a copies-only world: the search keeps the name for its chain copies.
+    assert tracker_logic.search_counts(world, "Bow") == frozenset()
+    assert tracker_logic.search_counts(world, "Fairy Ocarina") == {"Fairy Ocarina", "Ocarina"}
+    assert tracker_logic.search_counts(world, "Silver Scale") == {"Silver Scale"}
 
 
 def test_rows_are_built_once_per_loaded_seed(tmp_path, world, monkeypatch):
