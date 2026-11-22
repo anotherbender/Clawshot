@@ -97,6 +97,26 @@ def test_items_without_an_acquired_once_rule_count_only_when_held(world):
     assert inv(world, {"IsGet.Item_Boomerang": True}, stock("Item_Boomerang")).counts["Boomerang"] == 1
 
 
+# Q6: seed child logic takes the Goron Bracelet from Darunia's gift only. The tracker reads the gift from its cutscene's
+# saved Bool (patch/darunia.py SOURCE); a copy Bracelet or adult gauntlets (the strength cell) never stand in for it.
+DARUNIA = "HavePlayedEvent.Dm_Goron_0030"
+STRENGTH = (("Armor_Child_Gauntlet_Goron", 1), ("Armor_Adult_Gauntlet_Silver", 2), ("Armor_Adult_Gauntlet_Gold", 3))
+
+
+def test_goron_bracelet_comes_from_darunias_gift_only(world):
+    gift = inv(world, {DARUNIA: True})
+    assert gift.counts["Goron Bracelet"] == 1 and "Progressive Strength" not in gift.counts
+    for actor, tier in STRENGTH:
+        counts = inv(world, {DARUNIA: False}, stock(actor)).counts
+        assert counts["Progressive Strength"] == tier and "Goron Bracelet" not in counts, actor
+    unread = inv(world, ints=stock("Armor_Child_Gauntlet_Goron"))
+    assert "Goron Bracelet" not in unread.counts and "story: Goron Bracelet" in unread.unknown
+    # Were Darunia's gift ever shuffled, the flag would only say that check was done.
+    darunia = Check("GC Darunias Joy", "Darunia", "", "Goron City", None, "gift", "x", "x", "named_bool", (DARUNIA,))
+    shuffled = tracker_logic.inventory(seed([darunia]), parse({DARUNIA: True}, {}), world)
+    assert "Goron Bracelet" not in shuffled.counts and "story: Goron Bracelet" not in shuffled.unknown
+
+
 @pytest.mark.parametrize(
     ("actor", "item"), [("Item_DekuStick", "Buy Deku Stick (1)"), ("Item_DekuNut", "Buy Deku Nut (5)")]
 )

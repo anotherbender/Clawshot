@@ -17,7 +17,16 @@ after plan item 1.3 found the generator's world is not `validate` + `prepare` al
 main maintainer's review: D11 default age is Either; Either is `can_access(location)` with no age; save items go to
 the search the way the generator feeds its own (closed return gate); marks live beside the preferences (D9); the
 version gate also checks the spoiler's locations (D14); story-flag logic items (2.2); Ruto's Letter follows
-`has_bottle` (2.7); Q1 and Q2 answered. Decisions marked "(maint)" are the maintainer's.
+`has_bottle` (2.7); Q1 and Q2 answered. Decisions marked "(maint)" are the maintainer's. Revised 2026-11-21: D19 and
+section 8 (fixed vanilla pick-ups as tracker rows) added after BBender's play (seed 2445192976; contributor's build,
+version not recorded) showed Jabu-Jabu stays out of logic with no open check pointing at Ruto's Letter; proposed by
+Claude, chosen by BBender. Revised 2026-11-21 after a grill-me interview with BBender: Q3, Q4 and Q5 answered
+(BBender), and Q6 (the Goron Bracelet) left for the maintainer (end of this file). Revised 2026-11-21 after the
+maintainer review of PR #37: D19 accepted, Q3 accepted (narrowed: rows only for items the seed's logic reads, 8.1),
+Q4 (on by default) accepted, Q5 accepted for items the logic reads; each decided by Claude for the maintainer,
+2026-11-21; Kareem tests it in the tracker. Rows now depend on the settings only (8.3), and 8.2 and 8.5 describe the
+shipped code. Q6 answered the same day: the tracker reads the Goron Bracelet from Darunia's gift cutscene flag
+(reading it from a real save is unconfirmed until Kareem's tracker test).
 
 ### Goal
 
@@ -56,6 +65,25 @@ gifts, unset placement-hash pickups, unaudited event gates) can be marked done b
 - User preferences live in `app/preferences.py`'s folder (`%APPDATA%\Clawshot` on Windows, macOS/XDG
   equivalents); the icon cache (`%LOCALAPPDATA%\Clawshot\Cache\icons`) is safe to delete and holds no user data.
 - The OBS view already strips `areas[].checks`.
+- Tracker rows come only from the spoiler's `placements`, which hold only the seed's shuffled locations
+  (`generate/__init__.py`, `seed.shuffled`). A location the seed does not shuffle (type not selected,
+  `keep_vanilla`, not admitted as a gift) keeps its vanilla item and has no row. The generator's beatability search
+  collects those vanilla items when it reaches them; the tracker's search (D1, D16) counts only what the save holds.
+  So a fixed vanilla item that opens progress is invisible until picked up. Found 2026-11-21 in BBender's play
+  (seed 2445192976; contributor's build, version not recorded): `LH Underwater Item`
+  (Ruto's Letter, type `NPC`, a placed pick-up with no gift flow step, `plans/03-game-data.md` section on gifts) is
+  never shuffled; Jabu-Jabu (`is_child and Fish`, where `Fish` needs `has_bottle`, i.e. `Deliver Letter`) showed no
+  in-logic checks and no open check said why, until the letter was picked up.
+- Size, on a Chest-only seed (seed 2445192976's settings, 2026-11-21; BBender's count): 299 non-shuffled locations
+  hold a progression item (100 Gold Skulltula tokens, 80 silver rupees, 27 heart pieces, the rest
+  NPC/song/cutscene/boss/mask-shop gifts). 61 of them hold an item that only that location gives in the world (every
+  song, the ocarinas, the trade chain, Ruto's Letter, Zelda's Letter, the Weird Egg, Gerudo card, Great Fairy spells,
+  masks, boss rewards when not shuffled). The PR #37 description gives 34 for that seed's own Gift settings.
+  Maintainer review (generated seeds of `main` plus PR #37, 2026-11-21): 14 of the 61 hold an item no rule of the
+  seed's logic reads, so 47 remain after 8.1's filter (Recommended settings: 28 of 34). The 14 are the native chains'
+  fixed tiers (Silver and Golden Scale, Adult and Giant Wallet, both Great Fairy magic meters: a seed's world counts
+  only chain copies), the Treasure Chest Game heart, Granny's Blue Potion, Giant's Knife, Biggoron Sword, Stone of
+  Agony, and the Light, Shadow and Spirit Medallions (the remake's logic reads boss events instead).
 
 ### Decisions
 
@@ -78,6 +106,7 @@ gifts, unset placement-hash pickups, unaudited event gates) can be marked done b
 | D16 | Save items into the search | The logic inventory is fed to `Search` the way the generator feeds its own assumed items (constructor `items`), so the closed-return-gate child view behaves as in generation (maint). |
 | D17 | Story-flag logic items | Story steps that are logic names map to their save flags where the flag is known; otherwise they are listed as unmapped with a reason (maint). |
 | D18 | Ruto's Letter and bottles | Follow `has_bottle`: a bottle slot holding the letter counts as the letter only, never also as a bottle (maint). |
+| D19 | Fixed vanilla pick-ups | While logic is available, the tracker also lists **vanilla rows**: non-shuffled locations whose vanilla item is progression, shown with that item and the same in-logic flags as other open checks. Logic itself is unchanged (still D1/D16: only what the save holds); the alternative of letting the tracker's search collect reachable vanilla items like the generator was rejected, since it reports areas in logic while hiding which pick-up they wait on. Default scope and toggle are Q3/Q4. Proposed by Claude, chosen by BBender, 2026-11-21. **Accepted**, decided by Claude for the maintainer, 2026-11-21; Kareem tests it in the tracker. |
 | D15 | Logic world source | One shared, dump-free builder of the seed's logic world (the reachability-changing spec steps, then `prepare`) used by both the seed pipeline and the tracker, so the two cannot drift. Proposed by Claude, chosen by BBender over a tracker-side copy of the steps or storing the world in the spoiler (rec). |
 
 ### Acceptance criteria
@@ -153,8 +182,9 @@ gifts, unset placement-hash pickups, unaudited event gates) can be marked done b
 - **4.8** A "Clear manual marks" control removes all marks for the current seed and slot after a confirmation.
 - **4.9** The mark endpoint is a POST behind the server's existing token/Host/Origin checks and rejects unknown
   check ids, checks not currently unknown, and requests without a configured seed and slot.
-- **4.10** An unreadable or missing marks file is reported as a warning and treated as empty; it is never
-  overwritten until the user changes a mark.
+- **4.10** An unreadable marks file is reported as a warning and treated as empty; a missing one is treated as empty
+  without a warning (a fresh install has none; maintainer review, 2026-11-20). Neither is overwritten until the user changes a
+  mark.
 
 #### 5. Age selection
 
@@ -198,6 +228,44 @@ gifts, unset placement-hash pickups, unaudited event gates) can be marked done b
   item, mark its check, restart Clawshot, and confirm the mark persists and the shop's item is hidden in
   spoiler-free mode.
 
+#### 8. Vanilla rows (D19)
+
+- **8.1** With logic available, the state lists one vanilla row per world location that is not in the spoiler's
+  `placements`, holds a vanilla item of class progression, is not `n64_only`, is in the default scope (Q3), and holds
+  an item the seed's logic reads: collecting it raises a count that some rule of the rebuilt world reads (`Rule.reads`
+  over every location, exit, event, Gossip Stone and the goal; the item or its alias target, not a chain counter a
+  copies-only world keeps for its copies). The search waits only on those counts, so no other item can change what
+  is in logic (maintainer review, 2026-11-21). The list is built from the rebuilt world (1.1) in world order, once
+  per loaded seed. With logic unavailable (1.3) there are no vanilla rows.
+- **8.2** A vanilla row carries `vanilla: true`, the location's name and description where the location catalog has
+  one (else the OoT Randomizer name), its area (the location's area in the tracker's location index,
+  `seeds.location_index`, else `OTHER_AREA`, "Other", as for the seed's own checks), and its vanilla item. The item
+  is shown in spoiler-free mode too: the settings, not the seed, decide it.
+- **8.3** Collected: `true` when the vanilla item counts as held by 2.x (held now, or its acquired-once flag, D2),
+  `false` when the save reads the item's cells and they say not held, `null` otherwise. This uses the item only when
+  no shuffled check of the seed can also give it: the item is unique to this location among the world's vanilla
+  items, and no shuffled location's own vanilla item gives it (for a fixed tier: adds to its chain or is a tier at
+  least as high). That pool comes from the settings, never from the items the spoiler placed, so rows depend on the
+  settings only (maintainer review, 2026-11-21). Otherwise the row's state is `null`. A fixed tier of a progressive
+  item counts as held once the chain reaches its tier. A `null` row can be marked done like any unknown check
+  (section 4, same rules and storage).
+- **8.4** An open vanilla row gets `in_logic` exactly as 3.2. The in-logic search is the same search as the
+  shuffled checks' (no extra items).
+- **8.5** Vanilla rows are counted separately, in a top-level `vanilla_areas` list: one entry per area holding
+  vanilla rows, shaped like `areas` (`name`, `total`, `collected`, `unknown`, `marked`, `in_logic` per age, `checks`).
+  The existing `areas`, their counts and per-area check totals are unchanged. (First drafted as a `vanilla` key in
+  each area; 16.7 says why it changed.)
+- **8.6** The Tracker tab shows vanilla rows within their area, styled as vanilla (for example a "vanilla" tag), and
+  a "Show vanilla pick-ups" toggle (default per Q4, persisted like 5.3). "Show only in-logic" (6.3) applies to them
+  too.
+- **8.7** The OBS payload and rendering stay unchanged (D13, 6.6): no vanilla rows or counts.
+- **8.8** Synthetic-fixture tests: a custom world where a non-shuffled location holds an item that gates another
+  region shows the row open and in logic, the gated check out of logic; after the save holds the item the row is
+  collected and the gated check is in logic. Also: a vanilla item that a shuffled check could give yields
+  `collected: null`; shuffled-check state and area counts are equal with and without vanilla rows.
+- **8.9** `docs/tracker.md` "In logic" section explains vanilla rows and why they exist (a fixed pick-up such as
+  Ruto's Letter can gate a whole area).
+
 ### Out of scope (v1)
 
 - In-logic in the OBS view.
@@ -211,6 +279,51 @@ gifts, unset placement-hash pickups, unaudited event gates) can be marked done b
   game, seed or save folders", plus where the marks file lives.
 - Q2: Whether the acquired-once rule (D2) should also apply to items without an audited acquired-once flag.
   **Held-now only** for items without a known acquired-once flag, matching D4.
+
+### Questions answered by BBender (2026-11-21, grill-me), with the maintainer's decisions
+
+- Q3: Default scope of vanilla rows (D19, 8.1). Proposed (Claude): only locations whose vanilla item no other world
+  location gives (61 on a Chest-only seed: songs, ocarinas, trade chain, Ruto's and Zelda's Letters, Weird Egg,
+  Gerudo card, spells, masks, unshuffled boss rewards). Gold Skulltula tokens, silver rupees, heart pieces and other
+  repeated items stay out by default, since a single one rarely gates progress and 238 more rows would bury the
+  list. Alternative: every progression item (299). **Answer (BBender): unique items only**, as proposed.
+  **Maintainer: accepted, narrowed** to items the seed's logic reads (8.1): 47 rows on Chest-only and 28 on
+  Recommended, instead of 61 and 34. Decided by Claude for the maintainer, 2026-11-21; Kareem tests it in the tracker.
+- Q4: Whether "Show vanilla pick-ups" (8.6) defaults on or off. Proposed (Claude): on, since the problem it solves
+  is a gate the player does not know to look for. **Answer (BBender): on.** **Maintainer: on by default, accepted.**
+  Decided by Claude for the maintainer, 2026-11-21; Kareem tests it in the tracker.
+- Q5: Vanilla rows whose item the save has no one-time record for (Treasure Chest Game heart piece, Granny's Blue
+  Potion, the Magic Bean salesman). **Answer (BBender): keep them as `?` rows** with in-logic styling and Mark done,
+  so a gate such as the bean salesman stays visible; finding save flags for them is later work needing in-game
+  evidence. Rows that can never leave `?`: four on BBender's seed 2445192976 (Gift settings: those three and the
+  Goron Bracelet, Q6); eleven on a Chest-only seed before 8.1's filter (also Silver and Golden Scale, Adult and Giant
+  Wallet, both Great Fairy magic meters, and Talon's milk bottle). After the filter three remain on Chest-only, all
+  read by the logic: the Goron Bracelet (Q6), the Magic Bean salesman and Talon's milk bottle (the save cannot tell
+  that bottle from another); two on Recommended, where Talon's gift is shuffled. With Q6's mapping the Goron
+  Bracelet row reads Darunia's cutscene flag, leaving two on Chest-only and one on Recommended. **Maintainer: accepted
+  for items the logic reads**; rows whose item no rule reads are left out by 8.1 instead of staying `?`. Decided by
+  Claude for the maintainer, 2026-11-21; Kareem tests it in the tracker.
+- The app tab lists check names with spoilers off, items hidden (6.1 needs something to style): proposed by
+  Claude, confirmed by BBender. (Bombchus once found, marks per seed and save folder and the missing marks file are
+  the maintainer review's, 2026-11-20, at the top of this file.)
+- Q6, asked of the maintainer: the Goron Bracelet. Seed child logic reads `'Goron Bracelet'` from Darunia's native
+  gift only (`world.toml` `Progressive_Strength_Upgrade`; `rounds/r14-progressive.md`: an early copy Bracelet works
+  out of logic and logic never relies on it), while the strength cell grants `Progressive Strength` copies and lists
+  the Bracelet unmapped. So the tracker never counts the Bracelet: a child who has Darunia's gift still sees the
+  bomb-flower areas out of logic, and the vanilla row `GC Darunias Joy` shows `?` (markable). Claude first mapped
+  every strength tier to the Bracelet as well; that was dropped before merge because it lets a copy or adult
+  gauntlets stand in for it, against that note. Question: is there a saved record of Darunia's gift that the
+  tracker could read for `Goron Bracelet`, or should it stay unmapped?
+  **Maintainer: yes, map it** to `HavePlayedEvent.Dm_Goron_0030` (`data/tracker_logic.toml` `[story."Goron
+  Bracelet"]`), only while `GC Darunias Joy` keeps its vanilla item (`vanilla_at`); decided by Claude for the
+  maintainer, 2026-11-21; Kareem tests it in the tracker. The Bool is native (`progress.sav`, default false, reset
+  type 8); `patch/darunia.py` has Darunia's Event39 read it, and it is written right after the gift's Event127 in
+  `Dm_Goron_0030`, in every seed (`patch/__init__.py`). Kareem via Claude confirmed that flag in game on 2026-11-14
+  (`03-game-data.md`, Darunia correction). Event127's wrapper writes it even when it skips a redundant Bracelet
+  grant, which matches seed logic crediting Darunia's source. The strength cell still never grants the Bracelet,
+  so a copy Bracelet or adult gauntlets do not stand in for it. **Unconfirmed:** that the tracker picks the flag up
+  from a real save after the gift; only synthetic saves are tested, until Kareem's tracker test. Were the gift ever
+  shuffled, the flag would mean the check is done, not that the Bracelet is held; `vanilla_at` then drops it.
 
 ## Part 2: plan
 
@@ -329,3 +442,16 @@ Tests run with `uv run --with pytest-xdist pytest -n auto`; dump tests skip with
     15.1 [x] 7.4 The PR gives the maintainer exact steps: with a Clawshot Play seed, save after collecting a few items, confirm the in-logic list matches what is reachable in game for that age; buy a shop item, mark its check, restart Clawshot, confirm the mark persists and the shop item stays hidden in spoiler-free mode. The result is recorded by the maintainer, not claimed by the agent. Steps are in the PR #36 description; the result is for the maintainer to record.
     15.2 [x] P15.a Decisions made during implementation are listed in the PR with who proposed them, including D15 (proposed by Claude, chosen by BBender, 2026-11-20), the maintainer's review changes (D9 folder, D11 default Either, D14 location check, D16–D18, Q1, Q2) and P5.b (proposed by Claude). Listed in the PR #36 description.
     15.3 [ ] P15.b Commits carry an `Assisted-by: <model>` trailer and add named paths only; the PR is MIT-compatible and contains no game files, saves or logs.
+16. [ ] Vanilla rows (D19, spec section 8; added 2026-11-21, proposed by Claude, chosen by BBender; Q3/Q4 were built to the proposed defaults behind one constant each and accepted as built, Q3 narrowed by 8.1's reads filter: 16.1)
+    16.1 [x] P16.a Record the maintainer's answers to Q3 (scope) and Q4 (toggle default) in the spec before merging; until then the PR lists them as open. BBender answered Q3 (unique), Q4 (on) and Q5 (keep `?` rows) on 2026-11-21, as built. Recorded 2026-11-21 (spec header, D19, Q3-Q5): D19 accepted, Q3 accepted (narrowed by 8.1's reads filter), Q4 on by default accepted, Q5 accepted for items the logic reads; each decided by Claude for the maintainer, 2026-11-21; Kareem tests it in the tracker.
+    16.2 [x] 8.1 Also skips `Shop`, `Event` and `Drop` locations (`VANILLA_SKIPPED_TYPES`, proposed by Claude). `tracker/logic.py` gains `vanilla_rows(seed, world) -> tuple[...]`: world locations not in the spoiler's placements, vanilla item of class progression, not `n64_only`, in the Q3 scope (proposed: the vanilla item is given by no other world location); world order; computed once per loaded seed beside the cached world (1.2). None when logic is unavailable. Maintainer review (2026-11-21): also only items the seed's logic reads (8.1; `logic_reads`, `search_counts`), computed with the rows once per loaded seed.
+    16.3 [x] 8.2 Each row has `id` (location name), `label`/`where` from the location catalog when present else the OoT Randomizer name and "", `area` (area via `location_index`, else `OTHER_AREA`, "Other"; no row fell back on the tested seeds), `item`/`item_label` (vanilla item, display name as `seeds.py` does), `vanilla: true`. Item fields are present in spoiler-free mode.
+    16.4 [x] 8.3 Collected from the logic inventory (task 5): `true` when the inventory counts the vanilla item, `false` when every cell that maps to it was read and says not held, `null` when any such cell is unknown, the item is not mapped in `tracker_logic.toml`, or a shuffled check can also give it (8.3; maintainer review: decided from the shuffled locations' own items, which the settings give, not from the spoiler's placed items). Reuse the TOML mapping (inverted: logic name to cells); no new per-item Python branches (AGENTS.md rule 6 spirit). Fixed tiers of a progressive item count once the chain reaches the tier (proposed by Claude). In a seed's world only the Ocarina keeps fixed tiers (Fairy Ocarina = Ocarina 1, Ocarina of Time = Ocarina 2), so Saria's row counts once the save holds the Ocarina of Time. The native chains count only copies there, so their fixed tiers (Silver and Golden Scale and the rest) are plain items no rule reads, and 8.1 leaves them out. Rows that stay `null` for want of a cell: on BBender's seed 2445192976 four before 8.1's filter (Treasure Chest Game heart, Blue Potion, Goron Bracelet, Magic Bean); on a Chest-only seed three after it (Goron Bracelet, Magic Bean salesman, Talon's milk bottle): Q5 and Q6. Q6 (2026-11-21) maps the Goron Bracelet to Darunia's cutscene flag `HavePlayedEvent.Dm_Goron_0030` while that gift is unshuffled (`[story."Goron Bracelet"]`, `vanilla_at`), leaving two; tests use synthetic saves, and reading it from a real save is unconfirmed until Kareem's tracker test.
+    16.5 [x] 8.3 Marks: vanilla rows with `collected: null` go through the existing mark rules (tasks 7–9); `tracker-mark` accepts their ids; a save-confirmed state drops a mark (4.5).
+    16.6 [x] 8.4 `SeedLogic.annotate` gives open vanilla rows `in_logic` from the same `Search` as the shuffled checks (no extra items, no second search).
+    16.7 [x] 8.5 Vanilla rows are counted in their own area entries; existing area fields unchanged (test compares them with vanilla rows on and off). Built as a top-level `state["vanilla_areas"]` list (same shape as `areas`, plus `in_logic`) instead of a key inside each area, so areas that hold only vanilla rows need no new `areas` entry and the OBS payload stays equal by dropping one key; the tab merges them by area name (Claude).
+    16.8 [x] 8.6 `ui/static/tracker.js|css`: vanilla rows inside their area with a "vanilla" tag; "Show vanilla pick-ups" toggle (default per Q4, localStorage in try/catch as 10.4); "Show only in-logic" applies to them.
+    16.9 [x] 8.7 OBS payload strips vanilla rows and counts; the task-12 test still shows it equal to the pre-feature payload.
+    16.10 [x] 8.8 Synthetic tests (`tests/test_tracker_vanilla_rows.py`): custom world with a non-shuffled gate item (letter-like) and a gated check: row open and in logic, gated check out; save holding the item: row collected, gated check in logic. A vanilla item that a shuffled location's own item also gives yields `collected: null` (the items the spoiler placed are never read). Shuffled-check state equal with and without vanilla rows. Deterministic JSON (P14.a). Maintainer review (2026-11-21): an item no rule reads gets no row (synthetic, and the six fixed native tiers on the real Chest-only world); fixed tiers on the real Ocarina chain.
+    16.11 [x] 8.9 `docs/tracker.md` "In logic" section: vanilla rows, the toggle, and the Ruto's Letter / Jabu-Jabu example.
+    16.12 [ ] 7.3 Format, lint and the full suite pass; the PR description lists D19, Q3, Q4 and a maintainer in-game step: on a Chest-only seed as child with Silver Scale reachable, the tracker shows "LH Underwater Item" open and in logic before the letter is taken and collected after, and Jabu-Jabu's checks turn in logic once the letter is held. Full suite 2026-11-21: 4155 passed, 2 failed, 799 skipped; the two failures (`test_unavailable_logic_leaves_every_existing_field_unchanged`, an empty `vanilla_areas` key added while logic was unavailable) were fixed by leaving the key out, and the tracker tests then passed (128). Format and lint pass. The full suite was not rerun after that fix, nor after the maintainer review's fixes (format, lint and the focused tracker tests pass); the maintainer's full gate runs at merge.

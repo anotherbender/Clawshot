@@ -65,6 +65,9 @@ nothing left to show fold away.
 - **Hearts** count whole hearts; loose Pieces of Heart are not added.
 - **Story steps.** Meeting Zelda (Impa's send-off) and the owl's arrival in Hyrule Field are read from
   the save. Other story steps are worked out from the logic itself.
+- **Goron's Bracelet.** The seed's logic counts the child's Bracelet only from Darunia's gift, so the
+  tracker counts it once the save records the cutscene in which Darunia hands it over, not from a
+  Bracelet found in a chest or from the adult gauntlets.
 - **Unknown fields.** Anything the save cannot show counts as not held, and the tab says so in one line
   naming it: in-logic may then be more cautious than the game.
 
@@ -91,7 +94,27 @@ marks** removes this seed and save folder's marks after asking. They live in
 `~/.config/clawshot`) on Linux. If that file cannot be read, the tracker warns, shows no marks and
 leaves the file alone until you change a mark.
 
-The OBS view shows none of this: no in-logic data and no marks.
+**Vanilla pick-ups.** Some places your seed does not shuffle still hold an item the logic needs.
+Ruto's Letter at the bottom of Lake Hylia is one: until you hold it, Jabu-Jabu's Belly stays out of
+logic. So the tracker also lists these places in their area, tagged **vanilla**, with their usual item
+shown even in spoiler-free mode (your settings decide it, not the seed). They get the same in-logic
+styling, and the area heading counts them separately ("vanilla 0 / 1 · 1 in logic"), leaving the
+seed's own counts unchanged. One counts as collected once the save shows you hold its item (or ever
+had it, for used-up items as above; Saria's Fairy Ocarina also counts once you hold the Ocarina of
+Time). If the save cannot tell, or a shuffled check could also give that item, it shows `?` and you can
+mark it done. A few rows always show `?`, because the save cannot tell which source gave the item: the
+Magic Bean salesman and Talon's bottle of milk when that gift is not shuffled.
+
+Only items that come from that one place, and that your seed's logic uses, are listed. For example:
+songs and trade items when they are not shuffled, the ocarinas, Ruto's and Zelda's Letters, the Gerudo
+card, the Great Fairies' spells, the Fire and Light Arrows, masks, and the stones and medallions the
+logic asks for. Items found in many places, such as Gold Skulltula tokens, silver rupees and ordinary
+Pieces of Heart, are not listed. Neither are items your seed's logic never counts, such as a fixed
+Silver Scale, a wallet or a Great Fairy's magic meter: the logic counts only the upgrades your seed
+shuffles, so those are a bonus. **Show vanilla pick-ups** turns the rows off; the choice is remembered
+in this browser. They need in-logic, so they are hidden when in-logic is unavailable.
+
+The OBS view shows none of this: no in-logic data, no vanilla pick-ups and no marks.
 
 ## Hookshot Play
 
