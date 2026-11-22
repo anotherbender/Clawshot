@@ -45,7 +45,8 @@ def test_time_flows_needs_both_saved_clock_flags(worlds, history, age):
 
 def test_field_arrival_comes_before_zelda_without_items_and_night_waits_for_the_sendoff(worlds):
     world = worlds["Hyrule Field"]
-    night = world.locations["Market Lost Dog"]
+    # A child night check with no other gate (Richard also needs the Kakariko gate opened, round 21).
+    night = world.locations["Market Night Balcony Wonderitem 1"]
     search = Search(world)
     assert search.holds(ARRIVAL)  # the child field route alone: no Forest completion, no optional item
     assert not search.holds(SENDOFF)

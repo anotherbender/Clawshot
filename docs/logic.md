@@ -274,6 +274,12 @@ requires Dodongo's completion and available night. Sources: `remake/child_hyrule
 Kareem verified Saria before Darunia and the Step03 escape/reload controls on Longshot on
 2026-11-13; Bombchu Shop's entrance correction remains native-data evidence.
 
+**Richard and Cojiro (round 21).** Richard the Lost Dog's Heart Piece also requires `Kakariko Village Gate Open`:
+the findable Richard exists only after the Kakariko gate guard has read Zelda's Letter; before that the owner keeps
+him (at night both stay in her back-alley house, as Kareem saw). Static event-data evidence, a tightening, not played
+([round 21 npcs](../plans/rounds/r21-npcs.md)). `Cojiro Access` also requires `Epona`: Kareem found in game that
+woken adult Talon stays until Epona is freed from Ingo. Sources: `remake/child_market.toml`, `remake/gifts.toml`.
+
 **Song lessons and no-instrument safety.** Logic conservatively requires an Ocarina for all twelve
 `Dm_MelodyGet_*` checks: either instrument at either age. Kareem reproduced the old no-ocarina Minuet
 softlock and passed its Ocarina control on
