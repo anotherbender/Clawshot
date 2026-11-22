@@ -49,17 +49,20 @@ those records were checked on.
 ## Checks
 
 The **Checks** tab lists each area's checks by name; their rewards stay hidden unless spoiler mode is
-on. Areas flow in two or three columns, depending on the window's width. Click an area's name to fold
-it away; **Collapse all** and **Expand all** do every area, and the folded areas are remembered in this
-browser. Point at a check (or move to it with ↑ ↓) and the right-hand panel shows our own directions to
-it, how your save tracks it, and whether it is in logic and why.
+on. Under an area's heading a check's name drops the area part ("Lake Hylia: ", "LH GS " becomes
+"Skulltula: "). Areas flow in two or three columns, depending on the window's width. Click an area's
+name to fold it away; **Collapse all** and **Expand all** do every area, and the folded areas are
+remembered in this browser. Point at a check (or move to it with ↑ ↓) and the right-hand panel shows its
+full name, our own directions to it, how your save tracks it, and whether it is in logic and why
+(including any items the save could not read, which count as not held).
 
-Each check's look shows its state; the legend above the list repeats it. A filled green dot is
-collected (your save shows it), a filled amber dot is marked done by you, a ring is open: green and
-highlighted when in logic, dimmed when out of logic. A dashed ring means your save can't show that
-check, so you mark it yourself (below). Every open check (not collected and not marked done) is shown
-**in logic** when the seed's own logic says you can reach it with what your save holds, or **out of
-logic** otherwise. Each area heading counts its finished checks and "N in logic".
+Each check's look shows its state; the one-line legend above the list repeats it (hover a word for
+more). A filled green dot is collected (your save shows it), a filled amber dot is marked done by you,
+a ring is open: green and highlighted when in logic, dimmed when out of logic. A square instead of a ring
+means your save can't show that check, so you mark it yourself (below). Every open check (not collected
+and not marked done) is shown **in logic** when the seed's own logic says you can reach it with what
+your save holds, or **out of logic** otherwise. Each area heading counts its finished checks and "N in
+logic".
 
 **Show** chooses the rows: **All checks** (the default), **Open checks** (collected and marked checks
 leave the list) or **Open and in logic**. Areas with nothing left to show fold away, and **Hide finished
@@ -82,9 +85,11 @@ can be marked.
   the save. Other story steps are worked out from the logic itself.
 - **Goron's Bracelet.** The seed's logic counts the child's Bracelet only from Darunia's gift, so the
   tracker counts it once the save records the cutscene in which Darunia hands it over, not from a
-  Bracelet found in a chest or from the adult gauntlets.
-- **Unknown fields.** Anything the save cannot show counts as not held, and the tab says so in one line
-  naming it: in-logic may then be more cautious than the game.
+  Bracelet found in a chest or from the adult gauntlets. Confirmed on real saves: Kareem's Longshot saves
+  from just before and just after Darunia's dance (2026-11-13) read the Bracelet as not held, then held, and
+  the vanilla **Darunia's Dance** row as open, then collected (round 21, `plans/rounds/r21-checks.md`).
+- **Unknown fields.** Anything the save cannot show counts as not held, and the side panel's **In logic**
+  row names it for the check you point at: in-logic may then be more cautious than the game.
 
 **In logic for**, beside the list, chooses the age: **Either age** (the default: a check counts when either age can reach
 it, as the seed's logic does), **Follow save**, **Child** or **Adult**. Follow save reads the save's
@@ -97,7 +102,7 @@ and whose every location is in this version's world. Otherwise the age control a
 out with the reason, and the rest of the tracker works as before. A save, not live play, is read: pick
 something up and save before it counts.
 
-**Marking checks done.** Some checks the save cannot show (dashed ring): shop items, a few gifts, some
+**Marking checks done.** Some checks the save cannot show (a square): shop items, a few gifts, some
 floor pickups. Click such a check once you have it, so it leaves the open list; click it again to undo.
 If **Open checks** hid a check you clicked by mistake, switch to **All checks** and click it again. A
 marked check shows as marked by you, not as collected, never adds its item to what you hold, and keeps
@@ -131,7 +136,7 @@ shown even in spoiler-free mode (your settings decide it, not the seed). They ge
 styling, and the area heading counts them with the area's own checks. One counts as collected once
 the save shows you hold its item (or ever had it, for used-up items as above; Saria's Fairy Ocarina
 also counts once you hold the Ocarina of
-Time). If the save cannot tell, or a shuffled check could also give that item, it shows a dashed ring and
+Time). If the save cannot tell, or a shuffled check could also give that item, it shows a square and
 you can mark it done. A few rows always need marking, because the save cannot tell which source gave the item: the
 Magic Bean salesman and Talon's bottle of milk when that gift is not shuffled.
 
@@ -186,7 +191,8 @@ even while the app tab's spoiler mode is on.
 3. In OBS add a **Browser Source** and use that URL. Groups stack vertically in a narrow block.
    Four columns is the default: about 340 pixels wide with labels, suitable for a side overlay.
    Start at 350×3000 with labels, or 250×1700 without, then crop/scale or increase columns to fit
-   your scene. Text fallbacks can increase height. Check save/seed warnings in the app tab.
+   your scene. Text fallbacks can increase height. The OBS view never shows warnings: check save/seed
+   warnings in the app's Tracker tab.
    The surface has no controls and follows the same seed/save/slot as the app tracker.
 4. Disable OBS's shutdown-when-not-visible option if you want continuous refresh while hidden.
 

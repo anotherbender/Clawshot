@@ -32,7 +32,8 @@ yet (see "Skip" below).
 2. **States without prefixes.** Rows lost the `✓ ☑ — ?` prefixes and the Mark done / Unmark buttons. Each row is a
    button with a CSS-only marker (no font glyphs or art): filled green = collected (save), filled amber = marked
    done by you, struck grey = skipped by you, green ring = open in logic, dim ring = open out of logic, dashed ring
-   = the save can't show it. A legend above the list says the same in words and how clicking works. Clicking a
+   = the save can't show it (a square since the review fixes, below). A legend above the list says the same in
+   words. Clicking a
    row the save can't read (`markable`, PR #39's field, falling back to `collected == null` before #39) marks it
    done; clicking again undoes. Rows the save reads are clickable only when the entry says `skippable`, and then
    send `{check, marked, kind: "skip"}` (contract below). Marks still go through `tracker-mark` and the existing
@@ -54,6 +55,25 @@ yet (see "Skip" below).
      before, 0 after) with one "No save yet" line. With a save, a genuinely unread field stays dashed with `?`.
    - Missing items carry no tier/count badges (the stray "0" tier badges), and a held-keys badge of 0 is gone; with
      an icon, the key cell's found/total moved into its bottom-left corner so key cells are as tall as the others.
+
+## Review fixes (Claude, 2026-11-22, after the first `shots/after`)
+
+1. **Side panel:** on the Checks screen the workspace becomes `minmax(0, 1fr) 390px` (CSS `:has(#checks:not([hidden]))`,
+   above 700 px wide only); the side panel never scrolls with the list. The list's columns are `380px 3`: 2 at 1280
+   (826 px of list), 3 at 1920, measured.
+2. **Row names:** under an area heading a row drops the area's name or its OoT Randomizer code ("Bottom of the
+   Well: ", "Bottom of the Well ", "LH ", "Kak ", "OGC "; apostrophes and hyphens loose), and a leading `GS` becomes
+   "Skulltula: ", so "LLR GS Tree" and "Lake Hylia: Island Gravestone Grotto Chest" read "Skulltula: Tree" and
+   "Island Gravestone Grotto Chest". A code only strips in its own area. The side panel title keeps the full name.
+3. **Legend and notes:** one line, a marker and a word each (Collected, Marked, [Skipped], In logic, Out of logic,
+   Mark by hand), the longer meaning on hover; the click explanation moved to the side panel's idle text. The
+   "may be conservative: the save could not read ..." list moved into the side panel's In logic row (full list).
+4. **OBS warnings:** none, ever: the controller empties `warnings` in the OBS snapshot and tracker.js never draws
+   them on the OBS page; they stay on the Tracker tab. A missed OBS poll no longer prints the raw "Failed to
+   fetch" (seen once in a reshoot): OBS keeps its last view and says "Tracker connection lost" only after three
+   missed polls in a row.
+5. **Mark-by-hand marker:** a 12 px square instead of a dashed ring, coloured by logic like the rings; at the
+   1920 shot scaled to 1568 px wide (about a 1080p stream's 0.8) squares and rings stay distinct.
 
 ## Skip (Kareem: "a windmill rupee, a vanilla graveyard heart piece he doesn't want")
 
@@ -132,7 +152,12 @@ second click unmarked it.
 ## Checks run
 
 - Focused, outside the lock: `CLAWSHOT_WORKERS=1 uv run --with pytest-xdist pytest -q -n 2 tests/test_tracker_*.py
-  tests/test_ui.py`: 251 passed, 1 skipped.
+  tests/test_ui.py`: 251 passed, 1 skipped; after the review fixes 253 passed, 1 skipped. Screenshots reshot
+  after the review fixes into the same `shots/after/` paths (plus `obs-mid-labels-top.png`, the OBS header crop).
 - `uv run ruff format --check`, `uv run ruff check`: clean on the changed tests.
 
 Not yet: the skip backend (after MAIN MOVED for #39), the rebase onto it and the full gate.
+
+`docs/tracker.md` also records cs21g's confirmation of the Goron Bracelet read on Kareem's real before/after
+saves (Claude's request; evidence in `plans/rounds/r21-checks.md` and `work/r21-checks/darunia/`). The guide had
+no "unconfirmed" wording for it; the confirmation is added to the Goron's Bracelet bullet.
