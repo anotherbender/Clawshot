@@ -456,6 +456,8 @@ def _fill_restrictive(
     shop_refills: int = 0,
     stage: str = "progression",
     natives_first: bool = False,
+    first: frozenset[str] = frozenset(),
+    later: list[str] | None = None,
 ) -> int:
     """OoT Randomizer ``fill_restrictive``: take items from the end of ``items``; put each in a location that is
     reachable holding ``assumed``, the items still to place and whatever the placements so far give.
@@ -463,14 +465,22 @@ def _fill_restrictive(
     Items with a native shop display are taken last, leaving chests to items that can only go there, unless
     ``natives_first``: the progression stage takes them first, while the other shield can still open the way past
     Mido. Taken last, the second shield found every chest before Mido full (Chest+Shop: 11 of 130 failed attempts).
+    Then the ``first`` items, before the rest of the stage, while the most is still assumed and reachable.
+
+    Given the ``later`` stages' items, chests are kept for the items only a chest takes: once the empty chests are no
+    more than those items, here and later, any other item goes elsewhere when it can. Native displays keep their own
+    shop reserve above.
 
     An item with no reachable location left swaps into one this call filled before (:func:`_swap`); the displaced
     item goes back to be placed next, under the same rules."""
     native = world.settings.get("native_shop_items", ()) if "Shop" in settings.shuffle else ()
     # Reserve only the slots needed by remaining refills, not every shop slot.
-    items.sort(key=lambda name: (not world.items[name].priority, (name in native) == natives_first))
+    items.sort(key=lambda name: (not world.items[name].priority, (name in native) == natives_first, name in first))
     filled: list[str] = []
     swaps: dict[str, int] = {}
+    if later is not None:
+        bound = _chest_bound(world, settings, locations, [*items, *later])
+        later_bound = sum(item in bound for item in later)
     while items:
         item = items.pop()
         search = Search(world, [*assumed, *items])
@@ -483,6 +493,10 @@ def _fill_restrictive(
             )
             preferred = "Chest" if reserve and settings.item_location_types.get(item) != ("Shop",) else "Shop"
             candidates.sort(key=lambda name: world.locations[name].type != preferred)
+        elif later is not None and item not in bound:
+            chests = sum(world.locations[name].type == "Chest" for name in locations)
+            if chests <= later_bound + sum(name in bound for name in items):
+                candidates.sort(key=lambda name: world.locations[name].type == "Chest")
         spot = next((name for name in candidates if search.can_access(world.locations[name])), None)
         if spot is not None:
             locations.remove(spot)
@@ -510,6 +524,12 @@ def _fill_restrictive(
 
 def _is_shop_refill(settings: Settings, item: str) -> bool:
     return item.startswith("Buy ") and settings.item_location_types.get(item) == ("Shop",)
+
+
+def _chest_bound(world: World, settings: Settings, locations: list[str], items: list[str]) -> set[str]:
+    """The ``items`` no empty location but a chest may take."""
+    others = [name for name in locations if world.locations[name].type != "Chest"]
+    return {item for item in dict.fromkeys(items) if not any(allowed(world, settings, name, item) for name in others)}
 
 
 def _swap(
@@ -1157,10 +1177,15 @@ def fill(
     )
     _fill_bomb_ammo(world, settings, rng, placements, locations, unrestricted)
     progression = [item for item in unrestricted if world.items[item].progression]
-    shop_refills = _fill_restrictive(
-        world, settings, rng, placements, locations, progression, [], shop_refills, "progression", True
-    )
+    # Tokens held to chests and Skulltulas go first, while those are still reachable everywhere: placed in seeded
+    # order among the rest, the last copies found every reachable chest and Skulltula taken by earlier copies, with
+    # only gifts, songs and scrubs left to them (round 20: 4 of 9 failed first attempts of 200 broad seeds).
+    first = frozenset(item for item in token_held if set(held[item]) <= {"Chest", "Token"})
     filler = [item for item in unrestricted if not world.items[item].progression]
+    # The filler's maps and compasses still need chests; flexible progression took the last ones in 4 of round 20's 9.
+    shop_refills = _fill_restrictive(
+        world, settings, rng, placements, locations, progression, [], shop_refills, "progression", True, first, filler
+    )
     _fill_token_filler(world, settings, rng, placements, locations, filler)
     priority = [item for item in filler if world.items[item].priority]
     rest = [item for item in filler if not world.items[item].priority]
