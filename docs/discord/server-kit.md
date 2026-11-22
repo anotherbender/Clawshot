@@ -178,7 +178,7 @@ not yet player-accepted; its staged check uses Longshot. See the [README](../../
 New games initialize an empty nut slot (0/20); child Bow first followed by Boomerang use without a
 reload passed Kareem's 2026-11-12 check. Saves started with older builds are unchanged: after an
 age-unusable pickup, Save and Continue before using other items; changing areas does not clear that jam.
-Known issues: ocarinas from chests have no model despite working; songs may use a stand-in. Hookshot 2.0.12+
+Known issues: songs may use a stand-in model; Saria's own ocarina can look doubled in her farewell (cosmetic). Hookshot 2.0.12+
 loads seeds as mods, not through the crashing overlay route; Hookshot 2.1.0 text uses Switch icons.
 Play also supports Longshot (https://longshot.magicbean.dev/download). Its v3.0.0-rc.2 app check passed
 on 2026-11-13, including game options, Xbox prompts, shuffled rewards and save/reload.
