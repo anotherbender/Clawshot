@@ -59,7 +59,10 @@ RULES_TOML = Path(__file__).with_name("gift_rules.toml")
 SWAP, REWRITE, MORE = "swap", "rewrite", "more"
 CLASSES = (SWAP, REWRITE, MORE)
 FLAG_PREFIX = "Clawshot.Gift."
-FIELDS = {"class", "gate", "given", "flag", "skip", "reason", "writes", "once", "purchase"}
+FIELDS = {"class", "gate", "given", "flag", "skip", "reason", "writes", "once", "purchase", "track"}
+# Tracker-only native once-flags (spec tracker-auto-checks D1, D6): the patch never reads them.
+TRACK_KINDS = ("bool", "played", "quest")
+TRACK_FIELDS = {*TRACK_KINDS, "step", "source", "accepted", "played_by"}
 
 GAME_DATA_ACTOR = "GameDataActor"
 READ_QUERY = "EventQueryIsGameDataBool"
@@ -116,6 +119,21 @@ class GiftPatchError(PatchError):
 
 
 @dataclass(frozen=True)
+class TrackEntry:
+    """A native flag the tracker reads to see that a gift was given (spec tracker-auto-checks D1, D6).
+
+    ``bool`` reads the saved Bool ``name``, ``played`` reads ``HavePlayedEvent.<name>``, ``quest`` reads the enum
+    ``Step_<name>`` against ``step``. ``accepted`` only after a recorded maintainer run (``played_by``, D2)."""
+
+    kind: str
+    name: str
+    step: str | None
+    source: str
+    accepted: bool
+    played_by: str | None
+
+
+@dataclass(frozen=True)
 class Rule:
     check: str  # the world check name (OoTR or remake-only)
     cls: str
@@ -127,12 +145,59 @@ class Rule:
     writes: tuple[str, ...] = ()  # vanilla IsGet writes redirected to an existing check-completion flag
     once: tuple[str, ...] = ()  # equipped-shield queries replaced by saved check-completion queries
     purchase: bool = False  # specialize a native sale and save completion only after its grant
+    track: tuple[TrackEntry, ...] = ()  # tracker only; the patch ignores it (D1)
+
+
+def _nonempty(value: object) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _track(check: str, value: object) -> tuple[TrackEntry, ...]:
+    if not isinstance(value, list) or not value:
+        raise GiftPatchError(f"{check}: track must be a list of one or more entries")
+    out = []
+    for entry in value:
+        if not isinstance(entry, dict):
+            raise GiftPatchError(f"{check}: track entry {entry!r} is not a table")
+        unknown = set(entry) - TRACK_FIELDS
+        if unknown:
+            raise GiftPatchError(f"{check}: unknown track fields {sorted(unknown)}")
+        kinds = [kind for kind in TRACK_KINDS if kind in entry]
+        if len(kinds) != 1:
+            raise GiftPatchError(f"{check}: a track entry needs exactly one of {TRACK_KINDS}, not {kinds}")
+        kind = kinds[0]
+        if not _nonempty(entry[kind]):
+            raise GiftPatchError(f"{check}: track {kind} must be a non-empty name")
+        step = entry.get("step")
+        if kind == "quest" and not _nonempty(step):
+            raise GiftPatchError(f"{check}: a track quest needs a step")
+        if kind != "quest" and "step" in entry:
+            raise GiftPatchError(f"{check}: step belongs only to a quest track entry")
+        if not _nonempty(entry.get("source")):
+            raise GiftPatchError(f"{check}: a track entry needs a non-empty source")
+        accepted = entry.get("accepted")
+        if type(accepted) is not bool:
+            raise GiftPatchError(f"{check}: track accepted must be a Bool")
+        played_by = entry.get("played_by")
+        if played_by is not None and not _nonempty(played_by):
+            raise GiftPatchError(f"{check}: track played_by must be a non-empty string")
+        if accepted and played_by is None:
+            raise GiftPatchError(f"{check}: an accepted track entry needs played_by (who, which build, date)")
+        out.append(TrackEntry(kind, entry[kind], step, entry["source"], accepted, played_by))
+    return tuple(out)
 
 
 def _ref(check: str, value: object) -> str:
     if not isinstance(value, str) or value.count("/") != 1 or not all(value.split("/")):
         raise GiftPatchError(f"{check}: {value!r} is not '<flow>/<event>'")
     return value
+
+
+def _adds_flag(check: str, rule: Rule) -> bool:
+    """Whether the patch adds a ``Clawshot.Gift.*`` flag for this rule (:attr:`GiftChange.new_flag` at load time)."""
+    return rule.flag is None and bool(
+        rule.given or rule.once or rule.purchase or check in GALLERY_EXPERT_CHECKS.values()
+    )
 
 
 def loads(text: str) -> dict[str, Rule]:
@@ -155,6 +220,7 @@ def loads(text: str) -> dict[str, Rule]:
             tuple(_ref(check, r) for r in entry.get("writes", [])),
             tuple(_ref(check, r) for r in entry.get("once", [])),
             entry.get("purchase", False),
+            _track(check, entry["track"]) if "track" in entry else (),
         )
         if type(rule.purchase) is not bool:
             raise GiftPatchError(f"{check}: purchase must be a Bool")
@@ -170,6 +236,14 @@ def loads(text: str) -> dict[str, Rule]:
             raise GiftPatchError(f"{check}: writes need an existing per-check event completion flag")
         if cls == MORE and not rule.reason:
             raise GiftPatchError(f"{check}: class {MORE!r} needs a reason")
+        if rule.track:
+            # 1.2: the tracker already reads these; a second, native record would be a competing source.
+            if cls == MORE:
+                raise GiftPatchError(f"{check}: class {MORE!r} is never shuffled, so it has no track")
+            if rule.flag is not None:
+                raise GiftPatchError(f"{check}: track beside a flag ({rule.flag}); the tracker reads the flag")
+            if _adds_flag(check, rule):
+                raise GiftPatchError(f"{check}: track on a check with an added {FLAG_PREFIX}* flag")
         rules[check] = rule
     return rules
 
