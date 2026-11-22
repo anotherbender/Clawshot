@@ -303,8 +303,9 @@ With `--shuffle Chest Gift`, `--songs song` (default) keeps songs on song checks
 `--songs anywhere` releases all twelve for chest placement, subject to other destination restrictions.
 Storms, Minuet and Epona have been played from chests; the rest use the shared grant path but are
 **inferred, not individually verified**. Songs can show a stand-in model. Both chest ocarinas work
-and show their model in small and big chests (played 2026-11-22, `plans/chest-ocarina-model.md`); the
-Ocarina of Time plays songs. Din's Fire and Adult's Wallet have chest evidence.
+and show their model in small and big chests (played by BBender and Claude on Longshot v3.1.1,
+2026-11-22, `plans/chest-ocarina-model.md`); the Ocarina of Time plays songs. Din's Fire and Adult's
+Wallet have chest evidence.
 Other gift actors remain subject to the sourced chest allowlist and destination holds, not blanket
 permission for every gift to go in a chest. Authoritative restrictions: `data/settings.toml`.
 

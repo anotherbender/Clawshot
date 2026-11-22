@@ -3808,8 +3808,9 @@ as ungrantable and spoke protocol 2), so its bridge never ran the magic, ocarina
 
 ## 50. Chest ocarinas: why the get model was missing (2026-11-22)
 
-Found in game by Claude with BBender (Longshot v3.1.1 control bridge, dump 1.1.1); not implemented yet. Full
-evidence, run table, implementation notes and checklist: `plans/chest-ocarina-model.md`.
+Found in game by Claude with BBender (Longshot v3.1.1 control bridge, dump 1.1.1); implemented in every seed by PR #40
+(`patch/getitem.py` `ocarina_changes`). Full evidence, run table, implementation notes and checklist:
+`plans/chest-ocarina-model.md`.
 
 The model shows (and spins, lying flat like the inventory view) only with **both** changes: `RSDB/ActorInfo` loses
 `CalcPriority: After` on the two `Item_Ocarina_*` rows, and each ocarina pack gets `EventPerformerRef` →
@@ -3828,5 +3829,8 @@ the per-entry rule (proposed by Claude) on 2026-11-22. It is `rstb.ANIMATION_PAR
 **Saria's farewell prop** (BBender with Claude, 2026-11-22, Longshot v3.1.1, runs in `plans/chest-ocarina-model.md`):
 without `CalcPriority` on `Item_Ocarina_Fairy`, Saria's own ocarina `Dm_Item_Ocarina_Fairy_Saria` (no `CalcPriority`
 natively; model project `Item_Ocarina_Fairy`, shared with the instrument) is drawn wrong in `Dm_Kokiri_0155` until she
-takes it from her back. Isolated to the ActorInfo change (the pack changes alone do not do it); giving the prop's row
-`CalcPriority: After` removes it, so the generator does that too.
+takes it from her back. Isolated to the ActorInfo change (the pack changes alone do not do it). Giving the prop's row
+`CalcPriority: After` (the generator does) was clean only when the Fairy Ocarina had been taken from a chest earlier
+in the same session (runs V3, E); the native farewell, where the gift is the first Fairy Ocarina, still glitched with
+it (runs D, D2: two ocarinas overlapping, then hers doubled). Shipped as a known cosmetic issue (BBender's call, D5);
+`skip_saria_farewell` avoids the movie.

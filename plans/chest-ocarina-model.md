@@ -3,8 +3,8 @@
 Investigation by Claude with BBender, 2026-11-22. Clawshot `main` at `b3cd3b8`, dump 1.1.1 (update v131072),
 Longshot v3.1.1 (source `63363428`). Claude drove the game through Longshot's control bridge with BBender's
 permission for this investigation, and BBender watched the window. Observations marked *(BBender)* are BBender's. Every
-other claim is backed by the screenshots listed under "Evidence". Nothing is implemented yet. This file is the
-handoff for the implementation.
+other claim is backed by the screenshots listed under "Evidence". Written as the handoff for the implementation; the
+implementation (feature `ocarina-get-model`, PR #40) and its in-game results follow under "Implementation decisions".
 
 ## The problem
 
