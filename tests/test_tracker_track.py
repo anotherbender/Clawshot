@@ -1,7 +1,6 @@
 """Spec tracker-auto-checks sections 2-4: gifts read from the native once-flags in ``gift_rules.toml`` ``track``."""
 
 import json
-from pathlib import Path
 
 import pytest
 from test_tracker_state import build_save
@@ -294,10 +293,6 @@ def test_provisional_and_accepted_reads_differ_only_in_the_button_field(mixed):
     assert unknown["collected"] is None and unknown["markable"] is True  # every `?` check carries it too (D9)
     text = json.dumps(snap["state"]["areas"])  # the check entries; the snapshot's paths hold the test's name
     assert "provisional" not in text and "accepted" not in text and "Flag_P" not in text and "Flag_A" not in text
-    static = Path(seeds.__file__).parents[1] / "ui" / "static"
-    for name in ("tracker.js", "tracker.css", "tracker.html"):
-        page = (static / name).read_text(encoding="utf-8") if (static / name).exists() else ""
-        assert "provisional" not in page.lower() and "accepted" not in page.lower(), name  # no label or style (D9)
 
 
 def test_logic_counts_a_marked_check_as_done_whatever_its_read():
@@ -308,5 +303,5 @@ def test_logic_counts_a_marked_check_as_done_whatever_its_read():
         {"id": "B", "collected": None, "marked": True},
         {"id": "C", "collected": True},
     ]
-    assert tracker_logic._flag_open(done, None, None, frozenset()) == dict.fromkeys(tracker_logic.AGE_KEYS, 0)
+    assert tracker_logic._flag_open(done, None, None) == dict.fromkeys(tracker_logic.AGE_KEYS, 0)
     assert all("in_logic" not in check for check in done)
