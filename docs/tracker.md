@@ -185,14 +185,14 @@ even while the app tab's spoiler mode is on.
 ## OBS Browser Source
 
 1. Configure the Tracker tab and keep Clawshot running.
-2. Choose **OBS columns** (1–8), **OBS item labels**, **OBS dungeon names**, the **OBS
-   items/quest/dungeons** checkboxes and **Transparent OBS background**, then **Copy URL**.
+2. Choose **OBS item labels**, **OBS columns** (Auto or 1–8), **OBS dungeon names**,
+   **Transparent OBS background** and, under **OBS shows**, the sections to show, then **Copy URL**.
    These OBS-only controls do not change the in-app tracker layout.
-3. In OBS add a **Browser Source** and use that URL. Groups stack vertically in a narrow block.
-   Four columns is the default: about 340 pixels wide with labels, suitable for a side overlay.
-   Start at 350×3000 with labels, or 250×1700 without, then crop/scale or increase columns to fit
-   your scene. Text fallbacks can increase height. The OBS view never shows warnings: check save/seed
-   warnings in the app's Tracker tab.
+3. In OBS add a **Browser Source** and use that URL. Sections stack vertically in a narrow block.
+   The default view has no item labels: about 260 pixels wide and under 1000 tall with dungeon keys,
+   the collection line, items, and stones and medallions, so it fits beside a 1080p game. With item
+   labels it is about 340 wide and 1850 tall. Text fallbacks can increase height. The OBS view never
+   shows warnings: check save/seed warnings in the app's Tracker tab.
    The surface has no controls and follows the same seed/save/slot as the app tracker.
 4. Disable OBS's shutdown-when-not-visible option if you want continuous refresh while hidden.
 
@@ -202,15 +202,16 @@ on the network: the server binds only `127.0.0.1` on a random port, keeps its Ho
 and makes no external requests. OBS must run on the same computer.
 
 The URL fragment defaults to
-`columns=4&labels=1&icons=1&transparent=0&names=short&sections=items,quest,dungeons`.
-`columns` accepts whole numbers 1–8; missing/invalid values use four. Copy the updated URL into
-OBS after changing controls. Cells have a faint outline and no tile behind them. With labels off,
-successfully loaded icons sit in close cells: top-left badges show upgrade tiers and bottom-right
-badges show counts (bottles, ammo, rupees or magic capacity). Greyed-out items are not held and
-carry no badge; dashed cells and `?` mean the save could not show that field. Before the first save
-every item is simply greyed out, under one short "No save yet" line.
-Heart, piece, token and Skulltula check counts stay visible. Names/details remain available as tooltips and
-accessible labels. Without a usable item icon, text stays visible even with labels off.
+`labels=0&icons=1&transparent=0&names=short&sections=dungeons,collection,items,rewards`; `labels=1`
+asks for labelled cells. `columns` accepts whole numbers 1–8; missing/invalid values (the app's
+**Auto**) use six without labels and four with them. Copy the updated URL into OBS after changing
+controls. Cells have a faint outline and no tile behind them. A held item is bright, a missing one is
+dimmed; no caption says "held" or "not held". Captions appear only for tiers and counts (with labels)
+and as badges without labels: top-left for upgrade tiers, bottom-right for counts (bottles, ammo,
+rupees or magic capacity). Dashed cells and `?` mean the save could not show that field. Before the
+first save every item is simply dimmed, under one short "No save yet" line. Names and the full state
+remain available as tooltips and accessible labels. Without a usable item icon, text stays visible
+even with labels off.
 
 Compact quest cells use flat CSS, not game art: songs are `ZL`, `Ep`, `Sa`, `Su`, `SoT`, `SoS`,
 `Min`, `Bol`, `Ser`, `Req`, `Noc`, `Pre`, `Scr`; stones are `Kok`, `Gor`, `Zor`.
@@ -218,10 +219,10 @@ Medallions are circles: forest green, fire red, water blue, shadow purple, spiri
 light yellow. Missing holdings use the same grey-out. Full names remain in tooltips and accessible
 labels. Single-tier entries never display a tier number, in either the tab or OBS.
 
-With labels off, OBS hides the heading's extra text, warning paragraphs and **Checks by area** (a
-per-area count; with labels on it stays). Normal following needs no status line; waiting/unavailable
-states show one short line. The app keeps its status and warnings on the Tracker tab and the check
-list on the Checks tab. Use the Tracker tab to inspect compatibility/read warnings.
+Without labels, OBS hides the heading, the section titles and warning paragraphs. Normal following
+needs no status line; waiting/unavailable states show one short line, and a single missed update
+changes nothing (after three in a row it says "Tracker connection lost"). The app keeps its status and
+warnings on the Tracker tab and the check list on the Checks tab.
 
 Each dungeon row shows only the items that dungeon has in this seed: no boss key at the Deku Tree,
 no small-key cell where the seed holds none, no map or compass where there is none; an empty slot
@@ -234,19 +235,21 @@ out when missing. Hover for the full description; unknown flags show `?`. With i
 unavailable, each indicator uses its name and saved value instead. Collection counts stay visible
 with item labels off.
 
-`sections` accepts comma-separated `items`, `quest` and `dungeons`. Quest includes hearts/tokens/Skulltula checks,
-songs, stones and medallions; Items includes inventory and equipment. Missing, empty or any unknown
-section value shows all. The original group order is preserved, not the order typed in the URL.
-Clearing the last section checkbox restores all three. Partial views omit **Checks by area**;
-the app tab always keeps every group.
+`sections` accepts comma-separated `dungeons`, `collection` (hearts, pieces, tokens and Skulltula
+checks), `items`, `songs`, `rewards` (stones and medallions) and `areas` (**Checks by area**, a
+spoiler-free count per area). `quest`, from older URLs, means collection, songs and rewards. Missing,
+empty or any unknown section value shows the defaults (`dungeons,collection,items,rewards`); songs add
+about 120 pixels without labels, and Checks by area is off unless asked for. The original order is
+kept, not the order typed in the URL. Clearing the last section checkbox restores the defaults; the
+app tab always keeps every group.
 
 ### Two browser sources for a 1080p stream
 
-1. Choose four columns, turn **OBS item labels** off, and leave **Local item icons** on.
-2. Check only **OBS dungeons**, **Copy URL**, and use it for the first Browser Source
-   (`sections=dungeons`).
-3. Check only **OBS items** and **OBS quest**, copy that URL, and use it for the second source
-   (`sections=items,quest`). Place the sources side by side; both follow the same seed/save.
+1. Leave **OBS item labels** off and **Local item icons** on.
+2. Under **OBS shows** check only **Dungeon keys**, **Copy URL**, and use it for the first Browser
+   Source (`sections=dungeons`).
+3. Check only **Collection**, **Items**, **Songs** and **Stones & medallions**, copy that URL, and use it
+   for the second source. Place the sources side by side; both follow the same seed/save.
 
 Start each source at **290×1080**. Increase columns if text fallbacks make a part taller.
 Changing checkboxes updates the copied URL, not URLs already configured in OBS; paste each new URL

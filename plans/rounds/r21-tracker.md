@@ -75,6 +75,39 @@ yet (see "Skip" below).
 5. **Mark-by-hand marker:** a 12 px square instead of a dashed ring, coloured by logic like the rings; at the
    1920 shot scaled to 1568 px wide (about a 1080p stream's 0.8) squares and rings stay distinct.
 
+## Overlay pass (Claude's re-review: the overlay was still the bulky part)
+
+Claude's direction (Kareem unsure a checks overlay is needed): Checks by area stays an opt-in section, default off,
+no further polish; the effort goes to the items view.
+
+- **Sections switchable:** `sections=` now takes `dungeons`, `collection`, `items`, `songs`, `rewards`, `areas`
+  (`quest` from older URLs means collection, songs, rewards); the Tracker tab has an **OBS shows** row with one
+  checkbox each. Defaults: `dungeons,collection,items,rewards` (songs and Checks by area opt-in; my pick to hit
+  the size, see the question below).
+- **Compact is the default view** (`labels=1` asks for labels; the app's OBS item labels box starts unchecked).
+  **OBS columns** gains **Auto** (omitted from the URL): 6 without labels, 4 with them. Compact drops the heading
+  and section titles, cells 38 px (icons 30), dungeon key cells 34 px (icons 28).
+- **No "Not held"/"Held" captions** on any tile (OBS and the Tracker tab): a held tile is bright, a missing one
+  dimmed; captions only for tiers and counts ("Tier 1", "30", "2 bottles"); the full state stays in the tooltip
+  and accessible name.
+
+Sizes (`shots/after/metrics.json`, CSS px, synthetic mid save, icons on):
+
+| View | Before (main) | After |
+|---|---|---|
+| Compact, default sections (`obs-mid-default.png`) | 280 x 1914 (all groups) | 259 x 964 |
+| Compact, everything on incl. songs and Checks by area (`obs-mid-all.png`) | 280 x 1914 (no areas) | 259 x 1866 |
+| Labelled, default sections (`obs-mid-labels.png`) | 337 x 3440 | 337 x 1853 |
+| Labelled, everything on (`obs-mid-labels-all.png`) | 337 x 3440 | 337 x 2839 |
+| Compact before any save (`obs-empty-default.png`) | 280 x 1933, 126 `?` | 259 x 970, 0 `?` |
+
+Per section without labels: dungeon keys 456, collection 48, items 348, songs 114, stones and medallions 75 (each
+measured alone, minus the 16 px padding); songs on by default would make the compact view 1085.
+
+- **Overlay default sections: songs off by default keeps the compact view at 259 x 964; with songs it is 259 x
+  1085. Which do you want?**
+- **Compact (no labels) as the default overlay (built), or labelled?**
+
 ## Skip (Kareem: "a windmill rupee, a vanilla graveyard heart piece he doesn't want")
 
 Proposal posted 16:39; Claude approved it at 16:40 and moved ownership of `tracker/state.py`, `marks.py`,
@@ -138,16 +171,17 @@ Folders: `E:/OOTRemake/work/r21-tracker/shots/before/` and `.../shots/after/` (P
 | Tracker tab with save, 1280 / 1920 | `mid-1280-tracker-top.png`, `mid-1920-tracker-top.png` | same names |
 | Check list with save, 1280 / 1920 | `mid-1280-checks.png`, `mid-1920-checks.png` | same, plus `-checks-detail.png` |
 | Click to mark, Open checks + Hide finished + a folded area | | `mid-1280-checks-marked.png`, `mid-1280-checks-open-collapsed.png` |
-| OBS, no save, labels 340 px / compact 300 px | `obs-empty-labels.png`, `obs-empty-compact.png` | same names |
-| OBS with save: labels, compact, compact text-only | `obs-mid-labels.png`, `obs-mid-compact.png`, `obs-mid-compact-text.png` | same names |
-| OBS names full / hidden | (option did not exist) | `obs-mid-compact-full-names.png`, `obs-mid-compact-no-names.png`, `obs-mid-labels-full-names.png` |
+| OBS, no save, labels 340 px / compact 300 px | `obs-empty-labels.png`, `obs-empty-compact.png` | `obs-empty-labels.png`, `obs-empty-default.png` |
+| OBS with save: labels, compact, compact text-only | `obs-mid-labels.png`, `obs-mid-compact.png`, `obs-mid-compact-text.png` | `obs-mid-labels.png`, `obs-mid-default.png`, `obs-mid-text.png` |
+| OBS everything on (overlay pass) | (all groups were always on) | `obs-mid-all.png`, `obs-mid-labels-all.png` |
+| OBS names full / hidden | (option did not exist) | `obs-mid-full-names.png`, `obs-mid-no-names.png` |
 
 Measured (`metrics.json`): check-list columns 3 -> 2 at 1280 and 5 -> 3 at 1920; rows with a prefix symbol
 547 -> 0; Mark done buttons 223 (with save) / 547 (no save) -> 0; OBS dungeon cells 52 -> 35; OBS `?` badges
-before any save 126 -> 0; compact OBS 280 x 1914 -> 236 x 1628 px (full names 280 wide, hidden 193), labelled
-337 x 3440 -> 337 x 3092; no page errors; no request left 127.0.0.1. The marking flow ran in the page: a click
-marked a dashed-ring row (the marks file under the scratch APPDATA), Open checks hid it, All checks showed it, a
-second click unmarked it.
+before any save 126 -> 0; OBS sizes: see the overlay pass table above (the first after-set's 236 x 1628 compact
+and 337 x 3092 labelled are superseded); no page errors; no request left 127.0.0.1. The marking flow ran in the
+page: a click marked a mark-by-hand row (the marks file under the scratch APPDATA), Open checks hid it, All checks
+showed it, a second click unmarked it.
 
 ## Checks run
 
