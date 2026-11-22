@@ -81,7 +81,7 @@ in chests only; see [Progressive items](#progressive-items).
 The windmill floor check is in logic only through its adult approach from Dampé's grave, not
 child Boomerang retrieval. The cow-shed roof pickup remains a separate native check, not the
 rooftop man's gift. These source-logic corrections do not expand the floor palette or certify
-every surface ([round 20 audit](../plans/rounds/r20-audit.md)).
+every surface ([ranged pickup audit](../plans/rounds/r20-audit.md)).
 
 With Gift and Token selected, played bottles, Double Defense, the Echo Gem and gold rupees may also reach
 Skulltulas; this does not allow their unverified chest grants. Fixed Nut/Stick upgrades remain Scrub-only.
@@ -175,9 +175,14 @@ That start therefore inherits the existing Saria fast-start state (opening histo
 talked-to flag and Kokiri map visit). Later song lessons and Saria's bridge farewell remain separate.
 Trade items, bottles, masks, Lens, raw ammo, keys, tokens, dungeon rewards and arbitrary names are refused;
 they need additional source/slot/active-equipment contracts, not guessed save values.
-The broad inventory, Continue and Time-ocarina lessons passed Kareem's check. The starting-Sword
-map-visit compensation still requires its restaged A check; other choices retain their documented evidence limits.
-Evidence and provisional pool policy: [round 20 starts](../plans/rounds/r20-start.md).
+The broad inventory, Continue and Time-ocarina lessons passed Kareem's check. On Longshot 3.0.0 (2026-11-21),
+a New Game with Kokiri Sword, Deku Shield, Boomerang, Slingshot, Bomb Bag, Goron Bracelet, Hookshot, Ocarina of
+Time, Zelda's Lullaby, Song of Storms, Adult Wallet, Deku Tree map/compass, 6 hearts and 500 rupees had those
+items, songs, hearts and rupees present and working; Impa's Lullaby and the Windmill's Storms lessons still
+played with the songs owned; the Ocarina of Time stayed equipped after Saria's gift; and the Master Sword pull
+worked. After the Saria-state fix, that starting Kokiri Sword's Kokiri Forest pause map, Deku Tree map/compass
+and Hyrule Field big map also worked. Other choices retain their documented evidence limits.
+Evidence and provisional pool policy: [starting inventory record](../plans/rounds/r20-start.md).
 
 ### Progressive items
 
@@ -362,8 +367,10 @@ certified in game by that observation.
 
 **Scrub offer wording:** newly generated shuffled one-time sales name their actual
 reward and effective price (English in all16 languages). HF and DMC have separate
-offers even though their native pitch shares one message. Built/read-back-tested,
-not yet played on Longshot 3.0.0; [round20 hints](../plans/rounds/r20-hints.md).
+offers even though their native pitch shares one message. On Longshot 3.0.0 (Kareem,
+2026-11-21) all four supported offers named their real item: the Lost Woods bridge scrub, the two-scrub
+grotto's front scrub, the Hyrule Field password scrub and the Death Mountain Crater ledge scrub
+([hints play record](../plans/rounds/r20-hints.md)). Not every reward or price has been played.
 Repeat vendors are not shuffled; their native weapon/magic/bottle gates can hide every offer.
 The no-offers guard for [#26](https://github.com/hiKareeem/Clawshot/issues/26) ends that
 conversation before opening an empty shop menu. It applies even without Scrub shuffle.
@@ -498,7 +505,10 @@ are refused. These settings open **only the bridge**: they give no Light Arrows,
 complete no sages and skip none of the six native Light Arrow trial cores.
 With Gift shuffle, the native Light Arrow story still runs even if its gift moved.
 
-`--bridge tokens --bridge-count N` (0–100) is experimental, **built, not played**.
+`--bridge tokens --bridge-count N` (0–100) is experimental. On Longshot 3.0.0 (Kareem, 2026-11-21), a
+16-token bridge on a 15-token adult save stayed closed at 15; the 16th token came from a shuffled chest, the
+rainbow bridge scene played at 16 and the bridge persisted after Save/Continue
+([trials play record](../plans/rounds/r20-trials.md)). Other counts are not individually played.
 It compares the native Gold Skulltula token counter, including tokens found in shuffled
 chests; defeating a Skulltula that gives a different item does not add a token. Tokens
 are not spent. The bridge scene and permanent latch remain native. This setting does
@@ -532,12 +542,17 @@ one to five leaves a deterministic, seed-selected subset. Selection uses a separ
 random stream, so fill retries cannot change it. The spoiler's `ganon_trials.remaining`,
 play note and first tower-barrier-view dialogue name the trials that remain.
 
-This is **new games only, built, not played**. It initializes only existing native
+This is **new games only**. It initializes only existing native
 trial completion flags and the matching remaining counter. Zero also initializes the
-native all-barrier-clear flag; it does not fabricate scene history or a quest step.
+native all-barrier-clear flag and the barrier-clear scene history that enables the tower lift;
+it does not add a quest step.
 Partial counts retain the real last-core scene. Remaining trials still need their usual
 route and Light Arrows. The tower boss key and finale are unchanged.
-Evidence and pending paired **Longshot 3.0.0** checks: [round20 trials](../plans/rounds/r20-trials.md).
+Zero trials passed on Longshot 3.0.0 (Kareem, 2026-11-21): the barrier was gone and, after the lift fix,
+the tower lift was down, rode up, returned and persisted after Save/Continue. That check used a copy of a
+zero-trials save with two documented Bool changes (age false, barrier-clear scene history true, as the fixed
+build writes for a new game), not a fresh new game. Partial counts 1–5 are **built, not played**.
+Evidence: [trials play record](../plans/rounds/r20-trials.md).
 
 
 ## Master Sword shuffle
@@ -680,8 +695,10 @@ after re-entry and is superseded. Kareem passed one guard/rescue and the repaire
 including leaving/returning and Continue, on Longshot rc.7 on 2026-11-19. Chest keys credit only
 Fortress inventory, not guard defeat, source collection, carpenter rescues or Spirit progress.
 Talk to the Valley carpenter boss and answer Yes before the jailed carpenters; this enabled the
-guard in the played check. All four rescues, the captain's unchanged card (D39) and Training Ground
-remain **unplayed with this option**, so it stays experimental. The card alone does not clear guards.
+guard in the played check. On Longshot 3.0.0 (Kareem, 2026-11-21) the option also passed four keys from
+four chests, the guards' 20-rupee drops, all four rescues, the captain's unchanged card (D39) given once and
+Training Ground entry with its 30-rupee fee ([Fortress play record](../plans/rounds/r20-cows.md)).
+That is a bounded check, not a full playthrough, so it stays experimental. The card alone does not clear guards.
 
 The four jail sources use stable native actor/Hash identities, not a guessed torch-room match.
 Until that correspondence is verified, logic conservatively requires access to all four guard
@@ -744,8 +761,7 @@ The generator also accepts `--hint-distribution strong`, `very_strong` and `usel
 Strong favors required routes and barren areas; Very strong raises those weights and
 allows more dungeon-area hints. Useless gives only original joke lines. No distribution
 changes placements, item eligibility or D29's no-junk location clues; an exhausted useful
-hint pool still falls back to jokes. All four are app choices; Very strong is new this round
-and remains built, not played.
+hint pool still falls back to jokes. All four are app choices; Very strong remains built, not played.
 
 **Static text (partially played):** with dungeon rewards shuffled or a count-mode
 bridge, the Temple of Time altar lists reward regions and the selected Door/bridge
@@ -762,9 +778,12 @@ Each reward and region stays on one complete altar line. Door requirements form 
 cumulative sentence across pages, followed by the Rainbow Bridge condition; these
 condition lines are at most36 characters. Page breaks never split a reward/region.
 Kareem passed the staged Fairy refusals, House advice (including after the cure),
-legible Ganondorf subtitle, and bridge-scrub price/grant. Three other scrub offers
-were not located. The altar's reward rows were readable; revised cumulative
-condition wording remains built, not played.
+legible Ganondorf subtitle, and bridge-scrub price/grant. On Longshot 3.0.0 (2026-11-21)
+the other three scrub offers (Lost Woods grotto front, Hyrule Field password, Death Mountain
+Crater ledge) also named their real items, and the revised altar passed: one reward per line,
+the Door of Time as one sentence and the Rainbow Bridge line. Ganondorf's subtitle shows during
+his skippable voiced line ([hints play record](../plans/rounds/r20-hints.md)). Other Door and
+bridge modes and languages are not each played.
 
 **Wrong-age pickups:** the note lists shuffled age-locked rewards reachable by the wrong age at their
 first search frontier, including ties. Optional later pickups can differ from that order. Progressive

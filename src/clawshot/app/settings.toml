@@ -18,7 +18,8 @@ help = "Small keys anywhere moves small keys into shuffled chests, including the
 label = "Fortress jail keys (experimental)"
 kind = "boolean"
 group = "Items"
-help = "Off by default; needs shuffled chests. Move the four guards' floor keys into chests, leaving red-rupee replacements with a key-shaped model. Answer Yes to the Valley carpenter boss before the jail encounters. One guard/rescue and its once-only 20-rupee drop passed, including return and Continue. All four rescues, the captain's card and Training Ground remain unplayed with this option."
+# Played evidence: plans/rounds/r20-cows.md, four-rescue check (2026-11-21, Longshot 3.0.0 stable).
+help = "Off by default; needs shuffled chests. Move the four guards' floor keys into chests, leaving red-rupee replacements with a key-shaped model. Answer Yes to the Valley carpenter boss before the jail encounters. One guard/rescue and its once-only 20-rupee drop passed, including return and Continue. On Longshot 3.0.0, four keys from four chests, all four rescues, the captain's card once and Training Ground entry with its 30-rupee fee also passed; this is not a full playthrough."
 enabled_when = [{ key = "shuffle", contains = "Chest", reason = "Shuffle chests to move Fortress jail keys." }]
 [shuffle_100_token_reward]
 label = "100-token reward (experimental)"
@@ -50,7 +51,8 @@ label = "Ganon's Castle bridge (experimental)"
 kind = "choice"
 choices = ["vanilla", "stones", "medallions", "rewards", "tokens"]
 group = "World"
-help = "Vanilla follows the usual Light Arrow story. Count modes open only the bridge with owned rewards or native Gold Skulltula token stock. Medallion count passed below/at its threshold in game; token mode is built, not played. This does not skip the remaining trials."
+# Played evidence: plans/rounds/r20-trials.md, 16-token bridge (2026-11-21, Longshot 3.0.0 stable).
+help = "Vanilla follows the usual Light Arrow story. Count modes open only the bridge with owned rewards or native Gold Skulltula token stock. Medallion count passed below/at its threshold in game. Token mode passed on Longshot 3.0.0 with 16 tokens: closed at 15, opened at 16 with a chest token, and stayed open after Save/Continue. This does not skip the remaining trials."
 [bridge.labels]
 vanilla = "Vanilla story"
 stones = "Stones"
@@ -62,7 +64,7 @@ vanilla = "Keep the native bridge scene after the Temple's Light Arrow story."
 stones = "Require the selected count of unique owned Spiritual Stones, from zero to three."
 medallions = "Require the selected count of unique owned medallions, including Light, from zero to six."
 rewards = "Require the selected count of unique owned stones and medallions, from zero to nine."
-tokens = "Require 0–100 Gold Skulltula tokens in the native counter, including tokens found in shuffled chests. Built, not played; spends no tokens."
+tokens = "Require 0–100 Gold Skulltula tokens in the native counter, including tokens found in shuffled chests; spends no tokens. A 16-token bridge passed on Longshot 3.0.0: closed at 15, opened at 16 with a chest token, and stayed open after Save/Continue."
 [bridge_count]
 label = "Bridge count"
 kind = "integer"
@@ -76,7 +78,8 @@ kind = "integer"
 min = 0
 max = 6
 group = "World"
-help = "Six keeps vanilla. Zero clears all trials; one to five selects that many remaining trials from a dedicated seeded stream. The spoiler, play note and first barrier-view text name them. New games only. Built, not played."
+# Played evidence: plans/rounds/r20-trials.md, zero trials on the fixed TEST-COPY (2026-11-21, Longshot 3.0.0 stable).
+help = "Six keeps vanilla. Zero clears all trials; one to five selects that many remaining trials from a dedicated seeded stream. The spoiler, play note and first barrier-view text name them. New games only. Zero played on Longshot 3.0.0 (on an adjusted save, not a fresh game): no barrier, and the tower lift works and keeps working after Save/Continue. One to five are not played yet."
 [songs]
 label = "Song placement"
 kind = "choice"
@@ -108,7 +111,8 @@ help = "Experimental, off by default. After Sheik's first adult scene, return to
 label = "Starting items (experimental)"
 kind = "multi"
 group = "Starting inventory"
-help = "Empty by default. Choose owned items for New Game only. Choose the highest upgrade tier you want; earlier tiers and weapon containers are included. Selected pool copies become junk. Songs do not complete their lessons or story quests. Unsupported trade items, bottles, masks, Lens, keys, tokens and rewards are refused. Built, not played."
+# Played evidence: plans/rounds/r20-start.md, broad start (2026-11-21, Longshot 3.0.0 stable).
+help = "Empty by default. Choose owned items for New Game only. Choose the highest upgrade tier you want; earlier tiers and weapon containers are included. Selected pool copies become junk. Songs do not complete their lessons or story quests. Unsupported trade items, bottles, masks, Lens, keys, tokens and rewards are refused. Played on Longshot 3.0.0 with one broad start (sword, shield, Slingshot, Boomerang, bombs, Bracelet, Hookshot, Ocarina of Time, two songs, wallet, Deku Tree map and compass): the items worked, song lessons still played, and the pause maps worked. Other choices are not each played."
 [starting_hearts]
 label = "Extra starting hearts"
 kind = "integer"
@@ -305,5 +309,5 @@ mask = "Wear the Mask of Truth as a child to hear a Gossip Stone."
 [hint_distribution.choice_help]
 balanced = "A mix of clues about useful items, areas and routes."
 strong = "More helpful clues about useful items."
-very_strong = "New in this round: more clues about required routes and useful areas, with fewer random clues."
+very_strong = "More clues about required routes and useful areas, with fewer random clues."
 useless = "Clues deliberately chosen not to help you find useful items."

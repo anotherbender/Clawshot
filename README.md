@@ -75,12 +75,16 @@ shows neither. The maintainers' in-game check of in-logic and marks is still pen
 - **Optional:** boss Heart Containers, floor Heart Pieces, Gold Skulltulas (requires chests),
   and small keys outside their own dungeon (opt-in **Small keys anywhere**, including the Well floor key).
   Shadow's floor key stays unchanged. **Fortress jail keys** are a separate experimental, default-off option;
-  one rescue and its once-only replacement passed, but all four rescues, the card and Training Ground remain untested.
+  one rescue and its once-only replacement passed on rc.7; on Longshot 3.0.0 (2026-11-21) four keys from four chests,
+  all four rescues, the card once and Training Ground entry also passed.
   Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys.
 - **Experimental, default off:** dungeon rewards shuffled among their nine usual rewards (Rauru included), and a stones/medallions/rewards-count bridge. First-pull reward delivery and the medallion-count bridge passed in game; this is not a full shuffled playthrough.
-- **Experimental, built not played:** a Gold Skulltula token-count bridge (`--bridge tokens --bridge-count N`,
+- **Experimental:** a Gold Skulltula token-count bridge (`--bridge tokens --bridge-count N`,
   0–100, including chest tokens), and 0–6 Ganon trials remaining (`--trials-count N`, default6).
   Partial trial seeds name the remaining trials in the spoiler, play note and first barrier-view dialogue.
+  On Longshot 3.0.0 (2026-11-21) a 16-token bridge stayed shut at 15, opened at 16 and persisted after
+  Save/Continue; zero trials' barrier and tower lift passed on an adjusted save copy, not a fresh new game.
+  Partial counts 1–5 are built, not played ([trials play record](plans/rounds/r20-trials.md)).
 - **Not shuffled yet:** cows, pots, crates and loose rupees.
 - **Excluded locations:** pick checks by area/search in Settings, or use `--exclude-locations` with exact
   world check names. They never hold progression; impossible lists are refused. [Reference](docs/settings.md#excluded-locations).
@@ -106,7 +110,7 @@ that proves the model, not that every route has been verified in the game.
 | Hints and convenience options | Gossip Stones speak hints without the Mask of Truth by default; this, fast start, the forest option that opens only the exit bridge (`--forest closed_deku`) and 10-rupee Kokiri prices have in-game evidence. |
 | Scene handoffs | Lessons use a normal get only with zero stock of both ocarinas; either instrument retains the native lesson, at either age. Saria's separate farewell skip remains experimental and off by default. [Settings and played evidence](docs/settings.md#scene-handoffs-experimental). |
 | Free time travel | Experimental, off by default. Early adult return, the Prelude scene and the corrected first adult arrival have passed in-game checks. |
-| Starting inventory | Experimental, empty/off by default: chosen native items, songs, extra hearts, full wallet and maps/compasses for New Game only. Starting copies leave the pool as junk; unsafe choices are refused. Built, not played. [Settings](docs/settings.md#starting-inventory-experimental). |
+| Starting inventory | Experimental, empty/off by default: chosen native items, songs, extra hearts, full wallet and maps/compasses for New Game only. Starting copies leave the pool as junk; unsafe choices are refused. One broad New Game start passed on Longshot 3.0.0 (2026-11-21): its items, songs, 6 hearts and 500 rupees worked, Impa's and the Windmill's lessons still played, the Ocarina of Time stayed equipped, and the Master Sword pull and pause maps worked. Other choices are not individually played. [Settings](docs/settings.md#starting-inventory-experimental). |
 | Master Sword shuffle | Experimental, default off; requires Chest shuffle and free time travel. The sword goes to a chest; the pedestal still changes age. [Settings and v4 played evidence](docs/settings.md#master-sword-shuffle). |
 
 With Token added to the shipped presets, played bottle, Double Defense, Echo Gem and gold-rupee rewards
@@ -145,7 +149,9 @@ recovering it, collecting it once, returning and Continue passed in game. Round 
 behavior: Shadow's floor key stays in its usual place ([round 19 keys](plans/rounds/r19-keys.md)).
 **Fortress jail keys** is a separate experimental, default-off switch. After answering Yes to the carpenter
 boss, one guard encounter, rescue and 20-rupee drop passed; the drop stayed collected after returning and Continue.
-All four rescues, the captain's card and Training Ground still need play checks.
+On Longshot 3.0.0 (2026-11-21) the option also passed four keys from four chests, the guards' 20-rupee drops,
+all four rescues, the captain's card once and Training Ground entry with its 30-rupee fee
+([Fortress play record](plans/rounds/r20-cows.md)). That is not a full playthrough; it stays experimental.
 Experimental **All dungeon items anywhere** also releases maps, compasses and boss keys, including
 Ganon's Castle's boss key. Map/compass display and a remote boss key opening its door have passed in game.
 Defaults and both presets keep every dungeon item home.
@@ -241,6 +247,9 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
   The ocarina note interface is drawn separately.
 - A Market guard-house crash on Hookshot 2.0.11 matched upstream Hookshot issue #1112 (Hookshot's GitHub
   repository has been offline since 2026-11-13); no fix is claimed here.
+- **Voiced lines keep their original audio (cosmetic).** With zero Ganon trials, Rauru's replaced barrier
+  first-view text shows over his original voiced line. Ganondorf's pre-fight subtitle naming the Light Arrow
+  location shows during his skippable voiced line. Both seen on Longshot 3.0.0 (2026-11-21).
 
 ## Play a seed pack
 

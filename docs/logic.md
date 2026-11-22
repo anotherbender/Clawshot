@@ -45,7 +45,7 @@ The current acceptance boundary is in [settings](settings.md), with observations
 Cow work remains research only; no cow shuffle option or production check shipped
 ([round 19 cows](../plans/rounds/r19-cows.md)).
 
-**Ranged pickup audit (round 20):** the windmill platform pickup requires the existing adult
+**Ranged pickup audit:** the windmill platform pickup requires the existing adult
 Dampé approach; child Boomerang retrieval failed in BBender's report and the native Heart Piece
 actor has no liftable component. The Graveyard Heart Piece's disabled Boomerang trick is also
 removed. The cow-shed pickup does exist, with its own actor and map anchor in all three village
@@ -220,8 +220,10 @@ Sources: `src/clawshot/data/world/remake/gifts.toml`; D39 in `plans/decisions.md
 `plans/rounds/r13-gerudo-card.md` (static data trace, not a played route check).
 
 With Fortress jail-key shuffle enabled, one guard/rescue and the repaired once-only 20-rupee drop
-passed on Longshot rc.7 (2026-11-19), after the carpenter boss's Yes. All four rescues, the card and
-Training Ground are still unplayed with that option; no new pre-rescue access is inferred.
+passed on Longshot rc.7 (2026-11-19), after the carpenter boss's Yes. On Longshot 3.0.0 (2026-11-21),
+four keys from four chests, all four rescues, the card once and Training Ground entry with its 30-rupee fee
+also passed with that option ([Fortress play record](../plans/rounds/r20-cows.md)); no new pre-rescue access
+is inferred.
 The Well floor replacement passed recovery and once-only leave/return/Continue checks.
 Round 19 changes no key behavior: Shadow's floor key stays in its usual place under every setting
 ([round 19 keys](../plans/rounds/r19-keys.md)). See [key placement limits](settings.md#door-of-time-and-returning-to-child).
