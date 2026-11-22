@@ -181,6 +181,7 @@ const context = {
       text: el.textContent, shown: shown(el),
     })),
     notes: text('tracker-logic-note'),
+    warnings: text('tracker-warnings'),
     controls: {
       age: control('tracker-age'), show: control('tracker-show'), finished: control('tracker-hide-finished'),
       vanilla: control('tracker-vanilla'), clear: control('tracker-clear-marks'),

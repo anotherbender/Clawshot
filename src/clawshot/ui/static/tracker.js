@@ -445,7 +445,7 @@ function parseDungeonNames(fragment) {
     }
     const labels = Object.fromEntries([...(state.items || []), ...(state.songs || []), ...(state.rewards || [])].map((cell) => [cell.id, cell.label]));
     const unknown = (logic.unknown_items || []).map((id) => labels[id] || id);
-    if (unknown.length) notes.push("In logic may be conservative: the save could not read " + unknown.join(", ") + ".");
+    // The full list of unread items goes to the side panel's In logic row, not above the list.
     return {key, notes, unknown};
   }
   // A check's state in the Checks tab: ``markable`` offers Mark done (D9), ``skippable`` offers Skip.
@@ -479,31 +479,47 @@ function parseDungeonNames(fragment) {
   };
   // Marker shapes for the legend and the rows (CSS only, no fonts or art).
   const LEGEND = [
-    ["collected", "Collected: your save shows it"],
-    ["marked", "Marked done by you"],
-    ["skipped", "Skipped by you"],
-    ["in-logic", "Open, in logic"],
-    ["out-of-logic", "Open, out of logic"],
-    ["manual", "Open; your save can't show it, so click it when you have it"],
+    ["collected", "Collected", "Your save shows it collected"],
+    ["marked", "Marked", "Marked done by you"],
+    ["skipped", "Skipped", "Skipped by you"],
+    ["in-logic", "In logic", "Open, and in logic with what your save holds"],
+    ["out-of-logic", "Out of logic", "Open, and out of logic with what your save holds"],
+    ["manual", "Mark by hand", "Your save can't show this check: click it when you have it"],
   ];
   function marker(kind) {
     const el = node("span", "tracker-state tracker-state-" + kind);
     el.setAttribute("aria-hidden", "true");
     return el;
   }
-  // Without a save nothing can be marked and nothing is done yet, so the legend and the filters step aside.
+  // One line: a marker and a word each (the longer meaning on hover). Without a save it steps aside.
   function drawLegend(skippable, noSave) {
     legend.replaceChildren();
     legend.hidden = noSave;
-    for (const [kind, text] of LEGEND) {
+    for (const [kind, text, meaning] of LEGEND) {
       if (kind === "skipped" && !skippable) continue;
       const item = node("span", "tracker-legend-item");
+      item.title = meaning;
       item.append(marker(kind), document.createTextNode(text));
       legend.append(item);
     }
-    legend.append(node("p", "tracker-explanation",
-      "Click a check your save can't show to mark it done" + (skippable ? ", or one it shows to skip it" : "") +
-      ". Click again to undo; “All checks” shows everything you marked. Marks never change your save."));
+  }
+  // Row names drop their area's prefix under the area heading ("Lake Hylia: ", "LH ", "LH GS " becomes
+  // "Skulltula: "); the side panel keeps the full name. Codes are OoT Randomizer's location-name prefixes.
+  const AREA_CODES = {
+    "Kokiri Forest": ["KF"], "Lost Woods": ["LW"], "Sacred Forest Meadow": ["SFM"], "Hyrule Field": ["HF"],
+    "Lon Lon Ranch": ["LLR"], "Market": ["MK"], "Temple of Time": ["ToT"], "Hyrule Castle": ["HC"],
+    "Land outside Ganon's Castle": ["OGC"], "Kakariko Village": ["Kakariko", "Kak"], "Graveyard": ["GY"],
+    "Death Mountain Trail": ["DMT"], "Death Mountain Crater": ["DMC"], "Goron City": ["GC"], "Zora's River": ["ZR"],
+    "Zora's Domain": ["ZD"], "Zora's Fountain": ["ZF"], "Lake Hylia": ["LH"], "Gerudo Valley": ["GV"],
+    "Gerudo's Fortress": ["GF"], "Haunted Wasteland": ["Wasteland"], "Desert Colossus": ["Colossus"],
+  };
+  const loosely = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/'/g, "'?").replace(/[- ]/g, "[- ]");
+  function shortLabel(label, area) {
+    const prefixes = [area, ...(AREA_CODES[area] || [])].map(loosely).join("|");
+    let rest = label.replace(new RegExp("^(?:" + prefixes + ")(?::\\s*|\\s+)", "i"), "");
+    if (rest === label || !rest) return label;
+    rest = rest.replace(/^GS(?:\s+|$)/, (gap) => gap.trim() === gap ? "Skulltula" : "Skulltula: ");
+    return rest[0].toUpperCase() + rest.slice(1);
   }
   // The side panel: the pointed-at or focused check's own directions and state (app only).
   const panel = checksRoot ? {
@@ -515,7 +531,7 @@ function parseDungeonNames(fragment) {
   } : null;
   let selected = null;  // the selected check's id
   let rows = new Map();  // check id -> {check, state, area}
-  let view = {key: null, notes: [], unknown: []}, noSaveNow = false, logicReason = null;
+  let view = {key: null, notes: [], unknown: []}, noSaveNow = false, logicReason = null, skipOffered = false;
   const checksShown = () => panel && panel.screen && !panel.screen.hidden && panel.title && panel.details;
   const KIND_WORDS = {
     chest: "Chest", token: "Gold Skulltula", boss_heart: "Boss heart", freestanding: "Freestanding item",
@@ -547,7 +563,7 @@ function parseDungeonNames(fragment) {
     else if (ages.adult) words = "In logic as adult; child can't reach it yet with what you hold.";
     else if (ages.either) words = "In logic using both ages: it needs a trip between them.";
     else words = "Out of logic: neither age can reach it yet with what your save holds.";
-    if (view.unknown.length) words += " May be conservative: the save could not read " + view.unknown.length + " of the items it counts (see the note above the list).";
+    if (view.unknown.length) words += " May be conservative: the save could not read " + view.unknown.join(", ") + ", so they count as not held.";
     return words;
   }
   function showDetails() {
@@ -559,7 +575,9 @@ function parseDungeonNames(fragment) {
     if (!entry) {
       panel.title.textContent = "Checks";
       panel.text.textContent = noSaveNow || !rows.size ? "Every check of the seed, by area. Save in the game once to see what is done and what is in logic." :
-        "Point at a check, or move to it with ↑ ↓, to see where it is, how your save tracks it and whether it is in logic.";
+        "Point at a check, or move to it with ↑ ↓, to see where it is, how your save tracks it and whether it is in logic. " +
+        "Click a check your save can't show (square mark) to mark it done" + (skipOffered ? ", or one it shows to skip it" : "") +
+        "; click again to undo. “All checks” shows everything you marked. Marks never change your save.";
       return;
     }
     const {check, state, area} = entry;
@@ -603,7 +621,7 @@ function parseDungeonNames(fragment) {
     line.dataset.check = check.id;
     line.append(marker(kind));
     const label = check.label || check.name || check.id;
-    line.append(node("span", "tracker-check-label", label + (check.item ? ": " + (check.item_label || check.item) : "")));
+    line.append(node("span", "tracker-check-label", shortLabel(label, area) + (check.item ? ": " + (check.item_label || check.item) : "")));
     if (check.vanilla) {
       line.classList.add("tracker-check-vanilla");
       const tag = node("span", "tracker-vanilla-tag", "vanilla");
@@ -673,6 +691,7 @@ function parseDungeonNames(fragment) {
         (filter !== "all" && !lines.some(({line}) => !line.hidden));
       checksList.append(item);
     }
+    skipOffered = skippable;
     drawLegend(skippable, noSave);
     if (selected && !rows.has(selected)) selected = null;
     showDetails();
@@ -707,10 +726,12 @@ function parseDungeonNames(fragment) {
       status.textContent = idle ? "Choose a seed in the app" : noSave ? "No save yet" : labels[data.status] || "Tracker unavailable";
     }
     warnings.replaceChildren();
+    // OBS never shows warnings (seed identity, read problems): they stay on the app's Tracker tab.
     // Without a save the waiting reason is the no-save card itself.
-    const waitingReasons = noSave && !standalone ? new Set(data.warnings || []) : new Set();
-    for (const warning of [...new Set([...(data.warnings || []), ...(state?.warnings || [])])])
-      if (!waitingReasons.has(warning)) warnings.append(node("p", "", warning));
+    const waitingReasons = noSave ? new Set(data.warnings || []) : new Set();
+    if (!standalone)
+      for (const warning of [...new Set([...(data.warnings || []), ...(state?.warnings || [])])])
+        if (!waitingReasons.has(warning)) warnings.append(node("p", "", warning));
     if (!standalone) {
       const selectedSlot = slotSelect.value;
       const signature = JSON.stringify(data.slots || []);
@@ -790,19 +811,25 @@ function parseDungeonNames(fragment) {
     }
     document.documentElement.dataset.trackerReady = "true";
   }
+  let failures = 0;
   async function refresh() {
     if (pending || (!standalone && document.getElementById("tracker")?.hidden && (!panel?.screen || panel.screen.hidden))) return;
     pending = true;
     try {
       const data = await request(standalone ? "tracker-obs" : "tracker");
+      failures = 0;
       render(data);
       if (!standalone && !initialized && ["idle", "unconfigured"].includes(data.status)) {
         // Seed choice is explicit. Loading a tab never opens or reveals the selected seed's spoiler.
         status.textContent = "Use selected seed, or choose a seed output and Track seed.";
       }
     } catch (error) {
-      status.hidden = false;
-      status.textContent = compact ? "Tracker connection lost" : error.message;
+      // OBS rides out a missed poll (the next one comes a second later) and never shows a raw error message.
+      failures += 1;
+      if (!standalone || failures >= 3) {
+        status.hidden = false;
+        status.textContent = standalone ? "Tracker connection lost" : error.message;
+      }
     }
     finally { pending = false; }
   }

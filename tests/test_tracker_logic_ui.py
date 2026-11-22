@@ -154,12 +154,14 @@ def test_unavailable_logic_disables_the_controls_and_says_why(tmp_path):
     assert not any("in logic" in head["text"] for head in rendered["areaHeads"])
 
 
-# 11.5 (6.5)
+# 11.5 (6.5); round 21: the unread items are named in the side panel's In logic row, not above the list.
 def test_unknown_items_say_in_logic_may_be_conservative(tmp_path):
-    rendered = tab(tmp_path, snapshot(unknown_items=["hookshot", "Forest Temple small keys"]))
-    [note] = [note for note in rendered["notes"] if "conservative" in note]
-    assert "Hookshot" in note and "Forest Temple small keys" in note
-    assert not [note for note in tab(tmp_path)["notes"] if "conservative" in note]
+    point = [{"class": "tracker-check", "index": 0, "event": "pointerover"}]
+    rendered = tab(tmp_path, snapshot(unknown_items=["hookshot", "Forest Temple small keys"]), actions=point)
+    assert not [note for note in rendered["notes"] if "conservative" in note]
+    body = rendered["details"]["body"]
+    assert "May be conservative" in body and "Hookshot" in body and "Forest Temple small keys" in body
+    assert "conservative" not in tab(tmp_path, actions=point)["details"]["body"]
 
 
 # 11.6 (4.1, 4.2, 4.8); round 21: the row itself is the toggle, no Mark done button.
@@ -302,8 +304,7 @@ def test_rows_have_no_prefix_symbols_and_the_legend_names_each_state(tmp_path):
     rendered = tab(tmp_path)
     assert not [entry["text"] for entry in rendered["checks"] if entry["text"][:1] in "?—✓☑"]
     [legend] = rendered["legend"]
-    for words in ("Collected", "Marked done by you", "Open, in logic", "Open, out of logic", "can't show it"):
-        assert words in legend["text"]
+    assert legend["text"] == "CollectedMarkedIn logicOut of logicMark by hand"  # one line, a word each
     assert "Skipped" not in legend["text"] and legend["shown"]  # no check offers a skip
 
 
@@ -348,7 +349,7 @@ def test_a_check_the_save_reads_can_be_skipped_when_the_backend_offers_it(tmp_pa
     assert rendered["posts"] == [
         {"route": "tracker-mark", "body": {"check": "Child Chest", "marked": True, "kind": "skip"}}
     ]
-    assert "Skipped by you" in rendered["legend"][0]["text"]
+    assert "Skipped" in rendered["legend"][0]["text"]
     skipped = marked(snapshot(), "Child Chest", "skipped")
     undo = tab(tmp_path, skipped, actions=[{"class": "tracker-check", "index": 0, "event": "click"}])
     assert "tracker-check-skipped" in classes(undo)["Child Chest"]["className"]
@@ -418,3 +419,39 @@ def test_the_side_panel_shows_the_pointed_checks_directions_save_and_logic(tmp_p
     assert rendered["posts"] == []  # pointing only selects
     done = tab(tmp_path, snap, actions=[{"class": "tracker-check", "index": 2, "event": "pointerover"}])["details"]
     assert "Collected (your save)" in done["body"] and "records this chest once it is opened" in done["body"]
+
+
+def test_rows_drop_their_areas_prefix_and_the_panel_keeps_the_full_name(tmp_path):
+    snap = snapshot()
+    names = {
+        "Lake Hylia": [
+            "LH GS Bean Patch",
+            "Lake Hylia: Island Chest",
+            "Lake Hylia Underwater Rupee 1",
+            "Zora Shop Item",
+        ],
+        "Land outside Ganon's Castle": ["OGC GS"],
+        "Jabu-Jabu's Belly": ["Jabu Jabus Belly GS Near Boss", "KF Odd Row"],
+    }
+    snap["state"]["areas"] = [
+        {"name": area, "checks": [check(name, False) for name in rows]} for area, rows in names.items()
+    ]
+    rendered = tab(tmp_path, snap, actions=[{"class": "tracker-check", "index": 0, "event": "pointerover"}])
+    assert [entry["text"] for entry in rendered["checks"]] == [
+        "Skulltula: Bean Patch",
+        "Island Chest",
+        "Underwater Rupee 1",
+        "Zora Shop Item",
+        "Skulltula",
+        "Skulltula: Near Boss",
+        "KF Odd Row",  # another area's code stays
+    ]
+    assert rendered["details"]["title"] == "LH GS Bean Patch"
+
+
+def test_obs_never_shows_warnings(tmp_path):
+    snap = snapshot()
+    snap["warnings"] = ["Cannot confirm this save belongs to this seed: neither adds saved flags."]
+    snap["state"]["warnings"] = ["The save has none of this seed's chest records."]
+    assert render_tracker(tmp_path, snap, obs=True)["warnings"] == [""]
+    assert "Cannot confirm" in tab(tmp_path, snap)["warnings"][0]
