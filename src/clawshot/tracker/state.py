@@ -615,7 +615,7 @@ def _check_entry(
     if state is None:
         entry["reason"] = reason
     if markable(check, state):
-        entry["markable"] = True  # Mark done is offered; set on every `?` check, so it tells nothing more (D9)
+        entry["markable"] = True  # Mark done is offered; on a `—` check it is the only sign of a provisional read (D9)
         if check.location in marks:
             entry["marked"] = True  # marked done by hand (tracker.marks); never shows the item (D7)
     if show_locations or state is True:

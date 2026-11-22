@@ -103,7 +103,8 @@ collected and shows its reward even in spoiler-free mode, as an opened chest doe
 **Mark done**: the trade hand-ins, shops, and the gifts whose records do not tell (such as the 10 Big
 Poes and the 100 Gold Skulltula reward). Until each of these records has been confirmed in a played
 game, a gift it reads as not given yet keeps **Mark done**, and your mark on it stays (and keeps its
-reward hidden) until the record reads given; you cannot tell these apart from other reads in the tab.
+reward hidden) until the record reads given. That **Mark done** button is the only sign that a record
+is still unconfirmed: no label or style shows it.
 Reading these records needs a seed made by this same Clawshot version; for other seeds the tracker says
 so in one line and reads gifts as before ([design record](../plans/tracker-auto-checks.md)).
 
