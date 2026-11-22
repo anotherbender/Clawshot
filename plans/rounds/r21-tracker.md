@@ -119,7 +119,15 @@ Proposal posted 16:39; Claude approved it at 16:40 and moved ownership of `track
   `skippable: true` on the checks a skip is offered for.
 - `POST tracker-mark` takes `kind: "skip"`; `tracker-clear-marks` clears both tables; OBS strips both.
 - The UI side is built and tested against that contract with synthetic snapshots
-  (`test_a_check_the_save_reads_can_be_skipped_when_the_backend_offers_it`). Backend: waiting for MAIN MOVED #39.
+  (`test_a_check_the_save_reads_can_be_skipped_when_the_backend_offers_it`). Backend: prepared and tested on PR
+  #39's head `dc71f13` in a scratch worktree (`E:/OOTRemake/work/r21-tracker/skip-scratch`, patch
+  `skip-backend.patch`): `MarkStore` tables `marks`/`skips` (`table=` keyword, `skips` written only when
+  non-empty), `state.skip_fields` (`skippable` on a check read as not collected and not markable, `skipped` from
+  the table), area `skipped` counts, `SeedLogic.annotate(..., skipped)` keeps skipped checks out of `in_logic`,
+  `TrackerSession.skip`, `tracker-mark` `kind: "skip"`, OBS strips `skipped`. Tracker tests there: 275 passed,
+  1 skipped. Two PR #39 tests change as our own edits: the `MemoryMarks` double gains `table=`, and the
+  provisional/accepted comparison now differs in the click field only (`markable` vs `skippable`). Lands on this
+  branch after MAIN MOVED for #39.
 
 ## Choices made here (cs21a, provisional)
 
