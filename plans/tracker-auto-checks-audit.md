@@ -66,20 +66,20 @@ check covers it.
 | ZR Frogs Sarias Song | bool `MiniGame_FrogTenors_SariaSong` | MiniGame_FrogTenors/Event221 | MiniGame_FrogTenors:TeachNewMusic/Event164 (argument) | -/- | pass (note 5) |
 | ZR Frogs Suns Song | bool `MiniGame_FrogTenors_SunSong` | MiniGame_FrogTenors/Event222 | MiniGame_FrogTenors:TeachNewMusic/Event164 (argument) | -/- | pass (note 5) |
 | ZR Frogs Song of Time | bool `MiniGame_FrogTenors_TimeSong` | MiniGame_FrogTenors/Event223 | MiniGame_FrogTenors:TeachNewMusic/Event164 (argument) | -/- | pass (note 5) |
-| LW Gift from Saria | played `Dm_Kokiri_0155` | Dm_Kokiri_0155/Event68 | cut [; started by Goto_HyruleCastle/Event44 | PASS/PASS | pass (note 6) |
-| Song from Saria | played `Dm_MelodyGet_Saria` | Dm_MelodyGet_Saria/Event109 | cut [; started by SacredForestMeadow/Event0 | PASS/PASS | pass (note 6) |
-| Song from Malon | played `Dm_MelodyGet_Epona` | Dm_MelodyGet_Epona/Event11 | cut [; started by SubEvent_GetEponaSong/Event1 | PASS/PASS | pass (note 6) |
-| Song from Impa | played `Dm_MelodyGet_Zelda` | Dm_MelodyGet_Zelda/Event111 | cut [; started by DoorOfTime/Event21 | PASS/PASS | pass (note 6) |
-| Sheik in Forest | played `Dm_MelodyGet_Forest` | Dm_MelodyGet_Forest/Event22 | cut [; started by SageOfForest/Event13 | PASS/PASS | pass (note 6) |
-| Sheik in Kakariko | played `Dm_MelodyGet_Shadow` | Dm_MelodyGet_Shadow/Event21 | cut [; started by Dm_SY_BancChangeArrive/Event68 | PASS/PASS | pass (note 6) |
-| Sheik in Ice Cavern | played `Dm_MelodyGet_Water` | Dm_MelodyGet_Water/Event29 | cut [; started by SageOfWater/Event281, SageOfWater/Event283 | PASS/PASS | pass (note 6) |
-| Sheik at Colossus | played `Dm_MelodyGet_Spilit` | Dm_MelodyGet_Spilit/Event17 | cut [; started by a logic module | PASS/PASS | pass (note 6) |
-| Sheik at Temple | played `Dm_MelodyGet_Shine` | Dm_MelodyGet_Shine/Event53 | cut [; started by AllSage/Event37 | PASS/PASS | pass (note 6) |
-| HF Ocarina of Time Item | played `Dm_MelodyGet_Time` | Dm_MelodyGet_Time/Event70 | cut [; started by DoorOfTime/Event15 | PASS/PASS | pass (note 6) |
-| Song from Ocarina of Time | played `Dm_MelodyGet_Time` | Dm_MelodyGet_Time/Event4 | cut [; started by DoorOfTime/Event15 | PASS/PASS | pass (note 6) |
-| ToT Light Arrows Cutscene | played `Dm_TimeTemple_0130` | Dm_TimeTemple_0130/Event85 | cut [; started by AllSage/Event17 | PASS/PASS | pass (note 6) |
-| HC Zeldas Letter | played `Dm_HrlCastle_0050` | Dm_HrlCastle_0050/Event59 | cut [; started by Goto_HyruleCastle/Event31 | PASS/PASS | pass (note 6) |
-| GC Darunias Joy | played `Dm_Goron_0030` | Dm_Goron_0030/Event127 | cut [; started by Get_StoneOfFire/Event31 | PASS/PASS | pass (note 6) |
+| LW Gift from Saria | played `Dm_Kokiri_0155` | Dm_Kokiri_0155/Event68 | cut C01; started by Goto_HyruleCastle/Event44 | PASS/PASS | pass (note 6) |
+| Song from Saria | played `Dm_MelodyGet_Saria` | Dm_MelodyGet_Saria/Event109 | cut C12; started by SacredForestMeadow/Event0 | PASS/PASS | pass (note 6) |
+| Song from Malon | played `Dm_MelodyGet_Epona` | Dm_MelodyGet_Epona/Event11 | cut C04; started by SubEvent_GetEponaSong/Event1 | PASS/PASS | pass (note 6) |
+| Song from Impa | played `Dm_MelodyGet_Zelda` | Dm_MelodyGet_Zelda/Event111 | cut C10; started by DoorOfTime/Event21 | PASS/PASS | pass (note 6) |
+| Sheik in Forest | played `Dm_MelodyGet_Forest` | Dm_MelodyGet_Forest/Event22 | cut Learn_melody_C07-13; started by SageOfForest/Event13 | PASS/PASS | pass (note 6) |
+| Sheik in Kakariko | played `Dm_MelodyGet_Shadow` | Dm_MelodyGet_Shadow/Event21 | cut C13; started by Dm_SY_BancChangeArrive/Event68 | PASS/PASS | pass (note 6) |
+| Sheik in Ice Cavern | played `Dm_MelodyGet_Water` | Dm_MelodyGet_Water/Event29 | cut C15; started by SageOfWater/Event281, SageOfWater/Event283 | PASS/PASS | pass (note 6) |
+| Sheik at Colossus | played `Dm_MelodyGet_Spilit` | Dm_MelodyGet_Spilit/Event17 | cut Learn_melody; started by an EventRequestActor placed in the DesertColossus maps | PASS/PASS | pass (note 6) |
+| Sheik at Temple | played `Dm_MelodyGet_Shine` | Dm_MelodyGet_Shine/Event53 | cut C14_Learn_melody; started by AllSage/Event37 | PASS/PASS | pass (note 6) |
+| HF Ocarina of Time Item | played `Dm_MelodyGet_Time` | Dm_MelodyGet_Time/Event70 | cut EntryPoint0; started by DoorOfTime/Event15 | PASS/PASS | pass (note 6) |
+| Song from Ocarina of Time | played `Dm_MelodyGet_Time` | Dm_MelodyGet_Time/Event4 | cut C10; started by DoorOfTime/Event15 | PASS/PASS | pass (note 6) |
+| ToT Light Arrows Cutscene | played `Dm_TimeTemple_0130` | Dm_TimeTemple_0130/Event85 | cut C01; started by AllSage/Event17 | PASS/PASS | pass (note 6) |
+| HC Zeldas Letter | played `Dm_HrlCastle_0050` | Dm_HrlCastle_0050/Event59 | cut C15; started by Goto_HyruleCastle/Event31 | PASS/PASS | pass (note 6) |
+| GC Darunias Joy | played `Dm_Goron_0030` | Dm_Goron_0030/Event127 | cut C10; started by Get_StoneOfFire/Event31 | PASS/PASS | pass (note 6) |
 | Market Lost Dog | quest == Complete `SubEvent_FindRichard` | SubEvent_FindRichard/Event16 | SubEvent_FindRichard/Event32 | PASS/PASS | pass |
 | Market 10 Big Poes | quest == Complete `SubEvent_GhostShop` | Npc_Hylia_048_BottleShop/Event329 | Npc_Hylia_048_BottleShop/Event48 | CHECK/CHECK | fail (see below) |
 | DMT Biggoron | quest == Complete `SubEvent_GetSwordBigGoron` | Npc_Goron_Biggoron_Adult/Event123 | Npc_Goron_Biggoron_Adult/Event89 | PASS/PASS | pass |

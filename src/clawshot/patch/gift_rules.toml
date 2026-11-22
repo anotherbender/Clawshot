@@ -79,7 +79,7 @@ track = [
 class = "swap"
 gate = "the cutscene plays once"
 track = [
-  { played = "Dm_Goron_0030", source = "EventSetting row Dm_Goron_0030; grant Dm_Goron_0030/Event127 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_Goron_0030", source = "EventSetting row Dm_Goron_0030; grant Dm_Goron_0030/Event127 on every walk of cut C10; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."GC Medigoron"]
@@ -129,14 +129,14 @@ gate = "quest Goto_HyruleCastle step"
 class = "swap"
 gate = "the cutscene plays once"
 track = [
-  { played = "Dm_HrlCastle_0050", source = "EventSetting row Dm_HrlCastle_0050; grant Dm_HrlCastle_0050/Event59 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_HrlCastle_0050", source = "EventSetting row Dm_HrlCastle_0050; grant Dm_HrlCastle_0050/Event59 on every walk of cut C15; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."HF Ocarina of Time Item"]
 class = "swap"
 gate = "the cutscene plays once"
 track = [
-  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event70 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event70 on every walk of cut EntryPoint0; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Hideout Gerudo Membership Card"]
@@ -263,7 +263,7 @@ track = [
 class = "swap"
 gate = "the cutscene plays once"
 track = [
-  { played = "Dm_Kokiri_0155", source = "EventSetting row Dm_Kokiri_0155; grant Dm_Kokiri_0155/Event68 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_Kokiri_0155", source = "EventSetting row Dm_Kokiri_0155; grant Dm_Kokiri_0155/Event68 on every walk of cut C01; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."LW Ocarina Memory Game"]
@@ -358,7 +358,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event69"]
 track = [
-  { played = "Dm_MelodyGet_Spilit", source = "EventSetting row Dm_MelodyGet_Spilit; grant Dm_MelodyGet_Spilit/Event17 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Spilit", source = "EventSetting row Dm_MelodyGet_Spilit; grant Dm_MelodyGet_Spilit/Event17 on every walk of cut Learn_melody; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Sheik at Temple"]
@@ -366,7 +366,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event71"]
 track = [
-  { played = "Dm_MelodyGet_Shine", source = "EventSetting row Dm_MelodyGet_Shine; grant Dm_MelodyGet_Shine/Event53 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Shine", source = "EventSetting row Dm_MelodyGet_Shine; grant Dm_MelodyGet_Shine/Event53 on every walk of cut C14_Learn_melody; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Sheik in Crater"]
@@ -383,7 +383,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event65"]
 track = [
-  { played = "Dm_MelodyGet_Forest", source = "EventSetting row Dm_MelodyGet_Forest; grant Dm_MelodyGet_Forest/Event22 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Forest", source = "EventSetting row Dm_MelodyGet_Forest; grant Dm_MelodyGet_Forest/Event22 on every walk of cut Learn_melody_C07-13; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Sheik in Ice Cavern"]
@@ -391,7 +391,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event68"]
 track = [
-  { played = "Dm_MelodyGet_Water", source = "EventSetting row Dm_MelodyGet_Water; grant Dm_MelodyGet_Water/Event29 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Water", source = "EventSetting row Dm_MelodyGet_Water; grant Dm_MelodyGet_Water/Event29 on every walk of cut C15; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Sheik in Kakariko"]
@@ -399,7 +399,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event70"]
 track = [
-  { played = "Dm_MelodyGet_Shadow", source = "EventSetting row Dm_MelodyGet_Shadow; grant Dm_MelodyGet_Shadow/Event21 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Shadow", source = "EventSetting row Dm_MelodyGet_Shadow; grant Dm_MelodyGet_Shadow/Event21 on every walk of cut C13; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Song from Impa"]
@@ -407,7 +407,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event59"]
 track = [
-  { played = "Dm_MelodyGet_Zelda", source = "EventSetting row Dm_MelodyGet_Zelda; grant Dm_MelodyGet_Zelda/Event111 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Zelda", source = "EventSetting row Dm_MelodyGet_Zelda; grant Dm_MelodyGet_Zelda/Event111 on every walk of cut C10; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Song from Malon"]
@@ -415,7 +415,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event60"]
 track = [
-  { played = "Dm_MelodyGet_Epona", source = "EventSetting row Dm_MelodyGet_Epona; grant Dm_MelodyGet_Epona/Event11 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Epona", source = "EventSetting row Dm_MelodyGet_Epona; grant Dm_MelodyGet_Epona/Event11 on every walk of cut C04; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Song from Ocarina of Time"]
@@ -423,7 +423,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event63"]
 track = [
-  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event4 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event4 on every walk of cut C10; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Song from Royal Familys Tomb"]
@@ -439,7 +439,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event61"]
 track = [
-  { played = "Dm_MelodyGet_Saria", source = "EventSetting row Dm_MelodyGet_Saria; grant Dm_MelodyGet_Saria/Event109 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Saria", source = "EventSetting row Dm_MelodyGet_Saria; grant Dm_MelodyGet_Saria/Event109 on every walk of cut C12; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."Song from Windmill"]
@@ -453,7 +453,7 @@ skip = ["Dm_SY_Ocarina/Event64"]
 class = "swap"
 gate = "the cutscene plays once"
 track = [
-  { played = "Dm_TimeTemple_0130", source = "EventSetting row Dm_TimeTemple_0130; grant Dm_TimeTemple_0130/Event85 on every walk of cut [; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_TimeTemple_0130", source = "EventSetting row Dm_TimeTemple_0130; grant Dm_TimeTemple_0130/Event85 on every walk of cut C01; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."ToT Reward from Rauru"]
