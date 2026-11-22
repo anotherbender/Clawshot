@@ -272,8 +272,6 @@ def test_ocarina_pack_refuses_members_it_would_add(extra):
 def ocarina_romfs(root, zsdic_pack, *, missing=None):
     dictionaries = zsdic.Dictionaries.from_pack(zsdic_pack)
     files = {zsdic.PACK_PATH: zsdic_pack}
-    for path in getitem.OCARINA_DUMP_FILES:
-        files[path] = b"synthetic"
     donor = getitem.pack_path(getitem.DONOR)
     files[donor] = dictionaries.compress(donor, donor_pack())
     for actor in getitem.OCARINAS:
@@ -302,19 +300,9 @@ def test_ocarina_changes_touch_actor_info_and_both_packs(tmp_path, zsdic_pack):
         assert sarc.read(changes[path](native))[getitem.PERFORMER] == NATIVE_POUCH_PERFORMER
 
 
-@pytest.mark.parametrize(
-    "missing",
-    [
-        "AS/Item_Common.root.asb.zs",
-        "Model/Item_Common_Animation.anim.bfres.zs",
-        "Model/Item_Ocarina_Fairy_Animation.anim.bfres.zs",
-        "Model/Item_Ocarina_Time_Animation.anim.bfres.zs",
-        "Pack/Actor/Item_Boomerang.pack.zs",
-    ],
-)
-def test_ocarina_changes_refuse_a_dump_without_what_the_fix_names(tmp_path, zsdic_pack, missing):
-    ocarina_romfs(tmp_path, zsdic_pack, missing=missing)
-    with pytest.raises(PatchError, match=missing.replace(".", r"\.")):
+def test_ocarina_changes_refuse_a_dump_without_the_donor_pack(tmp_path, zsdic_pack):
+    ocarina_romfs(tmp_path, zsdic_pack, missing="Pack/Actor/Item_Boomerang.pack.zs")
+    with pytest.raises(PatchError, match=r"Pack/Actor/Item_Boomerang\.pack\.zs"):
         getitem.ocarina_changes(tmp_path)
 
 
@@ -334,7 +322,6 @@ def test_native_inputs_name_every_dump_file_the_ocarina_step_reads():
         getitem.ACTOR_INFO,
         getitem.pack_path(getitem.DONOR),
         *map(getitem.pack_path, getitem.OCARINAS),
-        *getitem.OCARINA_DUMP_FILES,
     }
 
 

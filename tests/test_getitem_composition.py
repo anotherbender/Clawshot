@@ -32,7 +32,7 @@ def insert_row(name):
 
 @pytest.fixture
 def ocarina_world(combined):
-    """The composition romfs plus the two ocarina rows and packs and the files the fix names."""
+    """The composition romfs plus the two ocarina rows and packs."""
 
     def add_rows(rows):
         rows.extend({"__RowId": a, "ActorName": a, "CalcPriority": "After"} for a in getitem.OCARINAS)
@@ -53,8 +53,6 @@ def ocarina_world(combined):
         sizes.set(getitem.pack_path(actor), 1 << 20)
         for name in pack:
             sizes.set(name, PARAM_ENTRY)
-    for path in getitem.OCARINA_DUMP_FILES:
-        put(combined, path, b"synthetic")
     put(combined, rstb.TABLE_PATH, rstb.write(sizes))
     return combined
 

@@ -42,7 +42,8 @@ SARIA_PROP = "Dm_Item_Ocarina_Fairy_Saria"
 DONOR = "Item_Boomerang"
 ANIMATION_SET = "AS/Item_Common.root.asb"
 COMMON_ANIMATION = "Item_Common_Animation"
-# What the ocarina get model names in the dump; the game loads them, the generator only checks they exist.
+# What the ocarina get model names; the game loads them from its own romfs. The generator never reads them, so they
+# stay out of the app's working set; tests/test_getitem_ocarina_dump.py checks the dump holds them.
 OCARINA_DUMP_FILES = (
     ANIMATION_SET + ".zs",
     f"Model/{COMMON_ANIMATION}.anim.bfres.zs",
@@ -160,7 +161,6 @@ def native_inputs() -> tuple[str, ...]:
         ACTOR_INFO,
         pack_path(DONOR),
         *(pack_path(actor) for actor in OCARINAS),
-        *OCARINA_DUMP_FILES,
     )
 
 
@@ -170,9 +170,8 @@ def ocarina_changes(romfs: str | Path) -> dict[str, Callable[[bytes], bytes]]:
     Compose last on these files (after ``ocarina.changes``): it checks only the native fields it changes."""
     romfs = Path(romfs)
     donor_path = pack_path(DONOR)
-    for path in (*OCARINA_DUMP_FILES, donor_path):
-        if not (romfs / path).is_file():
-            raise PatchError(f"the dump has no {path}, which the ocarina get model needs")
+    if not (romfs / donor_path).is_file():
+        raise PatchError(f"the dump has no {donor_path}, which the ocarina get model copies from")
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)
     donor = dictionaries.decompress(donor_path, (romfs / donor_path).read_bytes())
     out: dict[str, Callable[[bytes], bytes]] = {ACTOR_INFO: patch_ocarina_actor_info}
