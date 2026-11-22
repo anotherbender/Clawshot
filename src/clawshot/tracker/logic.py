@@ -316,7 +316,7 @@ def search_items(inv: Inventory, world: World) -> list[str]:
 @dataclass(frozen=True)
 class VanillaRow:
     """One fixed vanilla pick-up (spec D19). ``shared``: a shuffled check of the seed can also give the item, so
-    holding it does not say this location was taken (8.3)."""
+    holding it does not say this location was taken (8.3; :func:`vanilla_rows` says how it is decided)."""
 
     location: str
     label: str
@@ -352,13 +352,38 @@ def search_counts(world: World, item: str) -> frozenset[str]:
     return frozenset({item, info.alias[0]} if info is not None and info.alias else {item})
 
 
+def _can_give(world: World, given: str, item: str) -> bool:
+    """Whether a check holding ``given`` can raise what the tracker counts for ``item`` (8.3): the same item, an item
+    whose alias adds to it, or, for a fixed tier (``Item.tier``), its chain's counter, an item adding to the chain or
+    a tier at least as high."""
+    if given == item:
+        return True
+    info, other = world.items.get(item), world.items.get(given)
+    alias = other.alias if other is not None else None
+    if alias is not None and alias[0] == item and not other.tier:
+        return True
+    if info is None or not info.tier or info.alias is None:
+        return False
+    chain, need = info.alias
+    return given == chain or (alias is not None and alias[0] == chain and (not other.tier or alias[1] >= need))
+
+
 def vanilla_rows(seed: Seed, world: World, scope: str | None = None) -> tuple[VanillaRow, ...]:
     """The seed's fixed vanilla pick-ups in world order (8.1): world locations not in the spoiler's placements whose
     vanilla item is progression, not N64-only, not of :data:`VANILLA_SKIPPED_TYPES`, in ``scope``
     (:data:`VANILLA_SCOPE` by default), and read by the seed's logic: collecting it raises a count some rule of the
     world reads (:func:`logic_reads`, :func:`search_counts`). The search waits only on those counts, so any other
     item cannot change what is in logic. In a seed's world that leaves out the native chains' fixed tiers (Silver
-    and Golden Scale, the wallets, the Great Fairies' magic meters), which count as a bonus only."""
+    and Golden Scale, the wallets, the Great Fairies' magic meters), which count as a bonus only.
+
+    Rows depend on the settings only, never on what the seed placed where. The placements give only the set of
+    shuffled locations, which the settings decide and the tracker lists anyway. ``shared`` compares the row's item
+    with those locations' vanilla items, the pool the settings give (``generate.fill.fill``), not with the items the
+    spoiler placed. Two parts of the real pool are not seen. The remake's own chest contents
+    (``patch.plan.remake_vanilla``) are read from the dump; on the tested seeds they differ from the world's only in
+    Bombchu amounts, one more Deku Shield and one fewer Bottom of the Well small key, none an item that one location
+    alone gives (the default scope). The chain copies that replace filler (``generate.progressive.normalize_pool``)
+    count only toward their chains."""
     from clawshot.generate import names
 
     scope = scope or VANILLA_SCOPE
@@ -366,7 +391,7 @@ def vanilla_rows(seed: Seed, world: World, scope: str | None = None) -> tuple[Va
         raise ValueError(f"unknown vanilla scope {scope!r}")
     reads = logic_reads(world)
     placed = {check.location for check in seed.checks}
-    placed_items = {check.item for check in seed.checks}
+    pool = {loc.vanilla for name in placed if (loc := world.locations.get(name)) is not None and loc.vanilla}
     sources = Counter(loc.vanilla for loc in world.locations.values() if loc.vanilla is not None)
     places = seeds.location_index()
     catalog = seeds._catalog()
@@ -391,7 +416,7 @@ def vanilla_rows(seed: Seed, world: World, scope: str | None = None) -> tuple[Va
                 dungeon=place.dungeon if place else world.regions[loc.region].dungeon,
                 item=loc.vanilla,
                 item_label=shown.get(loc.vanilla, loc.vanilla),
-                shared=loc.vanilla in placed_items,
+                shared=any(_can_give(world, given, item.name) for given in pool),
             )
         )
     return tuple(rows)

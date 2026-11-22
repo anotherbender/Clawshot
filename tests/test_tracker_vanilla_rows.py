@@ -208,11 +208,40 @@ def test_an_unreadable_item_is_unknown_with_a_reason(tmp_path, world):
     assert "in_logic" in row  # unknown and unmarked is open (3.1)
 
 
-def test_an_item_a_shuffled_check_can_give_is_unknown(tmp_path, world):
+# S1: a shuffled check can give the item when one of the shuffled locations' own (vanilla) items is it: the pool the
+# settings give. The items the spoiler placed are never read, so rows depend on the settings only.
+def test_an_item_a_shuffled_check_can_give_is_unknown(tmp_path, world, monkeypatch):
+    spec = copy.deepcopy(SPEC)
+    spec["regions"][1]["locations"]["Child Chest"]["vanilla"] = "Lens of Truth"  # a shuffled check's own item
+    monkeypatch.setattr(tracker_logic, "world_spec", lambda: spec)
+    _, seed, logic = state_for(tmp_path, {BOOMERANG: 1})
+    world = logic.loaded.world
+    rows = {row.location: row for row in tracker_logic.vanilla_rows(seed, world, "all")}
+    assert rows["Lens Pickup A"].shared and rows["Lens Pickup B"].shared and not rows["Boomerang Pickup"].shared
+    inv = tracker_logic.Inventory({"Lens of Truth": 1}, ())
+    collected, reason = tracker_logic.vanilla_collected(rows["Lens Pickup A"], inv, world)
+    assert collected is None and "shuffled check" in reason
+
+
+def test_rows_never_read_the_placed_items(tmp_path, world):
+    plain, seed, logic = state_for(tmp_path, {BOOMERANG: 1})
+    # The same shuffled locations with other items: the Boomerang now in a chest, per the spoiler.
     placements = PLACEMENTS | {"Boomerang Chest": "Boomerang"}
-    state, _, _ = state_for(tmp_path, {BOOMERANG: 1}, placements=placements)
-    row = vanilla(state)["Boomerang Pickup"]
-    assert row["collected"] is None and "shuffled check" in row["reason"]
+    moved, other, _ = state_for(tmp_path, {BOOMERANG: 1}, placements=placements, name="moved")
+    world = logic.loaded.world
+    assert tracker_logic.vanilla_rows(seed, world, "all") == tracker_logic.vanilla_rows(other, world, "all")
+    assert vanilla(plain) == vanilla(moved) and vanilla(moved)["Boomerang Pickup"]["collected"] is True
+
+
+def test_a_tier_is_shared_only_by_a_check_that_can_reach_it(chest_only):
+    seed, world = chest_only
+    # Saria's Fairy Ocarina (Ocarina 1) shuffled cannot give the Ocarina of Time (Ocarina 2), and the reverse can.
+    saria = SimpleNamespace(checks=[*seed.checks, SimpleNamespace(location="LW Gift from Saria", item="Rupees (5)")])
+    rows = {row.location: row for row in tracker_logic.vanilla_rows(saria, world)}
+    assert "LW Gift from Saria" not in rows and rows["HF Ocarina of Time Item"].shared is False
+    drawbridge = SimpleNamespace(checks=[*seed.checks, SimpleNamespace(location="HF Ocarina of Time Item", item="x")])
+    rows = {row.location: row for row in tracker_logic.vanilla_rows(drawbridge, world)}
+    assert "HF Ocarina of Time Item" not in rows and rows["LW Gift from Saria"].shared is True
 
 
 def test_a_fixed_tier_counts_its_chain(tmp_path, world):
