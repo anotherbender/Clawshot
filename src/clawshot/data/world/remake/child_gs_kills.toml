@@ -1,0 +1,22 @@
+# Round 21 (cs21d): child Gold Skulltulas whose OoT Randomizer rule has no kill. Remake build e0f3ccfa.
+# Kareem, 2026-11-22, in game: the Lon Lon Ranch tree and Market guard-house Gold Skulltulas pop out after the
+# bonk/crate and still need killing; many early child tokens need a sword, Slingshot or Boomerang. In the dump each
+# is an Enemy_Skulltula_Gold with Enemy_Skulltula_Gold_AppearPopOut, the enemy whose death creates the token
+# (patch/tokens.py check_source: LifeDepleted drops it). The kill uses can_child_attack, as the other child token
+# rules do (KF GS Know It All House, ZR GS Ladder, LH GS Small Island). Kakariko's four night tokens get the same
+# in remake/child_kakariko.toml. Audit and list: plans/rounds/r21-sticks.md.
+
+[locations."LLR GS Tree"]
+rule = "is_child and can_bonk and can_child_attack"
+was = "is_child and can_bonk"
+source = "Overworld.json:2798. Kareem, 2026-11-22, in game: the Gold Skulltula pops out of the tree after the bonk and must be killed. HyruleField Child/Adult Static Enemy_Skulltula_Gold Hash 341792603838029977 (-40,158,201), AppearPopOut. plans/rounds/r21-sticks.md."
+
+[locations."Market GS Guard House"]
+rule = "is_child and can_break_crate and can_child_attack"
+was = "is_child and can_break_crate"
+source = "Overworld.json:1528. Kareem, 2026-11-22, in game: the Gold Skulltula pops out of the crate and must be killed. Market_Child_Static Enemy_Skulltula_Gold Hash 8942465719711548237 (17,102,58), AppearPopOut. plans/rounds/r21-sticks.md."
+
+[locations."ZF GS Tree"]
+rule = "is_child and can_bonk and can_child_attack"
+was = "is_child and can_bonk"
+source = "Overworld.json:2686. The Lon Lon Ranch tree's kind (Kareem, 2026-11-22, in game, played there, not here): ZoraFountain_Child_Static Enemy_Skulltula_Gold Hash 17355397719442343054 (49,110,32), AppearPopOut, the same pop-out enemy whose death drops the token. Tightening. plans/rounds/r21-sticks.md."

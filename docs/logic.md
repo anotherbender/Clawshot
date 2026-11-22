@@ -68,6 +68,12 @@ by chance). Loose sticks outside pots (Deku Tree grass, a Lake Hylia floor stick
 The tracker's in-logic view rebuilds the same world, so it follows.
 [Per-event evidence](../plans/rounds/r21-sticks.md).
 
+**Child Gold Skulltulas need a kill (round 21).** A token is the death drop of its Gold Skulltula, so a
+child token needs `can_child_attack` like the rest: `LLR GS Tree` and `Market GS Guard House` (Kareem, in
+game: the Skulltula pops out of the tree or crate and must be killed), `ZF GS Tree` and Kakariko's four
+night tokens (`remake/child_gs_kills.toml`, `remake/child_kakariko.toml`) were the OoT Randomizer rules
+without one. [Audit](../plans/rounds/r21-sticks.md).
+
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
 Boots or Serenade are shuffled. Claude chose the r16 precaution on 2026-11-17; Kareem was informed.
