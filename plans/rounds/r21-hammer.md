@@ -184,8 +184,10 @@ Checklist (candidate first):
 
 1. Start `hammer-beamos-next.bat`. Continue the save (adult Link by the Lon Lon Ranch fence, token pose).
 2. Debug > Teleport to Death Mountain Trail (or Goron City) and walk to Dodongo's Cavern; only Teleport and the clock
-   are allowed. Walk in through its entrance; its boulder is already gone in this save.
-3. In the first big room, find a Beamos (the spinning one-eyed statue that fires a beam). Put the Megaton Hammer on
+   are allowed. Walk in through its entrance. If the boulder in front of it is still there, break it with the Hammer
+   (that is the boulder class, already shown on 0.2.5; note whether it broke).
+3. Near the start (the dump places three Beamos in the cavern's opening rooms; any Beamos will do), find a Beamos (the
+   spinning one-eyed statue that fires a beam). Put the Megaton Hammer on
    a button. Using only the Hammer (no bombs, no sword), walk up to the Beamos and hit it, up to three times.
    **Pass:** it is destroyed (blows up as it does from a bomb). **Fail:** the Hammer bounces or it takes no damage.
    If one Beamos fails, try a second one once.
