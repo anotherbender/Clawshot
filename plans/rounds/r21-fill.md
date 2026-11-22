@@ -45,7 +45,7 @@ Same two causes as round 20, with the same proportions. Both are construction or
 frontiers have 68–97 allowed empty checks that cannot be reached yet, and the filler failures leave 36–45 empty
 non-chest checks that flexible progression could have taken instead of the last chests.
 
-## Candidate (`bd059b0`)
+## Candidate (`137daca`, rebased from `bd059b0` onto `f7ba65f`, a doc-only main move)
 
 Proposed by cs21h from the round 20 and 21 payloads. Two changes in `generate/fill.py`, neither touching `allowed`,
 logic, pools, swaps or the retry bound:
@@ -62,6 +62,11 @@ logic, pools, swaps or the retry bound:
 Defaults and Recommended do not shuffle Token, so (1) does not apply to them; (2) can apply to any recipe once
 chests run short.
 
+Spec change (proposed by cs21h, for Claude's review): `plans/04-world-format.md` stage 6 said "Token items retain
+the same seeded random candidate ordering as other progression; no weight or reserved quota" (round 19). The
+candidate changes the *item* order (tokens after native displays, before the rest) and adds the chest reserve; each
+item's candidate locations keep their seeded order and no quota is added. Stage 6 now says so.
+
 Synthetic witness `test_flexible_progression_leaves_the_last_chest_to_a_released_map` (`tests/test_fill.py`, round
 20's four-check shape): frozen main fails it with `no beatable fill in 1 attempts; last: items left unplaced:
 ['Map (Temple)']` (`map-witness-main.log`); the candidate passes it, with a tool still landing in a spare chest in
@@ -74,7 +79,12 @@ tests/test_generate.py tests/test_tokens.py tests/test_reward_bridge.py` → **3
 (`focused-1.log`). Smoke runs of the candidate on round 20's nine failing broad seeds, single process: all nine
 filled on the first attempt (not a measurement).
 
-Paired run: waiting for a lock slot (READY FOR LOCK posted 17:37).
+Cost proxy (not a timing claim; wall clock was unusable beside cs21b's full gate): one `fill` attempt each, broad
+inputs, seeds 0–4 and 6, profiled call counts candidate/main = 0.996, 0.957, 0.956, 0.942, 0.948, 0.973. Tokens
+first does not make the fill do more work per attempt.
+
+Paired run: placed 7th in `gate-order.txt` (after cs21b, cs21d, cs21f, cs21e); if sticks has merged by then,
+rebase, recapture inputs from the new main, refresh `baseline_fill.py` from main, and run on that head.
 
 ## Lock note
 
