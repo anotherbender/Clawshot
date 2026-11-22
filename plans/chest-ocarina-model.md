@@ -137,7 +137,7 @@ mods didn't include it.
 | D3 | Remove the round-8 ocarina prop staging; song model swaps stay as they are | Claude, accepted |
 | D4 | Mixed in-game QA: Claude through the control bridge (permission asked again), BBender the native scenes | Claude, accepted |
 | D5 | A broken native scene or get path: stop and report; BBender decides | Claude, accepted |
-| D6 | Ocarinas at show-item hand-overs and the Fairy Ocarina at Skulltulas: not decided, left open | BBender |
+| D6 | Ocarinas at show-item hand-overs and the Fairy Ocarina at Skulltulas: deferred to a later change, not in this PR | BBender |
 | D7 | No guessed AnimationParam size entry: stop if no constant fits | Claude, accepted |
 | D8 | One branch, one PR | Claude, accepted |
 
@@ -187,6 +187,7 @@ v3.1.1.
 | 4.5 re-check: native Saria gift with the prop fix (current build) | D (seed 4242 current build; test copy: Mido's chests give the three stones) | BBender (played; Claude launched, relaunched and teleported), 2026-11-22, run `ocarina-qa/runs/D1` | **Fail (D5, stopped):** still glitched. Two ocarinas overlapping while Saria presents the gift, and later **her red ocarina shown twice, merged into one odd shape** at her chest (BBender's screenshots). Differences from V3 (clean): the gift is the native Fairy Ocarina (V3: Ocarina of Time via gift shuffle), and the Fairy Ocarina was **not** owned before the scene (V3: from the big chest first) |
 | 4.5 experiment D2: as D, plus `CalcPriority: After` on `Npc_Equipment_009` and `Dm_Item_Ocarina_Fairy` (every row sharing the Fairy Ocarina's model project except the instrument) | D2 | BBender (played; Claude launched and teleported), 2026-11-22, run `ocarina-qa/runs/D2` | **Fail:** still glitched. Experiments stopped (BBender's call before the run) |
 | 4.5 experiment E: as D (prop row only, like V3), plus the Fairy Ocarina in the big chest where the save stands (test copy); native farewell gift (Fairy) | E | BBender (played; Claude launched and teleported), 2026-11-22, run `ocarina-qa/runs/E1` | **Clean:** no glitch. `IsGet.Item_Ocarina_Fairy` 1 and `EquipOcarina` = Fairy before the farewell |
+| 4.6 Zelda's Ocarina of Time scene (`Dm_MelodyGet_Time`, moat) | BBender's own app seed `seed-2408538532` (cutscene/NPC/song shuffle; `HF Ocarina of Time Item` = Rupees (20)) | BBender, 2026-11-22 | **Pass:** the scene played through; Zelda's ocarina (`Dm_Item_Ocarina_Time`, her `Weapon_L`) looked normal. Link held and then played the **Fairy Ocarina** at the moat and in the Song of Time lesson: he did not own the Ocarina of Time yet (the moat gave the seed's item), and the flow binds no ocarina to Link, so he shows his own instrument. Gift/cutscene shuffle's native movie, not this feature |
 | 4.5 Native Saria gift (`Dm_Kokiri_0155`) | 4242, default settings (Chest shuffled, gifts vanilla), output `C:/Users/bened/ootr/work/ocarina-qa/manual-4242` | BBender, 2026-11-22 | Pass: the cutscene looked normal; playing the ocarina afterwards was normal |
 
 Seed A: `ocarina-qa/tools/build_seed.py`, Chest + Token + Gift, base seed 1 with `KF Midos Bottom Right Chest` =
@@ -265,7 +266,7 @@ and so does the prop row (it helps when the Fairy Ocarina was obtained before th
 farewell is documented with the known issues; `skip_saria_farewell` avoids the movie. No further experiments (the
 open "owned vs loaded" question, experiment F, was offered and declined).
 
-## In-game acceptance (the investigation's list; results above, 4.6 Zelda's scene not yet played)
+## In-game acceptance (the investigation's list; results above)
 
 1. A real generated seed (not the experiment mod) with both ocarinas in chests: model visible, spinning, flat.
    Ocarina of Time then Fairy Ocarina: the Ocarina of Time stays equipped (`patch/ocarina.py`), songs kept.
