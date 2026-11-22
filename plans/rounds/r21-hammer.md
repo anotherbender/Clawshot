@@ -205,7 +205,16 @@ target is unidentified), the high Beamos (out of Hammer reach), D1 (a question, 
 
 ## Sweep and gates
 
-SWEEP_PLACEHOLDER
+Stacked on cs21d's sticks head `9d68e50` (not merged yet) so that one lock hold covers the head that will merge: both
+tracks loosen or tighten world rules and change placements. The only conflict was `docs/logic.md` (two new paragraphs
+at one spot; both kept, sticks first). The head merges cleanly with main `f7ba65f`. If sticks changes before it
+merges, rebase, rerun focused tests and freeze again. Focused tests on the stacked head (`-n 2`, workers 1): 245
+passed, 312 skipped (dump tests without `OOT_ROMFS`); ruff format and check clean.
+
+Pending, in one gate-lock hold, all on the frozen head (`work/r21-hammer/sweep.py`, workers 6, script outside the
+repo): 200 broad + 50 Defaults + 50 Recommended (seeds 21050000+), plus 50 broad with Master Sword shuffle on (the
+only setting where `adult_weapon` differs from `is_adult`), then the full gate (synthetic `-n 8`/workers 4, dump
+`-n 8`/workers 3).
 
 ## Every rule, by class
 
