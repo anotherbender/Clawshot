@@ -340,3 +340,16 @@ def test_the_app_working_set_holds_the_ocarina_inputs():
 
     wanted = working_files(SimpleNamespace(files=[]), resource_spec())
     assert set(getitem.native_inputs()) <= wanted, sorted(set(getitem.native_inputs()) - wanted)
+
+
+def test_only_a_chest_holding_an_ocarina_asks_for_the_get_model():
+    from clawshot.patch.items import ItemActors
+
+    actors = ItemActors(
+        actors={"Fairy Ocarina": getitem.FAIRY, "Ocarina of Time": getitem.TIME, "Bow": "Item_Bow"}, sources={}
+    )
+    placements = {"Chest A": "Bow", "Chest B": "Ocarina of Time", "Saria": "Fairy Ocarina", "Chest C": "Nothing"}
+    chests = ["Chest A", "Chest B", "Chest C"]
+    assert getitem.chest_ocarinas(placements, chests, actors) == ["Chest B"]
+    # An ocarina outside a chest (a gift, its vanilla spot) does not count.
+    assert getitem.chest_ocarinas(placements, ["Chest A", "Chest C"], actors) == []

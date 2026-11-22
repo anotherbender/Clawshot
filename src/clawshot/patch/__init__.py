@@ -271,8 +271,10 @@ def make_seed(
     plan, progressive_changes = progressive.changes(romfs, plan, prior_changes=changes)
     changes += (progressive_changes, bags.changes(romfs))
     changes += (ocarina.changes(romfs, prior_changes=changes),)
-    # Every seed (D2): the chest ocarinas' get model. Last on ActorInfo and the ocarina packs, after every row edit.
-    changes += (getitem.ocarina_changes(romfs),)
+    # Only seeds that put an ocarina in a chest (Q1 option b, Claude 2026-11-22, pending Kareem): the get model
+    # changes Saria's native farewell cosmetically. Last on ActorInfo and the ocarina packs, after every row edit.
+    if getitem.chest_ocarinas(out.placements, chests, table):
+        changes += (getitem.ocarina_changes(romfs),)
     return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files, token_rows)
 
 

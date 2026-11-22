@@ -1,18 +1,19 @@
 """Get-item display: what an item shows in Link's get pose; no inventory or chest-admission policy changes.
 
-The ocarinas' get model (:func:`ocarina_changes`, every seed): the two ``ActorInfo`` rows lose ``CalcPriority``
-and each ocarina pack gets the pouch get-pose performer, the common animation set and its own AnimationParam
-(plans/chest-ocarina-model.md, run O). Equipment components stay native.
+The ocarinas' get model (:func:`ocarina_changes`, in seeds that put an ocarina in a chest: :func:`chest_ocarinas`):
+the two ``ActorInfo`` rows lose ``CalcPriority`` and each ocarina pack gets the pouch get-pose performer, the common
+animation set and its own AnimationParam (plans/chest-ocarina-model.md, run O). Equipment components stay native.
 
 Songs borrow native ocarina meshes (:func:`changes`, an unwired experiment pending visual review).
 """
 
 import copy
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from functools import partial
 from pathlib import Path
 
 from clawshot.formats import byml, sarc, zsdic
+from clawshot.patch.items import ItemActors
 from clawshot.patch.plan import PatchError
 from clawshot.patch.shops import actor_path, member_path, resolve_member
 
@@ -164,8 +165,15 @@ def native_inputs() -> tuple[str, ...]:
     )
 
 
+def chest_ocarinas(placements: Mapping[str, str], chests: Iterable[str], actors: ItemActors) -> list[str]:
+    """The chests (in ``chests`` order) whose placed item is an ocarina: a seed gets :func:`ocarina_changes` only
+    when there is one. Elsewhere the change shows nothing and would only alter Saria's native farewell, where her
+    own ocarina is drawn wrong without the instrument's ``CalcPriority`` (plans/chest-ocarina-model.md, runs D, D2)."""
+    return [name for name in chests if actors.actors.get(placements.get(name, "")) in OCARINAS]
+
+
 def ocarina_changes(romfs: str | Path) -> dict[str, Callable[[bytes], bytes]]:
-    """The chest-ocarina get model, for every seed: ActorInfo rows and both ocarina packs.
+    """The chest-ocarina get model: ActorInfo rows and both ocarina packs (``make_seed`` asks :func:`chest_ocarinas`).
 
     Compose last on these files (after ``ocarina.changes``): it checks only the native fields it changes."""
     romfs = Path(romfs)

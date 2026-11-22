@@ -393,7 +393,10 @@ def test_custom_chest_items_and_token_pickups_write_one_valid_set_of_tables(romf
     write_seed(output, romfs, out)
     for path in TABLES:
         native = {row["__RowId"]: row for row in byml.read(before[path])}
-        if path == getitem.ACTOR_INFO:  # every seed's ocarina get model: the only change to native rows
+        # A seed with an ocarina in a chest also carries the ocarina get model, its only change to native rows.
+        if path == getitem.ACTOR_INFO and any(
+            step.get(path) is getitem.patch_ocarina_actor_info for step in output.extra_changes
+        ):
             for actor in getitem.OCARINAS:
                 assert native[actor].pop("CalcPriority") == "After", actor
             assert "CalcPriority" not in native[getitem.SARIA_PROP]

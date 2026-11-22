@@ -1,15 +1,19 @@
 """The chest ocarinas' get model in a real generated seed, against the dump (plans/chest-ocarina-model.md, run O).
 
-A Chest + Token seed, so ActorInfo also carries another step's rows; every difference from the dump is named."""
+A Chest + Gift + Token seed with both ocarinas in chests, so ActorInfo also carries another step's rows; every
+difference from the dump is named. A seed with no ocarina in a chest carries none of it (Q1 option b)."""
 
 import pytest
 
 from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.generate import Settings
-from clawshot.patch import getitem, make_seed, ocarina, write_seed
+from clawshot.patch import getitem, gifts, make_seed, ocarina, write_seed
 from clawshot.patch.shops import actor_path, member_path
+from clawshot.world.load import load_spec
 
-SETTINGS = Settings(shuffle=("Chest", "Token"))
+SETTINGS = Settings(shuffle=("Chest", "Gift", "Token"))
+# Both ocarinas go to these chests (swapped with what the fill put there), whatever the fill chose.
+CHESTS = {"KF Midos Top Left Chest": "Fairy Ocarina", "KF Midos Top Right Chest": "Ocarina of Time"}
 # Steps allowed to change ActorInfo rows besides the ocarina step: they add rows of their own.
 ROW_STEPS = {
     "clawshot.patch.tokens",
@@ -19,9 +23,21 @@ ROW_STEPS = {
 }
 
 
+def chest_ocarina_seed(romfs):
+    """As the CLI builds a Gift seed (``gifts.seed_setup``), then both ocarinas swapped into :data:`CHESTS`."""
+    spec, settings, step = gifts.seed_setup(romfs, load_spec(), SETTINGS)
+    filled = make_seed(romfs, 7, settings, spec, extra_steps=[step])
+    placements = {name: filled.seed.placements[name] for name in filled.seed.shuffled}
+    for chest, item in CHESTS.items():
+        source = next(name for name, placed in placements.items() if placed == item)
+        placements[source], placements[chest] = placements[chest], item
+    return make_seed(romfs, 7, settings, spec, extra_steps=[step], placements=placements)
+
+
 @pytest.fixture(scope="module")
 def seed(romfs, tmp_path_factory):
-    output = make_seed(romfs, 7, SETTINGS)
+    output = chest_ocarina_seed(romfs)
+    assert {name: output.seed.placements[name] for name in CHESTS} == CHESTS
     out = tmp_path_factory.mktemp("ocarina-seed")
     written = {info.path: info for info in write_seed(output, romfs, out)}
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)
@@ -33,13 +49,27 @@ def seed(romfs, tmp_path_factory):
     return output, written, read, lambda path: read(path, out)
 
 
+@pytest.mark.dump
+def test_a_seed_without_a_chest_ocarina_keeps_the_native_rows_and_packs(romfs, tmp_path):
+    output = make_seed(romfs, 7, Settings(shuffle=("Chest", "Token")))  # Chest-only kinds: no ocarina in the pool
+    written = {info.path for info in write_seed(output, romfs, tmp_path / "seed")}
+    assert not written & set(map(getitem.pack_path, getitem.OCARINAS)), sorted(written)
+    dictionaries = zsdic.Dictionaries.from_romfs(romfs)
+    rows = byml.read(
+        dictionaries.decompress(getitem.ACTOR_INFO, (tmp_path / "seed/romfs" / getitem.ACTOR_INFO).read_bytes())
+    )
+    by_id = {row["__RowId"]: row for row in rows}
+    assert [by_id[actor].get("CalcPriority") for actor in getitem.OCARINAS] == ["After", "After"]
+    assert "CalcPriority" not in by_id[getitem.SARIA_PROP]
+
+
 def step_module(transform):
     function = getattr(transform, "func", transform)
     return function.__module__
 
 
 @pytest.mark.dump
-def test_every_seed_runs_the_ocarina_step_last_on_its_files(seed):
+def test_a_chest_ocarina_seed_runs_the_ocarina_step_last_on_its_files(seed):
     output, written, _, _ = seed
     paths = (getitem.ACTOR_INFO, *map(getitem.pack_path, getitem.OCARINAS))
     for path in paths:

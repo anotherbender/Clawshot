@@ -154,9 +154,9 @@ def test_same_seed_same_folder_in_two_processes(romfs, tmp_path):
         folders.append({p.relative_to(out).as_posix(): p.read_bytes() for p in sorted(out.rglob("*")) if p.is_file()})
     assert folders[0] == folders[1]
     assert "spoiler.json" in folders[0] and len(folders[0]) > 1
-    # Every seed carries the ocarina get model (ActorInfo and both ocarina packs).
-    for path in (getitem.ACTOR_INFO, *map(getitem.pack_path, getitem.OCARINAS)):
-        assert f"romfs/{path}" in folders[0], path
+    # A Chest-only seed can put no ocarina in a chest, so it carries no ocarina get model (Q1 option b).
+    for path in map(getitem.pack_path, getitem.OCARINAS):
+        assert f"romfs/{path}" not in folders[0], path
 
 
 def test_every_actor_in_the_table_is_in_the_game(romfs):
