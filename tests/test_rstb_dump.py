@@ -72,3 +72,25 @@ def test_dump_pack_member_formulas_fit_every_member_of_their_type(romfs, table_b
     print(f"{counts}: {len(members) - len(misfits)} of {len(members)} fit")
     assert counts[rstb.ACTOR_PARAM] > 8000 and counts["PouchContentParam"] > 100
     assert misfits == []
+
+
+@pytest.mark.dump
+def test_dump_animation_parameter_formula_fits_every_member(romfs, table_bytes):
+    """Every unique AnimationParam in every actor pack: 5096 + 88 per own AnimationResources entry (section 50)."""
+    dicts, data = table_bytes
+    table = rstb.read(data)
+    members: dict[str, bytes] = {}
+    for path in sorted(romfs.glob("Pack/Actor/*.pack.zs")):
+        relative = path.relative_to(romfs).as_posix()
+        for name, content in sarc.read(dicts.decompress(relative, path.read_bytes())).items():
+            if name.endswith(rstb.ANIMATION_PARAM):
+                assert members.setdefault(name, content) == content, f"{name} differs between packs"
+    misfits = []
+    for name, content in sorted(members.items()):
+        resources = len(byml.read(content).get("AnimationResources", []))
+        needed = rstb.required_size(name, len(content), resources=resources)
+        if table.get(name) != needed:
+            misfits.append((name, len(content), resources, table.get(name), needed))
+    print(f"AnimationParam: {len(members) - len(misfits)} of {len(members)} fit")
+    assert len(members) > 500
+    assert misfits == []

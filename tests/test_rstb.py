@@ -87,6 +87,28 @@ def test_component_counts_belong_only_to_actor_parameters():
         rstb.required_size("Pack/Actor/X.pack.zs", 100, 3)
 
 
+ANIMATION = "Component/AnimationParam/X.engine__component__AnimationParam.bgyml"
+
+
+@pytest.mark.parametrize(
+    ("size", "resources", "entry"), [(100, 2, 128 + 5096 + 176), (20, 0, 32 + 5096), (472, 8, 480 + 5800)]
+)
+def test_an_animation_parameter_entry_counts_its_own_animation_resources(size, resources, entry):
+    assert rstb.required_size(ANIMATION, size, resources=resources) == entry
+    assert rstb.required_size(ANIMATION + ".zs", size, resources=resources) == entry
+
+
+def test_animation_resource_counts_belong_only_to_animation_parameters():
+    with pytest.raises(RstbError, match="AnimationResources"):
+        rstb.required_size(ANIMATION, 100)
+    with pytest.raises(RstbError, match="AnimationResources"):
+        rstb.required_size(ANIMATION, 100, resources=-1)
+    with pytest.raises(RstbError, match="only applies"):
+        rstb.required_size("Pack/Actor/X.pack.zs", 100, resources=2)
+    with pytest.raises(RstbError, match="only applies"):
+        rstb.required_size("Actor/X.engine__actor__ActorParam.bgyml", 100, 3, resources=2)
+
+
 def _header(magic=b"RESTBL", version=1, name_size=160, n_hash=0, n_name=0):
     return struct.pack("<6sIIII", magic, version, name_size, n_hash, n_name)
 
