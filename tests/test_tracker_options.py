@@ -11,7 +11,8 @@ from clawshot.ui.server import ASSETS
 
 NODE = shutil.which("node")
 pytestmark = pytest.mark.skipif(NODE is None, reason="Node is needed only for frontend fragment-parser tests")
-ALL = ["items", "quest", "dungeons"]
+DEFAULT = ["dungeons", "collection", "items", "rewards"]
+QUEST = ["collection", "songs", "rewards"]
 
 
 def parse_sections(tmp_path, fragments, parser="parseTrackerSections"):
@@ -208,6 +209,7 @@ const context = {
     areas: text('tracker-area'),
     cells: root.descendants().filter((el) => el.classList.contains('tracker-cell')).map((el) => ({
       className: el.className, label: el.attributes['aria-label'] || '',
+      captions: el.childNodes.filter((child) => child.tagName === 'SMALL').map((child) => child.textContent),
       badges: el.descendants().filter((child) => child.classList.contains('tracker-badge')).map((child) =>
         child.textContent),
     })),
@@ -250,7 +252,12 @@ def test_sections_select_groups_without_reordering_or_duplicate_groups(tmp_path)
         "#sections=quest,items,quest",
         "#sections=%20quest%20",
     ]
-    assert parse_sections(tmp_path, fragments) == [["dungeons"], ["items", "quest"], ["items", "quest"], ["quest"]]
+    assert parse_sections(tmp_path, fragments) == [
+        ["dungeons"],
+        ["collection", "items", "songs", "rewards"],
+        ["collection", "items", "songs", "rewards"],
+        QUEST,
+    ]
 
 
 def test_missing_empty_or_unknown_section_selection_falls_back_to_all(tmp_path):
@@ -262,7 +269,7 @@ def test_missing_empty_or_unknown_section_selection_falls_back_to_all(tmp_path):
         "#sections=items,,quest",
         "#sections=%20%20",
     ]
-    assert parse_sections(tmp_path, fragments) == [ALL for _ in fragments]
+    assert parse_sections(tmp_path, fragments) == [DEFAULT for _ in fragments]
 
 
 def test_dungeon_names_default_to_short(tmp_path):
@@ -340,3 +347,41 @@ def test_obs_before_any_save_draws_an_empty_inventory_not_unknown_tiles(tmp_path
     assert "?" in [badge for cell in unknown["cells"] for badge in cell["badges"]]
     missing = render_tracker(tmp_path, obs_snapshot("ok", held=False), obs=True, fragment="#labels=0")
     assert [badge for cell in missing["cells"] for badge in cell["badges"]] == []
+
+
+def test_each_obs_section_switches_on_its_own_and_checks_by_area_is_opt_in(tmp_path):
+    snap = obs_snapshot()
+    snap["state"]["songs"] = [{"id": "zeldas_lullaby", "group": "songs", "label": "Zelda's Lullaby", "held": True}]
+    snap["state"]["areas"] = [{"name": "Field", "collected": 1, "total": 3}]
+    fragments = ["", "#sections=songs", "#sections=areas", "#sections=dungeons,collection,items,songs,rewards,areas"]
+    shown = {}
+    for fragment in fragments:
+        rendered = render_tracker(tmp_path, snap, obs=True, fragment=fragment)
+        shown[fragment] = (
+            bool(rendered["dungeonRows"]),
+            bool(rendered["counts"]),
+            len(rendered["cells"]),
+            rendered["areas"],
+        )
+    assert shown[""] == (True, True, 2 + 6, [])  # 2 items + 6 drawn dungeon cells; no songs, no areas
+    assert shown["#sections=songs"] == (False, False, 1, [])
+    assert shown["#sections=areas"] == (False, False, 0, ["Field1 / 3"])
+    assert shown["#sections=dungeons,collection,items,songs,rewards,areas"] == (True, True, 2 + 6 + 1, ["Field1 / 3"])
+
+
+def test_the_obs_view_is_compact_unless_labels_are_asked_for(tmp_path):
+    assert render_tracker(tmp_path, obs_snapshot(), obs=True, fragment="")["compact"] is True
+    assert render_tracker(tmp_path, obs_snapshot(), obs=True, fragment="#labels=1")["compact"] is False
+
+
+def test_tiles_carry_captions_only_for_tiers_and_counts(tmp_path):
+    snap = obs_snapshot(held=True)
+    snap["state"]["items"] = [
+        {"id": "hookshot", "group": "upgrades", "label": "Hookshot", "held": True, "max_tier": 2, "tier": 1},
+        {"id": "bow", "group": "items", "label": "Bow", "held": True, "max_tier": 1, "count": 30},
+        {"id": "lens", "group": "items", "label": "Lens", "held": True, "max_tier": 1},
+        {"id": "boots", "group": "items", "label": "Boots", "held": False, "max_tier": 1},
+    ]
+    rendered = render_tracker(tmp_path, snap, obs=True, fragment="#labels=1&sections=items")
+    assert [cell["captions"] for cell in rendered["cells"]] == [["Tier 1"], ["30"], [], []]
+    assert "Not held" in rendered["cells"][3]["label"]  # the tooltip and accessible name keep the state

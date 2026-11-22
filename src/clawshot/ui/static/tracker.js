@@ -1,12 +1,17 @@
 "use strict";
 
-const TRACKER_SECTIONS = ["items", "quest", "dungeons"];
+// OBS sections, in drawing order. `quest` (older URLs) means collection, songs and rewards. Missing, empty or
+// unknown selections use the defaults, which keep the compact view within about 300x1000 px: dungeon keys, the
+// collection line, items, stones and medallions (songs and Checks by area are opt-in).
+const TRACKER_SECTIONS = ["dungeons", "collection", "items", "songs", "rewards", "areas"];
+const DEFAULT_SECTIONS = ["dungeons", "collection", "items", "rewards"];
+const SECTION_ALIASES = {quest: ["collection", "songs", "rewards"]};
 
 function parseTrackerSections(fragment) {
   const value = new URLSearchParams(fragment.replace(/^#/, "")).get("sections");
-  if (!value) return TRACKER_SECTIONS.slice();
-  const selected = value.split(",").map((part) => part.trim());
-  if (selected.some((part) => !TRACKER_SECTIONS.includes(part))) return TRACKER_SECTIONS.slice();
+  if (!value) return DEFAULT_SECTIONS.slice();
+  const selected = value.split(",").map((part) => part.trim()).flatMap((part) => SECTION_ALIASES[part] || [part]);
+  if (selected.some((part) => !TRACKER_SECTIONS.includes(part))) return DEFAULT_SECTIONS.slice();
   return TRACKER_SECTIONS.filter((part) => selected.includes(part));
 }
 
@@ -27,12 +32,14 @@ function parseDungeonNames(fragment) {
   const prefix = location.pathname.slice(0, location.pathname.lastIndexOf("/") + 1);
   const token = prefix.split("/")[2];
   const options = new URLSearchParams(location.hash.slice(1));
-  const compact = standalone && options.get("labels") === "0";
+  // Compact (no item labels) is the default; labels=1 asks for labelled cells.
+  const compact = standalone && options.get("labels") !== "1";
   const sections = new Set(standalone ? parseTrackerSections(location.hash) : TRACKER_SECTIONS);
   const dungeonNames = parseDungeonNames(location.hash);
   if (standalone && options.get("transparent") === "1") document.body.classList.add("tracker-transparent");
   let icons = options.get("icons") !== "0";
-  const defaultColumns = 4;
+  // Labelled cells default to 4 columns (about 340 px); compact cells to 6 (about 285 px).
+  const defaultColumns = compact ? 6 : 4;
   const requestedColumns = Number(options.get("columns") ?? defaultColumns);
   const columns = Number.isInteger(requestedColumns) && requestedColumns >= 1 && requestedColumns <= 8 ? requestedColumns : defaultColumns;
   if (standalone) {
@@ -186,26 +193,29 @@ function parseDungeonNames(fragment) {
     const obsFlags = node("div", "tracker-options tracker-obs-options");
     transparent = checkbox(obsFlags, "Transparent OBS background", false);
     transparent.addEventListener("change", updateObs);
-    labelToggle = checkbox(obsFlags, "OBS item labels", true, "tracker-obs-labels");
+    labelToggle = checkbox(obsFlags, "OBS item labels", false, "tracker-obs-labels");
     labelToggle.addEventListener("change", updateObs);
     columnSelect = select(obsFlags, "OBS columns", "tracker-obs-columns",
-      Array.from({length: 8}, (_, index) => [String(index + 1), String(index + 1)]), String(defaultColumns));
+      [["", "Auto"], ...Array.from({length: 8}, (_, index) => [String(index + 1), String(index + 1)])], "");
+    columnSelect.parentElement.title = "Auto: 4 with item labels, 6 without";
     columnSelect.addEventListener("change", updateObs);
     namesSelect = select(obsFlags, "OBS dungeon names", "tracker-obs-names",
       [["short", "Short"], ["full", "Full"], ["none", "Hidden"]], "short");
     namesSelect.addEventListener("change", updateObs);
-    for (const name of TRACKER_SECTIONS) {
-      const input = checkbox(obsFlags, "OBS " + name, true, "tracker-obs-sections-" + name);
-      if (name === "quest") input.parentElement.title = "Songs, stones, medallions, hearts and tokens";
+    const sectionRow = node("div", "tracker-options tracker-obs-sections");
+    sectionRow.append(document.createTextNode("OBS shows"));
+    for (const [name, caption] of [["dungeons", "Dungeon keys"], ["collection", "Collection"], ["items", "Items"],
+      ["songs", "Songs"], ["rewards", "Stones & medallions"], ["areas", "Checks by area"]]) {
+      const input = checkbox(sectionRow, caption, DEFAULT_SECTIONS.includes(name), "tracker-obs-sections-" + name);
       sectionToggles[name] = input;
       input.addEventListener("change", () => {
-        // No selection means all, matching empty/unknown fragment fallback.
+        // No selection means the defaults, matching the empty/unknown fragment fallback.
         if (!Object.values(sectionToggles).some((toggle) => toggle.checked))
-          for (const toggle of Object.values(sectionToggles)) toggle.checked = true;
+          for (const [other, toggle] of Object.entries(sectionToggles)) toggle.checked = DEFAULT_SECTIONS.includes(other);
         updateObs();
       });
     }
-    controls.append(obsFlags);
+    controls.append(obsFlags, sectionRow);
     const obs = node("div", "tracker-obs-link");
     const obsLabel = node("label", "", "OBS Browser Source URL (private; changes each app start)");
     obsUrl = node("input");
@@ -278,6 +288,7 @@ function parseDungeonNames(fragment) {
       labels: labelToggle.checked ? "1" : "0", columns: columnSelect.value, names: namesSelect.value,
       sections: TRACKER_SECTIONS.filter((name) => sectionToggles[name].checked).join(","),
     });
+    if (!columnSelect.value) fragment.delete("columns");  // Auto: 4 labelled, 6 compact
     obsUrl.value = new URL(prefix + "tracker.html#" + fragment, location.origin).href;
   }
   async function configure() {
@@ -360,14 +371,19 @@ function parseDungeonNames(fragment) {
         localIcon(el, cell.icon);
         el.append(node("span", "tracker-cell-label", label));
       }
-      // Without a save, counts and tiers are unread too.
+      // Without a save, counts and tiers are unread too. The tile's look says held or not; a caption appears only
+      // for a tier or a count (Tier 2, 30, 2 bottles), and the full description stays in the tooltip.
       let detail = noSave ? "No save yet" : held == null ? "Unknown" : held ? "Held" : "Not held";
-      if (!noSave && cell.basis === "slots") detail = cell.count == null ? "Count unknown" : cell.count + " bottle" + (cell.count === 1 ? "" : "s");
+      let caption = "";
+      if (!noSave && cell.basis === "slots") detail = caption = cell.count == null ? "Count unknown" : cell.count + " bottle" + (cell.count === 1 ? "" : "s");
       else if (!noSave) {
-        if (cell.max_tier > 1 && cell.tier != null && cell.tier > 0) detail = "Tier " + cell.tier;
-        if (cell.count != null) detail += " · " + cell.count;
+        if (cell.max_tier > 1 && cell.tier != null && cell.tier > 0) detail = caption = "Tier " + cell.tier;
+        if (cell.count != null) {
+          detail += " · " + cell.count;
+          caption = caption ? caption + " · " + cell.count : String(cell.count);
+        }
       }
-      el.append(node("small", "", detail));
+      if (caption && held !== false) el.append(node("small", "", caption));
       if (cell.contents?.length) el.append(node("small", "", cell.contents.map((bottle) => bottle.content || "?").join(", ")));
       el.title = label + " · " + detail + (cell.contents?.length ? " · " + cell.contents.map((bottle) => bottle.content || "?").join(", ") : "");
       el.setAttribute("aria-label", el.title);
@@ -783,7 +799,7 @@ function parseDungeonNames(fragment) {
         table.append(body); dungeonGroup.append(table);
       }
     }
-    if (sections.has("quest")) {
+    if (sections.has("collection")) {
       const health = state.hearts || {}, skulltulas = state.skulltula_checks || {};
       const counts = section("Collection");
       // Token stock and Skulltula source checks differ once Tokens are shuffled; Token-off seeds have no source checks.
@@ -793,11 +809,9 @@ function parseDungeonNames(fragment) {
         "Hearts " + show(health.containers ?? health.capacity) + " · Pieces " + show(health.pieces) + " · Gold Skulltulas " + show(state.tokens) + sources));
     }
     if (sections.has("items")) cells("Items & equipment", state.items, noSave);
-    if (sections.has("quest")) {
-      cells("Songs", state.songs, noSave);
-      cells("Stones & medallions", state.rewards, noSave);
-    }
-    if (standalone && sections.size === TRACKER_SECTIONS.length) {
+    if (sections.has("songs")) cells("Songs", state.songs, noSave);
+    if (sections.has("rewards")) cells("Stones & medallions", state.rewards, noSave);
+    if (standalone && sections.has("areas")) {
       // OBS keeps a spoiler-free per-area count; the check list itself lives on the app's Checks tab.
       const areas = section("Checks by area");
       areas.classList.add("tracker-areas-group");
