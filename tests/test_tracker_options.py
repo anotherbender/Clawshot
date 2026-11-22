@@ -14,21 +14,21 @@ pytestmark = pytest.mark.skipif(NODE is None, reason="Node is needed only for fr
 ALL = ["items", "quest", "dungeons"]
 
 
-def parse_sections(tmp_path, fragments):
+def parse_sections(tmp_path, fragments, parser="parseTrackerSections"):
     # The renderer exits without a root; the actual pure parser runs with Node's URLSearchParams.
     script = """
 const fs = require('node:fs');
 const vm = require('node:vm');
 const context = {document: {getElementById: () => null}, URLSearchParams};
 vm.runInNewContext(fs.readFileSync(process.argv[2], 'utf8'), context);
-const fragments = JSON.parse(fs.readFileSync(0, 'utf8'));
-console.log(JSON.stringify(fragments.map(value => context.parseTrackerSections(value))));
+const [parser, fragments] = JSON.parse(fs.readFileSync(0, 'utf8'));
+console.log(JSON.stringify(fragments.map(value => context[parser](value))));
 """
     runner = tmp_path / "tracker-options.cjs"
     runner.write_text(script, encoding="utf-8")
     result = subprocess.run(
         [NODE, str(runner), str(ASSETS / "tracker.js")],
-        input=json.dumps(fragments),
+        input=json.dumps([parser, fragments]),
         capture_output=True,
         text=True,
         timeout=10,
@@ -97,6 +97,7 @@ class Element {
   dispatch(type) { for (const listener of this.listeners[type] || []) listener({preventDefault() {}}); }
   focus() {}
   select() {}
+  get options() { return this.childNodes.filter((child) => child.tagName === 'OPTION'); }
   descendants() { return this.childNodes.flatMap((child) => [child, ...child.descendants()]); }
   querySelector(selector) { return this.querySelectorAll(selector)[0] ?? null; }
   querySelectorAll(selector) {
@@ -113,9 +114,14 @@ const root = new Element('div');
 const body = new Element('body');
 if (obs) body.dataset.tracker = 'obs';
 const documentElement = new Element('html');
+// The app page's Checks tab and side panel (absent on the OBS page); the Checks screen is the shown one.
+const checksRoot = new Element('div');
+const panelIds = ['checks', 'description-title', 'description-text', 'description-note', 'check-details'];
+const panel = Object.fromEntries(panelIds.map((id) => [id, new Element(id === 'check-details' ? 'div' : 'p')]));
+const byPageId = {'tracker-root': root, ...(obs ? {} : {'checks-root': checksRoot, ...panel})};
 const document = {
   body, documentElement,
-  getElementById: (id) => (id === 'tracker-root' ? root : null),
+  getElementById: (id) => byPageId[id] ?? null,
   createElement: (tag) => new Element(tag),
   createTextNode: (text) => new Element('#text', text),
 };
@@ -149,33 +155,45 @@ const context = {
   const settle = async () => {
     for (let turn = 0; turn < 20; turn++) await new Promise((resolve) => setImmediate(resolve));
   };
-  const byId = (id) => root.descendants().find((el) => el.id === id);
+  const all = () => [...root.descendants(), ...checksRoot.descendants()];
+  const byId = (id) => all().find((el) => el.id === id);
   for (const action of actions) {
     const target = action.id
       ? byId(action.id)
-      : root.descendants().filter((el) => el.classList.contains(action.class))[action.index || 0];
+      : all().filter((el) => el.classList.contains(action.class))[action.index || 0];
     if ('value' in action) target.value = action.value;
     if ('checked' in action) target.checked = action.checked;
     target.dispatch(action.event);
     await settle();
   }
-  const text = (name) => root.descendants().filter((el) => el.classList.contains(name)).map((el) => el.textContent);
+  const text = (name) => all().filter((el) => el.classList.contains(name)).map((el) => el.textContent);
   const shown = (el) => { for (let at = el; at; at = at.parentElement) if (at.hidden) return false; return true; };
   const control = (id) => {
     const el = byId(id);
     return el ? {value: el.value, checked: el.checked, disabled: !!el.disabled} : null;
   };
   console.log(JSON.stringify({
-    checks: root.descendants().filter((el) => el.classList.contains('tracker-check')).map((el) => ({
+    checks: all().filter((el) => el.classList.contains('tracker-check')).map((el) => ({
       id: el.dataset.check, text: el.textContent, className: el.className, shown: shown(el),
+      disabled: el.attributes['aria-disabled'] === 'true',
     })),
-    areaHeads: root.descendants().filter((el) => el.classList.contains('tracker-area-counts')).map((el) => ({
+    areaHeads: all().filter((el) => el.classList.contains('tracker-area-counts')).map((el) => ({
       text: el.textContent, shown: shown(el),
     })),
     notes: text('tracker-logic-note'),
     controls: {
-      age: control('tracker-age'), only: control('tracker-logic-only'), vanilla: control('tracker-vanilla'),
-      clear: control('tracker-clear-marks'),
+      age: control('tracker-age'), show: control('tracker-show'), finished: control('tracker-hide-finished'),
+      vanilla: control('tracker-vanilla'), clear: control('tracker-clear-marks'),
+    },
+    showOptions: (byId('tracker-show')?.options || []).map((option) => ({
+      value: option.value, disabled: !!option.disabled,
+    })),
+    legend: all().filter((el) => el.classList.contains('tracker-legend')).map((el) => ({
+      text: el.textContent, shown: shown(el),
+    })),
+    details: obs ? null : {
+      title: panel['description-title'].textContent, text: panel['description-text'].textContent,
+      body: panel['check-details'].textContent, shown: !panel['check-details'].hidden,
     },
     posts,
     storage: stored,
@@ -183,8 +201,19 @@ const context = {
     requested,
     compact: body.classList.contains('tracker-no-labels'),
     status: text('tracker-status'),  // a render error lands here, so a failed render prints its cause
+    checksStatus: text('tracker-checks-status'),
+    noSave: text('tracker-no-save'),
     counts: text('tracker-counts'),
     areas: text('tracker-area'),
+    cells: root.descendants().filter((el) => el.classList.contains('tracker-cell')).map((el) => ({
+      className: el.className, label: el.attributes['aria-label'] || '',
+      badges: el.descendants().filter((child) => child.classList.contains('tracker-badge')).map((child) =>
+        child.textContent),
+    })),
+    // Per OBS dungeon row: 'name:<shown name>', the item name of each drawn cell, '' for an empty slot.
+    dungeonRows: root.descendants().filter((el) => el.classList.contains('tracker-dungeon-row')).map((row) =>
+      row.childNodes.map((cell) => cell.classList.contains('tracker-dungeon-name') ? 'name:' + cell.textContent
+        : cell.classList.contains('tracker-dungeon-none') ? '' : cell.attributes['aria-label'].split(' · ')[1])),
   }));
 })();
 """
@@ -233,3 +262,80 @@ def test_missing_empty_or_unknown_section_selection_falls_back_to_all(tmp_path):
         "#sections=%20%20",
     ]
     assert parse_sections(tmp_path, fragments) == [ALL for _ in fragments]
+
+
+def test_dungeon_names_default_to_short(tmp_path):
+    fragments = ["#names=full", "#names=none", "#names=short", "#labels=0", "#names=", "#names=Full"]
+    assert parse_sections(tmp_path, fragments, "parseDungeonNames") == [
+        "full",
+        "none",
+        "short",
+        "short",
+        "short",
+        "short",
+    ]
+
+
+def obs_snapshot(status="ok", held=False):
+    """Two dungeons: the Deku Tree (no small keys or boss key in this seed) and the Forest Temple (all four)."""
+
+    def dungeon(name, struct, *, keys, boss):
+        return {
+            "name": name,
+            "id": struct,
+            "small_keys": {"held": None if held is None else 0, "found": None if held is None else 0, "total": keys},
+            "boss_key": held,
+            "map": held,
+            "compass": held,
+            "has_boss_key": boss,
+            "has_map": True,
+            "has_compass": True,
+        }
+
+    state = {
+        "seed": {"seed": 1},
+        "dungeons": [
+            dungeon("Deku Tree", "InsideTheDekuTree", keys=0, boss=False),
+            dungeon("Forest Temple", "ForestTemple", keys=5, boss=True),
+        ],
+        "items": [
+            {"id": "hookshot", "group": "upgrades", "label": "Hookshot", "held": held, "max_tier": 2, "tier": 0},
+            {"id": "bow", "group": "items", "label": "Bow", "held": held, "max_tier": 1},
+        ],
+        "songs": [],
+        "rewards": [],
+        "hearts": {},
+        "tokens": None,
+        "skulltula_checks": {"collected": 0, "total": 0, "unknown": 0},
+        "areas": [],
+        "show_locations": False,
+        "warnings": [],
+    }
+    return {"status": status, "state": state, "revision": 1, "warnings": []}
+
+
+def test_obs_dungeon_rows_draw_only_the_items_a_dungeon_has_with_short_full_or_no_names(tmp_path):
+    rows = {
+        mode: render_tracker(tmp_path, obs_snapshot(), obs=True, fragment=f"#labels=0&names={mode}")["dungeonRows"]
+        for mode in ("short", "full", "none")
+    }
+    items = [["", "", "Map", "Compass"], ["Small keys", "Boss key", "Map", "Compass"]]
+    assert rows["short"] == [["name:Deku", *items[0]], ["name:Forest", *items[1]]]
+    assert rows["full"] == [["name:Deku Tree", *items[0]], ["name:Forest Temple", *items[1]]]
+    assert rows["none"] == items
+
+
+def test_obs_before_any_save_draws_an_empty_inventory_not_unknown_tiles(tmp_path):
+    waiting = render_tracker(tmp_path, obs_snapshot("waiting", held=None), obs=True, fragment="#labels=0")
+    assert waiting["status"] == ["No save yet"]
+    assert all(
+        "tracker-missing" in cell["className"] and "tracker-unknown" not in cell["className"]
+        for cell in waiting["cells"]
+    )
+    assert [badge for cell in waiting["cells"] for badge in cell["badges"]] == []
+    # With a save read, a field the save lacks stays unknown (dashed, "?"); a missing item shows no tier or count.
+    unknown = render_tracker(tmp_path, obs_snapshot("ok", held=None), obs=True, fragment="#labels=0")
+    assert all("tracker-unknown" in cell["className"] for cell in unknown["cells"])
+    assert "?" in [badge for cell in unknown["cells"] for badge in cell["badges"]]
+    missing = render_tracker(tmp_path, obs_snapshot("ok", held=False), obs=True, fragment="#labels=0")
+    assert [badge for cell in missing["cells"] for badge in cell["badges"]] == []
