@@ -445,27 +445,63 @@ def _unknown_sources(mapping: Mapping_) -> dict[str, set[str]]:
     return out
 
 
+@dataclass(frozen=True)
+class _Reading:
+    """How the logic inventory shows a vanilla row's item (8.3). ``levels``: each logic name whose count shows it, with
+    the chain level one copy stands for (None: the count is the level); ``need``: the level that means held;
+    ``unknown``: the :class:`Inventory` ``unknown`` ids whose cells could grant one of them. No ``levels``: the tracker
+    does not read the item from the save."""
+
+    levels: tuple[tuple[str, int | None], ...]
+    need: int
+    unknown: frozenset[str]
+
+    def level(self, counts: Mapping[str, int]) -> int:
+        return max(
+            (counts.get(name, 0) if per is None else per * (counts.get(name, 0) > 0) for name, per in self.levels),
+            default=0,
+        )
+
+
+def _reading(item: str, world: World, known: set[str], sources: Mapping[str, set[str]]) -> _Reading:
+    """``item``'s :class:`_Reading`; ``known`` is ``Mapping_.logic_names()``, ``sources`` :func:`_unknown_sources`."""
+    info = world.items.get(item)
+    if info is not None and info.tier and info.alias is not None:
+        # A fixed tier counts once its chain reaches it: the chain's counter, or the highest tier the save shows.
+        chain, need = info.alias
+        levels: list[tuple[str, int | None]] = [(chain, None)]
+        levels += [
+            (name, other.alias[1])
+            for name, other in world.items.items()
+            if other.tier and other.alias is not None and other.alias[0] == chain
+        ]
+    else:
+        levels, need = [(item, None)], 1
+    kept = tuple((name, per) for name, per in levels if name in known)
+    return _Reading(kept, need, frozenset(tag for name, _ in kept for tag in sources.get(name, ())))
+
+
+def _collected(row: VanillaRow, inv: Inventory, reading: _Reading) -> tuple[bool | None, str | None]:
+    if row.shared:
+        return None, f"A shuffled check of this seed can also give {row.item_label}."
+    if not reading.levels:
+        return None, f"The tracker does not read {row.item_label} from the save."
+    if reading.level(inv.counts) >= reading.need:
+        return True, None
+    if reading.unknown & set(inv.unknown):
+        return None, f"The save could not be read for {row.item_label}."
+    return False, None
+
+
 def vanilla_collected(
     row: VanillaRow, inv: Inventory, world: World, mapping: Mapping_ | None = None
 ) -> tuple[bool | None, str | None]:
     """(collected, reason when unknown) for a vanilla row (8.3), from the logic inventory: True when it counts the
-    row's item (a fixed tier of a progressive item: the chain at that tier), False when every cell that could grant
-    it was read, None when one was not, the save has no cell for the item, or a shuffled check can also give it."""
+    row's item (a fixed tier of a progressive item: the chain at that tier or higher, so Saria's Fairy Ocarina counts
+    once the save holds the Ocarina of Time), False when every cell that could grant it was read, None when one was
+    not, the save has no cell for the item, or a shuffled check can also give it."""
     mapping = mapping or load_mapping()
-    if row.shared:
-        return None, f"A shuffled check of this seed can also give {row.item_label}."
-    known = mapping.logic_names()
-    name, need = row.item, 1
-    if name not in known:
-        item = world.items[name]
-        if not (item.tier and item.alias and item.alias[0] in known):
-            return None, f"The tracker does not read {row.item_label} from the save."
-        name, need = item.alias
-    if inv.counts.get(name, 0) >= need:
-        return True, None
-    if _unknown_sources(mapping).get(name, set()) & set(inv.unknown):
-        return None, f"The save could not be read for {row.item_label}."
-    return False, None
+    return _collected(row, inv, _reading(row.item, world, mapping.logic_names(), _unknown_sources(mapping)))
 
 
 def save_age(save: save_format.Save | None) -> str | None:

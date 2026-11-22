@@ -244,18 +244,29 @@ def test_a_tier_is_shared_only_by_a_check_that_can_reach_it(chest_only):
     assert "HF Ocarina of Time Item" not in rows and rows["LW Gift from Saria"].shared is True
 
 
-def test_a_fixed_tier_counts_its_chain(tmp_path, world):
-    inv = tracker_logic.Inventory({"Progressive Scale": 1}, ())
-    golden = tracker_logic.VanillaRow("Fishing", "Fishing", "", "Lake", None, "Golden Scale", "Golden Scale", False)
-    from types import SimpleNamespace
+# 8.3 (16.4): a fixed tier counts once its chain reaches it. In a seed's world only the Ocarina keeps fixed tiers
+# (Fairy Ocarina = Ocarina 1, Ocarina of Time = Ocarina 2), and the save's ocarina cell shows the highest one held.
+FAIRY, TIME = "PouchData.Item_Ocarina_Fairy.StockNum", "PouchData.Item_Ocarina_Time.StockNum"
 
-    from clawshot.world.model import Item
 
-    # vanilla_collected reads only the world's item table.
-    fake = SimpleNamespace(items={"Golden Scale": Item("Golden Scale", alias=("Progressive Scale", 2), tier=True)})
-    assert tracker_logic.vanilla_collected(golden, inv, fake) == (False, None)
-    two = tracker_logic.Inventory({"Progressive Scale": 2}, ())
-    assert tracker_logic.vanilla_collected(golden, two, fake) == (True, None)
+def test_a_fixed_tier_counts_its_chain(chest_only):
+    seed, world = chest_only
+    rows = {row.location: row for row in tracker_logic.vanilla_rows(seed, world)}
+    fairy, time = rows["LW Gift from Saria"], rows["HF Ocarina of Time Item"]
+    assert world.items[fairy.item].alias == ("Ocarina", 1) and world.items[time.item].alias == ("Ocarina", 2)
+    assert world.items[fairy.item].tier and world.items[time.item].tier
+    folder = seeds.Path("seed")
+    held = seeds.Seed(folder, folder, folder / "spoiler.json", None, "raw", {}, ())
+
+    def collected(ints):
+        inv = tracker_logic.inventory(held, parse({}, ints), world)
+        return [tracker_logic.vanilla_collected(row, inv, world) for row in (fairy, time)]
+
+    assert collected({FAIRY: 0, TIME: 0}) == [(False, None), (False, None)]
+    assert collected({FAIRY: 1, TIME: 0}) == [(True, None), (False, None)]
+    # The Ocarina of Time replaces Saria's ocarina in the save: her row still counts as taken.
+    assert collected({FAIRY: 0, TIME: 1}) == [(True, None), (True, None)]
+    assert [state for state, _ in collected({})] == [None, None]  # the ocarina cell was not read
 
 
 # 16.5 (8.3): unknown rows take manual marks like any unknown check, and a save-confirmed state drops the mark.
