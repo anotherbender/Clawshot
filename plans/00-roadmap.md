@@ -49,6 +49,10 @@ The standing Settings backlog below was separated from round 8, not discarded.
 | 19 | 2026-11-19–20 | Scene handoffs (no-ocarina lessons, Saria farewell), Light Arrows logic, 100-token reward, Master Sword shuffle, startup-test fix; cows research, fill rejected; released 0.2.4. | [Round 19](rounds/r19-overview.md) |
 | 20 | 2026-11-20– | In progress: hints, exclude locations, starting inventory, trials count and token bridge, open fountain/gate research, cows probe and Fortress packet, fill retry, logic audit. | [Round 20](rounds/r20-overview.md) |
 
+Outside the rounds, awaiting a maintainer's played check: tracker auto checks (gifts read from native flags,
+[design record](tracker-auto-checks.md)), checklist [tracker-auto-checks-play.md](tracker-auto-checks-play.md), static
+evidence [tracker-auto-checks-audit.md](tracker-auto-checks-audit.md).
+
 
 ## Settings backlog (Ship of Harkinian's lists, shown by Kareem 2026-11-09)
 

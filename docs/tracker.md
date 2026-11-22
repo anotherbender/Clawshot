@@ -94,6 +94,19 @@ marks** removes this seed and save folder's marks after asking. They live in
 `~/.config/clawshot`) on Linux. If that file cannot be read, the tracker warns, shows no marks and
 leaves the file alone until you change a mark.
 
+**Gifts read automatically.** Many gifts are read from records the game itself keeps once it gives
+them: minigame and NPC prizes (the Skull Kid's games, the archery and shooting galleries, fishing,
+bowling, the diving game, Anju's Cuccos, Talon's Cuccos, the Gold Skulltula rewards up to 50, the frogs),
+song and cutscene gifts (Saria, Malon, Impa, Sheik, the Ocarina of Time, the Light Arrows, Zelda's
+Letter, Darunia), and a few quests (the Lost Dog, Biggoron). Once one reads as given, it counts as
+collected and shows its reward even in spoiler-free mode, as an opened chest does. Others still need
+**Mark done**: the trade hand-ins, shops, and the gifts whose records do not tell (such as the 10 Big
+Poes and the 100 Gold Skulltula reward). Until each of these records has been confirmed in a played
+game, a gift it reads as not given yet keeps **Mark done**, and your mark on it stays (and keeps its
+reward hidden) until the record reads given; you cannot tell these apart from other reads in the tab.
+Reading these records needs a seed made by this same Clawshot version; for other seeds the tracker says
+so in one line and reads gifts as before ([design record](../plans/tracker-auto-checks.md)).
+
 **Vanilla pick-ups.** Some places your seed does not shuffle still hold an item the logic needs.
 Ruto's Letter at the bottom of Lake Hylia is one: until you hold it, Jabu-Jabu's Belly stays out of
 logic. So the tracker also lists these places in their area, tagged **vanilla**, with their usual item
