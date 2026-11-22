@@ -250,7 +250,7 @@ class TrackerSession:
             confirmed = [
                 check["id"]
                 for check in tracker_state.every_check(state)
-                if check["id"] in marked and check["collected"] is not None
+                if check["id"] in marked and not check.get("markable")  # collected, or an accepted "not" (D4)
             ]
             if confirmed:
                 try:
@@ -273,13 +273,14 @@ class TrackerSession:
         return self._marks_folder
 
     def mark(self, check: str, marked: bool) -> dict[str, Any]:
-        """Mark a check whose save state is unknown as done by hand, or unmark it (D8)."""
+        """Mark a check whose save state is unknown (or read by a provisional track flag as not collected) as done
+        by hand, or unmark it (D8; spec tracker-auto-checks D4)."""
         with self._lock:
             slot = self._marks_target()
             entry = next((c for c in tracker_state.every_check(self._state) if c["id"] == check), None)
             if entry is None:
                 raise ValueError(f"No check {check!r} in this seed.")
-            if entry["collected"] is not None:
+            if not entry.get("markable"):
                 raise ValueError(f"{entry['label']}: the save already says whether it is collected.")
             self._store().set(self._seed_id, slot, check, marked)
             self._set_state(self._build(self._parsed, slot), self._state_slot)

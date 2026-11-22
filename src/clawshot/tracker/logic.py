@@ -595,6 +595,7 @@ class SeedLogic:
             }
             if collected is None:
                 entry["reason"] = reason
+                entry["markable"] = True  # as for the seed's own `?` checks (tracker.state.markable)
                 if row.location in marked:
                     entry["marked"] = True
             grouped.setdefault(row.area, []).append(entry)
@@ -616,7 +617,7 @@ def _flag_open(checks: list[dict[str, Any]], world: World, search: Search, marke
     """Give each open check ``in_logic`` (3.1, 3.2) and return how many are in logic per age (3.4)."""
     totals = dict.fromkeys(AGE_KEYS, 0)
     for entry in checks:
-        if entry["collected"] is True or (entry["collected"] is None and entry["id"] in marked):
+        if entry["collected"] is True or entry.get("marked", False):  # entries carry marked only where markable
             continue
         location: Location = world.locations[entry["id"]]
         flags = {

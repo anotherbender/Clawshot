@@ -72,6 +72,7 @@ NAMED_BOOL = "named_bool"  # any of ``Check.flags`` true
 PLACEMENT_HASH = "placement_hash"  # any of ``Check.hashes`` in the save's Bool64bitKey list
 NO_RECORD = "none"  # no audited record: always unknown
 SOURCE_PAIR = "source_pair"  # a ``Check.hashes`` source H and H xor 2 both in the save's Bool64bitKey list
+TRACK = "track"  # any of ``Check.track``'s native once-flags (gift_rules.toml ``track``) true
 
 OTHER_AREA = "Other"
 _DUNGEON_ITEM = re.compile(r"^(Small Key|Boss Key|Map|Compass) \((.+)\)$")
@@ -117,6 +118,10 @@ class Check:
       when H and H xor 2 are both set, whatever the reward: the token stock is a separate count. Both unset is "not
       collected" only in the audited layout (:data:`SOURCE_SAVE_VERSION`); one without the other, or any other
       layout, is unknown.
+    - ``track``: gifts whose rule lists native once-flags in ``gift_rules.toml`` ``track`` (spec tracker-auto-checks
+      D1, D6): a saved Bool, ``HavePlayedEvent.<flow>``, or a quest's ``Step_<quest>`` enum equal to a named step.
+      Any true is collected; all present and false is not collected; otherwise unknown (D11). Only for seeds this
+      version made (D8). ``provisional`` is true while any entry is unplayed (``accepted = false``, D2, D4).
     - ``none``: no audited record (shops restock, section 17; swap-only gifts): always unknown, with ``reason``.
     """
 
@@ -132,6 +137,8 @@ class Check:
     flags: tuple[str, ...] = ()
     hashes: tuple[int, ...] = ()
     reason: str | None = None
+    track: tuple[Any, ...] = ()  # patch.gifts.TrackEntry, for method TRACK only
+    provisional: bool = False
 
 
 @dataclass(frozen=True)
@@ -260,6 +267,12 @@ def _gift_record(name: str, ids: tuple[str, ...]) -> tuple[tuple[str, ...], bool
     return tuple(gifts.FLAG_PREFIX + step.replace("/", ".") for step in steps), True
 
 
+def _gift_track(name: str) -> tuple[Any, ...]:
+    """The gift's ``track`` entries (``patch.gifts.TrackEntry``), or ()."""
+    rule = _gift_rules().get(name)
+    return rule.track if rule is not None else ()
+
+
 def _hash_ids(ids: Any) -> tuple[int, ...]:
     if not isinstance(ids, list):
         return ()
@@ -337,8 +350,10 @@ def _classify(
     chests: Mapping[str, tuple[int, ...]],
     tokens: Mapping[str, tuple[int, ...]],
     scrubs: Mapping[str, str],
+    track: bool = True,
 ) -> tuple[str, str, tuple[str, ...], tuple[int, ...], str | None, bool]:
-    """(kind, method, flags, hashes, reason, flag is added by the patch)."""
+    """(kind, method, flags, hashes, reason, flag is added by the patch). ``track``: read gifts' native track flags
+    (only for a seed this version made, spec tracker-auto-checks D8)."""
     location_type = place.type if place else None
     if name in _key_source_flags():
         return "freestanding", NAMED_BOOL, (_key_source_flags()[name],), (), None, False
@@ -361,6 +376,8 @@ def _classify(
     flags, added = _gift_record(name, ids)
     if flags:
         return "gift", NAMED_BOOL, flags, (), None, added
+    if track and _gift_track(name):
+        return "gift", TRACK, (), (), None, False
     if name in _gift_rules():
         return "gift", NO_RECORD, (), (), "this gift keeps no saved record of being given", False
     if location_type in ("BossHeart", "Collectable", "Freestanding"):
@@ -478,7 +495,8 @@ def load_seed(path: str | Path, *, index: Callable[[], Mapping[str, Place]] | No
 
     generator = spoiler.get("generator") if isinstance(spoiler.get("generator"), str) else None
     reading = installed_version()
-    if generator and generator != f"clawshot {reading}":
+    same_version = generator == f"clawshot {reading}"
+    if generator and not same_version:
         warnings.append(
             f"This seed was made by {generator}; the tracker reads it with clawshot {reading}'s definitions. "
             "Checks or flags that changed between versions may show wrongly."
@@ -492,6 +510,7 @@ def load_seed(path: str | Path, *, index: Callable[[], Mapping[str, Place]] | No
     checks = []
     added: list[tuple[str, ...]] = []
     unplaced = 0
+    untracked = False  # a gift with track entries that this seed's version gate keeps on today's read (D8)
     for name, item in placements.items():
         description = descriptions.get(name, {})
         if not isinstance(description, dict):
@@ -503,9 +522,14 @@ def load_seed(path: str | Path, *, index: Callable[[], Mapping[str, Place]] | No
         place = places.get(name)
         if place is None:
             unplaced += 1
-        kind, method, flags, hashes, reason, is_added = _classify(name, place, ids, chests, tokens, scrubs)
+        kind, method, flags, hashes, reason, is_added = _classify(
+            name, place, ids, chests, tokens, scrubs, track=same_version
+        )
         if is_added:
             added.append(flags)
+        track = _gift_track(name) if method == TRACK else ()
+        if not same_version and kind == "gift" and _gift_track(name):
+            untracked = True
         label = description.get("name") if isinstance(description.get("name"), str) else name
         where = description.get("where") if isinstance(description.get("where"), str) else ""
         display = item_names.get(item) if isinstance(item_names.get(item), str) else item
@@ -523,7 +547,14 @@ def load_seed(path: str | Path, *, index: Callable[[], Mapping[str, Place]] | No
                 flags=flags,
                 hashes=hashes,
                 reason=reason,
+                track=track,
+                provisional=any(not entry.accepted for entry in track),
             )
+        )
+    if untracked:
+        warnings.append(
+            f"Gifts read from the game's own flags need a seed made by clawshot {reading}; "
+            "this seed's gifts are read as before."
         )
     if unplaced:
         warnings.append(
