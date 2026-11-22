@@ -12,7 +12,7 @@ from clawshot.census.scan import GAME_DATA_LIST, GOLD_SKULLTULA, scan
 from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.generate import Settings
 from clawshot.generate import tokens as token_policy
-from clawshot.patch import actor_packs, items, make_seed, tokens, write_seed
+from clawshot.patch import actor_packs, getitem, items, make_seed, tokens, write_seed
 from clawshot.patch.plan import PatchError, Plan
 from clawshot.patch.write import write
 from clawshot.save import murmur3_32
@@ -393,6 +393,11 @@ def test_custom_chest_items_and_token_pickups_write_one_valid_set_of_tables(romf
     write_seed(output, romfs, out)
     for path in TABLES:
         native = {row["__RowId"]: row for row in byml.read(before[path])}
+        if path == getitem.ACTOR_INFO:  # every seed's ocarina get model: the only change to native rows
+            for actor in getitem.OCARINAS:
+                assert native[actor].pop("CalcPriority") == "After", actor
+            assert "CalcPriority" not in native[getitem.SARIA_PROP]
+            native[getitem.SARIA_PROP]["CalcPriority"] = "After"
         rows = byml.read(original(path, out / "romfs"))
         ids = [row["__RowId"] for row in rows]
         assert ids == sorted(set(ids))

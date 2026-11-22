@@ -208,6 +208,11 @@ class Written:
 @pytest.fixture
 def written(combined, tmp_path):
     """The seed, both producers' output combined as ``make_seed`` combines it, and ``write_seed``'s result."""
+    return write_combined(combined, tmp_path / "seed")
+
+
+def write_combined(combined, out, later_steps=()):
+    """Both producers' output combined as ``make_seed`` combines it, then ``later_steps``, through ``write_seed``."""
     dump = files_of(combined)
     seed = from_placements(combined_spec(), 7, Settings(shuffle=("Chest", "Token")), PLACEMENTS)
     locations = [*census(), chest(CHEST), chest(AP_CHEST_ID)]
@@ -227,11 +232,11 @@ def written(combined, tmp_path):
         seed,
         links,
         make_plan(seed, links, table, {}, overrides=custom.actors),
-        extra_changes=(delivery.changes, custom.changes),  # Token rows first: they insert over the dump's own rows
+        # Token rows first: they insert over the dump's own rows
+        extra_changes=(delivery.changes, custom.changes, *later_steps),
         new_files={**custom.new_files, **delivery.new_files},
         token_sources=token_rows,
     )
-    out = tmp_path / "seed"
     files = {info.path: info for info in write_seed(output, combined, out)}
     return Written(combined, dump, output, custom, delivery, files, out)
 

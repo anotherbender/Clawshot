@@ -11,11 +11,11 @@ from dataclasses import replace
 import pytest
 
 from clawshot.census.scan import CHEST, scan
-from clawshot.formats import byml, rstb, zsdic
+from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.generate import Settings, prepare
 from clawshot.patch import events as chest_events
+from clawshot.patch import getitem, make_seed, write_seed
 from clawshot.patch import items as item_actors
-from clawshot.patch import make_seed, write_seed
 from clawshot.patch.plan import DROP_KEY, EVENT_KEY, Plan
 from clawshot.world.load import load_spec
 from clawshot.world.model import Location
@@ -100,6 +100,8 @@ def test_written_files_differ_only_where_the_plan_says(romfs, tmp_path, seed_num
             data = dicts.decompress(path, data)
         need = rstb.required_size(path, len(data))
         expected_table.set(path, max(table.get(path), need))
+        if path.startswith("Pack/Actor/") and path.endswith(".pack.zs"):
+            expect_member_entries(expected_table, table, dicts.decompress(path, (romfs / path).read_bytes()), data)
     print(f"  other steps: {len(extra)} files")
     # Raw preallocated components retain their native entry; the writer must not
     # apply the compressed-resource size formula to these measured allocations.
@@ -125,6 +127,21 @@ def test_written_files_differ_only_where_the_plan_says(romfs, tmp_path, seed_num
     print(f"  size table {'written' if raised else 'not written: every entry fits'}")
 
 
+def expect_member_entries(expected_table, table, before, after):
+    """A changed actor pack's members: a new member with no entry gets its type's formula, a changed actor
+    parameter is raised to what its own components need (never lowered); copied native members keep theirs."""
+    old, new = sarc.read(before), sarc.read(after)
+    for name, content in new.items():
+        if name not in old and table.get(name) is None:
+            resources = None
+            if name.endswith(rstb.ANIMATION_PARAM):
+                resources = len(byml.read(content).get("AnimationResources", []))
+            expected_table.set(name, rstb.required_size(name, len(content), resources=resources))
+        elif name.endswith(rstb.ACTOR_PARAM) and old.get(name) != content:
+            need = rstb.required_size(name, len(content), len(byml.read(content).get("Components", {})))
+            expected_table.set(name, max(table.get(name), need))
+
+
 def test_same_seed_same_folder_in_two_processes(romfs, tmp_path):
     folders = []
     for hash_seed in ("1", "2"):
@@ -137,6 +154,9 @@ def test_same_seed_same_folder_in_two_processes(romfs, tmp_path):
         folders.append({p.relative_to(out).as_posix(): p.read_bytes() for p in sorted(out.rglob("*")) if p.is_file()})
     assert folders[0] == folders[1]
     assert "spoiler.json" in folders[0] and len(folders[0]) > 1
+    # Every seed carries the ocarina get model (ActorInfo and both ocarina packs).
+    for path in (getitem.ACTOR_INFO, *map(getitem.pack_path, getitem.OCARINAS)):
+        assert f"romfs/{path}" in folders[0], path
 
 
 def test_every_actor_in_the_table_is_in_the_game(romfs):
