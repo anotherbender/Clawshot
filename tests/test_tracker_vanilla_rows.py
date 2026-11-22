@@ -148,13 +148,15 @@ def test_search_counts_follow_the_search(chest_only):
 
 
 def test_rows_are_built_once_per_loaded_seed(tmp_path, world, monkeypatch):
-    calls = []
-    real = tracker_logic.vanilla_rows
+    calls, readings = [], []
+    real, real_sources = tracker_logic.vanilla_rows, tracker_logic._unknown_sources
     monkeypatch.setattr(tracker_logic, "vanilla_rows", lambda *a: calls.append(1) or real(*a))
+    # How each row's item is read from the inventory is worked out with the rows, not again on every poll.
+    monkeypatch.setattr(tracker_logic, "_unknown_sources", lambda m: readings.append(1) or real_sources(m))
     _, seed, logic = state_for(tmp_path, {BOOMERANG: 0})
     for held in (0, 1, 0):
         build_state(seed, parse({}, {BOOMERANG: held}), logic=logic)
-    assert len(calls) == 1
+    assert len(calls) == 1 and len(readings) == 1
 
 
 def test_no_rows_while_logic_is_unavailable(tmp_path, world):

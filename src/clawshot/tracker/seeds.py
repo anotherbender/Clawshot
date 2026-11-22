@@ -219,7 +219,7 @@ def _scrub_flags() -> dict[str, str]:
 
 
 @cache
-def _catalog() -> dict:
+def location_catalog() -> dict:
     """The readable-location catalog the spoiler copies its ``ids`` from (``generate.names.load``)."""
     from clawshot.generate import names
 
@@ -488,7 +488,7 @@ def load_seed(path: str | Path, *, index: Callable[[], Mapping[str, Place]] | No
     chests = _chest_hashes(spoiler)
     tokens = _token_sources(spoiler)
     scrubs = _scrub_flags()
-    catalog = _catalog()
+    catalog = location_catalog()
     checks = []
     added: list[tuple[str, ...]] = []
     unplaced = 0

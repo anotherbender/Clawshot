@@ -405,7 +405,7 @@ def vanilla_rows(seed: Seed, world: World, scope: str | None = None) -> tuple[Va
     pool = {loc.vanilla for name in placed if (loc := world.locations.get(name)) is not None and loc.vanilla}
     sources = Counter(loc.vanilla for loc in world.locations.values() if loc.vanilla is not None)
     places = seeds.location_index()
-    catalog = seeds._catalog()
+    catalog = seeds.location_catalog()
     shown = names.item_names()
     rows = []
     for name, loc in world.locations.items():
@@ -531,14 +531,21 @@ class SeedLogic:
         self.loaded = loaded
         self._key: str | None = None
         self._search: Search | None = None
-        self._vanilla: tuple[VanillaRow, ...] | None = None
+        self._vanilla: tuple[tuple[VanillaRow, _Reading], ...] | None = None
 
     def vanilla(self, seed: Seed) -> tuple[VanillaRow, ...]:
         """The seed's vanilla rows, built once per loaded seed (8.1); none while logic is unavailable."""
+        return tuple(row for row, _ in self._vanilla_readings(seed))
+
+    def _vanilla_readings(self, seed: Seed) -> tuple[tuple[VanillaRow, _Reading], ...]:
+        """Each vanilla row with how the inventory shows its item, both built once per loaded seed: save polls only
+        compare counts."""
         if not self.loaded.available:
             return ()
         if self._vanilla is None:
-            self._vanilla = vanilla_rows(seed, self.loaded.world)
+            world, mapping = self.loaded.world, load_mapping()
+            known, sources = mapping.logic_names(), _unknown_sources(mapping)
+            self._vanilla = tuple((row, _reading(row.item, world, known, sources)) for row in vanilla_rows(seed, world))
         return self._vanilla
 
     def search(self, inv: Inventory) -> Search:
@@ -569,8 +576,8 @@ class SeedLogic:
         for area in state["areas"]:
             area["in_logic"] = _flag_open(area["checks"], world, search, marked)
         grouped: dict[str, list[dict[str, Any]]] = {}
-        for row in self.vanilla(seed):
-            collected, reason = vanilla_collected(row, inv, world)
+        for row, reading in self._vanilla_readings(seed):
+            collected, reason = _collected(row, inv, reading)
             entry: dict[str, Any] = {
                 "id": row.location,
                 "label": row.label,
