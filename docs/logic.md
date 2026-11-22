@@ -56,6 +56,18 @@ Dodongo's torch-room exit also needs usable fire rather than adult age/sword own
 Child Sticks and Din's remain valid; the adult Fire Arrows branch retains the existing shuffled-sword
 guard. Ordinary-Bow torch chaining there remains unplayed and is not newly admitted.
 
+**Deku Sticks and Nuts (round 21): pots are not a source.** A child has sticks in logic only from a
+shop's Deku Stick (`Buy Deku Stick (1)`/`(5)`, or a shuffled `Deku Stick (1)`) or from the Deku Babas a
+weapon kills (`Deku Stick Drop` in KF Outside Deku Tree, the Deku Tree Lobby and the Forest Temple's two
+courtyards: the Kokiri Sword or Boomerang as a child). Nuts likewise come from shops, a shuffled
+`Deku Nuts (5)`/`(10)` or those Babas (`Deku Nut Drop`). OoT Randomizer's "Stick Pot" (Goron City, Zora's
+Domain, Bottom of the Well) and "Nut Pot" events are closed (`remake/pot_drops.toml`): Kareem found Goron
+City's pot gives one stick, refilled only by leaving and re-entering; the remake's other stick pots are the
+same kind, Bottom of the Well has none, and no pot holds a fixed nut (a pot without a set drop gives one only
+by chance). Loose sticks outside pots (Deku Tree grass, a Lake Hylia floor stick) are not in logic: unplayed.
+The tracker's in-logic view rebuilds the same world, so it follows.
+[Per-event evidence](../plans/rounds/r21-sticks.md).
+
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
 Boots or Serenade are shuffled. Claude chose the r16 precaution on 2026-11-17; Kareem was informed.
