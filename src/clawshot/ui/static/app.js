@@ -3,7 +3,7 @@
 const $ = (id) => document.getElementById(id);
 const base = location.pathname;
 const token = base.split("/")[2];
-const screens = ["game", "settings", "generate", "tracker"];
+const screens = ["game", "settings", "generate", "tracker", "checks"];
 let metadata = [],
   values = {},
   inputs = {},
