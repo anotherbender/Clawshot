@@ -128,6 +128,13 @@ Proposal posted 16:39; Claude approved it at 16:40 and moved ownership of `track
   1 skipped. Two PR #39 tests change as our own edits: the `MemoryMarks` double gains `table=`, and the
   provisional/accepted comparison now differs in the click field only (`markable` vs `skippable`). Lands on this
   branch after MAIN MOVED for #39.
+- Longshot 3.1.x `save-work` (Claude's request, after #39; evidence `E:/OOTRemake/work/longshot-311/REPORT.md`,
+  "Saves"): `saves._walk` skips a `save-work` folder below the chosen folder, so `list_slots`/`choose_slot` see
+  only the real `slot_NN` folders. Prepared in the same scratch worktree/patch, a separate commit when it lands.
+  Test `test_longshot_working_copy_is_never_a_slot_and_the_3_0_layout_reads_the_same` (synthetic 3.0.0 and 3.1.1
+  user folders give the same slots; fails without the fix). On the read-only copy `savetest/userls311-save-copy`:
+  6 slots (was 12), newest `save/.../slot_01`, `slot_00`..`slot_05` all resolve by name. Pointing the tracker
+  at `save-work` itself still reads it (an explicit choice); only discovery from above skips it.
 
 ## Choices made here (cs21a, provisional)
 
