@@ -162,7 +162,9 @@ Do not choose the game dump or a generated `romfs` folder as a save folder.
 
 Clawshot **Play** uses the same per-seed `user` layout for a supported Longshot installation.
 Leave **Save folder** empty when using it. If you manually copied the seed to Longshot's mods,
-choose the Longshot **user** folder where that run saves instead. Clawshot only reads it.
+choose the Longshot **user** folder where that run saves instead. Clawshot only reads it. Longshot 3.1
+also keeps a working copy in `user/save-work/` beside `user/save/`; the tracker reads only the finished
+saves in `save/` and ignores `save-work`.
 
 For an emulator, choose this game's save folder (containing `slot_NN`), or its enclosing
 user/save folder. Nested user-ID/title-ID folders are searched. Multiple profiles can contain

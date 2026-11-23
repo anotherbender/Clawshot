@@ -28,6 +28,10 @@ GAME_SAVE_ID = "0400486024dec000"  # the game's save-data folder in an emulator 
 _TITLE_FOLDER = re.compile(r"^[0-9a-fA-F]{16}$")
 MAX_DEPTH = 8  # an emulator's nand/user/save/<zeros>/<user>/<game>/slot_NN from its data folder is 7 deep
 MAX_FOLDERS = 5000  # stop walking a folder that is clearly not a save folder (a whole drive)
+# Longshot 3.1's working copy beside ``save/``: the game writes there first and moves a finished save into ``save/``
+# (Longshot #607, v3.1.0; the v3.1.1 saves page: "Save tools copy only save/"). Checked on a copy of a 3.1.1 user
+# folder (work/longshot-311/REPORT.md, "Saves"): reading it picked a working-copy slot over the newest real save.
+_WORKING_COPY = "save-work"
 MAX_SAVE_BYTES = 16 << 20
 # Types whose entry value is a file offset rather than the value itself (clawshot.save: Bool, Int, Float, Enum and
 # UInt are stored in the pair; Bool64bitKey's offset is checked by the reader).
@@ -61,9 +65,9 @@ def _walk(folder: Path):
             except OSError:
                 continue
             # In an emulator NAND, other games' 16-digit save folders sit beside this game's one; the all-zero
-            # system folder above them is kept (sloperina section 1's path).
+            # system folder above them is kept (sloperina section 1's path). Longshot's working copy is never a save.
             name = entry.name.lower()
-            if _TITLE_FOLDER.match(name) and name not in (GAME_SAVE_ID, "0" * 16):
+            if name == _WORKING_COPY or (_TITLE_FOLDER.match(name) and name not in (GAME_SAVE_ID, "0" * 16)):
                 continue
             stack.append((Path(entry.path), depth + 1))
 
