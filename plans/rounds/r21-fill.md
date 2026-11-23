@@ -1,7 +1,7 @@
 # Round 21, Track fill — cs21h
 
 Branch `r21/fill`, starting main `e9bb0d77270fbc92a455df53dac1f4099b6bc859` (0.2.5 plus the round 20 close records).
-Model: `anthropic/claude-opus-5-5`. Status: **candidate awaiting its paired run (not READY)**; handoff 2026-11-23 10:30.
+Model: `anthropic/claude-opus-5-5`. Status: **candidate 1 rejected on the paired run; candidate 2 (aimed at its printed cause) awaiting a paired slot**.
 External scripts and receipts: `E:/OOTRemake/work/r21-fill/`.
 
 No game started, personal seed opened, save edited or game/runtime folder written. This is a generator-only
@@ -107,6 +107,60 @@ moved, rerun the focused command.
 - Decision rule fixed in advance: accept only if broad first failures drop, zero exhausted in every recipe, and
   Defaults/Recommended do not get worse; otherwise reject and leave this file as the research record, with the
   candidate reverted.
+
+## Paired run 1: candidate 1 rejected (2026-11-23 17:46–18:03, under the lock)
+
+Head `fe4bccd` (candidate 1 = `5f6e2e1`'s change rebased) on main `aeba6df`; main arm = `baseline_fill.py` (still
+byte-identical to main's `fill.py`); inputs recaptured from `aeba6df` (identical to the `5078acb` capture,
+compared field by field). Six workers, `CLAWSHOT_WORKERS=6`, no game running at any stage; 1,015.85 s; lock
+released by its creator. Receipts: `paired-r21.log`, `paired-r21-rows.jsonl`, `paired-r21-summary.json`.
+
+| Recipe | Seeds per arm | First failures main → candidate | Exhausted | Mean / max attempts main → candidate | Median s main → candidate | Median paired delta s |
+|---|---:|---:|---:|---|---|---:|
+| Broad | 200 | 6 → 14 | 0 → 0 | 1.04 / 3 → 1.07 / 2 | 10.808 → 10.509 | +0.023 |
+| Defaults | 50 | 0 → 0 | 0 → 0 | 1 / 1 → 1 / 1 | 5.175 → 5.235 | +0.004 |
+| Recommended | 50 | 2 → 2 | 0 → 0 | 1.04 / 2 → 1.04 / 2 | 9.385 → 9.460 | −0.037 |
+
+**After-sticks (and npcs, PR #40, hammer, pr39-accept) re-measure of main, `aeba6df`: broad 6/200 first failures
+(3.0%), 0 exhausted** — 4 `Gold Skulltula Token`, 1 `Small Key (Forest Temple)`, 1 `Small Key (Fire Temple)`, all
+shared progression; no late map/compass failure. Before sticks (`e9bb0d7`, above): 10/200. Defaults 0/50,
+Recommended 2/50 (both `Kokiri Sword`, seeds 36 and 45, unchanged by the candidate). [INFERENCE] The drop from 10
+to 6 comes from the merged logic changes moving placements (Claude quoted cs21e's sweep at 14/200 on its own
+seeds and inputs; the counts are not comparable across those cohorts).
+
+**Decision (cs21h, under the rule fixed at 10:30): reject candidate 1.** Broad rose 6 → 14.
+Recovered seeds 17, 122, 138, 157, 172, 195: tokens first removed every shared-progression failure, keys included.
+Introduced 8, 14, 19, 34, 60, 89, 105, 112, 152, 159, 167, 169, 191, 199: all fourteen are late filler with a
+map or compass stranded.
+
+Printed cause (`trace_filler.py`, `trace-filler-candidate.jsonl`, single process): tokens placed first put about
+61 of 100 tokens in chests (seed 8: 61 chests, 39 Skulltulas), so chests run short; the reserve was then off by one
+or two in every one of the fourteen. Two undercounts: (a) the Ice Cavern map and compass counted as flexible because
+one non-chest check in their dungeon (`Sheik in Ice Cavern`) may take them, so two items rode on one slot that
+was usually taken anyway; (b) chests no map may take (`Hyrule Field Chest (Obj_Heart_Piece)`, explicit exclusions)
+counted as supply. Each failing seed had 18–20 empty chests for 20 maps/compasses at the filler.
+
+## Candidate 2 (aimed at the printed cause)
+
+Same two changes; only the reserve's accounting in `_chest_bound` changes:
+
+- A released dungeon item always counts as needing a chest (outside its dungeon only a chest takes it; a stray
+  in-dungeon check does not make it flexible).
+- Supply is the empty chests every chest-needing item may take; when tight, other items put those chests last
+  (other checks, then chests none of them may take, are tried first).
+
+Effective reserve sizes at stage entry (seed 1): broad 155 of 156 empty chests counted, 64 chest-needing copies;
+Defaults 89 of 89 with every item chest-needing (Chest-only shuffle: the reserve never reorders anything);
+Recommended 0 chest-needing items (own-dungeon keys: the reserve never fires).
+
+Aimed check (same tracer, single process, first attempt of each seed): **19 of the 20 seeds** that failed in
+either arm of paired run 1 now fill (`trace-filler-candidate2.jsonl`). The residual, seed 89: 20 empty chests,
+19 usable by maps, 20 maps. The reserve was on for 74 of 217 steps, but late flexible items (Pieces of Heart,
+Din's Fire, Zelda's Lullaby, Fairy Ocarina) still took chests when no other reachable check was left. The reserve
+is an order preference, not a guarantee. Not a measurement; only the paired run counts.
+
+Focused (same command, no game running): **375 passed, 10 skipped, 23.26 s** (`focused-6.log`); ruff clean.
+Candidate files kept: `candidate1_fill.py`, `candidate2_fill.py`.
 
 ## Lock note
 

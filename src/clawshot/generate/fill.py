@@ -467,9 +467,9 @@ def _fill_restrictive(
     Mido. Taken last, the second shield found every chest before Mido full (Chest+Shop: 11 of 130 failed attempts).
     Then the ``first`` items, before the rest of the stage, while the most is still assumed and reachable.
 
-    Given the ``later`` stages' items, chests are kept for the items only a chest takes: once the empty chests are no
-    more than those items, here and later, any other item goes elsewhere when it can. Native displays keep their own
-    shop reserve above.
+    Given the ``later`` stages' items, chests are kept for the items that need one (:func:`_chest_bound`): once the
+    empty chests those items may take are no more than those items, here and later, any other item takes another
+    check, or a chest none of them may take, when it can. Native displays keep their own shop reserve above.
 
     An item with no reachable location left swaps into one this call filled before (:func:`_swap`); the displaced
     item goes back to be placed next, under the same rules."""
@@ -479,7 +479,7 @@ def _fill_restrictive(
     filled: list[str] = []
     swaps: dict[str, int] = {}
     if later is not None:
-        bound = _chest_bound(world, settings, locations, [*items, *later])
+        bound, useful = _chest_bound(world, settings, locations, [*items, *later])
         later_bound = sum(item in bound for item in later)
     while items:
         item = items.pop()
@@ -494,9 +494,9 @@ def _fill_restrictive(
             preferred = "Chest" if reserve and settings.item_location_types.get(item) != ("Shop",) else "Shop"
             candidates.sort(key=lambda name: world.locations[name].type != preferred)
         elif later is not None and item not in bound:
-            chests = sum(world.locations[name].type == "Chest" for name in locations)
+            chests = sum(name in useful for name in locations)
             if chests <= later_bound + sum(name in bound for name in items):
-                candidates.sort(key=lambda name: world.locations[name].type == "Chest")
+                candidates.sort(key=lambda name: name in useful)
         spot = next((name for name in candidates if search.can_access(world.locations[name])), None)
         if spot is not None:
             locations.remove(spot)
@@ -526,10 +526,23 @@ def _is_shop_refill(settings: Settings, item: str) -> bool:
     return item.startswith("Buy ") and settings.item_location_types.get(item) == ("Shop",)
 
 
-def _chest_bound(world: World, settings: Settings, locations: list[str], items: list[str]) -> set[str]:
-    """The ``items`` no empty location but a chest may take."""
+def _chest_bound(world: World, settings: Settings, locations: list[str], items: list[str]) -> tuple[set[str], set[str]]:
+    """The ``items`` that need a chest, and the empty chests every one of them may take.
+
+    An item needs one when no other empty location may take it, or when it is a released dungeon item: outside its
+    dungeon only a chest takes it, and the few other checks inside (the Ice Cavern's one, for its map and compass
+    both) do not make it flexible (round 21: those two, counted as flexible, stranded a map in 14 of 200 seeds).
+    A chest only some of them may take (``Hyrule Field Chest (Obj_Heart_Piece)`` refuses maps) is not counted."""
     others = [name for name in locations if world.locations[name].type != "Chest"]
-    return {item for item in dict.fromkeys(items) if not any(allowed(world, settings, name, item) for name in others)}
+    bound = {
+        item
+        for item in dict.fromkeys(items)
+        if (world.items[item].dungeon is not None and not is_restricted(world, settings, item))
+        or not any(allowed(world, settings, name, item) for name in others)
+    }
+    chests = [name for name in locations if world.locations[name].type == "Chest"]
+    useful = {name for name in chests if all(allowed(world, settings, name, item) for item in bound)}
+    return bound, useful
 
 
 def _swap(
