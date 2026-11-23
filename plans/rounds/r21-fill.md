@@ -1,7 +1,7 @@
 # Round 21, Track fill — cs21h
 
 Branch `r21/fill`, starting main `e9bb0d77270fbc92a455df53dac1f4099b6bc859` (0.2.5 plus the round 20 close records).
-Model: `anthropic/claude-opus-5-5`. Status: **in progress**.
+Model: `anthropic/claude-opus-5-5`. Status: **candidate awaiting its paired run (not READY)**; handoff 2026-11-23 10:30.
 External scripts and receipts: `E:/OOTRemake/work/r21-fill/`.
 
 No game started, personal seed opened, save edited or game/runtime folder written. This is a generator-only
@@ -89,6 +89,24 @@ Rebased onto `3667df5` (sticks merged, MAIN MOVED 22:59); main's `fill.py` is st
 `baseline_fill.py`. Inputs recaptured from `3667df5` into `inputs.pkl` (they differ from the `e9bb0d7` capture,
 kept as `inputs-e9bb0d7.pkl`). Focused run again (same command, no game running): **375 passed, 10 skipped,
 27.98 s** (`focused-3.log`). The paired run's main arm on these inputs is the after-sticks re-measure of main.
+
+Rebased again onto `ff78b5e` (tracker, no generator/data change) and `b1d510d` (npcs logic: Richard, Cojiro); main's
+`fill.py` still byte-identical to `baseline_fill.py`. Inputs recaptured from `b1d510d` (`inputs.pkl`; the `3667df5`
+capture kept as `inputs-3667df5.pkl`). Before the paired run: rebase onto the main of that moment, recapture if it
+moved, rerun the focused command.
+
+## Handoff (2026-11-23 10:30)
+
+- Branch `r21/fill`, head `f896b98` on main `b1d510d`: `fill: tokens first in shared progression; keep the last
+  chests for maps` (product change + witness test) and three plans-only commits.
+- Checked: main re-measure on `e9bb0d7` (10/200 broad first failures, 0 exhausted); synthetic witness fails on main,
+  passes on the candidate; focused 375 passed / 10 skipped after each rebase; call-count proxy 0.94–1.00x.
+- Not yet checked: the paired comparison (the acceptance measurement), the after-sticks re-measure of main (its
+  main arm), the 200/50/50 sweep and the full gate. Gate order at 10:24: cs21c, cs21e, then cs21h; and no sweep
+  while `longshot.exe` runs (Kareem playing) or until it has been closed 10 minutes.
+- Decision rule fixed in advance: accept only if broad first failures drop, zero exhausted in every recipe, and
+  Defaults/Recommended do not get worse; otherwise reject and leave this file as the research record, with the
+  candidate reverted.
 
 ## Lock note
 
