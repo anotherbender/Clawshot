@@ -165,3 +165,30 @@ def test_added_component_in_existing_pack_gets_allocation_and_actor_growth(romfs
     assert table.get(NEW_POUCH) == rstb.required_size(NEW_POUCH, len(packed[NEW_POUCH]))
     assert table.get(NATIVE_PARAM) >= rstb.required_size(NATIVE_PARAM, len(packed[NATIVE_PARAM]), 20)
     assert table.get(SHARED) == SHARED_ENTRY
+
+
+def changed_native(value):
+    """An extra change to the native pack: its shared member now holds ``value``."""
+
+    def transform(data):
+        pack = sarc.read(data)
+        pack[SHARED] = byml.write({"Value": value})
+        return sarc.write(pack)
+
+    return {NATIVE: transform}
+
+
+def test_a_new_pack_may_copy_a_member_of_a_pack_this_write_changes(romfs, tmp_path):
+    """Song pickups hold the song's ModelInfo as the seed writes it (song get effects): the copy matches the written
+    member, whose entry the changed pack's own sizing set."""
+    out = tmp_path / "out"
+    file = created(created_pack(**{SHARED: byml.write({"Value": 2})}))
+    write(Plan([], [], []), romfs, out, extra_changes=(changed_native(2),), new_files={NEW: file})
+    assert byml.read(sarc.read(decompressed(romfs, out, NEW))[SHARED]) == {"Value": 2}
+    table = rstb.read(decompressed(romfs, out, rstb.TABLE_PATH))
+    assert table.get(SHARED) == SHARED_ENTRY
+
+
+def test_a_copy_of_a_changed_pack_must_match_what_this_write_holds(romfs, tmp_path):
+    with pytest.raises(PatchError, match="not byte-identical"):
+        write(Plan([], [], []), romfs, tmp_path / "out", extra_changes=(changed_native(2),), new_files={NEW: created()})
