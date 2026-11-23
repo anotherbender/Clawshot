@@ -97,6 +97,10 @@ rocks' were checked in round 14].
   for an *unverified* Hammer (r7-play.md: "not an unverified Hammer alternative"), not one seen to fail. It now
   expects the Hammer to open the `WallCrack` and the fairies to still need a Bottle.
 - `docs/logic.md`: one paragraph (own lines).
+- Kareem's call (2026-11-23, via Claude), not a Hammer class: `LW GS Bean Patch Near Theater` drops OoT Randomizer's
+  `shuffle_scrubs == 'off' and Deku_Shield` way (the scrub's nut reflected into the Skulltula): players cannot be
+  assumed to know it. Now `can_plant_bugs and can_child_attack` (`remake/child_gs_kills.toml`, which cs21d's
+  question in `r21-sticks.md` pointed at); test `tests/test_child_gs_kills.py`. A tightening; the sweep includes it.
 
 ## Beamos-gated rules (ground Beamos widened after Kareem's check, 2026-11-23)
 

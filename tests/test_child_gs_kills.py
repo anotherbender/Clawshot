@@ -30,3 +30,15 @@ def test_a_child_token_needs_a_kill(token, region):
     assert not search.can_access(world.locations[token], CHILD)
     search.collect("Slingshot")
     assert search.can_access(world.locations[token], CHILD)
+
+
+def test_the_bean_patch_token_does_not_count_on_a_reflected_scrub_nut():
+    # Kareem, 2026-11-23: the Deku Shield reflecting the nearby scrub's nut is not a way players can be assumed to know.
+    spec = load_spec()
+    spec["settings"]["starting_age"] = CHILD
+    spec["settings"]["shuffle_scrubs"] = "off"
+    world = build_world(spec)
+    rule = world.locations["LW GS Bean Patch Near Theater"].rule
+    bugs_and_shield = {"Bugs": 1, "Bottle": 1, "Deku Shield": 1}
+    assert not rule(bugs_and_shield, CHILD, 1)
+    assert rule({**bugs_and_shield, "Slingshot": 1}, CHILD, 1)
