@@ -44,3 +44,28 @@ def test_dump_game_data_list_round_trips(romfs):
     written = byml.dump(document)
     assert byml.difference(document.root, byml.read(written)) is None
     assert written == data, _first_byte_difference(data, written)
+
+
+@pytest.mark.dump
+def test_dump_every_effect_file_round_trips(romfs):
+    """BYML version 5: every ``Effect/*.vsetb.byml.zs`` reads, writes back to the same bytes and reads to the same
+    tree; the binary ``PtclBin`` node keeps its alignment."""
+    dicts = zsdic.Dictionaries.from_romfs(romfs)
+    paths = sorted((romfs / "Effect").glob("*.vsetb.byml.zs"))
+    assert len(paths) > 1000
+    tree_differences = {}
+    byte_differences = {}
+    for path in paths:
+        rel = path.relative_to(romfs).as_posix()
+        data = dicts.decompress(rel, path.read_bytes())
+        document = byml.load(data)
+        assert document.version == 5, rel
+        assert isinstance(document.root["PtclBin"], byml.Binary), rel
+        written = byml.dump(document)
+        if (d := byml.difference(document.root, byml.read(written))) is not None:
+            tree_differences[rel] = d
+        elif written != data:
+            byte_differences[rel] = _first_byte_difference(data, written)
+    assert tree_differences == {}
+    print(f"{len(paths) - len(byte_differences)} of {len(paths)} effect files are byte-identical after a round trip")
+    assert byte_differences == {}, next(iter(byte_differences.items()))
