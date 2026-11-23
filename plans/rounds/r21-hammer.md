@@ -210,6 +210,15 @@ What a pass covers, by class: the ground Beamos (`Enemy_Beamos`) in Spirit S1 (t
 likely target of its explosives; both Beamos there are this actor) and GTG G1 and G2. Not covered: S2 and S3 (their
 target is unidentified), the high Beamos (out of Hammer reach), D1 (a question, not a widening).
 
+**Dodongo's Cavern entrance boulder (Kareem: never seen as an adult).** The dump agrees: the boulder
+`Obj_DeathMtTrail_BrokenRock_A_01` 9966036182374691433 (-47.6,108.9,-19.7) and its scripted Bomb Flower
+`Obj_BombFlower_Grass_For_Break_Obj_DeathMtTrail_BrokenRock_A_01` 12145309744777105449 are placed only in
+`DeathMountainTrail_Child_Static`; neither is in `DeathMountainTrail_Adult_Static` (467 actors) or `_Adult_Dynamic`
+(1715), both indexed. The rule already says so: Death Mountain -> Dodongos Cavern Beginning is
+`Progressive_Strength_Upgrade or is_adult` (`remake/child_death_mountain_trail.toml`, cs 2026-11-07: "no boulder in
+the adult files"), so the adult needs nothing and there is nothing to loosen. The boulder has no damage table (a
+scripted break), so the child side stays Bracelet-only, as before.
+
 ## Sweep and gates
 
 Rebased onto main `b1d510d` (sticks 3667df5, tracker ff78b5e and npcs merged). The only conflict was `docs/logic.md`
