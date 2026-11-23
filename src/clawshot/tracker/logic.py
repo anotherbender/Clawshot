@@ -44,6 +44,7 @@ from clawshot.generate import Settings
 from clawshot.patch.logic_world import logic_world
 from clawshot.tracker import seeds, state
 from clawshot.tracker.seeds import DUNGEON_INFO, OTHER_AREA, Seed, installed_version
+from clawshot.tracker.state import skip_fields
 from clawshot.world.model import Location, World
 from clawshot.world.rules import ADULT, CHILD
 from clawshot.world.search import Search
@@ -559,10 +560,16 @@ class SeedLogic:
         return self._search
 
     def annotate(
-        self, state: dict[str, Any], seed: Seed, save: save_format.Save | None, marked: frozenset[str] = frozenset()
+        self,
+        state: dict[str, Any],
+        seed: Seed,
+        save: save_format.Save | None,
+        marked: frozenset[str] = frozenset(),
+        skipped: frozenset[str] = frozenset(),
     ) -> None:
         """Add ``state["logic"]`` and, while logic is available, each open check's ``in_logic`` and each area's
-        ``in_logic`` counts. Open: not collected, or unknown and not ``marked`` (D5)."""
+        ``in_logic`` counts. Open: not collected, not marked done (D5) and not skipped (round 21). Vanilla rows get
+        ``markable``/``marked`` and ``skippable``/``skipped`` as the seed's own checks do."""
         logic: dict[str, Any] = {
             "available": self.loaded.available,
             "reason": self.loaded.reason,
@@ -598,6 +605,7 @@ class SeedLogic:
                 entry["markable"] = True  # as for the seed's own `?` checks (tracker.state.markable)
                 if row.location in marked:
                     entry["marked"] = True
+            skip_fields(entry, skipped)
             grouped.setdefault(row.area, []).append(entry)
         state["vanilla_areas"] = [
             {
@@ -606,6 +614,7 @@ class SeedLogic:
                 "total": len(checks),
                 "unknown": sum(c["collected"] is None for c in checks),
                 "marked": sum(c.get("marked", False) for c in checks),
+                "skipped": sum(c.get("skipped", False) for c in checks),
                 "in_logic": _flag_open(checks, world, search),
                 "checks": checks,
             }
@@ -617,7 +626,8 @@ def _flag_open(checks: list[dict[str, Any]], world: World, search: Search) -> di
     """Give each open check ``in_logic`` (3.1, 3.2) and return how many are in logic per age (3.4)."""
     totals = dict.fromkeys(AGE_KEYS, 0)
     for entry in checks:
-        if entry["collected"] is True or entry.get("marked", False):  # entries carry marked only where markable
+        # Entries carry marked only where markable and skipped only where skippable.
+        if entry["collected"] is True or entry.get("marked", False) or entry.get("skipped", False):
             continue
         location: Location = world.locations[entry["id"]]
         flags = {

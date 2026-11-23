@@ -4,7 +4,6 @@ import threading
 from pathlib import Path
 
 from clawshot.app.paths import absolute_path
-from clawshot.tracker import marks as tracker_marks
 from clawshot.tracker.icons import IconCache, icon_id
 from clawshot.tracker.saves import TrackerSession
 
@@ -86,24 +85,27 @@ class TrackerController:
                 for area in (state or {}).get("areas", []):
                     area.pop("checks", None)
                     area.pop("marked", None)
+                    area.pop("skipped", None)
                     area.pop("in_logic", None)
                 data.pop("save_folder", None)
                 data.pop("slots", None)
                 data.pop("save_path", None)
-                for holder in (data, state or {}):
-                    if "warnings" in holder:
-                        holder["warnings"] = [
-                            w for w in holder["warnings"] if not str(w).startswith(tracker_marks.WARNING_PREFIX)
-                        ]
+                # No warnings at all in OBS (seed identity, read problems, marks file): they stay in the app.
+                data["warnings"] = []
+                if state is not None:
+                    state["warnings"] = []
             return data
 
     def mark(self, body):
-        """Mark a check the save cannot read as done by hand, or unmark it (POST ``tracker-mark``)."""
-        check, marked = body.get("check"), body.get("marked")
+        """Mark a check the save cannot read as done by hand, or skip a check it reads as not collected
+        (``kind: "skip"``), or take either back (POST ``tracker-mark``)."""
+        check, marked, kind = body.get("check"), body.get("marked"), body.get("kind", "done")
         if not isinstance(check, str) or not check or type(marked) is not bool:
             raise ValueError("Name a check and whether it is marked done.")
+        if kind not in ("done", "skip"):
+            raise ValueError("A mark's kind is done or skip.")
         with self.lock:
-            self.session.mark(check, marked)
+            (self.session.skip if kind == "skip" else self.session.mark)(check, marked)
             return self.snapshot()
 
     def clear_marks(self, body):

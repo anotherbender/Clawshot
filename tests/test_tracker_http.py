@@ -406,3 +406,23 @@ def test_marks_on_a_provisional_not_collected_gift_only_and_obs_unchanged(track_
         obs = request(server, "tracker-obs")[2]
         assert all("checks" not in area for area in obs["state"]["areas"])
         assert "markable" not in json.dumps(obs) and "marked" not in json.dumps(obs["state"]["areas"])
+
+
+# Round 21: skips through the same route (plans/rounds/r21-tracker.md).
+def test_skip_kind_on_the_mark_route_and_obs_strips_it(marks_seed):
+    root, _ = marks_seed
+    with running_server(Application(preferences=Preferences())) as server:
+        assert request(server, "tracker-configure", {"seed": str(root)})[0] == 200
+        status, _, skipped = request(server, "tracker-mark", {"check": "Test Chest", "marked": True, "kind": "skip"})
+        assert status == 200, skipped
+        entry = check_entry(skipped, "Test Chest")
+        assert (entry["skippable"], entry["skipped"]) == (True, True)
+        for body in (
+            {"check": "Test Shop", "marked": True, "kind": "skip"},  # unknown: mark it done instead
+            {"check": "Test Chest", "marked": True, "kind": "later"},
+        ):
+            assert request(server, "tracker-mark", body)[0] == 400, body
+        obs = request(server, "tracker-obs")[2]
+        assert "skipped" not in json.dumps(obs["state"]["areas"]) and "skippable" not in json.dumps(obs)
+        back = request(server, "tracker-mark", {"check": "Test Chest", "marked": False, "kind": "skip"})[2]
+        assert "skipped" not in check_entry(back, "Test Chest")

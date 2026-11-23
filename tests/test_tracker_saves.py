@@ -60,6 +60,35 @@ def test_slots_in_runtime_and_emulator_layouts(tmp_path):
     assert list_slots(tmp_path / "missing") == []
 
 
+# Longshot 3.1.x keeps a working copy in user/save-work/<account>/ beside user/save/ (work/longshot-311/REPORT.md,
+# "Saves": pointed at the user folder, the reader chose save-work's slot_05 and no slot resolved by name).
+def test_longshot_working_copy_is_never_a_slot_and_the_3_0_layout_reads_the_same(tmp_path):
+    def layout(root):
+        save_folder = root / "user" / "save" / ACCOUNT
+        write_slot(save_folder, 1, b"newest real", 9 * SECOND)
+        write_slot(save_folder, 5, b"older real", 4 * SECOND)
+        return root / "user"
+
+    def view(slots):
+        return [(s["id"], s["number"], s["mtime_ns"], s["size"]) for s in slots]
+
+    v300 = layout(tmp_path / "300")  # Longshot 3.0.0 / Hookshot: save/ only
+    v311 = layout(tmp_path / "311")
+    work = v311 / "save-work" / ACCOUNT  # the working copy: same slots, written later, plus a slot save/ lacks
+    for number in (1, 5, 7):
+        write_slot(work, number, b"working copy", 20 * SECOND)
+    (v311 / "save-work" / f"{ACCOUNT}.lock").write_bytes(b"")
+
+    expected = [("slot_01", 1, 9 * SECOND, len(b"newest real")), ("slot_05", 5, 4 * SECOND, len(b"older real"))]
+    assert view(list_slots(v300)) == view(list_slots(v311)) == expected
+    slots = list_slots(v311)
+    assert all("save-work" not in s["path"] for s in slots)
+    assert choose_slot(slots, None)["id"] == "slot_01"
+    assert choose_slot(slots, "slot_05")["size"] == choose_slot(slots, 5)["size"] == len(b"older real")
+    assert choose_slot(slots, "slot_07") is None  # only the working copy has it
+    assert view(list_slots(v311 / "save")) == expected  # pointed at save/ itself: unchanged
+
+
 def test_read_complete_refuses_partial_files():
     good = build_save({"IsTreasureBoxOpen.123": True})
     assert read_complete(good).flag("IsTreasureBoxOpen.123") is True

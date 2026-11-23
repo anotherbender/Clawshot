@@ -28,7 +28,6 @@
 .tracker-areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 8px; }
 .tracker-area { border-left: 2px solid var(--border); padding: 4px 8px; font-size: 13px; }
 .tracker-area > span { display: block; color: var(--muted); }
-.tracker-check { font-size: 12px; margin: 5px 0; }
 .tracker-explanation { color: var(--muted); font-size: 12px; }
 body[data-tracker="obs"] { overflow: auto; background: var(--panel); }
 body[data-tracker="obs"] #tracker-root { --tracker-columns: 4; --tracker-cell-width: 78px; padding: 8px; width: max(280px, calc(var(--tracker-columns) * (var(--tracker-cell-width) + 3px) + 13px)); max-width: 100%; }
@@ -39,17 +38,20 @@ body[data-tracker="obs"] .tracker-content { display: flex; flex-direction: colum
 body[data-tracker="obs"] .tracker-group { min-width: 0; width: 100%; }
 body[data-tracker="obs"] .section-title { font-size: 15px; margin: 5px 0; }
 body[data-tracker="obs"] .tracker-cells { grid-template-columns: repeat(var(--tracker-columns), minmax(0, var(--tracker-cell-width))); gap: 3px; }
-body[data-tracker="obs"] .tracker-cell { min-width: 0; min-height: 48px; padding: 3px; overflow-wrap: anywhere; }
+body[data-tracker="obs"] .tracker-cell { min-width: 0; min-height: 44px; padding: 3px; overflow-wrap: anywhere; border-color: var(--outline-faint); background: transparent; }
 body[data-tracker="obs"] .tracker-cell-label { font-size: 11px; }
 body[data-tracker="obs"] .tracker-icon { width: 32px; height: 32px; }
 body[data-tracker="obs"] .tracker-areas { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
 body[data-tracker="obs"] .tracker-area { min-width: 0; overflow-wrap: anywhere; font-size: 11px; }
 body[data-tracker="obs"] .tracker-counts, body[data-tracker="obs"] .tracker-explanation { font-size: 11px; }
 body[data-tracker="obs"] .tracker-badge { display: none; }
-body[data-tracker="obs"].tracker-no-labels #tracker-root { --tracker-cell-width: 42px; }
-body[data-tracker="obs"].tracker-no-labels .heading p,
-body[data-tracker="obs"].tracker-no-labels .tracker-warnings,
-body[data-tracker="obs"].tracker-no-labels .tracker-areas-group { display: none; }
+body[data-tracker="obs"].tracker-no-labels #tracker-root { --tracker-cell-width: 38px; }
+body[data-tracker="obs"].tracker-no-labels .heading,
+body[data-tracker="obs"].tracker-no-labels .tracker-warnings { display: none; }
+body[data-tracker="obs"].tracker-no-labels .tracker-content { gap: 2px; }
+/* Compact: icons speak for their group, so no section titles; the dungeon names head the key rows. */
+body[data-tracker="obs"].tracker-no-labels .section-title { display: none; }
+body[data-tracker="obs"].tracker-no-labels .tracker-group + .tracker-group { margin-top: 5px; }
 body[data-tracker="obs"] .tracker-quest-cell { min-height: 38px; height: 38px; padding: 2px; }
 body[data-tracker="obs"] .tracker-quest-chip { display: grid; place-items: center; width: 32px; height: 32px; font-size: 11px; font-weight: 600; white-space: nowrap; overflow-wrap: normal; }
 body[data-tracker="obs"] .tracker-missing .tracker-quest-chip { filter: grayscale(1); }
@@ -60,7 +62,10 @@ body[data-tracker="obs"] [data-medallion="water_medallion"] { background: var(--
 body[data-tracker="obs"] [data-medallion="shadow_medallion"] { background: var(--medallion-shadow); }
 body[data-tracker="obs"] [data-medallion="spirit_medallion"] { background: var(--medallion-spirit); }
 body[data-tracker="obs"] [data-medallion="light_medallion"] { background: var(--medallion-light); }
-body[data-tracker="obs"].tracker-no-labels .tracker-has-icon { min-height: 38px; padding: 2px; }
+body[data-tracker="obs"].tracker-no-labels .tracker-has-icon { min-height: 36px; padding: 2px; }
+body[data-tracker="obs"].tracker-no-labels .tracker-icon { width: 30px; height: 30px; }
+body[data-tracker="obs"].tracker-no-labels .tracker-quest-cell { min-height: 36px; height: 36px; }
+body[data-tracker="obs"].tracker-no-labels .tracker-quest-chip { width: 30px; height: 30px; }
 body[data-tracker="obs"].tracker-no-labels .tracker-has-icon .tracker-cell-label,
 body[data-tracker="obs"].tracker-no-labels .tracker-has-icon > small:not(.tracker-key-total),
 body[data-tracker="obs"].tracker-no-labels .tracker-quest-cell > small { display: none; }
@@ -70,24 +75,71 @@ body[data-tracker="obs"].tracker-no-labels .tracker-quest-cell .tracker-badge,
 body[data-tracker="obs"] .tracker-dungeon-item .tracker-badge { display: block; position: absolute; bottom: 0; right: 1px; padding: 0 2px; border-radius: 2px; background: var(--panel); color: var(--fg); font: bold 11px var(--sans); line-height: 14px; font-variant-numeric: tabular-nums; }
 body[data-tracker="obs"].tracker-no-labels .tracker-has-icon .tracker-badge-tier { top: 0; left: 1px; right: auto; bottom: auto; color: var(--amber); }
 body[data-tracker="obs"] .tracker-dungeon-row { display: grid; grid-template-columns: minmax(0, 1fr) repeat(4, minmax(32px, 40px)); gap: 2px; align-items: center; margin: 2px 0; }
+body[data-tracker="obs"][data-dungeon-names="short"] .tracker-dungeon-row { grid-template-columns: 58px repeat(4, minmax(32px, 40px)); }
+body[data-tracker="obs"][data-dungeon-names="none"] .tracker-dungeon-row { grid-template-columns: repeat(4, minmax(32px, 40px)); }
 body[data-tracker="obs"] .tracker-dungeon-name { font-size: 11px; font-weight: 500; line-height: 1.15; overflow-wrap: anywhere; padding-right: 3px; }
+body[data-tracker="obs"][data-dungeon-names="short"] .tracker-dungeon-name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body[data-tracker="obs"][data-dungeon-names="short"] #tracker-root { width: max(236px, calc(var(--tracker-columns) * (var(--tracker-cell-width) + 3px) + 13px)); }
+body[data-tracker="obs"][data-dungeon-names="none"] #tracker-root { width: max(184px, calc(var(--tracker-columns) * (var(--tracker-cell-width) + 3px) + 13px)); }
 body[data-tracker="obs"] .tracker-dungeon-item { min-height: 40px; padding: 1px; }
 body[data-tracker="obs"] .tracker-dungeon-item .tracker-cell-label { font-size: 10px; }
 body[data-tracker="obs"] .tracker-dungeon-item.tracker-has-icon .tracker-cell-label,
 body[data-tracker="obs"] .tracker-dungeon-item.tracker-has-icon .tracker-dungeon-flag { display: none; }
 body[data-tracker="obs"] .tracker-dungeon-item .tracker-key-total { display: block; margin: 0 0 12px; font-size: 10px; }
-body[data-tracker="obs"].tracker-no-labels .tracker-dungeon-item.tracker-has-icon { min-height: 40px; }
+/* With an icon, found/total sits in the bottom-left corner (held keys bottom-right), so key cells match the others. */
+body[data-tracker="obs"] .tracker-dungeon-item.tracker-has-icon .tracker-key-total { position: absolute; left: 1px; bottom: 0; margin: 0; padding: 0 2px; border-radius: 2px; background: var(--panel); color: var(--muted); font: bold 10px var(--sans); line-height: 13px; font-variant-numeric: tabular-nums; }
+body[data-tracker="obs"].tracker-no-labels .tracker-dungeon-item.tracker-has-icon { min-height: 34px; }
+body[data-tracker="obs"].tracker-no-labels .tracker-dungeon-item .tracker-icon { width: 28px; height: 28px; }
+body[data-tracker="obs"].tracker-no-labels .tracker-dungeon-row { grid-template-columns: minmax(0, 1fr) repeat(4, 36px); margin: 1px 0; }
+body[data-tracker="obs"].tracker-no-labels[data-dungeon-names="short"] .tracker-dungeon-row { grid-template-columns: 58px repeat(4, 36px); }
+body[data-tracker="obs"].tracker-no-labels[data-dungeon-names="none"] .tracker-dungeon-row { grid-template-columns: repeat(4, 36px); }
 body.tracker-transparent, body.tracker-transparent .tracker-cell { background: transparent; }
 @media (max-width: 720px) {
   .tracker-path { grid-template-columns: minmax(0, 1fr) auto; }
   .tracker-path label { grid-column: 1 / -1; }
 }
-/* In logic (Tracker tab only): open checks reachable now, out of reach, and checks marked done by hand. */
-.tracker-logic-note { color: var(--muted); font-size: 12px; margin: 4px 0; }
+/* Checks tab: state markers (CSS shapes only), collapsible areas in 2-3 fluid columns, and the side-panel details. */
+.tracker-logic-controls, .tracker-check-tools { margin: 10px 0; }
+.tracker-check-tools button { min-height: 28px; padding: 3px 12px; font-size: 13px; }
+.tracker-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 8px 0 12px; color: var(--muted); font-size: 12px; }
+.tracker-legend-item { display: inline-flex; align-items: center; gap: 6px; cursor: help; }
+.tracker-logic-note, .tracker-checks-status { color: var(--muted); font-size: 12px; margin: 4px 0; }
+.tracker-checks-status:empty { display: none; }
+.tracker-no-save { margin: 8px 0 18px; padding: 4px 18px 10px; border: 1px solid var(--border); background: var(--value); }
+.tracker-checks-status.tracker-no-save { padding: 8px 12px; color: var(--fg); font-size: 13px; }
+.tracker-no-save p { font-size: 14px; line-height: 1.5; }
+.tracker-no-save code { overflow-wrap: anywhere; }
+/* On the Checks tab the side panel is a fixed 390 px column (it never scrolls with the list) and the list gets the
+   rest: 380 px columns give 2 at 1280 wide and 3 at 1920. */
+@media (min-width: 701px) {
+  .workspace:has(#checks:not([hidden])) { grid-template-columns: minmax(0, 1fr) 390px; }
+  .workspace:has(#checks:not([hidden])) .side-panel { padding-top: 27px; }
+}
+#checks-root .tracker-areas { display: block; columns: 380px 3; column-gap: 18px; }
+#checks-root .tracker-area { break-inside: avoid; margin: 0 0 10px; padding: 0 0 0 6px; }
+.tracker-area-head, .tracker-check { display: flex; align-items: baseline; gap: 7px; width: 100%; min-height: 0; border: 0; background: none; text-align: left; color: var(--fg); }
+.tracker-area-head { flex-wrap: wrap; padding: 3px 4px; font-size: 14px; }
+.tracker-area-head .tracker-area-counts { margin-left: auto; color: var(--muted); font-size: 12px; font-weight: 400; }
+.tracker-area-fold { flex: none; width: 0; height: 0; border-top: 5px solid currentColor; border-left: 4px solid transparent; border-right: 4px solid transparent; align-self: center; }
+.tracker-area-collapsed .tracker-area-fold { transform: rotate(-90deg); }
+.tracker-check { padding: 2px 4px; font-size: 13px; line-height: 1.35; }
+.tracker-area-head:hover, .tracker-check:hover, .tracker-check-selected { background: var(--label); }
+.tracker-check[aria-disabled="true"] { cursor: default; }
+.tracker-check-label { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.tracker-state { flex: none; box-sizing: border-box; width: 11px; height: 11px; border: 2px solid var(--fg); border-radius: 50%; align-self: center; }
+.tracker-state-in-logic { border-color: var(--success); }
+.tracker-state-out-of-logic, .tracker-state-unread { border-color: var(--muted); opacity: .6; }
+.tracker-state-collected { border-color: var(--success); background: var(--success); }
+.tracker-state-marked { border-color: var(--amber); background: var(--amber); }
+.tracker-state-skipped { border-color: var(--muted); background: linear-gradient(135deg, transparent 40%, var(--muted) 40% 60%, transparent 60%); }
+/* Mark by hand: a square, not a ring, so it stays distinct from out-of-logic rings in a 1080p stream capture. */
+.tracker-state-manual, .tracker-check-manual .tracker-state { width: 12px; height: 12px; border-radius: 0; }
 .tracker-check-in-logic { color: var(--success); font-weight: 600; }
 .tracker-check-out-of-logic { color: var(--muted); opacity: .75; }
-.tracker-check-collected { color: var(--muted); }
-.tracker-check-marked { color: var(--muted); font-style: italic; }
-.tracker-mark { padding: 0 6px; font-size: 11px; margin-left: 4px; }
-.tracker-area[hidden], .tracker-check[hidden] { display: none; }
-.tracker-vanilla-tag { font-size: 10px; padding: 0 4px; border: 1px solid currentColor; border-radius: 3px; opacity: .7; }
+.tracker-check-collected, .tracker-check-marked, .tracker-check-skipped { color: var(--muted); }
+.tracker-check-skipped .tracker-check-label { text-decoration: line-through; }
+.tracker-area[hidden], .tracker-check[hidden], .tracker-area-checks[hidden], .tracker-legend[hidden] { display: none; }
+.tracker-vanilla-tag { flex: none; font-size: 10px; padding: 0 4px; border: 1px solid currentColor; border-radius: 3px; opacity: .7; }
+.check-details dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 7px 14px; margin: 6px 0 0; font-size: 14px; line-height: 1.45; }
+.check-details dt { color: var(--amber); }
+.check-details dd { margin: 0; }
