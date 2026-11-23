@@ -371,8 +371,9 @@ was = "is_adult or Kokiri_Sword"
 source = "Gerudo Training Ground.json:8. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the Stalfos fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [locations."Gerudo Training Ground Beamos Chest"]
-# adult_weapon for the fight only: the Beamos part (has_explosives) is kept (r21-hammer.md, Beamos staged check).
-rule = "has_explosives and (adult_weapon or (is_child and Kokiri_Sword))"
+# adult_weapon for the fight; the Beamos (Enemy_Beamos 2867582777575272608, 0.0 from the chest) takes the Hammer too:
+# Kareem, Longshot 3.0.0, 2026-11-23, one Hammer hit destroyed an Enemy_Beamos (r21-hammer.md, Beamos G1).
+rule = "can_blast_or_smash and (adult_weapon or (is_child and Kokiri_Sword))"
 was = "has_explosives and (is_adult or Kokiri_Sword)"
 source = "Gerudo Training Ground.json:9. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the room's fight after the Beamos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 

@@ -55,7 +55,7 @@ where a natural adult save reaches a Beamos with the Hammer.**
 | Bomb Flower | flower `Obj_BombFlower_A_02/_A_03` (no damage table); fruit `Obj_BombFlower_A_01`: `BombFlower_Fruit` Hammer 1.0, Bomb 0.0, MaxLife 1, material `BombFruit` `IsExplode` | 1 (fruit) | 0 (fruit) | 1 | no | **kept**: that a Hammer hit detonates the fruit is not traced (its death-procedure table is unread); staged as an observation |
 | Switch | eye switches (`Obj_EyeSwitch_*`, no damage table); Hammer switches already Hammer-only; crystal switch (`can_jumpslash` names the Hammer) | | | | no | eye-switch rules **kept** |
 | Enemy | every `Enemy_*` an enemy rule names: a generic table, Hammer 1.0 = Bomb 1.0 (Freezard 99, Torch Slug 100); only Jabu's tentacles have Hammer 0 | 1+ | 1 | | yes: "works as an adult weapon" | widen non-boss fights (`adult_weapon`) |
-| Beamos | `Enemy_Beamos`, `Enemy_Beamos_For_High_Place`: the generic enemy table (every named type 1.0), so the table does not say why N64's Beamos needed explosives; it respawns on area reload (`ActorGameDataSetting BancResetNoItemWarp`) | 1 | 1 | 2 | no; Kareem: uncertain | **kept everywhere**, staged check |
+| Beamos | `Enemy_Beamos`, `Enemy_Beamos_For_High_Place`: the generic enemy table (every named type 1.0), so the table does not say why N64's Beamos needed explosives; it respawns on area reload (`ActorGameDataSetting BancResetNoItemWarp`) | 1 | 1 | 2 | Kareem, Longshot 3.0.0, 2026-11-23: one Hammer hit destroys an `Enemy_Beamos` (both arms) | ground Beamos **widened** (S1, G1, G2); high Beamos kept (out of reach) |
 | Boss | King Dodongo, Phantom Ganon, Morpha, Bongo Bongo, Twinrova: Hammer 1.0 (Kotake/Koume 0, Bomb 0 too) | 1 | 1 | | no | **kept**: King Dodongo by Kareem's word; the others' reflect, nucleus and eye steps are not damage-table facts, and no natural save reaches them unbeaten |
 
 The WallCrack table is specific, not generic: `CrackStoneObject` gives Hammer and Bomb 100, Bottle 1, and 0 to every
@@ -98,7 +98,7 @@ rocks' were checked in round 14].
   expects the Hammer to open the `WallCrack` and the fairies to still need a Bottle.
 - `docs/logic.md`: one paragraph (own lines).
 
-## Beamos-gated rules (Kareem: kept out of the widening)
+## Beamos-gated rules (ground Beamos widened after Kareem's check, 2026-11-23)
 
 Placed Beamos (`walls.py`): Spirit Temple `Enemy_Beamos` 8232607517064124082 (33.6,104.7,-30.7),
 12328217772424437690 (18.2,129.7,-28.5), 15096857207894283138 (40.2,130.0,-29.0) and five
@@ -109,13 +109,13 @@ Temple 1748567630123051400 (first Beamos) and 4966197794818826898 (falling spike
 
 | # | Rule | Explosives read | Beamos | Status |
 |---|---|---|---|---|
-| S1 | Spirit Temple Anubis Room -> Spirit Temple Beyond Anubis Room (`spirit_temple.toml`, Spirit Temple.json:259) | `has_explosives` | `Enemy_Beamos` 12328217772424437690 and 15096857207894283138 at y 130 between the Anubis room and the Beyond Anubis checks (Near Four Armos Chest 21.7 away); the region's own pot is "Spirit Temple Beamos Hall Pot" | **kept**; the Beamos is the likely target [inference from position]; behind it: Near Four Armos Chest, both Hallway Invisible Chests, Mirror Shield Chest |
+| S1 | Spirit Temple Anubis Room -> Spirit Temple Beyond Anubis Room (`spirit_temple.toml`, Spirit Temple.json:259) | `has_explosives` | `Enemy_Beamos` 12328217772424437690 and 15096857207894283138 at y 130 between the Anubis room and the Beyond Anubis checks (Near Four Armos Chest 21.7 away); the region's own pot is "Spirit Temple Beamos Hall Pot" | **widened** (`remake/hammer.toml`, Kareem's check); the Beamos is the likely target [inference from position]; behind it: Near Four Armos Chest, both Hallway Invisible Chests, Mirror Shield Chest |
 | S2 | Spirit Temple Central Chamber -> Desert Colossus Hands (Spirit Temple.json:229) | `is_adult and has_explosives` | target not identified: this Beamos pair or `Obj_SpiritTemple_CrackWall_A_02` (-10.6,157.1,-27.5) | **kept** |
 | S3 | Spirit Temple Big Mirror Room -> Spirit Temple Before Boss (Spirit Temple.json:296) | `has_explosives and Mirror_Shield` | target not identified: the CrackWall above is the nearer candidate | **kept** |
 | S4 | Early Adult Spirit Temple -> Spirit Temple Boulder Room | `Bombs` only with a trick (a switch) | `Enemy_Beamos` 8232607517064124082 stands near the Boulder Room GS | not Beamos-gated (Bow, Hookshot or Bombchus hit the switch) |
 | S5 | Spirit Sun Block Room / west hallway rules | age-unknown `has_explosives` (the child's climb wall) | five `Beamos_For_High_Place` on ledges | not Beamos-gated; a high Beamos is out of Hammer reach anyway |
-| G1 | Gerudo Training Ground Beamos Chest (`master_sword.toml`) | `has_explosives and (adult_weapon or ...)` | 2867582777575272608 at 0.0 from the chest | Beamos part **kept**; only the fight part reads `adult_weapon` |
-| G2 | Gerudo Training Ground Lobby -> Lava Room Front (`adult_gerudo_training_ground.toml`) | `here(has_explosives and (adult_weapon or ...))` | the same Beamos (the Lava Room is past the Beamos room) | Beamos part **kept** |
+| G1 | Gerudo Training Ground Beamos Chest (`master_sword.toml`) | `has_explosives and (adult_weapon or ...)` | 2867582777575272608 at 0.0 from the chest | **widened**: `can_blast_or_smash and (adult_weapon or ...)` (Kareem's check) |
+| G2 | Gerudo Training Ground Lobby -> Lava Room Front (`adult_gerudo_training_ground.toml`) | `here(has_explosives and (adult_weapon or ...))` | the same Beamos (the Lava Room is past the Beamos room) | **widened**: `here(can_blast_or_smash and ...)` (Kareem's check) |
 | C1 | Ganon's Castle Spirit Trial Crystal Switch Chest | `can_jumpslash or has_explosives` | `Enemy_Beamos` 10314802415333902283 16.6 away | already Hammer through `can_jumpslash`; unchanged |
 | D1 | Desert Colossus Chest (TBox_Rupee_Purple), region Colossus Grotto | none: rule `True` | `Enemy_Beamos` 16367174076614975674 at 0.1 from the chest | **finding, not changed:** if this chest appears only once the Beamos dies, its `True` is too loose; question below |
 
@@ -138,7 +138,7 @@ checklist: see "Staged checks" below.
 - **Not one of the covered actors:** DC Far Bridge -> Mouth (bombs into the skull's eyes), DC Staircase -> Climb
   (Bomb Flower staircase), Fire Temple Elevator Room -> Boulder Maze Lower (a ranged switch), the Spirit lower adult
   switch, Ganon's Spirit Trial Bombchu hole, Bombchu Bowling, and the Bombchu-as-projectile rules.
-- **Beamos:** every rule above.
+- **Beamos:** S2 and S3 (target not identified), the high Beamos (out of reach); D1 is a question.
 - **Target not identified (left as is, tightening-safe):** SFM chest and gossip stone (the only cover is 24 away and
   18 above, the "unverified top hole"), HF GS Near Kak Grotto (inside the grotto; Hyrule Field's webs are Hammer 0),
   DC Lobby -> Lower Right Side, DC Lower Right Side -> Torch Room, Fire Temple Flame Maze -> Upper ("Bomb exposes
@@ -161,9 +161,10 @@ checklist: see "Staged checks" below.
 
 ## Staged checks
 
-One packet, **not yet played**; nothing in it needs Kareem before morning. It decides the ground Beamos (S1, G1, G2)
-and records one observation for the Bomb Flower class. The logic on this branch does not depend on it: the Beamos
-parts stay as they are until it passes, and a pass gets its own commit.
+One packet, **played by Kareem on Longshot 3.0.0, 2026-11-23: PASS**, both arms the same. One Hammer hit destroyed
+a Beamos in Dodongo's Cavern; a Hammer hit on a Bomb Flower blew it up (observation for round 22, below). He has
+never seen the boulder in front of Dodongo's Cavern as an adult (see the DC entrance boulder below). The ground
+Beamos (S1, G1, G2) widened in its own commit after the pass.
 
 - Game: **Longshot 3.0.0** stable (`builds\stable\v3.0.0\bin\longshot.exe`, pinned in both launchers; no
   `hookshot.exe` in either). `HOS_FS_OVERLAY` stays unset; each launcher loads one mod through `HOS_MODS`.
@@ -222,7 +223,7 @@ only setting where `adult_weapon` differs from `is_adult`), then the full gate (
 
 Columns: the inventory index, the region, the rule's kind and name, the class, the verdict ("widened", "kept",
 "already Hammer" for rules that already read `can_blast_or_smash` or the Hammer, "child only", "no change" for trick
-branches and Hammer-only rules) and the file that owns the rule now. Beamos-gated rows are "kept" (see above).
+branches and Hammer-only rules) and the file that owns the rule now. Ground-Beamos rows widened after Kareem's check.
 
 | # | Region | Kind | Name | Class | Verdict | Object / note | File |
 |---|---|---|---|---|---|---|---|
@@ -404,7 +405,7 @@ branches and Hammer-only rules) and the file that owns the rule now. Beamos-gate
 | 175 | Spirit Temple Central Chamber | location | Spirit Temple GS Lobby | age-unknown child access | kept |  | adult_spirit_temple.toml |
 | 176 | Spirit Temple Central Chamber | location | Spirit Temple GS Hall After Sun Block Room | age-unknown child access | kept |  | translated |
 | 177 | Spirit Temple Central Chamber | exit | Desert Colossus Hands | unresolved | kept | Spirit CrackWall_A_02: which of three rules it serves is not identified | translated |
-| 178 | Spirit Temple Anubis Room | exit | Spirit Temple Beyond Anubis Room | unresolved | kept | as above | translated |
+| 178 | Spirit Temple Anubis Room | exit | Spirit Temple Beyond Anubis Room | Beamos (S1) | widened | Enemy_Beamos pair in the hall; Kareem's check 2026-11-23 | hammer.toml |
 | 179 | Spirit Temple Anubis Room | exit | Spirit Temple Big Mirror Room | already Hammer | already Hammer |  | translated |
 | 180 | Spirit Temple Big Mirror Room | exit | Spirit Temple Before Boss | unresolved | kept | as above | translated |
 | 181 | Twinrova Boss Room | event | Defeat Twinrova | boss | kept | Twinrova | master_sword.toml |
@@ -417,8 +418,8 @@ branches and Hammer-only rules) and the file that owns the rule now. Beamos-gate
 | 188 | Ice Cavern End | location | Sheik in Ice Cavern | enemy | widened |  | song_lessons.toml |
 | 189 | Ice Cavern End | event | Ice Cavern End Chest Access | enemy | widened |  | adult_lake_hylia.toml |
 | 190 | Gerudo Training Ground Lobby | location | Gerudo Training Ground Stalfos Chest | enemy | widened | Stalfos | master_sword.toml |
-| 191 | Gerudo Training Ground Lobby | location | Gerudo Training Ground Beamos Chest | Beamos + enemy | widened | fight part widened; Beamos part kept (staged) | master_sword.toml |
-| 192 | Gerudo Training Ground Lobby | exit | Gerudo Training Ground Lava Room Front | Beamos + enemy | widened | fight part widened; Beamos part kept (staged) | adult_gerudo_training_ground.toml |
+| 191 | Gerudo Training Ground Lobby | location | Gerudo Training Ground Beamos Chest | Beamos + enemy | widened | fight and Beamos (G1, Kareem's check 2026-11-23) | master_sword.toml |
+| 192 | Gerudo Training Ground Lobby | exit | Gerudo Training Ground Lava Room Front | Beamos + enemy | widened | fight and Beamos (G2, Kareem's check 2026-11-23) | adult_gerudo_training_ground.toml |
 | 193 | Gerudo Training Ground Lobby | exit | Gerudo Training Ground Boulder Room | enemy | widened |  | master_sword.toml |
 | 194 | Gerudo Training Ground Like Like Room | location | Gerudo Training Ground Heavy Block First Chest | cracked wall | already Hammer |  | adult_gerudo_training_ground.toml |
 | 195 | Gerudo Training Ground Like Like Room | location | Gerudo Training Ground Heavy Block Second Chest | cracked wall | already Hammer |  | adult_gerudo_training_ground.toml |

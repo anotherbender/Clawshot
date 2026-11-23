@@ -23,8 +23,9 @@ source = "Banc room 0: one Bow eye-switch chest (east, 2436665354602612279) and 
 [exits."Gerudo Training Ground Lobby"."Gerudo Training Ground Lava Room Front"]
 # Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword, the Kokiri
 # Sword the child's; it folds to the rule before while shuffle_master_sword is false. Round 21 cs21e: adult_weapon for
-# the fight; the Beamos part (has_explosives) is kept (r21-hammer.md, Beamos staged check).
-rule = "here(has_explosives and (adult_weapon or (is_child and Kokiri_Sword))) and can_use(Goron_Tunic)"
+# the fight, and the Beamos room's Enemy_Beamos 2867582777575272608 takes the Hammer (Kareem, Longshot 3.0.0,
+# 2026-11-23: one Hammer hit destroyed an Enemy_Beamos; r21-hammer.md, Beamos G2).
+rule = "here(can_blast_or_smash and (adult_weapon or (is_child and Kokiri_Sword))) and can_use(Goron_Tunic)"
 was = "here(has_explosives and (is_adult or Kokiri_Sword))"
 source = "EG section 2: after the Beamos room the lava room needs the Goron Tunic for heat resistance; ZC: wear the Goron Tunic in the lava rooms or the heat drains hearts. The remake's heat damage: https://www.ign.com/wikis/ocarina-of-time-remake/Biggest_Changes_and_Differences (Link Reacts to Temperature)."
 

@@ -1,7 +1,7 @@
 """Round 21 (plans/rounds/r21-hammer.md): the Megaton Hammer opens what the remake's data and Kareem's play say it
-opens, per object class, and nothing else: cracked walls, cracked floors and grotto covers widen; King Dodongo, the
-Shadow Temple skull pots and the webs keep their explosives; with Master Sword shuffle on, ordinary enemy fights take
-the Hammer while the bosses keep the sword. Built, not played."""
+opens, per object class, and nothing else: cracked walls, cracked floors, grotto covers and the ground Beamos widen;
+King Dodongo, the Shadow Temple skull pots and the webs keep their explosives; with Master Sword shuffle on, ordinary
+enemy fights take the Hammer while the bosses keep the sword."""
 
 import pytest
 
@@ -11,8 +11,8 @@ from clawshot.world.rules import DAY
 HAMMER = {"Megaton Hammer": 1}
 BOMBS = {"Bomb Bag": 1, "Progressive Strength Upgrade": 1}
 
-# (kind, region, name, the other items the rule asks for): explosives there break a WallCrack-family wall or floor or
-# a BrokenBomb grotto cover.
+# (kind, region, name, the other items the rule asks for): explosives there break a WallCrack-family wall or floor, a
+# BrokenBomb grotto cover or a ground Beamos (Kareem, Longshot 3.0.0, 2026-11-23: one Hammer hit destroys one).
 WIDENED = [
     ("stone", None, "DMC Gossip Stone", {}),
     ("exit", "Zoras Fountain", "ZF Great Fairy Fountain", {}),
@@ -37,6 +37,10 @@ WIDENED = [
         "Water Temple Boss Key Chest Room",
         {"Iron Boots": 1, "Progressive Strength Upgrade": 1},
     ),
+    ("exit", "Spirit Temple Anubis Room", "Spirit Temple Beyond Anubis Room", {}),
+    ("location", None, "Gerudo Training Ground Beamos Chest", {}),
+    # The Lava Room Front exit's here(): the Beamos room, compiled into the lobby's third subrule event.
+    ("event", "Gerudo Training Ground Lobby", "Gerudo Training Ground Lobby Subrule 3", {}),
 ]
 
 # Explosives the data says the Hammer cannot replace (Hammer 0.0 on the skull pots and webs) or that Kareem keeps.

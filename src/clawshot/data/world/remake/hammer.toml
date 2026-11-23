@@ -8,8 +8,9 @@
 # Each entry below names the actor that its explosives open; translated rules widen here, rules another override file
 # owns widen in that file. has_explosives becomes can_blast_or_smash (OoT Randomizer's explosives-or-Hammer helper).
 # Not here: King Dodongo (Kareem: bombs or Bomb Flowers with the Bracelet), anything the data says the Hammer cannot
-# damage (spider webs, Shadow Temple skull pots, icicles, Bottom of the Well candlesticks, beehives: Hammer 0.0), and
-# explosives whose target is not one of these actors (eye switches, Bomb Flower chains, the Beamos).
+# damage (spider webs, Shadow Temple skull pots, icicles, Bottom of the Well candlesticks, beehives: Hammer 0.0), the
+# high Beamos (out of reach), and explosives whose target is not one of these actors (eye switches, Bomb Flower chains).
+# The ground Beamos (Enemy_Beamos) joined after Kareem's staged check (2026-11-23, see Spirit Temple Beyond Anubis Room).
 
 [locations."DMC Gossip Stone"]
 rule = "can_blast_or_smash"
@@ -50,3 +51,8 @@ source = "Round 21 cs21e (r21-hammer.md, class cracked wall): Obj_ShadowTemple_C
 rule = "can_blast_or_smash"
 was = "has_explosives"
 source = "Round 21 cs21e (r21-hammer.md, class cracked wall): WallCrack 9285626040364164957 at (118.7,51.6,-17.6), 0.6 from the chest, ShadowTemple_Static; WallCrack's damage table takes Hammer 100 (= Bomb 100)."
+
+[exits."Spirit Temple Anubis Room"."Spirit Temple Beyond Anubis Room"]
+rule = "can_blast_or_smash"
+was = "has_explosives"
+source = "Round 21 cs21e (r21-hammer.md, Beamos S1): the hall between the Anubis room and the Beyond Anubis checks holds Enemy_Beamos 12328217772424437690 (18.2,129.7,-28.5) and 15096857207894283138 (40.2,130.0,-29.0), SpiritTemple_Dynamic, the likely target of its explosives [inference from position]; Enemy_Beamos carries the generic enemy damage table (every named type 1.0). Kareem, Longshot 3.0.0, 2026-11-23, candidate and control arms the same: one Megaton Hammer hit destroyed an Enemy_Beamos in Dodongo's Cavern (natural adult save, 2026-11-11_2050-main-after-water slot_04)."
