@@ -162,4 +162,22 @@ are in logic. With `e9bb0d7`'s two override files it fails at the Richard assert
 the base `gifts.toml` it fails at the Cojiro assertion; on head it passes. `ruff format --check`, `ruff check`:
 clean.
 
-Sweep and full gate: (below, after the lock.)
+**Rebases while frozen.** `ff6504e` (on `f7ba65f`) -> `534f490` (on `e8dc77d`, PR #39) -> `f25c4a3` (on `3667df5`,
+sticks) -> `f426b94` (on `ff78b5e`, tracker). Focused world/name tests after each: 43, 44, 44, 44 passed; ruff clean.
+
+**Sweep** (gate lock held by cs21f from 23:59, no game running, 6 workers; `E:/OOTRemake/work/r21-npcs/sweep.py`,
+canonical native-prepared recipes as round 20's audit, seeds 21060000+): run on `f25c4a3` (main `3667df5`).
+Main then moved to `ff78b5e` (tracker, UI and docs only: no file under `data/`, `generate/` or `world/`); Claude
+ruled the sweep stands and the gate runs on the rebased head. The gate runner refuses unless our patch outside this
+file is byte-identical to the swept one.
+
+| Recipe | Seeds | Accepted | Exhausted | First-try failures (seeds) | Max attempts |
+|---|---|---|---|---|---|
+| Broad (CS1, `work/r18-fill/settings.txt`) | 200 | 200 | 0 | 4 (21060041, 074, 111, 144) | 2 |
+| Defaults | 50 | 50 | 0 | 1 (21060004) | 2 |
+| Recommended | 50 | 50 | 0 | 3 (21060004, 012, 036) | 2 |
+
+Sweep 463 s of generation, stage 490.5 s, exit 0. Rows: `work/r21-npcs/sweep-rows.jsonl`, `sweep-results.json`.
+
+**Full gate** on the head after this receipt (same hold): result in `work/r21-npcs/gate-results.json` and the
+`cs-r21` handoff.
