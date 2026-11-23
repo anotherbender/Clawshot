@@ -83,8 +83,12 @@ Cost proxy (not a timing claim; wall clock was unusable beside cs21b's full gate
 inputs, seeds 0–4 and 6, profiled call counts candidate/main = 0.996, 0.957, 0.956, 0.942, 0.948, 0.973. Tokens
 first does not make the fill do more work per attempt.
 
-Paired run: placed 7th in `gate-order.txt` (after cs21b, cs21d, cs21f, cs21e); if sticks has merged by then,
-rebase, recapture inputs from the new main, refresh `baseline_fill.py` from main, and run on that head.
+Paired run: placed 9th in `gate-order.txt` (after cs21c).
+
+Rebased onto `3667df5` (sticks merged, MAIN MOVED 22:59); main's `fill.py` is still byte-identical to
+`baseline_fill.py`. Inputs recaptured from `3667df5` into `inputs.pkl` (they differ from the `e9bb0d7` capture,
+kept as `inputs-e9bb0d7.pkl`). Focused run again (same command, no game running): **375 passed, 10 skipped,
+27.98 s** (`focused-3.log`). The paired run's main arm on these inputs is the after-sticks re-measure of main.
 
 ## Lock note
 
