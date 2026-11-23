@@ -210,7 +210,16 @@ showed it, a second click unmarked it.
   after the review fixes into the same `shots/after/` paths (plus `obs-mid-labels-top.png`, the OBS header crop).
 - `uv run ruff format --check`, `uv run ruff check`: clean on the changed tests.
 
-Not yet: the skip backend (after MAIN MOVED for #39), the rebase onto it and the full gate.
+- After the skips backend and the save-work fix, rebased on main `3667df5` (sticks): focused tracker+UI 291 passed,
+  1 skipped. FROZEN `7c74b9f`.
+- Full gate on `7c74b9f` under `gate.lock` (Claude's order; logs `E:/OOTRemake/work/r21-tracker/gate/`):
+  `ruff format --check` clean (551 files), `ruff check` clean, synthetic `CLAWSHOT_WORKERS=4 ... pytest -n 8`:
+  4335 passed, 832 skipped (dump-marked), 7:18 (22:58-23:18 hold). Dump `CLAWSHOT_WORKERS=3 ... pytest -m dump
+  -n 8` with `OOT_ROMFS`, `OOT_NUP` and `OOT_DUMP` (`_common.txt`): 829 passed, 0 skipped, 37:20 (23:21-23:58
+  hold; `dump-full.txt`). A first f4e388c run was stopped when main moved (nothing recorded).
+- Mistake, corrected on the thread at 23:19: the 23:18 LOCK RELEASED post called the gate PASS after a dump run
+  with `OOT_ROMFS` only, where `tests/test_pack_nup_dump.py`'s 60 tests skipped (769 passed, 60 skipped;
+  `dump.txt`). The 23:21 rerun with all three variables is the dump result above.
 
 `docs/tracker.md` also records cs21g's confirmation of the Goron Bracelet read on Kareem's real before/after
 saves (Claude's request; evidence in `plans/rounds/r21-checks.md` and `work/r21-checks/darunia/`). The guide had
