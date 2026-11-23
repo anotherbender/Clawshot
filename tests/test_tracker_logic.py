@@ -473,3 +473,34 @@ def test_same_seed_save_and_marks_give_equal_json(tmp_path, world):
         return json_module.dumps(build_state(seed, save, logic=logic, marks=marks), sort_keys=True)
 
     assert build() == build()
+
+
+# --- Round 21: skips (plans/rounds/r21-tracker.md).
+def test_a_skipped_check_leaves_the_open_set_and_only_read_not_collected_checks_skip(tmp_path, world):
+    seed = load_seed(write_seed(tmp_path))
+    logic = tracker_logic.SeedLogic(tracker_logic.load_world(seed))
+    skips = frozenset({"Child Chest", "Boomerang Chest"})
+    state = build_state(seed, parse(open_save(Boomerang_Chest=True)), logic=logic, skips=skips)
+    child, boomerang = entries(state)["Child Chest"], entries(state)["Boomerang Chest"]
+    assert child["skippable"] is True and child["skipped"] is True and "in_logic" not in child
+    assert boomerang["collected"] is True and "skipped" not in boomerang and "skippable" not in boomerang
+    [area] = state["areas"]
+    assert area["skipped"] == 1 and area["in_logic"]["child"] == 0
+    unknown = build_state(seed, parse(unknown_child_chest()), logic=logic, skips=skips)
+    assert "skippable" not in entries(unknown)["Child Chest"] and "skipped" not in entries(unknown)["Child Chest"]
+
+
+def test_skips_survive_save_reads_and_clear_marks_removes_them(tmp_path, world, marks_folder):
+    session, progress = session_with_save(tmp_path, open_save(Boomerang_Chest=True))
+    with pytest.raises(ValueError, match="only a check the save reads"):
+        session.skip("Boomerang Chest", True)  # collected: nothing to skip
+    with pytest.raises(ValueError, match="already says"):
+        session.mark("Child Chest", True)  # read by the save: a skip, not a mark
+    session.skip("Child Chest", True)
+    resave(progress, open_save(Boomerang_Chest=True))
+    assert entries(session.snapshot()["state"])["Child Chest"]["skipped"] is True  # a save read keeps it
+    session.skip("Child Chest", False)
+    assert "skipped" not in entries(session.snapshot()["state"])["Child Chest"]
+    session.skip("Child Chest", True)
+    session.clear_marks()
+    assert "skipped" not in entries(session.snapshot()["state"])["Child Chest"]

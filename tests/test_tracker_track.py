@@ -186,21 +186,20 @@ class MemoryMarks:
     warning = ""
 
     def __init__(self):
-        self.data: dict[tuple[str, str], set[str]] = {}
+        self.data: dict[tuple[str, str, str], set[str]] = {}
 
-    def marks(self, seed_id, slot):
-        return frozenset(self.data.get((seed_id, slot), ()))
+    def marks(self, seed_id, slot, *, table="marks"):
+        return frozenset(self.data.get((table, seed_id, slot), ()))
 
-    def set(self, seed_id, slot, check, marked):
-        (self.data.setdefault((seed_id, slot), set()).add if marked else self.data.get((seed_id, slot), set()).discard)(
-            check
-        )
+    def set(self, seed_id, slot, check, marked, *, table="marks"):
+        checks = self.data.setdefault((table, seed_id, slot), set())
+        (checks.add if marked else checks.discard)(check)
 
     def drop(self, seed_id, slot, checks):
-        self.data.get((seed_id, slot), set()).difference_update(checks)
+        self.data.get(("marks", seed_id, slot), set()).difference_update(checks)
 
     def clear(self, seed_id, slot):
-        return len(self.data.pop((seed_id, slot), ()))
+        return sum(len(self.data.pop((table, seed_id, slot), ())) for table in ("marks", "skips"))
 
 
 @pytest.fixture
@@ -287,7 +286,8 @@ def test_provisional_and_accepted_reads_differ_only_in_the_button_field(mixed):
     same = ("id", "label", "where", "dungeon")
     kid = {k: v for k, v in entry(snap, "LW Skull Kid").items() if k not in same}
     saria = {k: v for k, v in entry(snap, "Song from Saria").items() if k not in same}
-    assert kid.pop("markable") is True
+    # The click's kind is the only difference: mark done (provisional) or skip (accepted; round 21 skips).
+    assert kid.pop("markable") is True and saria.pop("skippable") is True
     assert kid == saria
     unknown = entry(snap, "Test Shop Item")
     assert unknown["collected"] is None and unknown["markable"] is True  # every `?` check carries it too (D9)

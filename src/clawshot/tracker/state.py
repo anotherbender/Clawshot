@@ -599,8 +599,22 @@ def markable(check: Check, state: bool | None) -> bool:
     return state is None or (state is False and check.method == TRACK and check.provisional)
 
 
+def skip_fields(entry: dict[str, Any], skips: frozenset[str]) -> None:
+    """A check the save reads as not collected, and that is not markable, can be skipped by hand (round 21,
+    plans/rounds/r21-tracker.md): ``skippable: true``, and ``skipped: true`` when it is in ``skips``. A skipped check
+    leaves the open list; a save that reads it collected wins, and the skip stays in the file, unused."""
+    if entry["collected"] is False and not entry.get("markable"):
+        entry["skippable"] = True
+        if entry["id"] in skips:
+            entry["skipped"] = True
+
+
 def _check_entry(
-    check: Check, save: save_format.Save | None, show_locations: bool, marks: frozenset[str] = frozenset()
+    check: Check,
+    save: save_format.Save | None,
+    show_locations: bool,
+    marks: frozenset[str] = frozenset(),
+    skips: frozenset[str] = frozenset(),
 ) -> dict[str, Any]:
     state, reason = collected(check, save)
     entry: dict[str, Any] = {
@@ -618,6 +632,7 @@ def _check_entry(
         entry["markable"] = True  # Mark done is offered; on a `—` check it is the only sign of a provisional read (D9)
         if check.location in marks:
             entry["marked"] = True  # marked done by hand (tracker.marks); never shows the item (D7)
+    skip_fields(entry, skips)
     if show_locations or state is True:
         entry["item"] = check.item
         entry["item_label"] = check.item_label
@@ -625,16 +640,23 @@ def _check_entry(
 
 
 def areas(
-    seed: Seed, save: save_format.Save | None, *, show_locations: bool = False, marks: frozenset[str] = frozenset()
+    seed: Seed,
+    save: save_format.Save | None,
+    *,
+    show_locations: bool = False,
+    marks: frozenset[str] = frozenset(),
+    skips: frozenset[str] = frozenset(),
 ) -> list[dict[str, Any]]:
     """Checks grouped by area in the seed's world order. Without ``show_locations`` an entry names its item only once
     collected; ``collected`` is ``None`` (counted under ``unknown``) wherever the save cannot say. An unknown check in
     ``marks`` (marked done by hand) has ``marked: true`` and is counted under ``marked`` as well as ``unknown``; a
     save-confirmed state wins over a mark (D8). ``markable: true`` marks every check that can be marked: unknown
-    ones, and a provisional track read of "not collected" (spec tracker-auto-checks D4), whose mark is kept."""
+    ones, and a provisional track read of "not collected" (spec tracker-auto-checks D4), whose mark is kept. A check
+    in ``skips`` the save reads as not collected has ``skipped: true`` (:func:`skip_fields`), counted under
+    ``skipped``."""
     grouped: dict[str, list[dict[str, Any]]] = {}
     for check in seed.checks:
-        grouped.setdefault(check.area, []).append(_check_entry(check, save, show_locations, marks))
+        grouped.setdefault(check.area, []).append(_check_entry(check, save, show_locations, marks, skips))
     return [
         {
             "name": name,
@@ -642,6 +664,7 @@ def areas(
             "total": len(checks),
             "unknown": sum(c["collected"] is None for c in checks),
             "marked": sum(c.get("marked", False) for c in checks),
+            "skipped": sum(c.get("skipped", False) for c in checks),
             "checks": checks,
         }
         for name, checks in grouped.items()
@@ -660,12 +683,13 @@ def build_state(
     show_locations: bool = False,
     logic: Any = None,
     marks: frozenset[str] = frozenset(),
+    skips: frozenset[str] = frozenset(),
 ) -> dict[str, Any]:
     """The tracker's whole view, JSON-able. ``save`` may be ``None`` (seed totals with every save value unknown).
     ``tokens`` is the native token stock [S6], never a count of collected Skulltula sources [T]; those are counted in
     ``skulltula_checks`` (collected, total and unknown source checks; total 0 when the seed shuffles no Skulltula).
     With ``logic`` (a :class:`clawshot.tracker.logic.SeedLogic`) the state gains ``logic`` and in-logic data;
-    ``marks`` are the check ids marked done by hand (``clawshot.tracker.marks``)."""
+    ``marks`` are the check ids marked done by hand and ``skips`` those skipped by hand (``clawshot.tracker.marks``)."""
     reader = _Reader(save)
     warnings = list(seed.warnings)
     identity = _identity(seed, save)
@@ -679,7 +703,7 @@ def build_state(
     sources = any(c.method == SOURCE_PAIR for c in seed.checks)
     if save is not None and sources and (why := _source_layout(save)):
         warnings.append(f"Gold Skulltula sources show as unknown: {why}.")
-    grouped = areas(seed, save, show_locations=show_locations, marks=marks)
+    grouped = areas(seed, save, show_locations=show_locations, marks=marks, skips=skips)
     skulltulas = [check for area in grouped for check in area["checks"] if check["kind"] == "token"]
     state = {
         "seed": dict(seed.metadata),
@@ -700,5 +724,5 @@ def build_state(
         "warnings": warnings,
     }
     if logic is not None:
-        logic.annotate(state, seed, save, marks)
+        logic.annotate(state, seed, save, marks, skips)
     return state

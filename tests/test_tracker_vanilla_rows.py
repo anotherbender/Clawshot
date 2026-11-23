@@ -182,6 +182,7 @@ def test_a_row_names_its_place_and_item_without_spoilers(tmp_path, world):
         "vanilla": True,
         "item": "Boomerang",
         "item_label": "Boomerang",
+        "skippable": True,  # round 21: read as not held, so the player may skip it
         "in_logic": None,
     }
     assert [area["name"] for area in state["vanilla_areas"]] == ["Lake"]

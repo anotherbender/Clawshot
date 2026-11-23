@@ -111,3 +111,31 @@ def test_writes_are_atomic_and_deterministic(folder, monkeypatch):
         store.set("seed-a", SLOT_A, "Gamma", True)
     assert (folder / marks.MARKS_FILE).read_text(encoding="utf-8") == text  # the old file is untouched
     assert sorted(p.name for p in folder.iterdir()) == ["copy.json", marks.MARKS_FILE]
+
+
+# Round 21: skips, a second table beside the marks.
+def test_skips_are_a_separate_table_that_drop_never_touches_and_clear_empties(folder):
+    store = marks.MarkStore()
+    store.set("seed-1", SLOT_A, "Shop Item", True)
+    store.set("seed-1", SLOT_A, "Windmill Rupee", True, table=marks.SKIPS)
+    again = marks.MarkStore()
+    assert again.marks("seed-1", SLOT_A) == {"Shop Item"}
+    assert again.marks("seed-1", SLOT_A, table=marks.SKIPS) == {"Windmill Rupee"}
+    again.drop("seed-1", SLOT_A, ["Windmill Rupee", "Shop Item"])  # a save read drops marks only
+    assert marks.MarkStore().marks("seed-1", SLOT_A, table=marks.SKIPS) == {"Windmill Rupee"}
+    assert marks.MarkStore().marks("seed-1", SLOT_A) == frozenset()
+    assert again.clear("seed-1", SLOT_A) == 1
+    assert json.loads((folder / marks.MARKS_FILE).read_text(encoding="utf-8")) == {"version": 1, "marks": {}}
+
+
+def test_a_file_without_skips_keeps_its_bytes_and_an_old_file_reads(folder):
+    folder.mkdir()
+    old = (
+        '{\n  "marks": {\n    "seed-1": {\n      "C:/saves": [\n        "A"\n      ]\n    }\n  },\n  "version": 1\n}\n'
+    )
+    (folder / marks.MARKS_FILE).write_text(old, encoding="utf-8")
+    store = marks.MarkStore()
+    assert store.marks("seed-1", "C:/saves") == {"A"} and store.marks("seed-1", "C:/saves", table=marks.SKIPS) == set()
+    store.set("seed-1", "C:/saves", "B", True, table=marks.SKIPS)
+    store.set("seed-1", "C:/saves", "B", False, table=marks.SKIPS)
+    assert (folder / marks.MARKS_FILE).read_text(encoding="utf-8") == old

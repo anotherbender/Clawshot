@@ -59,12 +59,13 @@ full name, our own directions to it, how your save tracks it, and whether it is 
 Each check's look shows its state; the one-line legend above the list repeats it (hover a word for
 more). A filled green dot is collected (your save shows it), a filled amber dot is marked done by you,
 a ring is open: green and highlighted when in logic, dimmed when out of logic. A square instead of a ring
-means your save can't show that check, so you mark it yourself (below). Every open check (not collected
-and not marked done) is shown **in logic** when the seed's own logic says you can reach it with what
+means your save can't show that check, so you mark it yourself (below). A struck-through name is a check
+you chose to skip. Every open check (not collected, not marked done and not skipped) is shown **in logic**
+when the seed's own logic says you can reach it with what
 your save holds, or **out of logic** otherwise. Each area heading counts its finished checks and "N in
 logic".
 
-**Show** chooses the rows: **All checks** (the default), **Open checks** (collected and marked checks
+**Show** chooses the rows: **All checks** (the default), **Open checks** (collected, marked and skipped checks
 leave the list) or **Open and in logic**. Areas with nothing left to show fold away, and **Hide finished
 areas** also hides an area whose every check is done. Both choices are remembered in this browser.
 Before any save is read, the tab lists the seed's checks with a **No save loaded yet** line and nothing
@@ -115,16 +116,23 @@ removes this seed and save folder's marks after asking. They live in
 `~/.config/clawshot`) on Linux. If that file cannot be read, the tracker warns, shows no marks and
 leaves the file alone until you change a mark.
 
+**Skipping checks.** A check your save does show, but which you do not mean to get (a windmill rupee, a
+heart piece you can do without), can be skipped: click it and it leaves the open list and the "in logic"
+counts; click it again to undo. A skipped check is shown struck through, never counts as collected, and
+keeps its reward hidden. Unlike a mark, a skip stays when a later save is read; if you collect the check
+anyway, the save wins and it shows as collected. Skips are kept beside the marks, per seed and save
+folder, and **Clear my marks** removes them too. The OBS view never shows them.
+
 **Gifts read automatically.** Many gifts are read from records the game itself keeps once it gives
 them: minigame and NPC prizes (the Skull Kid's games, the archery and shooting galleries, fishing,
 bowling, the diving game, Anju's Cuccos, Talon's Cuccos, the Gold Skulltula rewards up to 50, the frogs),
 song and cutscene gifts (Saria, Malon, Impa, Sheik, the Ocarina of Time, the Light Arrows, Zelda's
 Letter, Darunia), and a few quests (the Lost Dog, Biggoron). Once one reads as given, it counts as
 collected and shows its reward even in spoiler-free mode, as an opened chest does. Others still need
-**Mark done**: the trade hand-ins, shops, and the gifts whose records do not tell (such as the 10 Big
+marking by hand: the trade hand-ins, shops, and the gifts whose records do not tell (such as the 10 Big
 Poes and the 100 Gold Skulltula reward). Until each of these records has been confirmed in a played
-game, a gift it reads as not given yet keeps **Mark done**, and your mark on it stays (and keeps its
-reward hidden) until the record reads given. That **Mark done** button is the only sign that a record
+game, a gift it reads as not given yet keeps the square and can be marked done, and your mark on it stays
+(and keeps its reward hidden) until the record reads given. That square is the only sign that a record
 is still unconfirmed: no label or style shows it.
 Reading these records needs a seed made by this same Clawshot version; for other seeds the tracker says
 so in one line and reads gifts as before ([design record](../plans/tracker-auto-checks.md)).

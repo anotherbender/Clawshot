@@ -247,8 +247,11 @@ class TrackerSession:
             self._logic = tracker_logic.SeedLogic(tracker_logic.load_world(self._seed))
         store = self._store() if marks_folder is not None else None
         marked = store.marks(self._seed_id, marks_folder) if store is not None else frozenset()
+        skipped = (
+            store.marks(self._seed_id, marks_folder, table=tracker_marks.SKIPS) if store is not None else frozenset()
+        )
         state = tracker_state.build_state(
-            self._seed, parsed, show_locations=self._show, logic=self._logic, marks=marked
+            self._seed, parsed, show_locations=self._show, logic=self._logic, marks=marked, skips=skipped
         )
         if store is not None:
             confirmed = [
@@ -290,8 +293,22 @@ class TrackerSession:
             self._set_state(self._build(self._parsed, slot), self._state_slot)
             return self.snapshot()
 
+    def skip(self, check: str, skipped: bool) -> dict[str, Any]:
+        """Skip a check the save reads as not collected (``skippable``), so it leaves the open list, or take the skip
+        back. A save read never drops a skip (round 21, plans/rounds/r21-tracker.md)."""
+        with self._lock:
+            slot = self._marks_target()
+            entry = next((c for c in tracker_state.every_check(self._state) if c["id"] == check), None)
+            if entry is None:
+                raise ValueError(f"No check {check!r} in this seed.")
+            if skipped and not entry.get("skippable"):
+                raise ValueError(f"{entry['label']}: only a check the save reads as not collected can be skipped.")
+            self._store().set(self._seed_id, slot, check, skipped, table=tracker_marks.SKIPS)
+            self._set_state(self._build(self._parsed, slot), self._state_slot)
+            return self.snapshot()
+
     def clear_marks(self) -> dict[str, Any]:
-        """Remove every mark of this seed and save folder."""
+        """Remove every mark and skip of this seed and save folder."""
         with self._lock:
             slot = self._marks_target()
             self._store().clear(self._seed_id, slot)
