@@ -20,7 +20,8 @@
           Game</button
         ><button data-screen="settings">Settings</button
         ><button data-screen="generate">Generate</button
-        ><button data-screen="tracker">Tracker</button><kbd>E</kbd>
+        ><button data-screen="tracker">Tracker</button
+        ><button data-screen="checks">Checks</button><kbd>E</kbd>
       </nav>
       <span class="local-badge">Local · no game files shared</span>
     </header>
@@ -224,6 +225,10 @@
           data-help-note="Save in the game to update. Longshot and emulator players can choose another save folder. OBS uses the same tracker without controls.">
           <div id="tracker-root"></div>
         </section>
+        <!-- No data-help: the side panel keeps the selected check's details. -->
+        <section id="checks" class="screen" hidden>
+          <div id="checks-root"></div>
+        </section>
       </main>
       <aside class="side-panel">
         <section class="description-panel" aria-live="polite">
@@ -234,6 +239,7 @@
           <p id="description-note" class="description-note">
             Choose your game files. Only pressing Play starts the chosen game.
           </p>
+          <div id="check-details" class="check-details" hidden></div>
           <div id="result" hidden>
             <h3>Seed ready</h3>
             <p id="result-summary"></p>

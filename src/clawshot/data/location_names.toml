@@ -2768,9 +2768,9 @@ ids = ["Npc_Hylia_048_BottleShop/Event329"]
 [[location]]
 location = "Kak Anju Trade Pocket Cucco"
 name = "Cucco Lady's Cojiro Trade"
-where = "Kakariko Village, the Cucco Lady's pen (adult): once the hatched Pocket Cucco has woken Talon, give it back to her"
+where = "Kakariko Village, the Cucco Lady's pen (adult, by day): once the hatched Pocket Cucco has woken Talon and Epona has been freed from Ingo, give it back to her"
 oot_randomizer_name = "Kak Anju Trade Pocket Cucco"
-source = "https://www.nintendolife.com/guides/zelda-ocarina-of-time-biggeron-sword-trading-sequence-switch-2#how-to-wake-up-rancher-talon; https://zeldacentral.com/games/ocarina-of-time-remake/walkthrough/biggoron-sword-route/#cojiro; data: census gift step(s) Npc_Hylia_049_Adult/Event234 (src/clawshot/data/locations.toml; gift_rules.toml class swap; plans/03-game-data.md section 19)"
+source = "https://www.nintendolife.com/guides/zelda-ocarina-of-time-biggeron-sword-trading-sequence-switch-2#how-to-wake-up-rancher-talon; https://zeldacentral.com/games/ocarina-of-time-remake/walkthrough/biggoron-sword-route/#cojiro; Kareem in game on 0.2.5, 2026-11-22 (Epona freed as well; remake/gifts.toml Cojiro Access); data: census gift step(s) Npc_Hylia_049_Adult/Event234 (src/clawshot/data/locations.toml; gift_rules.toml class swap; plans/03-game-data.md section 19)"
 ids = ["Npc_Hylia_049_Adult/Event234"]
 
 [[location]]
@@ -2856,9 +2856,9 @@ ids = ["SimpleShop/Event182"]
 [[location]]
 location = "Market Lost Dog"
 name = "Richard the Lost Dog"
-where = "Hyrule Castle Town back alley (child, night): find Richard, the white dog, and lead him back to his owner."
+where = "Hyrule Castle Town (child, night, after showing Zelda's Letter to the Kakariko gate guard): Richard goes missing; from 21:00 he roams the back alley. Lead him to his owner, who waits in the square at night."
 oot_randomizer_name = "Market Lost Dog"
-source = "https://www.eurogamer.net/all-heart-pieces-locations-zelda-ocarina-of-time#section-7; https://www.ign.com/wikis/ocarina-of-time-remake/All_Heart_Piece_Locations; https://www.nintendolife.com/guides/zelda-ocarina-of-time-heart-piece-locations-switch-2; data: census gift step(s) SubEvent_FindRichard/Event16 (src/clawshot/data/locations.toml; gift_rules.toml class swap; plans/03-game-data.md section 19)"
+source = "https://www.eurogamer.net/all-heart-pieces-locations-zelda-ocarina-of-time#section-7; https://www.ign.com/wikis/ocarina-of-time-remake/All_Heart_Piece_Locations; https://www.nintendolife.com/guides/zelda-ocarina-of-time-heart-piece-locations-switch-2; data: census gift step(s) SubEvent_FindRichard/Event16 (src/clawshot/data/locations.toml; gift_rules.toml class swap; plans/03-game-data.md section 19); trigger and schedules: remake/child_market.toml Market Lost Dog (round 21)"
 ids = ["SubEvent_FindRichard/Event16"]
 
 [[location]]

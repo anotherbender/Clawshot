@@ -50,6 +50,10 @@ The standing Settings backlog below was separated from round 8, not discarded.
 | 20 | 2026-11-20–21 | Hint and shop text, excluded locations, starting inventory, trials count and token bridge, logic audit; cows and the Fortress played; open fountain research, fill rejected; PRs #37 and #38; released 0.2.5. | [Round 20](rounds/r20-overview.md) |
 | 21 | 2026-11-22– | In progress: tracker Checks tab and overlay, PRs #39 and #40, stick pots out of logic, Megaton Hammer audit, Richard's quest, pending play checks, fill retry. | [Round 21](rounds/r21-overview.md) |
 
+Outside the rounds, awaiting a maintainer's played check: tracker auto checks (gifts read from native flags,
+[design record](tracker-auto-checks.md)), checklist [tracker-auto-checks-play.md](tracker-auto-checks-play.md), static
+evidence [tracker-auto-checks-audit.md](tracker-auto-checks-audit.md).
+
 
 ## Settings backlog (Ship of Harkinian's lists, shown by Kareem 2026-11-09)
 

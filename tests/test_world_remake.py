@@ -226,6 +226,23 @@ def test_night_comes_only_after_meeting_zelda():
         assert after.can_access(world.locations[name], CHILD), name
 
 
+def test_richard_waits_for_the_kakariko_gate_and_cojiro_for_epona():
+    """Richard goes missing only after the Kakariko gate guard has read Zelda's Letter (remake/child_market.toml),
+    and Anju's Cojiro trade waits until Epona is freed as well as Talon woken (remake/gifts.toml)."""
+    world = load_world()
+    every = [loc.vanilla for loc in world.locations.values() if loc.vanilla is not None]
+    dog = world.locations["Market Lost Dog"]
+    cucco = world.locations["Kak Anju Trade Pocket Cucco"]
+    no_letter = reachable(world, [item for item in every if item != "Zeldas Letter"])
+    assert no_letter.holds("Time Flows") and not no_letter.holds("Kakariko Village Gate Open")
+    assert not no_letter.can_access(dog, CHILD)
+    no_song = reachable(world, [item for item in every if item != "Eponas Song"])
+    assert no_song.holds("Wake Up Adult Talon") and not no_song.holds("Epona")
+    assert not no_song.can_access(cucco, ADULT)
+    full = reachable(world, every)
+    assert full.can_access(dog, CHILD) and full.can_access(cucco, ADULT)
+
+
 def fountain(region: str):
     spec = load_spec()
     spec["start"] = region

@@ -61,10 +61,13 @@ rule = "(at_night and 'Time Flows')"
 was = "at_night"
 source = "Eurogamer, 'all new changes': time does not flow until Link has met Zelda (event 'Time Flows')"
 
+# Richard the Lost Dog (round 21, cs21f; chain in plans/rounds/r21-npcs.md): the remake's quest starts only after
+# Zelda's Letter is shown to the guard at Kakariko's Death Mountain gate. Until then the woman keeps Richard with her
+# (by day at the north end of the square, at night both inside her back-alley house, as Kareem saw on 0.2.5).
 [locations."Market Lost Dog"]
-rule = "is_child and (at_night and 'Time Flows')"
+rule = "is_child and (at_night and 'Time Flows') and 'Kakariko Village Gate Open'"
 was = "is_child and at_night"
-source = "Eurogamer, 'all new changes': time does not flow until Link has met Zelda (event 'Time Flows'); Nintendo Life heart piece guide: at night the woman who lost Richard waits by the market entrance, Richard is in the back alley (Animal_Dog_Richard_01, HeartPieceAnchor SubEvent_FindRichard_GetHeartPiece at (2,100,27))"
+source = "Build e0f3ccfa (cs21f, static; tightening). Gate: the three findable Richards (Market_Child_Static Animal_Dog_Richard_01 2049679476173821084, 14327379207017884455, 14347642661140999207) are created by HrlMarket_Child_Dog_Prefab_7574 nodes 0/1/7 only when Npc_Hylia_Soldier_003_GateOpen AND NOT SubEvent_FindRichard_RichardRivival AND RandomAppear_0k (nodes 2-9, 29-31); her own Richard 4292840208460850313 is deleted by the same flag (Market_Child_Prefab_f3a2 node 2 <- node 17). GateOpen is written only by Npc_Hylia_Soldier_003 ShowItem_ZeldaLetter Event3 and Dm_Kakariko_0010 Event18 (the guard reading the letter); RSDB Challenge SubEvent_FindRichard DependFlagName is the same flag. Reward: SubEvent_FindRichard Event16 hands over Obj_Heart_Piece inside SubEvent_FindRichard_ClearEvent, whose three callers (SubEvent_FindRichard Event52, Event131; Npc_Hylia_052_Child Event37) all need Market_Npc_Hylia_052_Child_BringRichard, set only by 7574 node 10 when one of those Richards follows Link. Night: the quest talk reaches the reward on EventQueryTimeDivision case 1 (nightTalk_moving; Talk_28 of the retry branch tells Link to search at night); quest schedules (Pack/AIScheduleParam SubEvent_FindRichard_Ready_*) put her at AnchorAction3 (1.7,100.1,26.6) from 19:00 and Richard on his back-alley rail from 21:00 to 05:00. 'Time Flows': Eurogamer, 'all new changes'"
 
 # Bombchu Bowling: the alley lady lets Link play only once the Stone of Fire quest is complete (Dodongo's Cavern
 # beaten), and lends ten Bombchus per round. Prizes in order: Bombchus (first clear), a bigger Bomb Bag (second),

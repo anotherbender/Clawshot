@@ -1,0 +1,78 @@
+# Round 21 (cs21d): pot-only Deku Stick and Deku Nut sources leave logic. Remake build e0f3ccfa.
+# Kareem, 2026-11-22, in game: Goron City's stick pot exists and drops one Deku Stick, farmable only by leaving and
+# re-entering; decision: remove pot-only stick sources from logic. The same holds for OoT Randomizer's "Nut Pot"
+# events: no placement in the remake names a fixed nut there.
+# Dump facts (every non-DreamWorld Banc file; pots are Obj_Pot_A_*, ResetType 88: they return on every visit):
+# - A pot's Banc Dynamic names its drop: Drop__DropActor (a fixed pickup) or Drop__DropTable (one of the tables in
+#   the pot's actor pack). No pot names Obj_DekuNut or DropTable_Obj_DekuNut anywhere in the game.
+# - A pot with neither uses DropTable_ResourceSupply_00: heart, magic, range weapon, nut and bomb types at weight 20
+#   each and the stick type at 0, after GameParameter/DropGlobalParam's DropUnlockCondition (nuts after
+#   Get_StoneOfForest_IsAfter_GoInside_Exp, sticks only while Sequence_IsChildhood) and ReplaceSetting (a green
+#   rupee instead). A chance per visit, not a source.
+# Deku Baba sources (KF Outside Deku Tree, Deku Tree Lobby, Forest Temple NW/NE Outdoors) need a weapon and stay, as
+# remake/master_sword.toml has them. Per-event evidence: plans/rounds/r21-sticks.md.
+
+[events."Goron City"."Deku Stick Drop"]
+rule = "False"
+was = "is_child"
+source = "OoT Randomizer 'Stick Pot' (Overworld.json:2228). Remake: GoronCity_Child_Static Obj_Pot_A_03 Hash 16954699510563627060 (Drop__DropActor Obj_DekuStick, beside EventRequestActor DekuStick_Stolen) and GoronCity_Child_Dynamic Obj_Pot_A_03 Hash 10324626920382966851 (Drop__DropTable DropTable_Obj_DekuStick, one stick); no adult copy. Pots only, ResetType 88. Kareem, 2026-11-22, in game: one stick, farmable only by re-entering; removed from logic (his decision). plans/rounds/r21-sticks.md."
+
+[events."Zoras Domain"."Deku Stick Drop"]
+rule = "False"
+was = "is_child"
+source = "OoT Randomizer 'Stick Pot' (Overworld.json:2632). Remake: ZoraDomain_Child_Dynamic Obj_Pot_A_04 Hash 9081708815728257714 (Drop__DropTable DropTable_Obj_DekuStick, one stick; the Adult_Alternative copy 7245442263071117107 is gated by the sticks' Sequence_IsChildhood unlock). Pot only, ResetType 88: the Goron City case, removed with it (Kareem's decision, 2026-11-22). plans/rounds/r21-sticks.md."
+
+[events."Zoras Domain"."Deku Nut Drop"]
+rule = "False"
+was = "True"
+source = "OoT Randomizer 'Nut Pot' (Overworld.json:2633). Remake: ZoraDomain Child and Adult_Alternative Dynamic hold five Obj_Pot_A_04 each: four with no drop parameter (DropTable_ResourceSupply_00, a chance) and the stick pot; no nut pot. Pot-only chance, removed with the stick pots (Kareem's decision, 2026-11-22). plans/rounds/r21-sticks.md."
+
+[events."Bottom of the Well Main Area"."Deku Stick Drop"]
+rule = "False"
+was = "True"
+source = "OoT Randomizer 'Stick Pot' (Bottom of the Well.json:52). Remake: BottomOfTheWell Static/Dynamic hold 48 Obj_Pot_A_08/_Respawn; none names a stick (tables: MagicJar, Heart, Bomb, Drop_ResourceSupply_BeforeBoss; 18 with none, whose stick weight is 0); one fixed blue rupee. No pot stick exists; removed (Kareem's decision, 2026-11-22). The one Enemy_Dekubaba (Hash 14156286471211114919, room 5) is not added: that would be a loosening without a played check. plans/rounds/r21-sticks.md."
+
+[events."Bottom of the Well Main Area"."Deku Nut Drop"]
+rule = "False"
+was = "True"
+source = "OoT Randomizer 'Nut Pot' (Bottom of the Well.json:53). Remake: no BottomOfTheWell pot names a nut (see the stick entry); the 18 pots with no drop parameter give a nut only by chance (DropTable_ResourceSupply_00). Pot-only chance, removed with the stick pots (Kareem's decision, 2026-11-22). plans/rounds/r21-sticks.md."
+
+[events."Ganons Castle Spirit Trial Ending"."Deku Nut Drop"]
+rule = "False"
+was = "True"
+source = "OoT Randomizer 'Nut Pot' (Ganons Castle.json:266). Remake: no InsideGanonCastle pot names a nut (fixed MagicJar/Fairy, MagicJar and RangeWeapon tables, Drop_ResourceSupply_BeforeBoss variants whose candidates are magic, range weapon, bomb and heart); the rest are chance pots (DropTable_ResourceSupply_00). Pot-only chance, removed with the stick pots (Kareem's decision, 2026-11-22). plans/rounds/r21-sticks.md."
+
+[events."Graveyard Dampes Grave"."Deku Nut Drop"]
+rule = "False"
+was = "True"
+source = "OoT Randomizer 'Nut Pot' (Overworld.json:2057). Remake: the Graveyard Banc (Dampé's grave included) has no Obj_Pot actor at all (round 10 pot census, plans/rounds/r10-pots.md; rechecked round 21). No source; removed. plans/rounds/r21-sticks.md."
+
+[events."Haunted Wasteland"."Deku Nut Drop"]
+rule = "False"
+was = "True"
+source = "OoT Randomizer 'Nut Pot' (Overworld.json:1125). Remake: HountedWasteland Child and Adult Dynamic hold four Obj_Pot_A_05 each, two DropTable_Obj_Heart and two DropTable_Obj_MagicJar_Small; no nut. No source; removed. plans/rounds/r21-sticks.md."
+
+[events."HC Storms Grotto"."Deku Nut Drop"]
+rule = "False"
+was = "can_blast_or_smash"
+source = "OoT Randomizer 'Nut Pot' (Overworld.json:3097). Remake: the HyruleCastle Banc's six Obj_Pot_A_01 have no drop parameter (DropTable_ResourceSupply_00, a chance); no pot names a nut. Pot-only chance, removed with the stick pots (Kareem's decision, 2026-11-22). plans/rounds/r21-sticks.md."
+
+[events."HF Cow Grotto"."Deku Nut Drop"]
+rule = "False"
+was = "has_fire_source"
+source = "OoT Randomizer 'Nut Pot' (Overworld.json:3030). Remake: no HyruleField pot names a nut (fixed blue rupees and a fairy, two chance pots). The field's only fixed nut, Obj_DekuNut Hash 9807262312429560898 (HyruleField_Child_Static, by the Zora buildings at Lake Hylia), is not in this grotto. No source; removed. plans/rounds/r21-sticks.md."
+
+[events."Jabu Jabus Belly Past Big Octo"."Deku Nut Drop"]
+rule = "False"
+was = "True"
+source = "OoT Randomizer 'Nut Pot' (Jabu Jabus Belly.json:62). Remake: no InsideJabuJabuBelly pot names a nut; the Drop_ResourceSupply_BeforeBoss_PotChild/_PotChildHeart pots list nut and stick among second candidates of a lottery that also offers heart and magic, so a nut is not guaranteed. Pot-only chance, removed with the stick pots (Kareem's decision, 2026-11-22). plans/rounds/r21-sticks.md."
+
+[events."Shadow Temple Beginning"."Deku Nut Drop"]
+rule = "False"
+was = "True"
+source = "OoT Randomizer 'Nut Pot' (Shadow Temple.json:28). Remake: no ShadowTemple pot names a nut (fixed rupees and a fairy, MagicJar, Heart, Bomb and before-boss tables); the rest are chance pots (DropTable_ResourceSupply_00). Pot-only chance, removed with the stick pots (Kareem's decision, 2026-11-22). plans/rounds/r21-sticks.md."
+
+[events."Child Spirit Before Locked Door"."Deku Nut Drop"]
+rule = "False"
+was = "True"
+source = "OoT Randomizer 'Nut Pot' (Spirit Temple.json:56). Remake: no SpiritTemple pot names a nut (Heart, Bomb and RangeWeapon tables); the rest are chance pots (DropTable_ResourceSupply_00). Pot-only chance, removed with the stick pots (Kareem's decision, 2026-11-22). plans/rounds/r21-sticks.md."

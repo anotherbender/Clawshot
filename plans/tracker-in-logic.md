@@ -96,7 +96,7 @@ gifts, unset placement-hash pickups, unaudited event gates) can be marked done b
 | D5 | Unknown checks without a manual mark | Count as **not collected** (still open) (rec). |
 | D6 | Manual mark effect | Marks the check done (leaves the open list). Does **not** add its item to the logic inventory (rec). |
 | D7 | Manual mark spoilers | A marked check's item stays hidden in spoiler-free mode; only spoiler mode or save confirmation shows it (rec). |
-| D8 | Which checks can be marked | Only checks whose save state is unknown (`collected is None`). A save-confirmed state wins over and drops a mark. |
+| D8 | Which checks can be marked | Only checks whose save state is unknown (`collected is None`). A save-confirmed state wins over and drops a mark. Exception ([tracker-auto-checks](tracker-auto-checks.md) D4, round 21): a gift whose unplayed (`accepted = false`) track flag reads "not collected" stays markable and keeps its mark. |
 | D9 | Mark storage | JSON in Clawshot's preferences folder (beside `app/preferences.py`'s file, not the deletable icon cache), never in seed, save or game folders (rec; folder (maint)). |
 | D10 | Mark scope | Per seed (by `output_sha256`, else a hash of the spoiler file) and per save slot (rec). |
 | D11 | Age display | Selectable: **Either** (default), Follow save, Child, Adult. Either means `Search.can_access(location)` with no age, so tracker and generator agree. Follow save reads `Sequence_IsChildhood`; unreadable falls back to Either and says so. A chosen option persists until changed (rec; default Either (maint): with Follow save a child would see adult-only checks as out of logic even when they can become adult, and other randomizer trackers count both ages). |
@@ -171,7 +171,7 @@ gifts, unset placement-hash pickups, unaudited event gates) can be marked done b
 - **4.3** A mark does not add the check's item to the logic inventory (D6).
 - **4.4** In spoiler-free mode a marked check's item stays hidden (D7).
 - **4.5** When a later save reads the marked check as collected or not collected, the save's state is used and the
-  mark is removed from storage.
+  mark is removed from storage (except a provisional track read of "not collected": tracker-auto-checks D4).
 - **4.6** Marks are stored as JSON in Clawshot's preferences folder (the parent of
   `app.preferences.user_preferences_path()`: `%APPDATA%\Clawshot` on Windows, macOS/XDG equivalents; not the
   deletable cache folder),

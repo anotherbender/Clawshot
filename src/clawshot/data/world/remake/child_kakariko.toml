@@ -69,24 +69,24 @@ source = "census: the chest is HyruleField's 5755485285664292988 ('Hyrule Field 
 # Gold Skulltulas at night: all five are night-only in the guides; four carry Enemy_Skulltula_Gold_Nocturnal.
 
 [locations."Kak GS House Under Construction"]
-rule = "is_child and ((at_night and 'Time Flows') or gold_skulls_ignore_daytime)"
+rule = "is_child and ((at_night and 'Time Flows') or gold_skulls_ignore_daytime) and can_child_attack"
 was = "is_child and (at_night or gold_skulls_ignore_daytime)"
-source = "night needs time to flow (Eurogamer 17 changes: time starts after meeting Zelda); data: Enemy_Skulltula_Gold 14107117960174262321 (-61,102,60), Enemy_Skulltula_Gold_Nocturnal; IGN Kakariko: at night on the construction site's brick wall, by the scaffolding"
+source = "night needs time to flow (Eurogamer 17 changes: time starts after meeting Zelda); data: Enemy_Skulltula_Gold 14107117960174262321 (-61,102,60), Enemy_Skulltula_Gold_Nocturnal; IGN Kakariko: at night on the construction site's brick wall, by the scaffolding. Kill added (round 21, cs21d): the token is the enemy's death drop (patch/tokens.py check_source); Kareem, 2026-11-22: early child tokens need a weapon; plans/rounds/r21-sticks.md"
 
 [locations."Kak GS Skulltula House"]
-rule = "is_child and ((at_night and 'Time Flows') or gold_skulls_ignore_daytime)"
+rule = "is_child and ((at_night and 'Time Flows') or gold_skulls_ignore_daytime) and can_child_attack"
 was = "is_child and (at_night or gold_skulls_ignore_daytime)"
-source = "night needs time to flow (Eurogamer 17 changes); data: Enemy_Skulltula_Gold 15314554401574296838 (-29,103,61), Nocturnal; IGN Kakariko: left of the House of Skulltula's door, night only"
+source = "night needs time to flow (Eurogamer 17 changes); data: Enemy_Skulltula_Gold 15314554401574296838 (-29,103,61), Nocturnal; IGN Kakariko: left of the House of Skulltula's door, night only. Kill added (round 21, cs21d): the token is the enemy's death drop (patch/tokens.py check_source); Kareem, 2026-11-22: early child tokens need a weapon; plans/rounds/r21-sticks.md"
 
 [locations."Kak GS Near Gate Guard"]
-rule = "is_child and ((at_night and 'Time Flows') or gold_skulls_ignore_daytime)"
+rule = "is_child and ((at_night and 'Time Flows') or gold_skulls_ignore_daytime) and can_child_attack"
 was = "is_child and (at_night or gold_skulls_ignore_daytime)"
-source = "night needs time to flow (Eurogamer 17 changes); data: Enemy_Skulltula_Gold 11629189455828560791 (-75,105,2), Nocturnal; Nintendo Life GS #18 and Eurogamer Kakariko GS #2: at night behind the house by the Death Mountain gate"
+source = "night needs time to flow (Eurogamer 17 changes); data: Enemy_Skulltula_Gold 11629189455828560791 (-75,105,2), Nocturnal; Nintendo Life GS #18 and Eurogamer Kakariko GS #2: at night behind the house by the Death Mountain gate. Kill added (round 21, cs21d): the token is the enemy's death drop (patch/tokens.py check_source); Kareem, 2026-11-22: early child tokens need a weapon; plans/rounds/r21-sticks.md"
 
 [locations."Kak GS Tree"]
-rule = "is_child and ((at_night and 'Time Flows') or gold_skulls_ignore_daytime) and can_bonk"
+rule = "is_child and ((at_night and 'Time Flows') or gold_skulls_ignore_daytime) and can_bonk and can_child_attack"
 was = "is_child and (at_night or gold_skulls_ignore_daytime) and can_bonk"
-source = "night needs time to flow (Eurogamer 17 changes). Night kept: Nintendo Life GS #16, Eurogamer Kakariko GS #1 and Polygon say night; but the actor (Enemy_Skulltula_Gold 7677963516305772491, (-74,104,43), linked to Obj_Tree_A_01) has no Nocturnal flag and IGN's walkthrough gets it by day: question in the findings"
+source = "night needs time to flow (Eurogamer 17 changes). Night kept: Nintendo Life GS #16, Eurogamer Kakariko GS #1 and Polygon say night; but the actor (Enemy_Skulltula_Gold 7677963516305772491, (-74,104,43), linked to Obj_Tree_A_01) has no Nocturnal flag and IGN's walkthrough gets it by day: question in the findings. Kill added (round 21, cs21d): a tree token like Lon Lon Ranch's, which Kareem (2026-11-22, in game) found pops out and must be killed; plans/rounds/r21-sticks.md"
 
 [locations."Kak GS Watchtower"]
 rule = "is_child and ((at_night and 'Time Flows') or gold_skulls_ignore_daytime) and (Slingshot or has_bombchus or (logic_kakariko_tower_gs and (Sticks or Kokiri_Sword)))"

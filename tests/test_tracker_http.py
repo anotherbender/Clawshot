@@ -359,3 +359,70 @@ def test_clear_marks_needs_confirmation_and_clears_this_slot(marks_seed):
         status, _, cleared = request(server, "tracker-clear-marks", {"confirmed": True})
         assert status == 200, cleared
         assert "marked" not in check_entry(cleared, "Test Shop")
+
+
+@pytest.fixture
+def track_seed(tracker_seed, monkeypatch):
+    """The tracker seed made by this version, plus two gifts read by track flags: LW Skull Kid's provisional, Song
+    from Saria's accepted; both read "not collected" in the slot (tracker-auto-checks 3.1, 3.2)."""
+    from test_tracker_state import build_save
+
+    import clawshot.tracker.seeds as seeds
+    from clawshot.patch import gifts
+
+    root, slot = tracker_seed
+    rules = gifts.loads(
+        '[check."LW Skull Kid"]\nclass = "swap"\n'
+        'track = [{ bool = "Flag_P", source = "s", accepted = false }]\n'
+        '[check."Song from Saria"]\nclass = "swap"\n'
+        'track = [{ bool = "Flag_A", source = "s", accepted = true, played_by = "p" }]\n'
+    )
+    monkeypatch.setattr(seeds, "_gift_rules", lambda: rules)
+    places = {name: Place("Test", None, "Chest") for name in ("Test Chest", "Test Key")}
+    places |= {"LW Skull Kid": Place("Test", None, "NPC"), "Song from Saria": Place("Test", None, "Song")}
+    monkeypatch.setattr(seeds, "location_index", lambda: places)
+    spoiler_path = root / "seed/spoiler.json"
+    spoiler = json.loads(spoiler_path.read_text(encoding="utf-8"))
+    spoiler["generator"] = f"clawshot {seeds.installed_version()}"
+    spoiler["placements"] |= {"LW Skull Kid": "Synthetic gift reward", "Song from Saria": "Synthetic song reward"}
+    spoiler_path.write_text(json.dumps(spoiler), encoding="utf-8")
+    slot.write_bytes(build_save({"IsTreasureBoxOpen.123": False, "Flag_P": False, "Flag_A": False}))
+    return root, slot
+
+
+# tracker-auto-checks P7.d, 3.4
+def test_marks_on_a_provisional_not_collected_gift_only_and_obs_unchanged(track_seed):
+    root, _ = track_seed
+    with running_server(Application(preferences=Preferences())) as server:
+        assert request(server, "tracker-configure", {"seed": str(root)})[0] == 200
+        status, _, marked = request(server, "tracker-mark", {"check": "LW Skull Kid", "marked": True})
+        assert status == 200, marked
+        kid = check_entry(marked, "LW Skull Kid")
+        assert (kid["collected"], kid["marked"], kid["markable"]) == (False, True, True)
+        assert "Synthetic gift reward" not in json.dumps(marked)
+        assert request(server, "tracker-mark", {"check": "Song from Saria", "marked": True})[0] == 400
+        unmarked = request(server, "tracker-mark", {"check": "LW Skull Kid", "marked": False})
+        assert unmarked[0] == 200 and "marked" not in check_entry(unmarked[2], "LW Skull Kid")
+        obs = request(server, "tracker-obs")[2]
+        assert all("checks" not in area for area in obs["state"]["areas"])
+        assert "markable" not in json.dumps(obs) and "marked" not in json.dumps(obs["state"]["areas"])
+
+
+# Round 21: skips through the same route (plans/rounds/r21-tracker.md).
+def test_skip_kind_on_the_mark_route_and_obs_strips_it(marks_seed):
+    root, _ = marks_seed
+    with running_server(Application(preferences=Preferences())) as server:
+        assert request(server, "tracker-configure", {"seed": str(root)})[0] == 200
+        status, _, skipped = request(server, "tracker-mark", {"check": "Test Chest", "marked": True, "kind": "skip"})
+        assert status == 200, skipped
+        entry = check_entry(skipped, "Test Chest")
+        assert (entry["skippable"], entry["skipped"]) == (True, True)
+        for body in (
+            {"check": "Test Shop", "marked": True, "kind": "skip"},  # unknown: mark it done instead
+            {"check": "Test Chest", "marked": True, "kind": "later"},
+        ):
+            assert request(server, "tracker-mark", body)[0] == 400, body
+        obs = request(server, "tracker-obs")[2]
+        assert "skipped" not in json.dumps(obs["state"]["areas"]) and "skippable" not in json.dumps(obs)
+        back = request(server, "tracker-mark", {"check": "Test Chest", "marked": False, "kind": "skip"})[2]
+        assert "skipped" not in check_entry(back, "Test Chest")

@@ -28,6 +28,10 @@ GAME_SAVE_ID = "0400486024dec000"  # the game's save-data folder in an emulator 
 _TITLE_FOLDER = re.compile(r"^[0-9a-fA-F]{16}$")
 MAX_DEPTH = 8  # an emulator's nand/user/save/<zeros>/<user>/<game>/slot_NN from its data folder is 7 deep
 MAX_FOLDERS = 5000  # stop walking a folder that is clearly not a save folder (a whole drive)
+# Longshot 3.1's working copy beside ``save/``: the game writes there first and moves a finished save into ``save/``
+# (Longshot #607, v3.1.0; the v3.1.1 saves page: "Save tools copy only save/"). Checked on a copy of a 3.1.1 user
+# folder (work/longshot-311/REPORT.md, "Saves"): reading it picked a working-copy slot over the newest real save.
+_WORKING_COPY = "save-work"
 MAX_SAVE_BYTES = 16 << 20
 # Types whose entry value is a file offset rather than the value itself (clawshot.save: Bool, Int, Float, Enum and
 # UInt are stored in the pair; Bool64bitKey's offset is checked by the reader).
@@ -61,9 +65,9 @@ def _walk(folder: Path):
             except OSError:
                 continue
             # In an emulator NAND, other games' 16-digit save folders sit beside this game's one; the all-zero
-            # system folder above them is kept (sloperina section 1's path).
+            # system folder above them is kept (sloperina section 1's path). Longshot's working copy is never a save.
             name = entry.name.lower()
-            if _TITLE_FOLDER.match(name) and name not in (GAME_SAVE_ID, "0" * 16):
+            if name == _WORKING_COPY or (_TITLE_FOLDER.match(name) and name not in (GAME_SAVE_ID, "0" * 16)):
                 continue
             stack.append((Path(entry.path), depth + 1))
 
@@ -243,14 +247,17 @@ class TrackerSession:
             self._logic = tracker_logic.SeedLogic(tracker_logic.load_world(self._seed))
         store = self._store() if marks_folder is not None else None
         marked = store.marks(self._seed_id, marks_folder) if store is not None else frozenset()
+        skipped = (
+            store.marks(self._seed_id, marks_folder, table=tracker_marks.SKIPS) if store is not None else frozenset()
+        )
         state = tracker_state.build_state(
-            self._seed, parsed, show_locations=self._show, logic=self._logic, marks=marked
+            self._seed, parsed, show_locations=self._show, logic=self._logic, marks=marked, skips=skipped
         )
         if store is not None:
             confirmed = [
                 check["id"]
                 for check in tracker_state.every_check(state)
-                if check["id"] in marked and check["collected"] is not None
+                if check["id"] in marked and not check.get("markable")  # collected, or an accepted "not" (D4)
             ]
             if confirmed:
                 try:
@@ -273,20 +280,35 @@ class TrackerSession:
         return self._marks_folder
 
     def mark(self, check: str, marked: bool) -> dict[str, Any]:
-        """Mark a check whose save state is unknown as done by hand, or unmark it (D8)."""
+        """Mark a check whose save state is unknown (or read by a provisional track flag as not collected) as done
+        by hand, or unmark it (D8; spec tracker-auto-checks D4)."""
         with self._lock:
             slot = self._marks_target()
             entry = next((c for c in tracker_state.every_check(self._state) if c["id"] == check), None)
             if entry is None:
                 raise ValueError(f"No check {check!r} in this seed.")
-            if entry["collected"] is not None:
+            if not entry.get("markable"):
                 raise ValueError(f"{entry['label']}: the save already says whether it is collected.")
             self._store().set(self._seed_id, slot, check, marked)
             self._set_state(self._build(self._parsed, slot), self._state_slot)
             return self.snapshot()
 
+    def skip(self, check: str, skipped: bool) -> dict[str, Any]:
+        """Skip a check the save reads as not collected (``skippable``), so it leaves the open list, or take the skip
+        back. A save read never drops a skip (round 21, plans/rounds/r21-tracker.md)."""
+        with self._lock:
+            slot = self._marks_target()
+            entry = next((c for c in tracker_state.every_check(self._state) if c["id"] == check), None)
+            if entry is None:
+                raise ValueError(f"No check {check!r} in this seed.")
+            if skipped and not entry.get("skippable"):
+                raise ValueError(f"{entry['label']}: only a check the save reads as not collected can be skipped.")
+            self._store().set(self._seed_id, slot, check, skipped, table=tracker_marks.SKIPS)
+            self._set_state(self._build(self._parsed, slot), self._state_slot)
+            return self.snapshot()
+
     def clear_marks(self) -> dict[str, Any]:
-        """Remove every mark of this seed and save folder."""
+        """Remove every mark and skip of this seed and save folder."""
         with self._lock:
             slot = self._marks_target()
             self._store().clear(self._seed_id, slot)
