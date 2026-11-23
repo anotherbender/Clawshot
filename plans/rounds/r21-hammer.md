@@ -1,9 +1,14 @@
 # Round 21, track hammer (cs21e): the Megaton Hammer as explosives and as an adult weapon
 
-Agent cs21e, branch `r21/hammer`, base `e9bb0d7`. Built, not played: nothing in this file was run in game by the
-agent. Research scripts and decoded data stay outside the repo in `E:/OOTRemake/work/r21-hammer/` (`inventory.py`,
-`placed.py`, `damage.py`, `analyze.py`, `near.py`, `walls.py`, `table.py`; outputs `inventory.json`, `placed.json`,
-`damage.json`, `rates.json`, `rule-table.md`).
+**Handoff: READY (merge), head `fca895e`** on main `566c159`: sweep 350/350 with 0 exhausted, and the full gate
+passed after a test-only re-pin (see "Sweep and gates"). Nothing widened rests on an unplayed check: the classes
+rest on the dump plus Kareem's play on 0.2.5 and on Longshot 3.0.0 (the Beamos check, 2026-11-23).
+
+Agent cs21e, branch `r21/hammer`, base `e9bb0d7`, now on `566c159`. The agent ran nothing in game; Kareem played the
+Beamos packet. Research scripts and decoded data stay outside the repo in `E:/OOTRemake/work/r21-hammer/`
+(`inventory.py`, `placed.py`, `damage.py`, `analyze.py`, `near.py`, `walls.py`, `table.py`, `sweep.py`,
+`shieldseed.py`; outputs `inventory.json`, `placed.json`, `damage.json`, `rates.json`, `rule-table.md`,
+`sweep-results.json`).
 
 ## Ask
 
