@@ -90,3 +90,21 @@ recorded here, never from the marks oracle alone (7.2). The static evidence for 
 
 | Gift | Result | Who, runtime build, date |
 |---|---|---|
+| ZR Frogs Zeldas Lullaby | pass: `=true -> collected`, Empty Bottle given | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, round 21 pr39 launcher 01) |
+| ZR Frogs Sarias Song | pass: `=true -> collected`, Piece of Heart given | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, launcher 01) |
+| ZR Frogs Suns Song | pass: `=true -> collected`, 5 Rupees given | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, launcher 01) |
+| HF Ocarina of Time Item | pass: `=true -> collected`, Piece of Heart given (no Ocarina of Time in the save) | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, launcher 01) |
+| Song from Ocarina of Time | pass: `=true -> collected`, Requiem of Spirit given | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, launcher 01) |
+| Song from Malon | pass: `=true -> collected`, Minuet of the Forest given | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, launcher 01) |
+| LLR Talons Chickens | pass: `=true -> collected`, Farore's Wind given | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, launcher 01) |
+| Sheik at Temple | pass: `=true -> collected`, Prelude of Light given | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, launcher 02) |
+| Kak Shooting Gallery Reward | pass: `=true -> collected`, 1 Rupee given | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, launcher 02) |
+| Kak Man on Roof | pass: `=true -> collected`, 20 Rupees given | Kareem, Longshot 3.0.0, 2026-11-23 (seed 921101, launcher 02) |
+
+Each run started from a copy of a natural save where the row read `false`; afterwards no other row changed value
+(read-outs `work/r21-pr39/readout-*.txt` against `before-readout-*.txt`; record `plans/rounds/r21-pr39.md`).
+
+**Cutscene skip (the "Also" step above), answered for Sheik at Temple:** on Longshot 3.0.0 (Kareem, 2026-11-23,
+launcher 03) Sheik's Temple of Time scene offers no skip button at all; the Prelude of Light was given and
+`HavePlayedEvent.Dm_MelodyGet_Shine` read true. So for this row there is no skip to test. Other cutscene rows, owl
+skips and fast start are still unchecked.
