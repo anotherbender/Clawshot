@@ -1,17 +1,19 @@
-"""Explicit native get-display experiments; no inventory or chest-admission policy changes.
+"""Get-item display: what an item shows in Link's get pose; no inventory or chest-admission policy changes.
 
-Songs borrow native ocarina meshes. Ocarina chests stage native cutscene props,
-without changing the playable Accessory actors. Neither correction is automatic
-before visual review.
+The ocarinas' get model (:func:`ocarina_changes`, in seeds that put an ocarina in a chest: :func:`chest_ocarinas`):
+the two ``ActorInfo`` rows lose ``CalcPriority`` and each ocarina pack gets the pouch get-pose performer, the common
+animation set and its own AnimationParam (plans/chest-ocarina-model.md, run O). Equipment components stay native.
+
+Songs borrow native ocarina meshes (:func:`changes`, an unwired experiment pending visual review).
 """
 
 import copy
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable, Mapping
 from functools import partial
 from pathlib import Path
 
-from clawshot.census.hints import flow_path, read_flow
-from clawshot.formats import byml, evfl, sarc
+from clawshot.formats import byml, sarc, zsdic
+from clawshot.patch.items import ItemActors
 from clawshot.patch.plan import PatchError
 from clawshot.patch.shops import actor_path, member_path, resolve_member
 
@@ -34,8 +36,20 @@ SONG_MODELS = {
 }
 OCARINAS = (FAIRY, TIME)
 PERFORMER = "Component/EventPerformerParam/PouchContent.engine__component__EventPerformerParam.bgyml"
-CHEST_FLOWS = ("Dm_SY_TreasureboxSmall", "Dm_SY_Treasurebox")
-MESSAGE_TARGET = "UI_MessageTargetActorName"
+COMMON_PERFORMER = "Component/EventPerformerParam/Common.engine__component__EventPerformerParam.bgyml"
+# Saria's own ocarina in her farewell (Dm_Kokiri_0155): shares the Fairy Ocarina's model project.
+SARIA_PROP = "Dm_Item_Ocarina_Fairy_Saria"
+# A native pack holding the PouchContent performer member (its own actor inherits the reference from a $parent).
+DONOR = "Item_Boomerang"
+ANIMATION_SET = "AS/Item_Common.root.asb"
+COMMON_ANIMATION = "Item_Common_Animation"
+# What the ocarina get model names; the game loads them from its own romfs. The generator never reads them, so they
+# stay out of the app's working set; tests/test_getitem_ocarina_dump.py checks the dump holds them.
+OCARINA_DUMP_FILES = (
+    ANIMATION_SET + ".zs",
+    f"Model/{COMMON_ANIMATION}.anim.bfres.zs",
+    *(f"Model/{actor}_Animation.anim.bfres.zs" for actor in (FAIRY, TIME)),
+)
 MODEL_FIELDS = ("FmdbName", "ModelProjectName", "ModelAabbMin", "ModelAabbMax")
 
 
@@ -71,6 +85,109 @@ def patch_pack(data: bytes, *, actor: str) -> bytes:
     return result
 
 
+def patch_ocarina_actor_info(data: bytes) -> bytes:
+    """Drop ``CalcPriority: After`` from the two ocarina rows and give it to :data:`SARIA_PROP`, all found by
+    ``__RowId``; nothing else changes.
+
+    Without the instrument's ``After``, Saria's own ocarina (a prop sharing the ``Item_Ocarina_Fairy`` model project)
+    is drawn wrong in her farewell until she takes it from her back; with its own ``After`` it is not
+    (plans/chest-ocarina-model.md, runs V1-V3). Works on a table earlier steps already grew (custom items, tokens,
+    keys): no row order or native snapshot."""
+    document = byml.load(data)
+    rows = {row.get("__RowId"): row for row in document.root}
+    for actor in (*OCARINAS, SARIA_PROP):
+        if actor not in rows:
+            raise PatchError(f"{actor}: no ActorInfo row")
+    for actor in OCARINAS:
+        if (value := rows[actor].get("CalcPriority")) != "After":
+            raise PatchError(f"{actor}: CalcPriority is {value!r}, not the native 'After'")
+    if (value := rows[SARIA_PROP].get("CalcPriority")) is not None:
+        raise PatchError(f"{SARIA_PROP}: CalcPriority is {value!r}, not natively absent")
+    for actor in OCARINAS:
+        del rows[actor]["CalcPriority"]
+    rows[SARIA_PROP]["CalcPriority"] = "After"
+    return _dump(document)
+
+
+def animation_member(actor: str) -> str:
+    return f"Component/AnimationParam/{actor}.engine__component__AnimationParam.bgyml"
+
+
+def animation_param(actor: str) -> bytes:
+    """The ocarina's own AnimationParam, built from two animation names: the common get-pose set, then the
+    ocarina's native (otherwise unreferenced) animation file, which lays it flat like the inventory view."""
+    resources = [{"ModelProjectName": name} for name in (COMMON_ANIMATION, f"{actor}_Animation")]
+    return byml.write({"AnimationResources": resources})
+
+
+def patch_ocarina_pack(data: bytes, *, actor: str, donor: bytes) -> bytes:
+    """Give an ocarina the pouch get-pose performer and a spinning, flat animation; equipment stays native.
+
+    ``donor`` is the decompressed :data:`DONOR` pack, whose native ``PouchContent`` performer is copied unchanged."""
+    if actor not in OCARINAS:
+        raise PatchError(f"no ocarina get-model correction for {actor}")
+    pack = sarc.read(data)
+    param = member_path(actor_path(actor))
+    document = byml.load(pack[param])
+    components = document.root["Components"]
+    if (performer := components.get("EventPerformerRef")) != "?" + COMMON_PERFORMER:
+        raise PatchError(f"{actor}: EventPerformerRef is {performer!r}, not the native Common performer")
+    for key in ("ASRef", "AnimationRef"):
+        if key in components:
+            raise PatchError(f"{actor}: already has {key} {components[key]!r}")
+    animation = animation_member(actor)
+    for member in (PERFORMER, animation):
+        if member in pack:
+            raise PatchError(f"{actor}: the pack already holds {member}")
+    donor_members = sarc.read(donor)
+    if PERFORMER not in donor_members:
+        raise PatchError(f"{actor}: the donor {DONOR} has no {PERFORMER}")
+    components["EventPerformerRef"] = "?" + PERFORMER
+    components["ASRef"] = "?" + ANIMATION_SET
+    components["AnimationRef"] = "?" + animation
+    pack[param] = _dump(document)
+    pack[PERFORMER] = donor_members[PERFORMER]
+    pack[animation] = animation_param(actor)
+    result = sarc.write(pack)
+    if sarc.read(result) != pack:
+        raise PatchError(f"{actor}: ocarina get-model pack failed read-back")
+    return result
+
+
+def native_inputs() -> tuple[str, ...]:
+    """Every romfs file :func:`ocarina_changes` and its transforms read, the dictionaries' pack included, so the
+    app's working set (``clawshot.pack.source.working_files``) holds them."""
+    return (
+        "Pack/ZsDic.pack.zs",
+        ACTOR_INFO,
+        pack_path(DONOR),
+        *(pack_path(actor) for actor in OCARINAS),
+    )
+
+
+def chest_ocarinas(placements: Mapping[str, str], chests: Iterable[str], actors: ItemActors) -> list[str]:
+    """The chests (in ``chests`` order) whose placed item is an ocarina: a seed gets :func:`ocarina_changes` only
+    when there is one. Elsewhere the change shows nothing and would only alter Saria's native farewell, where her
+    own ocarina is drawn wrong without the instrument's ``CalcPriority`` (plans/chest-ocarina-model.md, runs D, D2)."""
+    return [name for name in chests if actors.actors.get(placements.get(name, "")) in OCARINAS]
+
+
+def ocarina_changes(romfs: str | Path) -> dict[str, Callable[[bytes], bytes]]:
+    """The chest-ocarina get model: ActorInfo rows and both ocarina packs (``make_seed`` asks :func:`chest_ocarinas`).
+
+    Compose last on these files (after ``ocarina.changes``): it checks only the native fields it changes."""
+    romfs = Path(romfs)
+    donor_path = pack_path(DONOR)
+    if not (romfs / donor_path).is_file():
+        raise PatchError(f"the dump has no {donor_path}, which the ocarina get model copies from")
+    dictionaries = zsdic.Dictionaries.from_romfs(romfs)
+    donor = dictionaries.decompress(donor_path, (romfs / donor_path).read_bytes())
+    out: dict[str, Callable[[bytes], bytes]] = {ACTOR_INFO: patch_ocarina_actor_info}
+    for actor in OCARINAS:
+        out[pack_path(actor)] = partial(patch_ocarina_pack, actor=actor, donor=donor)
+    return out
+
+
 def patch_actor_info(data: bytes, *, actors: tuple[str, ...]) -> bytes:
     """Keep cached models consistent and reserve conservative native display heap budgets.
 
@@ -102,143 +219,8 @@ def patch_actor_info(data: bytes, *, actors: tuple[str, ...]) -> bytes:
     return _dump(document)
 
 
-def patch_chest_flow(data: bytes, *, prop_template: evfl.Actor) -> bytes:
-    """Stage native props for ocarinas, keeping the actual equipment actors native.
-
-    The native gift binds to Player's Weapon_L, not the generic chest guest.
-    UI_MessageTargetActorName is the existing item-name UI scratch String64; the
-    normal get window subsequently sets it to the very same ContentName.
-    """
-    document = evfl.read(data)
-    fc = document.flowchart
-    if fc is None or fc.name not in CHEST_FLOWS:
-        raise PatchError("not a native chest flow")
-    if any(e.name.startswith("Clawshot_Ocarina") for e in fc.events):
-        raise PatchError(f"{fc.name}: ocarina presentation already patched")
-    original = list(fc.events)
-
-    def action_name(event):
-        if isinstance(event, evfl.ActionEvent):
-            return fc.actors[event.actor].name, fc.actors[event.actor].actions[event.action]
-        return None
-
-    def unique(actor, action):
-        found = [i for i, e in enumerate(original) if action_name(e) == (actor, action)]
-        if len(found) != 1:
-            raise PatchError(f"{fc.name}: expected one {actor}.{action}, found {found}")
-        return found[0]
-
-    guest = "PouchContentGuestPerformer"
-    actions = ["EventTriggerPlayerNoHit", "EventTriggerModelBindForItemGetDemo", "EventPlayAS"]
-    if fc.name == "Dm_SY_Treasurebox":
-        actions = [actions[2], actions[0], actions[1]]
-    chain = [unique(guest, action) for action in actions]
-    if any(original[a].next != b for a, b in zip(chain, chain[1:], strict=False)):
-        raise PatchError(f"{fc.name}: native get-demo chain changed: {[original[i] for i in chain]}")
-    start = chain[0]
-    continuation = original[chain[-1]].next
-    sleep = unique("TreasureBox_EventStarter", "EventTriggerTBoxRequestSleepActorHolderData")
-    game_data = next(i for i, a in enumerate(fc.actors) if a.name == "GameDataActor")
-    gd = fc.actors[game_data]
-    for collection, name in (
-        (gd.actions, "EventTriggerSetGameDataString64"),
-        (gd.queries, "EventQueryIsGameDataString64"),
-    ):
-        if name not in collection:
-            collection.append(name)
-    props = []
-    for actor in OCARINAS:
-        prop = copy.deepcopy(prop_template)
-        prop.name = "Dm_" + actor
-        prop.secondary_name = ""
-        prop.entry_point = evfl.NONE
-        prop.actions = ["EventTriggerParticipateEvent", "EventTriggerModelBind", "EventGoOffstageForUser"]
-        props.append(len(fc.actors))
-        fc.actors.append(prop)
-
-    def append(event):
-        index = len(fc.events)
-        event.name = f"Clawshot_Ocarina_{index}"
-        fc.events.append(event)
-        return index
-
-    def gate(targets, otherwise):
-        current = otherwise
-        for actor, target in reversed(list(zip(OCARINAS, targets, strict=True))):
-            current = append(
-                evfl.SwitchEvent(
-                    "",
-                    game_data,
-                    gd.queries.index("EventQueryIsGameDataString64"),
-                    [(0, target), (1, current)],
-                    {"GameDataName": MESSAGE_TARGET, "Index": -1, "Value": actor},
-                )
-            )
-        return append(
-            evfl.ActionEvent(
-                "",
-                game_data,
-                gd.actions.index("EventTriggerSetGameDataString64"),
-                current,
-                {"GameDataName": MESSAGE_TARGET, "Index": -1, "Value": evfl.Argument("ContentName")},
-            )
-        )
-
-    show, hide = [], []
-    for prop in props:
-        attach = append(
-            evfl.ActionEvent(
-                "",
-                prop,
-                1,
-                continuation,
-                {
-                    "ActorName": "Player_Event",
-                    "InstanceName": "",
-                    "BoneName": "Weapon_L",
-                    "TransOffset": evfl.FloatArray((0.0, 0.0, 0.0)),
-                    "RotOffset": evfl.FloatArray((0.0, 0.0, 0.0)),
-                },
-            )
-        )
-        show.append(append(evfl.ActionEvent("", prop, 0, attach)))
-        hide.append(
-            append(
-                evfl.ActionEvent(
-                    "",
-                    prop,
-                    2,
-                    original[sleep].next,
-                    {
-                        "IsWaitEnd": True,
-                        "IsSleepXLink": True,
-                        "ExecuteSetSpeedZeroEveryFrame": False,
-                        "IsRidingTargetGoOffstage": False,
-                    },
-                )
-            )
-        )
-    show_gate = gate(show, start)
-    # Redirect existing incoming edges; the fallback still runs the native chain.
-    for event in original:
-        if getattr(event, "next", None) == start:
-            event.next = show_gate
-        if isinstance(event, evfl.ForkEvent):
-            event.forks = [show_gate if i == start else i for i in event.forks]
-        if isinstance(event, (evfl.SwitchEvent, evfl.SubFlowSwitchEvent)):
-            event.cases = [(value, show_gate if i == start else i) for value, i in event.cases]
-    for entry in fc.entry_points:
-        if entry.main_event == start:
-            entry.main_event = show_gate
-    original[sleep].next = gate(hide, original[sleep].next)
-    written = evfl.write(document)
-    if evfl.read(written) != document:
-        raise PatchError(f"{fc.name}: ocarina presentation failed read-back")
-    return written
-
-
 def changes(romfs: str | Path, actors: Iterable[str]) -> dict:
-    """FileChanges for explicit actor identities, suitable for the common overlay writer.
+    """Song get-model FileChanges for explicit song actors, suitable for the common overlay writer (unwired).
 
     Call only for intended chest actors. This does not certify a grant or release
     a gift-only actor from the sourced allowlist.
@@ -246,7 +228,7 @@ def changes(romfs: str | Path, actors: Iterable[str]) -> dict:
     actors = tuple(sorted(set(actors)))
     if not actors:
         return {}
-    unknown = set(actors) - SONG_MODELS.keys() - set(OCARINAS)
+    unknown = set(actors) - SONG_MODELS.keys()
     if unknown:
         raise PatchError(f"no get-display correction for {sorted(unknown)}")
     romfs = Path(romfs)
@@ -257,13 +239,6 @@ def changes(romfs: str | Path, actors: Iterable[str]) -> dict:
     out = {pack_path(actor): partial(patch_pack, actor=actor) for actor in songs}
     if songs:
         out[ACTOR_INFO] = partial(patch_actor_info, actors=songs)
-    if any(actor in OCARINAS for actor in actors):
-        # Copy native lifecycle metadata, not a guessed event actor creation policy.
-        template = next(a for a in read_flow(romfs, "Dm_MelodyGet_Time").actors if a.name == "Dm_" + TIME)
-        if (template.params or {}).get("EventMemberCreateMethod") != 1:
-            raise PatchError(f"native ocarina prop creation changed: {template}")
-        for flow in CHEST_FLOWS:
-            out[flow_path(romfs, flow)] = partial(patch_chest_flow, prop_template=template)
     return out
 
 

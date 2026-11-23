@@ -3805,3 +3805,34 @@ as ungrantable and spoke protocol 2), so its bridge never ran the magic, ocarina
   set by the give and cleared).
 - **One box**: Archipelago slots (which rewrite every get line) end `GetPouchContent:DefaultGetMessage` after
   `Dm_SY_Get:GetMessage`, without `GetCaption` (mysterypaint's call). Pieces of Heart and other own windows keep theirs.
+
+## 50. Chest ocarinas: why the get model was missing (2026-11-22)
+
+Found in game by Claude with BBender (Longshot v3.1.1 control bridge, dump 1.1.1); implemented by PR #40
+(`patch/getitem.py` `ocarina_changes`), applied only to seeds that put an ocarina in a chest (round 21 review,
+`rounds/r21-pr40.md` Q1). Full evidence, run table, implementation notes and checklist:
+`plans/chest-ocarina-model.md`.
+
+The model shows (and spins, lying flat like the inventory view) only with **both** changes: `RSDB/ActorInfo` loses
+`CalcPriority: After` on the two `Item_Ocarina_*` rows, and each ocarina pack gets `EventPerformerRef` →
+`PouchContent`, `ASRef` → `AS/Item_Common.root.asb` and `AnimationRef` → a new AnimationParam listing
+`Item_Common_Animation` and the ocarina's own `Item_Ocarina_X_Animation`. Equipment components stay; the Fairy
+Ocarina still plays. Corrects sections 26 and 33: the chest flows need no ocarina branch or staged prop, and round
+7's performer change failed only because `CalcPriority` stayed.
+
+**AnimationParam size entries** (measured by Claude, 2026-11-22, dump 1.1.1, update v131072, Clawshot `b3cd3b8`):
+all 544 unique `*.engine__component__AnimationParam.bgyml` members of the actor packs (20 to 472 bytes, 38 with a
+`$parent`) have entry = size rounded to 32 + **5096 + 88 per entry of the file's own `AnimationResources` list**
+(0 entries: 28 members, 1: 256, 2: 220, 3: 34, 4: 2, 5: 2, 6: 1, 8: 1). No single constant fits; BBender accepted
+the per-entry rule (proposed by Claude) on 2026-11-22. It is `rstb.ANIMATION_PARAM*`, checked by
+`tests/test_rstb_dump.py`.
+
+**Saria's farewell prop** (BBender with Claude, 2026-11-22, Longshot v3.1.1, runs in `plans/chest-ocarina-model.md`):
+without `CalcPriority` on `Item_Ocarina_Fairy`, Saria's own ocarina `Dm_Item_Ocarina_Fairy_Saria` (no `CalcPriority`
+natively; model project `Item_Ocarina_Fairy`, shared with the instrument) is drawn wrong in `Dm_Kokiri_0155` until she
+takes it from her back. Isolated to the ActorInfo change (the pack changes alone do not do it). Giving the prop's row
+`CalcPriority: After` (the generator does) was clean only when the Fairy Ocarina had been taken from a chest earlier
+in the same session (runs V3, E); the native farewell, where the gift is the first Fairy Ocarina, still glitched with
+it (runs D, D2: two ocarinas overlapping, then hers doubled). Shipped as a known cosmetic issue (BBender's call, D5);
+`skip_saria_farewell` avoids the movie. On Longshot 3.0.0 (Kareem, 2026-11-23, `rounds/r21-pr40.md`) the same native
+case showed one normal ocarina with this change, with main 0.2.5 and with no mod at all.

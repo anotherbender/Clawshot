@@ -40,6 +40,13 @@ ACTOR_PARAM = ".engine__actor__ActorParam.bgyml"
 ACTOR_PARAM_OVERHEAD = 5144
 ACTOR_PARAM_PER_COMPONENT = 48
 
+# Animation parameter files inside actor packs: 5096 plus 88 per entry of the file's own ``AnimationResources`` list,
+# whether or not it has a ``$parent`` (544 of 544 unique ``*.engine__component__AnimationParam.bgyml`` members, dump
+# 1.1.1; plans/03-game-data.md, section 50).
+ANIMATION_PARAM = ".engine__component__AnimationParam.bgyml"
+ANIMATION_PARAM_OVERHEAD = 5096
+ANIMATION_PARAM_PER_RESOURCE = 88
+
 # Files with a formula of their own: resource path -> (alignment, overhead). GameDataList is one file: its entry
 # (1,463,176) is its size (1,462,888, a multiple of 8) + 288, which rounding to 32 would overshoot.
 OWN_FORMULA: dict[str, tuple[int, int]] = {
@@ -147,16 +154,25 @@ def write(table: ResourceSizeTable) -> bytes:
     return bytes(out)
 
 
-def required_size(path: str, size: int, components: int | None = None) -> int:
+def required_size(path: str, size: int, components: int | None = None, *, resources: int | None = None) -> int:
     """The entry a file at ``path`` (resource or romfs path) needs when its decompressed size is ``size``:
     ``size`` rounded up to 32 bytes plus the overhead of its type (:data:`OVERHEAD`), or a file's own formula
     (:data:`OWN_FORMULA`). An actor parameter file (:data:`ACTOR_PARAM`) also needs ``components``, the number of
-    entries in its own ``Components`` map; no other type takes it.
+    entries in its own ``Components`` map, and an animation parameter file (:data:`ANIMATION_PARAM`) ``resources``,
+    the number of entries in its own ``AnimationResources`` list; no other type takes either.
 
     Raises :class:`RstbError` for a type whose formula has not been checked against the game.
     """
     path = resource_path(path)
     rounded = (size + ALIGNMENT - 1) // ALIGNMENT * ALIGNMENT
+    if path.endswith(ANIMATION_PARAM):
+        if components is not None:
+            raise RstbError(f"{path}: a component count only applies to actor parameter files")
+        if resources is None or resources < 0:
+            raise RstbError(f"{path}: an animation parameter's entry needs its own AnimationResources count")
+        return rounded + ANIMATION_PARAM_OVERHEAD + ANIMATION_PARAM_PER_RESOURCE * resources
+    if resources is not None:
+        raise RstbError(f"{path}: an AnimationResources count only applies to animation parameter files")
     if path.endswith(ACTOR_PARAM):
         if components is None or components < 0:
             raise RstbError(f"{path}: an actor parameter's entry needs its own component count, not {components}")
@@ -170,5 +186,6 @@ def required_size(path: str, size: int, components: int | None = None) -> int:
         if path.endswith(suffix):
             return rounded + overhead
     raise RstbError(
-        f"no size formula for {path}: only {', '.join([*OVERHEAD, ACTOR_PARAM])} are checked against the game"
+        f"no size formula for {path}: only {', '.join([*OVERHEAD, ACTOR_PARAM, ANIMATION_PARAM])} "
+        "are checked against the game"
     )

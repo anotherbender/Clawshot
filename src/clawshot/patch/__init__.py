@@ -257,7 +257,7 @@ def make_seed(
     changes += (mido_schedule.changes(kept=kept_mido),)
     fast_files += tuple(mido_schedule.build(romfs, kept=kept_mido))
     plan = make_plan(out, links, table, chest_events.load(), overrides=custom.actors)
-    from clawshot.patch import keys, ocarina, progressive, progressive_bonus, scene_handoff
+    from clawshot.patch import getitem, keys, ocarina, progressive, progressive_bonus, scene_handoff
 
     handoff = scene_handoff.build(romfs, skip_saria_farewell=settings.skip_saria_farewell, prior_changes=changes)
     changes += (handoff.changes,)
@@ -271,6 +271,10 @@ def make_seed(
     plan, progressive_changes = progressive.changes(romfs, plan, prior_changes=changes)
     changes += (progressive_changes, bags.changes(romfs))
     changes += (ocarina.changes(romfs, prior_changes=changes),)
+    # Only seeds that put an ocarina in a chest (Q1 option b, Claude 2026-11-22, pending Kareem): the get model
+    # changes Saria's native farewell cosmetically. Last on ActorInfo and the ocarina packs, after every row edit.
+    if getitem.chest_ocarinas(out.placements, chests, table):
+        changes += (getitem.ocarina_changes(romfs),)
     return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files, token_rows)
 
 

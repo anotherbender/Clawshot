@@ -408,7 +408,9 @@ give the version, OS and whole UI error text (terminal error if it never opens).
   a fresh seed with a newer Clawshot and start a new game; keep the old folder and saves.
   Newer versions never put keys there while dungeon items stay home; with **Small keys
   anywhere** a hand chest can hold a small key named to its own dungeon, so it is not lost.
-- Ocarinas from chests have no visible model, but you still receive them.
+- In seeds that put an ocarina in a chest, Saria's own ocarina can look doubled or merged in her farewell
+  until she plays it (seen on Longshot v3.1.1, not on 3.0.0). It is only cosmetic; **Skip Saria's bridge
+  farewell** skips the movie.
 - Dampé's digging prize and Bombchu Bowling prizes show the original prize but give the seed's item.
 - **Saves started with older builds:** Save and Continue after an age-unusable pickup before using other
   items; changing areas does not clear the old item-bar jam. New games initialize an empty nut slot (0/20);

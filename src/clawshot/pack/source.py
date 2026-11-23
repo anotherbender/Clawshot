@@ -301,7 +301,7 @@ def working_files(source: "NupRomfs | NxRomfs | StackedRomfs | FolderRomfs", spe
     from fnmatch import fnmatchcase
 
     from clawshot.generate import tokens as token_policy
-    from clawshot.patch import floor_keys, items, jail_keys, shops, tokens
+    from clawshot.patch import floor_keys, getitem, items, jail_keys, shops, tokens
 
     actors = set(items.load().actors.values())
     slots = shops.load()
@@ -314,6 +314,8 @@ def working_files(source: "NupRomfs | NxRomfs | StackedRomfs | FolderRomfs", spe
     # Scripted floor/jail keys retain native lifecycle packs and source-bound flow contracts.
     wanted.update(floor_keys.native_inputs())
     wanted.update(jail_keys.native_inputs())
+    # Every seed's ocarina get model reads the ocarina packs, its donor and the animation files it names.
+    wanted.update(getitem.native_inputs())
     wanted.update(path for path in source.files if any(fnmatchcase(path, pattern) for pattern in spec["patterns"]))
     return wanted
 

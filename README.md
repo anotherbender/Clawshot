@@ -233,8 +233,11 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
   receive it from her; that native hand-over clears the fortress, not merely finding the card.
   Older Gift seeds could move it without clearing the guards; existing seeds and saves are not repaired.
   This follows the [static game-data trace](plans/rounds/r13-gerudo-card.md), not a played D39 acceptance test.
-- Chest ocarinas show no model despite working; songs can show an ocarina stand-in rather than a
-  normal item model. Only some songs have been individually played from chests.
+- Songs can show an ocarina stand-in rather than a normal item model. Only some songs have been
+  individually played from chests. (Chest ocarinas now show their model.)
+- In seeds that put an ocarina in a chest, Saria's own ocarina can look doubled or merged in her farewell at
+  the Lost Woods bridge until she plays it (seen on Longshot v3.1.1, not on 3.0.0). Cosmetic;
+  `skip_saria_farewell` skips the movie.
 - Previously generated seeds can lose boss keys, maps and compasses placed in small chests,
   despite showing their pickup text. Repaired map/compass saves and menus, boss-key credit,
   pickup indicator and normal boss-door opening passed in-game. Rebuilding cannot re-award opened chests.

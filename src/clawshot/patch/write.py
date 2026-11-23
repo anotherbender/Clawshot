@@ -145,16 +145,23 @@ def _absent(romfs: Path, table: rstb.ResourceSizeTable, path: str, what: str) ->
 
 
 def _entry_for(path: str, data: bytes) -> int:
-    """The measured size entry of a resource new to the game (an actor parameter counts its own components)."""
-    components = None
+    """The measured size entry of a resource new to the game (an actor parameter counts its own components, an
+    animation parameter its own AnimationResources entries)."""
+    components = resources = None
     if path.endswith(rstb.ACTOR_PARAM):
         node = byml.read(data)
         own = node.get("Components", {}) if isinstance(node, dict) else None
         if not isinstance(own, dict):
             raise PatchError(f"{path}: an actor parameter file without a Components map")
         components = len(own)
+    elif path.endswith(rstb.ANIMATION_PARAM):
+        node = byml.read(data)
+        listed = node.get("AnimationResources", []) if isinstance(node, dict) else None
+        if not isinstance(listed, list):
+            raise PatchError(f"{path}: an animation parameter file without an AnimationResources list")
+        resources = len(listed)
     try:
-        return rstb.required_size(path, len(data), components)
+        return rstb.required_size(path, len(data), components, resources=resources)
     except RstbError as error:
         raise PatchError(f"{path}: {error}") from error
 

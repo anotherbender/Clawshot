@@ -4,14 +4,11 @@ import copy
 
 import pytest
 
-from clawshot.census.hints import read_flow
-from clawshot.formats import byml, evfl, rstb, sarc, zsdic
+from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.patch import getitem
-from clawshot.patch.gamedata import GAME_DATA_LIST
 from clawshot.patch.plan import Plan
 from clawshot.patch.shops import actor_path, member_path, resolve_member
 from clawshot.patch.write import write
-from clawshot.save import murmur3_32
 
 
 @pytest.mark.dump
@@ -69,52 +66,3 @@ def test_native_song_models_keep_every_grant_identity_and_size_all_changed_membe
             continue
         expected_table.set(info.path, max(original_table.get(info.path), rstb.required_size(info.path, info.new_size)))
     assert table == expected_table
-
-
-@pytest.mark.dump
-def test_ocarina_chest_props_preserve_native_equipment_and_all_grants(romfs, tmp_path):
-    dictionaries = zsdic.Dictionaries.from_romfs(romfs)
-
-    def raw(path, root=romfs):
-        return dictionaries.decompress(path, (root / path).read_bytes())
-
-    gamedata = byml.read(raw(GAME_DATA_LIST))["Data"]
-    key = murmur3_32(getitem.MESSAGE_TARGET.encode())
-    assert any(int(row["Hash"]) == key for row in gamedata["String64"]), (getitem.MESSAGE_TARGET, key)
-    transforms = getitem.changes(romfs, getitem.OCARINAS)
-    # No modified instrument, prop, inventory table or grant helper is shipped.
-    assert all(path.startswith("Event/EventFlow/Dm_SY_Treasurebox") for path in transforms)
-    out = tmp_path / "ocarina-props"
-    written = write(Plan([], [], []), romfs, out, extra_changes=(transforms,))
-    table = rstb.read(raw(rstb.TABLE_PATH, out / "romfs"))
-    for path in transforms:
-        before = evfl.read(raw(path)).flowchart
-        after = evfl.read(raw(path, out / "romfs")).flowchart
-        old_events = copy.deepcopy(after.events[: len(before.events)])
-        for old, changed in zip(before.events, old_events, strict=True):
-            if old != changed:
-                assert isinstance(old, (evfl.ActionEvent, evfl.SubFlowEvent))
-                assert changed.next >= len(before.events)
-                changed.next = old.next
-            assert changed == old
-        for old, changed in zip(before.actors, after.actors, strict=False):
-            if old.name == "GameDataActor":
-                changed.actions = old.actions
-                changed.queries = old.queries
-            assert old == changed
-        assert after.entry_points == before.entry_points
-        for prop in after.actors[len(before.actors) :]:
-            assert prop.params == next(
-                a.params for a in read_flow(romfs, "Dm_MelodyGet_Time").actors if a.name == "Dm_" + getitem.TIME
-            )
-            pack = sarc.read(raw(getitem.pack_path(prop.name)))
-            components = resolve_member(pack, actor_path(prop.name))["Components"]
-            assert "AccessoryRef" not in components
-            assert "PhysicsRef" in components
-            model = resolve_member(pack, components["ModelInfoRef"])
-            assert model["FmdbName"] == prop.name.removeprefix("Dm_")
-            assert (romfs / f"Model/{model['ModelProjectName']}.{model['FmdbName']}.bfres.zs").is_file()
-        for row in written:
-            if row.path == path:
-                assert table.get(path) >= rstb.required_size(path, row.new_size)
-                print(path, row.size, "->", row.new_size, "allocation", table.get(path))

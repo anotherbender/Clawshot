@@ -10,7 +10,7 @@ from clawshot import patch as patch_api
 from clawshot.census.gifts import FLOW_VERSIONS
 from clawshot.formats import byml, evfl, msbt, rstb, sarc, zsdic
 from clawshot.generate import Settings
-from clawshot.patch import key_text, keys, ocarina, scene_handoff, text
+from clawshot.patch import getitem, key_text, keys, ocarina, scene_handoff, text
 from clawshot.patch.key_targets import DungeonGrant
 from clawshot.patch.key_text import labels
 from clawshot.patch.plan import ChestChange, Plan
@@ -595,6 +595,8 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
     monkeypatch.setattr(patch_api.item_actors, "load", lambda: patch_api.item_actors.loads(""))
     monkeypatch.setattr(patch_api, "make_plan", lambda *args, overrides=None: plan)
     monkeypatch.setattr(text, "sheik_hint_changes", lambda *args: {})
+    # The ocarina get model (ActorInfo rows, ocarina packs) is presentation only; test_getitem covers it.
+    monkeypatch.setattr(getitem, "ocarina_changes", lambda romfs: {})
     # The real receipt compiler sees the same resource set this invented world's
     # writer applies below; unrelated native quest scenes are not part of it.
     compile_receipts = ocarina.changes
