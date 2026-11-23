@@ -1,0 +1,170 @@
+# Song get effects: what a song shows when found in a chest, at a gift or on the floor (plans/song-get-effects.md,
+# "Final visuals"). Read by clawshot.patch.songs.
+#
+# Non-warp songs show the Fairy Ocarina with their own lesson effect; warp songs show the Ocarina of Time with the
+# player's sword-charge effect split into sparks, aura and light (static: Clawshot_ChargeSpark, _ChargeAura,
+# _ChargeLight), 4 sparks and 4 aura copies on a ring around the ocarina's vertical axis (0, 90, 180, 270 degrees)
+# and one light in the centre, spraying up (rotation_x is in radians). Colours are R, G, B multipliers on the
+# effect's own colours. "floor" is the floor pickup (ELink call Wait), "get_pose" Link's get pose (GetDemo).
+source = "BBender, confirmed in game 2026-11-23, runs SONGS and SONGS3 (plans/song-get-effects.md, decisions E4-E7; values as built in the gallery, warp_sparks.json), get-pose light at 0.3 after run SONGQA1 (E8)"
+
+# Condition-table offsets of the warp children in .110 (plans/song-get-effects.md, "The effect table"): floor is a
+# constant true (from Obj_Rupee_Red's Wait container), get_pose tests UICaptureScene (from Item_FairyBless_MP).
+[conditions]
+floor = 0xF20
+get_pose = 0x4FC0
+
+# Non-warp songs (E5, E6): the song's own effect at scale 0.3 on Wait and GetDemo; GetDemo also on bone Root at
+# PositionY 0 (upright and centred in the get pose).
+[songs.Item_Melody_ZeldaLullaby]
+kind = "non_warp"
+effect = "Ply_Ocarina_Correct_ZeldaLullaby_00"
+scale = 0.3
+
+[songs.Item_Melody_EponaSong]
+kind = "non_warp"
+effect = "Ply_Ocarina_Correct_EponaSong_00"
+scale = 0.3
+
+[songs.Item_Melody_SariaSong]
+kind = "non_warp"
+effect = "Ply_Ocarina_Correct_SariaSong_00"
+scale = 0.3
+
+[songs.Item_Melody_SunSong]
+kind = "non_warp"
+effect = "Ply_Ocarina_Correct_SunSong_00"
+scale = 0.3
+
+[songs.Item_Melody_TimeSong]
+kind = "non_warp"
+effect = "Ply_Ocarina_Correct_TimeSong_00"
+scale = 0.3
+
+[songs.Item_Melody_StormSong]
+kind = "non_warp"
+effect = "Ply_Ocarina_Correct_StormSong_00"
+scale = 0.3
+
+# Warp songs (E4, E7, E8). "light" is the light the effect casts on the ocarina, the floor and Link: the brightness
+# knob. The floor light of Minuet, Bolero, Serenade and Nocturne is the aura colour times 0.3 (E7); every get-pose
+# light is 0.3 of what run SONGS3 showed (E8: the aura colour, Prelude its own light).
+[songs.Item_Melody_ForestMinuet]
+kind = "warp"
+ring_radius = 0.12
+rotation_x = -1.5708
+life_scale = 0.5
+
+[songs.Item_Melody_ForestMinuet.floor]
+scale = 0.6
+position_y = -0.15
+sparks = [0.1, 1.5, 0.1]
+aura = [0.05, 0.75, 0.05]
+light = [0.015, 0.225, 0.015]
+
+[songs.Item_Melody_ForestMinuet.get_pose]
+scale = 1.0
+position_y = -0.3
+sparks = [0.08, 1.2, 0.08]
+aura = [0.065, 0.975, 0.065]
+light = [0.0195, 0.2925, 0.0195]
+
+[songs.Item_Melody_FireBolero]
+kind = "warp"
+ring_radius = 0.12
+rotation_x = -1.5708
+life_scale = 0.5
+
+[songs.Item_Melody_FireBolero.floor]
+scale = 0.6
+position_y = -0.15
+sparks = [12.0, 0.03, 0.0]
+aura = [12.0, 0.03, 0.0]
+light = [3.6, 0.009, 0.0]
+
+[songs.Item_Melody_FireBolero.get_pose]
+scale = 1.0
+position_y = -0.3
+sparks = [7.0, 0.02, 0.0]
+aura = [7.0, 0.02, 0.0]
+light = [2.1, 0.006, 0.0]
+
+[songs.Item_Melody_WaterSerenade]
+kind = "warp"
+ring_radius = 0.12
+rotation_x = -1.5708
+life_scale = 0.5
+
+[songs.Item_Melody_WaterSerenade.floor]
+scale = 0.6
+position_y = -0.15
+sparks = [0.025, 0.1, 2.5]
+aura = [0.015, 0.06, 1.5]
+light = [0.0045, 0.018, 0.45]
+
+[songs.Item_Melody_WaterSerenade.get_pose]
+scale = 1.0
+position_y = -0.3
+sparks = [0.025, 0.1, 2.5]
+aura = [0.015, 0.06, 1.5]
+light = [0.0045, 0.018, 0.45]
+
+[songs.Item_Melody_SpiritRequiem]
+kind = "warp"
+ring_radius = 0.12
+rotation_x = -1.5708
+life_scale = 0.5
+
+[songs.Item_Melody_SpiritRequiem.floor]
+scale = 0.6
+position_y = -0.15
+sparks = [5.0, 0.08, 0.0]
+aura = [3.0, 0.048, 0.0]
+light = [3.0, 0.048, 0.0]
+
+[songs.Item_Melody_SpiritRequiem.get_pose]
+scale = 1.0
+position_y = -0.3
+sparks = [2.8, 0.045, 0.0]
+aura = [1.68, 0.027, 0.0]
+light = [0.504, 0.0081, 0.0]
+
+[songs.Item_Melody_ShadowNocturne]
+kind = "warp"
+ring_radius = 0.12
+rotation_x = -1.5708
+life_scale = 0.5
+
+[songs.Item_Melody_ShadowNocturne.floor]
+scale = 0.6
+position_y = -0.15
+sparks = [0.8, 0.0, 2.0]
+aura = [12.0, 0.0, 0.6]
+light = [3.6, 0.0, 0.18]
+
+[songs.Item_Melody_ShadowNocturne.get_pose]
+scale = 1.0
+position_y = -0.3
+sparks = [0.8, 0.0, 2.0]
+aura = [12.0, 0.0, 0.6]
+light = [3.6, 0.0, 0.18]
+
+[songs.Item_Melody_LightPrelude]
+kind = "warp"
+ring_radius = 0.12
+rotation_x = -1.5708
+life_scale = 0.5
+
+[songs.Item_Melody_LightPrelude.floor]
+scale = 0.6
+position_y = -0.15
+sparks = [3.5, 0.4, 0.15]
+aura = [15.0, 0.0875, 0.04]
+light = [0.6, 0.5, 0.35]
+
+[songs.Item_Melody_LightPrelude.get_pose]
+scale = 1.0
+position_y = -0.3
+sparks = [3.5, 0.4, 0.15]
+aura = [15.0, 0.0875, 0.04]
+light = [0.18, 0.15, 0.105]

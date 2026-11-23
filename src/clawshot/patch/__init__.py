@@ -257,7 +257,7 @@ def make_seed(
     changes += (mido_schedule.changes(kept=kept_mido),)
     fast_files += tuple(mido_schedule.build(romfs, kept=kept_mido))
     plan = make_plan(out, links, table, chest_events.load(), overrides=custom.actors)
-    from clawshot.patch import getitem, keys, ocarina, progressive, progressive_bonus, scene_handoff
+    from clawshot.patch import getitem, keys, ocarina, progressive, progressive_bonus, scene_handoff, songs
 
     handoff = scene_handoff.build(romfs, skip_saria_farewell=settings.skip_saria_farewell, prior_changes=changes)
     changes += (handoff.changes,)
@@ -275,6 +275,15 @@ def make_seed(
     # changes Saria's native farewell cosmetically. Last on ActorInfo and the ocarina packs, after every row edit.
     if getitem.chest_ocarinas(out.placements, chests, table):
         changes += (getitem.ocarina_changes(romfs),)
+    # Only seeds with a song away from its vanilla place (as the ocarina get model, BBender 2026-11-23): songs show
+    # an ocarina with their own effect, and the floor pickups are written but placed nowhere (song-get-effects S3).
+    # Last on ActorInfo and the song packs.
+    if songs.moved_songs(out.placements, out.world, table):
+        delivery = songs.build(romfs)
+        changes += (delivery.changes,)
+        if overlap := sorted(new_files.keys() & delivery.new_files.keys()):
+            raise PatchError(f"another step and the song pickups both create {overlap}")
+        new_files.update(delivery.new_files)
     return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files, token_rows)
 
 
