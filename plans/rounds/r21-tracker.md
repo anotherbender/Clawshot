@@ -119,20 +119,25 @@ Proposal posted 16:39; Claude approved it at 16:40 and moved ownership of `track
   `skippable: true` on the checks a skip is offered for.
 - `POST tracker-mark` takes `kind: "skip"`; `tracker-clear-marks` clears both tables; OBS strips both.
 - The UI side is built and tested against that contract with synthetic snapshots
-  (`test_a_check_the_save_reads_can_be_skipped_when_the_backend_offers_it`). Backend: prepared and tested on PR
-  #39's head `dc71f13` in a scratch worktree (`E:/OOTRemake/work/r21-tracker/skip-scratch`, patch
-  `skip-backend.patch`): `MarkStore` tables `marks`/`skips` (`table=` keyword, `skips` written only when
-  non-empty), `state.skip_fields` (`skippable` on a check read as not collected and not markable, `skipped` from
-  the table), area `skipped` counts, `SeedLogic.annotate(..., skipped)` keeps skipped checks out of `in_logic`,
-  `TrackerSession.skip`, `tracker-mark` `kind: "skip"`, OBS strips `skipped`. Tracker tests there: 275 passed,
-  1 skipped. Two PR #39 tests change as our own edits: the `MemoryMarks` double gains `table=`, and the
-  provisional/accepted comparison now differs in the click field only (`markable` vs `skippable`). Lands on this
-  branch after MAIN MOVED for #39.
+  (`test_a_check_the_save_reads_can_be_skipped_when_the_backend_offers_it`). Backend landed after MAIN MOVED
+  `e8dc77d` (#39 merged) in `61785a2`: `MarkStore` tables `marks`/`skips` (`table=` keyword, `skips` written only
+  when non-empty, so a file without skips keeps its bytes), `state.skip_fields` (`skippable` on a check read as
+  not collected and not markable, `skipped` from the table), area `skipped` counts, `SeedLogic.annotate(...,
+  skipped)` keeps skipped checks out of `in_logic`, `TrackerSession.skip`, `tracker-mark` `kind: "skip"`, OBS
+  strips `skipped`. Two PR #39 tests change as our own edits: the `MemoryMarks` double gains `table=`, and the
+  provisional/accepted comparison now differs in the click field only (`markable` vs `skippable`). PR #39's new UI
+  test clicked the removed Mark done button: ported to the row toggle (`b2f078a`); tracker.js drops the pre-#39
+  `markable` fallback (in the rebased `1a5cc8a`).
+- In the browser (`shots.py after`, synthetic fixture, in-process server): clicking an open, save-read check
+  ("Bottom of the Well Center Skulltula Chest") strikes it through, the area head goes 9/23 -> 10/23 done, the
+  side panel says "Skipped by you", `tracker-marks.json` gains a `skips` table under the seed and save folder, the
+  skip survives a page reload, and a second click undoes it (`shots/after/mid-1280-checks-skipped.png`). No page
+  errors, no non-local requests.
 - Longshot 3.1.x `save-work` (Claude's request, after #39; evidence `E:/OOTRemake/work/longshot-311/REPORT.md`,
-  "Saves"): `saves._walk` skips a `save-work` folder below the chosen folder, so `list_slots`/`choose_slot` see
-  only the real `slot_NN` folders. Prepared in the same scratch worktree/patch, a separate commit when it lands.
-  Test `test_longshot_working_copy_is_never_a_slot_and_the_3_0_layout_reads_the_same` (synthetic 3.0.0 and 3.1.1
-  user folders give the same slots; fails without the fix). On the read-only copy `savetest/userls311-save-copy`:
+  "Saves"), commit `d3b939b`: `saves._walk` skips a `save-work` folder below the chosen folder, so
+  `list_slots`/`choose_slot` see only the real `slot_NN` folders. Test
+  `test_longshot_working_copy_is_never_a_slot_and_the_3_0_layout_reads_the_same` (synthetic 3.0.0 and 3.1.1 user
+  folders give the same slots; fails without the fix). On the read-only copy `savetest/userls311-save-copy`:
   6 slots (was 12), newest `save/.../slot_01`, `slot_00`..`slot_05` all resolve by name. Pointing the tracker
   at `save-work` itself still reads it (an explicit choice); only discovery from above skips it.
 
