@@ -23,8 +23,10 @@ launcher references `hookshot.exe` (grep). Times are estimates, not measured. En
 | 1 | P1 (21217000) | Trials count 1 end to end; Very strong hints, 10 stones on the route; zero-stone bridge on approach | 1A, 1B, 1C | 45-70 min | staged, dry runs pass, boot check owed (Claude) |
 | - | Darunia tracker | Tracker reads `Dm_Goron_0030` from real saves | none | 0 | **checked by agent** (below) |
 | 2 | C1 control (21217000, six trials) | Native six beams and line; only if P1 is unclear | one | 8-10 min | staged |
-| 3 | P2 (21217026) | Count 2: a non-final core keeps the tower shut, the last opens it | 2A-2D | 55-85 min | staged |
-| 4 | P3 (21217020), P4 (21217041), P5 (21217007) | Counts 3, 4, 5: beams and line at entry, first core keeps the tower shut; P3 can finish | 3A-3D, 4A-4C, 5A-5C | 40-60 min each (P3 full +20-30) | staged; question 1 |
+| 3 | S2 (castle save + one edit; mod of seed 21217026) | Count 2: a non-final core keeps the tower shut, the last opens it | S2-a, S2-b | 25-35 min | staged (replaces New Game P2) |
+| 4 | S3, S4, S5 (same save; mods of seeds 21217020, 21217041, 21217007) | Counts 3, 4, 5: beams and line at entry, first core keeps the tower shut | one each | 10-15 min each | staged (replace New Game P3-P5) |
+| - | S2 control (same edited save, seed 21217026 built with six trials) | Same beams from the save, native line | one | 5-8 min | staged, optional |
+| - | P2-P5 New Game route | As S2-S5 plus each count's New Game writer | `ingame/new-game-route/` | 3-5 h in all | kept as alternative |
 | 5 | P6 (21217201) | Light Arrows scene with only Shadow and Spirit awakened; vanilla bridge after it; count 5 at entry | 6A-6G | 3-4.5 h | staged, optional; question 2 |
 
 All packets: Forest open, Door of Time open, free time travel, fast start `intro saria kaepora`, Chest shuffle,
@@ -32,7 +34,9 @@ All packets: Forest open, Door of Time open, free time travel, fast start `intro
 `spoiler.json` (`settings_string`); build script `build_seeds.sh` (P1-P5, C1) and the P6 command in this file's
 receipts below.
 
-## Why every count needs its own New Game
+## Why every count needs its own New Game (without a save edit)
+
+Superseded for counts 2-5 by the save route below; this explains the New Game route that P1 and the alternatives use.
 
 `trials_count` writes only new-game initial values (`patch/trials.py` `initial_values`: the skipped trials'
 `InsideGanonCastle_Dungeon_BarrierRemove_<trial>` Bools and `InsideGanonCastle_Dungeon_Barrier_Count`). A save
@@ -139,13 +143,49 @@ writer), Darunia (no game behaviour) and the Light Arrows scene (logic-only chan
   partial trials, Very strong and the Light Arrows scene still say not played; zero trials, token bridge, start,
   hints, cows and Fortress say what was played).
 
+## Save route for counts 2-5 (Claude's request, 2026-11-22, from Kareem's question)
+
+Kareem asked whether a trials save can replace the New Game route. `scan_castle_saves.py` read every non-seed backup
+(including `2026-11-20_real-longshot-profile-copy`) for adult saves with Light Arrows, count 6, no trial removed
+and all-clear false (`scan-castle.jsonl`). The real-profile copy is past the trials in all six slots (count 0,
+all-clear true). Exactly one save qualifies: `2026-11-17_213402-r17-chest-hunt-main-save-1/<uid>/slot_05`, a
+game-written autosave of 2026-11-16 12:42, caption **InsideGanonCastle**, Light Arrows scene played, the first-view
+scene `Dm_InsideGanonCastle_0003` **not** played, 0090 false, Ganon's boss key not held. Its inventory (main's
+tracker reader) covers Forest and Shadow and every trial entry: Fairy Bow, Light and Fire Arrows, Din's Fire,
+Longshot, Hover Boots, Megaton Hammer, Lens, Mirror Shield, Goron Tunic, 3 Bombchus, 2 bottles, double magic,
+12 hearts; Silver (not Golden) Gauntlets.
+
+**The edit** (`make_save_profiles.py`, proof `save-edit-proof.json`): per profile, a copy of that slot with
+`InsideGanonCastle_Dungeon_Barrier_Count = N` and `InsideGanonCastle_Dungeon_BarrierRemove_<trial> = true` for each
+trial the packet's seed skips. The values are taken from `patch/trials.initial_values(seed, N)` and asserted equal
+to the expected set; in-place u32 changes only, same file length; re-parsed diffs equal the intended entries
+exactly (count 2: 5 entries/5 bytes; 3: 4/4; 4: 3/3; 5: 2/2); Bool64 keys unchanged; source SHA-256 `5b95d18a...`
+unchanged after. Both S2 arms carry the identical edited file (SHA-256 `0f61f64e...`). Profiles are prepared once;
+the S launchers never recopy and stop if the prepared save is missing. Mods: the existing `r21-trials2`..`5`
+(their trial text matches the edits' subsets) and a new `r21-trials2-control` (seed 21217026, P2 settings, six
+trials; verified count 6, no removals, native line).
+
+| Route | Counts 2-5 | Kareem's time |
+|---|---|---|
+| New Game (P2-P5) | four New Games, 25-40 min each to adult, then castle | 3-5 h |
+| Save (S2-S5) | Continue inside the castle | S2 25-35 min, S3-S5 10-15 min each: 55-80 min |
+
+**What the edit route cannot prove:** (1) the New Game writer: that a New Game on the build starts with those
+values. P1 proves it end to end at count 1; the other counts use the same writer, and each staged build's
+defaults are checked statically (`verify-packets.json`). (2) The early castle entry of a New Game seed (count
+bridge before the Light Arrows story); the save has the story and the vanilla bridge done. P1 covers it once.
+(3) The control cannot separate build from save for castle behaviour: with the same edit both arms hold the same
+state, so they differ only in the first-view line. What it does prove: the game's own castle reading a partial
+state as the writer sets it: which beams stay, the counter starting at N (a non-final core keeps the tower shut),
+the last-core scene, pots, elevator and persistence, plus the build's line.
+
+**Proposal (cs21g):** P1 stays end to end as the New Game proof; S2 replaces P2 (both trials); S3-S5 replace P3-P5
+at entry plus one trial. The New Game route stays in `ingame/new-game-route/`.
+
 ## Questions
 
-1. **Trials counts 3, 4 and 5: each needs its own New Game and the 25-40 minute route to adult before 10-15
-   minutes of castle checks, and each adds only a different starting value over P1 and P2. Play them (P3-P5,
-   about 2-3 hours), skip them, or accept one documented save edit of P1's adult save (setting the count and
-   pre-removed trials to each count's new-game values, the same edit in both arms)?** Proposed by cs21g: skip
-   unless P2 fails; the save edit forges exactly what the tested writer sets, so it adds little.
+1. ~~Counts 3-5: New Game, skip, or a documented save edit?~~ Superseded by the save route above (Claude's request):
+   S2-S5 from Kareem's own castle save with one documented edit; P1 keeps the New Game proof.
 2. **The Light Arrows check (P6) costs 3-4.5 hours of Shadow and Spirit play. Play it, or leave the logic on its
    static evidence and have Kareem report if his own seed ever gives him Shadow and Spirit before the other
    three?** Proposed by cs21g: the watch item; P6 stays staged.
@@ -179,9 +219,12 @@ rules, research, or text layout, not a new round 20 behaviour unless noted):
 `scan-all.jsonl`,
 `darunia_tracker.py`, `darunia-tracker-result.json`, `darunia_ui.py`, `darunia/ui-before.png`,
 `darunia/ui-after.png`, `darunia/ui-proof.json`, `readout.py` (post-play save read-out), `ingame/START HERE.md`,
-`ingame/CHECKLIST.md`, 25 launchers in `ingame/`. Seeds were built at `CLAWSHOT_WORKERS=1` with no game running,
-one at a time; no gate, sweep or full suite (no product behaviour changed).
+`ingame/CHECKLIST.md`, 31 launchers (17 in `ingame/`, the 14 New Game P2-P5 alternatives in
+`ingame/new-game-route/`), `scan_castle_saves.py`, `scan-castle.jsonl`, `make_save_profiles.py`,
+`save-edit-proof.json`.
+Seeds were built at `CLAWSHOT_WORKERS=1` with no game running, one at a time; no gate, sweep or full suite (no
+product behaviour changed).
 
 ## Played
 
-Nothing in this track was played in game. Boot checks of the seven mods are Claude's.
+Nothing in this track was played in game. Boot checks of the eight mods are Claude's.
