@@ -136,7 +136,7 @@ track = [
 class = "swap"
 gate = "the cutscene plays once"
 track = [
-  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event70 on every walk of cut EntryPoint0; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event70 on every walk of cut EntryPoint0; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."Hideout Gerudo Membership Card"]
@@ -211,14 +211,14 @@ purchase = true
 class = "swap"
 gate = "Npc_Hylia_001_IsGetHeartPiece"
 track = [
-  { bool = "Npc_Hylia_001_IsGetHeartPiece", source = "Npc_Hylia_001_Adult/Event11 sets it on every path through grant Npc_Hylia_001_Adult/Event4 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { bool = "Npc_Hylia_001_IsGetHeartPiece", source = "Npc_Hylia_001_Adult/Event11 sets it on every path through grant Npc_Hylia_001_Adult/Event4 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."Kak Shooting Gallery Reward"]
 class = "swap"
 gate = "MiniGame_HitTarget_Kakariko_Get_Quiver"
 track = [
-  { bool = "MiniGame_HitTarget_Kakariko_Get_Quiver", source = "MiniGame_HitTarget/Event185 sets it on every path through grant MiniGame_HitTarget/Event242, MiniGame_HitTarget/Event381 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { bool = "MiniGame_HitTarget_Kakariko_Get_Quiver", source = "MiniGame_HitTarget/Event185 sets it on every path through grant MiniGame_HitTarget/Event242, MiniGame_HitTarget/Event381 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."King Dodongo"]
@@ -256,7 +256,7 @@ reason = "a retry step gives the vanilla item again whenever the player no longe
 class = "swap"
 gate = "IsClear_Minigame_FindOutCucco"
 track = [
-  { bool = "IsClear_Minigame_FindOutCucco", source = "Minigame_FindOutCucco/Event89 sets it on every path through grant Minigame_FindOutCucco/Event23 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { bool = "IsClear_Minigame_FindOutCucco", source = "Minigame_FindOutCucco/Event89 sets it on every path through grant Minigame_FindOutCucco/Event23 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."LW Gift from Saria"]
@@ -366,7 +366,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event71"]
 track = [
-  { played = "Dm_MelodyGet_Shine", source = "EventSetting row Dm_MelodyGet_Shine; grant Dm_MelodyGet_Shine/Event53 on every walk of cut C14_Learn_melody; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Shine", source = "EventSetting row Dm_MelodyGet_Shine; grant Dm_MelodyGet_Shine/Event53 on every walk of cut C14_Learn_melody; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."Sheik in Crater"]
@@ -415,7 +415,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event60"]
 track = [
-  { played = "Dm_MelodyGet_Epona", source = "EventSetting row Dm_MelodyGet_Epona; grant Dm_MelodyGet_Epona/Event11 on every walk of cut C04; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Epona", source = "EventSetting row Dm_MelodyGet_Epona; grant Dm_MelodyGet_Epona/Event11 on every walk of cut C04; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."Song from Ocarina of Time"]
@@ -423,7 +423,7 @@ class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event63"]
 track = [
-  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event4 on every walk of cut C10; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event4 on every walk of cut C10; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."Song from Royal Familys Tomb"]
@@ -518,7 +518,7 @@ track = [
 class = "swap"
 gate = "MiniGame_FrogTenors_ZeldaLullaby; first-only TeachNewMusic path; variable native rupees"
 track = [
-  { bool = "MiniGame_FrogTenors_ZeldaLullaby", source = "MiniGame_FrogTenors/Event172 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { bool = "MiniGame_FrogTenors_ZeldaLullaby", source = "MiniGame_FrogTenors/Event172 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."ZR Frogs Eponas Song"]
@@ -532,14 +532,14 @@ track = [
 class = "swap"
 gate = "MiniGame_FrogTenors_SariaSong; first-only TeachNewMusic path; variable native rupees"
 track = [
-  { bool = "MiniGame_FrogTenors_SariaSong", source = "MiniGame_FrogTenors/Event221 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { bool = "MiniGame_FrogTenors_SariaSong", source = "MiniGame_FrogTenors/Event221 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."ZR Frogs Suns Song"]
 class = "swap"
 gate = "MiniGame_FrogTenors_SunSong; first-only TeachNewMusic path; variable native rupees"
 track = [
-  { bool = "MiniGame_FrogTenors_SunSong", source = "MiniGame_FrogTenors/Event222 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = false },
+  { bool = "MiniGame_FrogTenors_SunSong", source = "MiniGame_FrogTenors/Event222 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
 
 [check."ZR Frogs Song of Time"]

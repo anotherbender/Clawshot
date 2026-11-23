@@ -270,7 +270,22 @@ FAILED_AUDIT = (  # spec tracker-auto-checks "Stays manual": failed the D2 audit
 )
 
 
-def test_real_track_entries_are_provisional_cite_the_audit_and_sit_on_shuffled_world_checks():
+# Entries accepted from a recorded maintainer run (spec D2, 7.2): plans/tracker-auto-checks-play.md "Results".
+PLAYED = {
+    "HF Ocarina of Time Item",
+    "Kak Man on Roof",
+    "Kak Shooting Gallery Reward",
+    "LLR Talons Chickens",
+    "Sheik at Temple",
+    "Song from Malon",
+    "Song from Ocarina of Time",
+    "ZR Frogs Sarias Song",
+    "ZR Frogs Suns Song",
+    "ZR Frogs Zeldas Lullaby",
+}
+
+
+def test_real_track_entries_are_accepted_only_where_played_cite_the_audit_and_sit_on_shuffled_world_checks():
     rules = gifts.load()
     tracked = {name: rule for name, rule in rules.items() if rule.track}
     assert len(tracked) == 51
@@ -279,7 +294,8 @@ def test_real_track_entries_are_provisional_cite_the_audit_and_sit_on_shuffled_w
         assert name in world.locations, name
         assert rule.cls != gifts.MORE, name
         for entry in rule.track:
-            assert entry.accepted is False and entry.played_by is None, name  # D2, 7.2: none played yet
+            assert entry.accepted is (name in PLAYED), name
+            assert (entry.played_by is not None) is entry.accepted, name
             assert entry.source.endswith(AUDIT_RECORD), name
     assert not set(FAILED_AUDIT) & set(tracked)
 
