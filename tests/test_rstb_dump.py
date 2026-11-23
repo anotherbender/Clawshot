@@ -31,6 +31,8 @@ def test_dump_size_table_round_trips(table_bytes):
         "RSDB/GameAnalyzedEventInfo.Product.111.rstbl.byml.zs",
         "RSDB/GameActorInfo.Product.111.rstbl.byml.zs",
         "RSDB/PouchActorInfo.Product.111.rstbl.byml.zs",
+        "Effect/*.vsetb.byml.zs",
+        "ELink2/*.belnk.zs",
     ],
 )
 def test_dump_size_formula_fits_every_file(romfs, table_bytes, pattern):
@@ -45,7 +47,7 @@ def test_dump_size_formula_fits_every_file(romfs, table_bytes, pattern):
         if entry != needed:
             misfits.append((path, size, entry, needed))
     print(f"{pattern}: {len(paths) - len(misfits)} of {len(paths)} fit")
-    assert misfits == []
+    assert misfits == [], f"first misfit (path, size, entry, formula): {misfits[0]}"
 
 
 @pytest.mark.dump
@@ -94,3 +96,24 @@ def test_dump_animation_parameter_formula_fits_every_member(romfs, table_bytes):
     print(f"AnimationParam: {len(members) - len(misfits)} of {len(members)} fit")
     assert len(members) > 500
     assert misfits == []
+
+
+@pytest.mark.dump
+def test_dump_elink_parameter_formula_fits_every_member(romfs, table_bytes):
+    """Every unique ELinkParam in every actor pack: size rounded to 32 + 5064 (section 51)."""
+    dicts, data = table_bytes
+    table = rstb.read(data)
+    members: dict[str, bytes] = {}
+    for path in sorted(romfs.glob("Pack/Actor/*.pack.zs")):
+        relative = path.relative_to(romfs).as_posix()
+        for name, content in sarc.read(dicts.decompress(relative, path.read_bytes())).items():
+            if name.endswith(rstb.ELINK_PARAM):
+                assert members.setdefault(name, content) == content, f"{name} differs between packs"
+    misfits = [
+        (name, len(content), table.get(name), rstb.required_size(name, len(content)))
+        for name, content in sorted(members.items())
+        if table.get(name) != rstb.required_size(name, len(content))
+    ]
+    print(f"ELinkParam: {len(members) - len(misfits)} of {len(members)} fit")
+    assert len(members) > 1300
+    assert misfits == [], f"first misfit (member, size, entry, formula): {misfits[0]}"

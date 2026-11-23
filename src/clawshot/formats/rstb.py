@@ -31,7 +31,16 @@ OVERHEAD: dict[str, int] = {
     ".pack": 312,  # packs (8384 of 8384 that have an entry; Pack/ZsDic.pack.zs has none)
     # Round 15: pouch components inside actor packs; a constant parsed size whatever fields they set (166 of 166).
     ".game__component__PouchContentParam.bgyml": 5216,
+    # Effect-user components inside actor packs (1309 of 1309 unique members, dump 1.1.1; section 51).
+    ".engine__component__ELinkParam.bgyml": 5064,
+    # Effect files (1431 of 1432, dump 1.1.1; section 51): ``static`` has its own formula (OWN_FORMULA).
+    ".vsetb.byml": 264,
 }
+ELINK_PARAM = ".engine__component__ELinkParam.bgyml"
+# ELink tables (``ELink2/elink2.Product.*.belnk``): both native tables fit size + 272 and size rounded to 32 + 264
+# (dump 1.1.1; section 51). The two differ for other sizes, so an entry takes the larger (BBender, 2026-11-23).
+ELINK_TABLE = ".belnk"
+ELINK_TABLE_OVERHEAD = 272
 ALIGNMENT = 32
 
 # Actor parameter files inside actor packs (Round 15): 5144 plus 48 per entry of the file's own ``Components`` map,
@@ -66,6 +75,10 @@ OWN_FORMULA: dict[str, tuple[int, int]] = {
     # R13 native new-game Sequence: 5916 raw -> 6296 allocated, rounded32 +376.
     # 107/108 native Sequence AINBs share this overhead; not a generic AINB rule.
     "Sequence/SetPouchAndStatusForGameStart.module.ainb": (32, 376),
+    # The always-loaded effect file: 52,401,096 raw -> 52,405,256, rounded + 4136, where every other effect file is
+    # rounded + 264; nothing measured on them predicts the difference (section 51). Measured on this one file, so
+    # it equals the native entry plus the rounded growth (BBender, 2026-11-23).
+    "Effect/static.Nin_Ounce_NVN2.vsetb.byml": (32, 4136),
 }
 
 
@@ -182,10 +195,12 @@ def required_size(path: str, size: int, components: int | None = None, *, resour
     if path in OWN_FORMULA:
         alignment, overhead = OWN_FORMULA[path]
         return (size + alignment - 1) // alignment * alignment + overhead
+    if path.startswith("ELink2/") and path.endswith(ELINK_TABLE):
+        return max(size + ELINK_TABLE_OVERHEAD, rounded + OVERHEAD[".bcett.byml"])
     for suffix, overhead in OVERHEAD.items():
         if path.endswith(suffix):
             return rounded + overhead
     raise RstbError(
-        f"no size formula for {path}: only {', '.join([*OVERHEAD, ACTOR_PARAM, ANIMATION_PARAM])} "
+        f"no size formula for {path}: only {', '.join([*OVERHEAD, ACTOR_PARAM, ANIMATION_PARAM, ELINK_TABLE])} "
         "are checked against the game"
     )
