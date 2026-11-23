@@ -27,6 +27,14 @@ source = "cs13b, build e0f3ccfa: Npc_Hylia_049_Adult/Event264 grants Item_Pocket
 keep_vanilla = "R13: shown Item_PocketCucco must give the native Cojiro the next shown hand-in needs"
 source = "cs13b, build e0f3ccfa: ShowItemReplaceEvent Npc_Hylia_049_Adult_ShowPocketCucco, Event234 grants Item_CojiroCucco; LW Trade Cojiro (SubEvent_GetSwordBigGoron_Step03) needs Cojiro shown"
 
+# Round 21 (cs21f, from Kareem's play on 0.2.5): the chain's end is the shuffled DMT Biggoron (an always hint), and
+# Granny's potion sale reads Odd Potion Access, so the trade events must hold in game. Flows not researched (the
+# chain is vanilla); whether Talon must be woken again after Epona is freed is not known.
+[events."Kakariko Village"."Cojiro Access"]
+rule = "is_adult and at_day and 'Wake Up Adult Talon' and Epona"
+was = "is_adult and at_day and 'Wake Up Adult Talon'"
+source = "Kareem, in game on 0.2.5, 2026-11-22 (E:/OOTRemake/work/rounds/r21/tracker-ui-notes.md): woken adult Talon complains about Ingo and stays; Anju by day says Link woke him but still has to help him, so Cojiro also needs Epona freed from Ingo (event Epona, child_lon_lon_ranch.toml). Tightening"
+
 [locations."Kak Granny Trade Odd Mushroom"]
 keep_vanilla = "R13: shown Item_OddMushroom must give the native Odd Potion the next shown hand-in needs"
 source = "cs13b, build e0f3ccfa: SubEvent_GetSwordBigGoron_Step04 shows OddMushroom to Npc_Hylia_053_Adult, Event167 grants Item_OddPowder; Fado's Step05 shows OddPowder"
