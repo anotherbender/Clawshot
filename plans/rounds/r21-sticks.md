@@ -93,6 +93,11 @@ in-logic view follows with no tracker change; a save's held sticks still count (
   `test_ranged_pickups`, `test_tracker_logic*`, `test_logic_world`, `test_world_rules`, `test_world_search`,
   `test_world_census`, `test_shop_logic`, `test_sheik_logic`, `test_progressive_logic`, `test_r18_logic_returns`,
   `test_world_token_routes`, `test_hints_world`): 508 passed, 6 skipped in 89.68 s. No game running at each stage.
+- After change 2 (`7b62729`): the same suite plus `test_child_gs_kills`, `test_world_tiers`, `test_world_clock`:
+  551 passed, 6 skipped in 114.5 s. `test_child_gs_kills.py` fails 7/7 on the `e9bb0d7` copy.
+- Rebased on main `e8dc77d` (`0a2bc9f`), focused subset (`test_pot_drops`, `test_child_gs_kills`, `test_world_remake*`,
+  `test_master_sword_logic`, `test_ranged_pickups`, `test_tracker_logic*`, `test_logic_world`, `test_world_rules`,
+  `test_world_search`, `test_world_census`, `test_shop_logic`, `test_world_token_routes`): 422 passed, 6 skipped.
 - Sweep and full gate: below.
 
 ## Change 2: child Gold Skulltulas need a kill
@@ -145,9 +150,42 @@ On `9d68e50` it puts the first child stick purchase in sphere 7-10.
 
 ## Sweep (rule 2)
 
-Paired on identical seeds (r20's ranges: Broad 20200000-20200199, Defaults and Recommended 20200000-20200049),
-canonical `make_seed` preparation, broad CS1 from `E:/OOTRemake/work/r18-fill/settings.txt`, the app's presets,
-6 workers, under the gate lock: main `e9bb0d7` (the `git archive` copy) then this head. Results pending.
+Identical seeds in every arm (r20's ranges: Broad 20200000-20200199, Defaults and Recommended 20200000-20200049,
+NoEarlySticks 20200000-20200099), canonical `make_seed` preparation, broad CS1 from
+`E:/OOTRemake/work/r18-fill/settings.txt`, the app's presets, 6 workers, under the gate lock, no game running.
+`sweep.py` counts fill attempts and keeps each failed attempt's message; rows and summaries in
+`E:/OOTRemake/work/r21-sticks/sweep-{main,head}/` (first run) and `sweep2-{main,pots,head}/` (second run).
+
+**First run (17:04-17:28):** main `e9bb0d7` against pots-only `9d68e50`, standard recipes: identical outcomes.
+
+**Second run (21:26-22:00):** main `e9bb0d7`, pots-only `9d68e50`, head `7b62729` (rebased unchanged as `0a2bc9f`:
+main's moves to `e8dc77d` touch no world, fill, shop or logic-doc file), each 400 seeds:
+
+| Recipe | Arm | Accepted | Exhausted | First-try failures | Attempts | Max |
+|---|---|---:|---:|---:|---:|---:|
+| Broad | main / pots / head | 200/200 each | 0 | 10 (5.0%) each | 210 | 2 |
+| Defaults | main / pots / head | 50/50 each | 0 | 2 (4%) each | 52 | 2 |
+| Recommended | main / pots / head | 50/50 each | 0 | 2 (4%) each | 52 | 2 |
+| NoEarlySticks | main / pots / head | 100/100 each | 0 | 13 (13%) each | 114 | 3 |
+
+Same retry seeds in every arm: Broad 20200024, 032, 043, 055, 093, 165, 170, 173, 185, 189 (four "no reachable
+location for 'Gold Skulltula Token'", six "items left unplaced" with late maps/compasses and ammo); Defaults 040,
+043; Recommended 027, 029; NoEarlySticks 009, 012, 024, 029, 035, 040, 062, 063, 070, 077, 088, 089, 097. **For
+cs21h: this change leaves main's first-try failure rate exactly as it was (Broad 10/200).**
+
+Seeds whose digest differs (counts only, both arms accepted):
+
+| Recipe | main vs pots: placements / spheres / hints | pots vs head | main vs head |
+|---|---|---|---|
+| Broad (200) | 0 / 3 / 0 | 0 / 200 / 0 | 0 / 200 / 0 |
+| Defaults (50) | 0 / 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 |
+| Recommended (50) | 0 / 0 / 0 | 0 / 0 / 0 | 0 / 0 / 0 |
+| NoEarlySticks (100) | 0 / 22 / 0 | 0 / 100 / 0 | 0 / 100 / 0 |
+
+No placement moved in any of the 400 seeds, as the fill analysis above predicts: both changes only tighten rules the
+general fill evaluates with every unplaced child weapon assumed. The pots change moves the playthrough's spheres in
+3 Broad and 22 NoEarlySticks seeds; the token change moves them in every seed that shuffles tokens (Broad,
+NoEarlySticks; Defaults and Recommended keep tokens vanilla). Hints read the same.
 
 ## Not in logic, for later (no change made)
 
