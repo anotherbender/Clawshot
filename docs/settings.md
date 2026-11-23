@@ -554,8 +554,13 @@ route and Light Arrows. The tower boss key and finale are unchanged.
 Zero trials passed on Longshot 3.0.0 (Kareem, 2026-11-21): the barrier was gone and, after the lift fix,
 the tower lift was down, rode up, returned and persisted after Save/Continue. That check used a copy of a
 zero-trials save with two documented Bool changes (age false, barrier-clear scene history true, as the fixed
-build writes for a new game), not a fresh new game. Partial counts 1–5 are **built, not played**.
-Evidence: [trials play record](../plans/rounds/r20-trials.md).
+build writes for a new game), not a fresh new game.
+Count one passed end to end on Longshot 3.0.0 (Kareem, 2026-11-23) in two parts. A new game showed one beam and
+the line naming the remaining trial. Then a copy of Kareem's castle save, edited only to the count and cleared trials
+a count-one new game writes, finished the last trial: the barrier-breaking scene played, the barrier went down, four
+pots appeared by the elevator and the lift carried him up. Count two passed for its first trial: that beam went
+down while the other beam and the tower barrier stayed. Counts 3–5 are **built, not played**.
+Evidence: [trials play record](../plans/rounds/r20-trials.md), [round 21 checks](../plans/rounds/r21-checks.md).
 
 
 ## Master Sword shuffle

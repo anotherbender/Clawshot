@@ -20,13 +20,14 @@ launcher references `hookshot.exe` (grep). Times are estimates, not measured. En
 
 | # | Packet (seed) | Covers | Parts | Time | Status |
 |---|---|---|---|---|---|
-| 1 | P1 (21217000) | Trials count 1 end to end; Very strong hints, 10 stones on the route; zero-stone bridge on approach | 1A, 1B, 1C | 45-70 min | staged, dry runs pass, boot check owed (Claude) |
+| 1 | P1 (21217000) | New Game writer at count 1 (beams, line); Very strong hints, 10 stones; zero-stone bridge | 1A, 1B, 1C | 45-70 min | **played 2026-11-23**: stones PASS, entry PASS; Forest end not finishable with P1's items |
+| 1b | S1 (castle save + one edit; mod of seed 21217000) | Count 1 end: Forest trial, barrier scene, pots, elevator, Continue | one | 15-25 min | **played 2026-11-23 PASS** (Save/Continue not reported) |
 | - | Darunia tracker | Tracker reads `Dm_Goron_0030` from real saves | none | 0 | **checked by agent** (below) |
 | 2 | C1 control (21217000, six trials) | Native six beams and line; only if P1 is unclear | one | 8-10 min | staged |
-| 3 | S2 (castle save + one edit; mod of seed 21217026) | Count 2: a non-final core keeps the tower shut, the last opens it | S2-a, S2-b | 25-35 min | staged (replaces New Game P2) |
+| 3 | S2 (castle save + one edit; mod of seed 21217026) | Count 2: a non-final core keeps the tower shut | S2-a (S2-b withdrawn) | 10-15 min | **S2-a played PASS**; S2-b needs Golden Gauntlets |
 | 4 | S3, S4, S5 (same save; mods of seeds 21217020, 21217041, 21217007) | Counts 3, 4, 5: beams and line at entry, first core keeps the tower shut | one each | 10-15 min each | staged (replace New Game P3-P5) |
 | - | S2 control (same edited save, seed 21217026 built with six trials) | Same beams from the save, native line | one | 5-8 min | staged, optional |
-| - | P2-P5 New Game route | As S2-S5 plus each count's New Game writer | `ingame/new-game-route/` | 3-5 h in all | kept as alternative |
+| - | P2-P5 New Game route | As S2-S5 plus each count's New Game writer | `ingame/new-game-route/` | 3-5 h in all | not recommended: starts miss the Forest trial's items |
 | 5 | P6 (21217201) | Light Arrows scene with only Shadow and Spirit awakened; vanilla bridge after it; count 5 at entry | 6A-6G | 3-4.5 h | staged, optional; question 2 |
 
 All packets: Forest open, Door of Time open, free time travel, fast start `intro saria kaepora`, Chest shuffle,
@@ -45,11 +46,13 @@ played saves"). Every count therefore needs a New Game and the natural route to 
 Malon/Talon/courtyard/Zelda, Impa's send-off, the open Door, the Master Sword. That route is parts A and B
 (25-40 min together) of every trials packet. A natural adult save (the control) can only show count 6.
 
-Trial choice: each packet's seed was picked (`generate/trials.py` `remaining`) so its remaining trials are the
-cheapest ones a New Game can clear with supported starting items (`starting.py` `CHOICES`): Forest (Bow, Din's
-Fire, Light Arrows), Shadow (adds Longshot, Hover Boots, Megaton Hammer), Fire (adds Goron Tunic, Golden
-Gauntlets). Water needs a bottle and Spirit Bombchus, Light the Lens; none is a supported start, so P4/P5 stop
-after Forest. Golden Gauntlets imply the Bracelet, which validation accepts only with free time travel (on).
+Trial choice: each packet's seed was picked (`generate/trials.py` `remaining`) so its remaining trials looked
+cheapest to clear with supported starting items (`starting.py` `CHOICES`). **That choice was wrong (found in play,
+2026-11-23):** it read the base `data/world/ganons_castle.toml`, not the remake overrides in
+`data/world/remake/adult_ganons_castle.toml` that main's logic applies on top (round 4, commit `522c4ad`). The
+effective rules (printed with `world.load.load_world`) need Song of Time, Hover Boots and a Hookshot for the
+Forest trial's onward door and Golden Gauntlets for the Shadow trial's end and the Fire trial's door. P1-P5's
+starts do not cover them; see "Play results and castle research" below.
 
 What each count adds: P1 alone already shows all six beam removals (five pre-set, Forest by its own core) and the
 last-core tail at count 1. P2 is the only packet showing that a non-final core keeps the tower shut, i.e. that
@@ -182,6 +185,65 @@ the last-core scene, pots, elevator and persistence, plus the build's line.
 **Proposal (cs21g):** P1 stays end to end as the New Game proof; S2 replaces P2 (both trials); S3-S5 replace P3-P5
 at entry plus one trial. The New Game route stays in `ingame/new-game-route/`.
 
+## Play results and castle research (2026-11-23)
+
+**Results** (Kareem, Longshot 3.0.0, via Claude): see "Played" below. Two failures were staging errors, not game
+or logic faults: P1-1C's Forest trial and S2-b's Shadow trial need items those packets lacked.
+
+**Trial names, beams and doors are right** (read-only dump, `castle_actors.py`, `castle_links.py`,
+`castle-actors.json`). Each trial's last room holds its `Obj_InsideGanonCastle_Core_*` and a
+`Gimmick_ArrowLight_BarrierRemove_<trial>` module that writes `InsideGanonCastle_Dungeon_BarrierRemove_<trial>`,
+and each core room's door carries `InsideGanonCastle_LookBarrierFromDoor_<trial>`:
+
+| Trial | Rooms (core) | Hall door (x, z) | Core module |
+|---|---|---|---|
+| Forest | 2, 3, (4) | (16.1, 7.8) | Room_04_Prefab_0198 |
+| Water | 5, 6, (7) | (33.0, -21.0) | Room_07_Prefab_bb4c |
+| Shadow | 8, (9) | (16.1, -49.8) | Room_09_Prefab_676e |
+| Fire | 10, (11) | (-16.1, -49.9) | Room_11_Prefab_fe03 |
+| Light | 12-14, (15) | (-33.1, -21.0) | Room_15_Prefab_98a7 |
+| Spirit | 16, 17, (18) | (-16.1, 7.8) | Room_18_Prefab_bd08 |
+
+**Golden boulders.** `LiftableParam.LiftGrade` hashes resolve (murmur3) to `None` (Obj_LiftRock_A), `Middle`
+(Obj_LiftRock_B: the silver-gauntlet rocks in Desert Colossus, Gerudo Valley, Zora's Fountain, Goron City) and
+`High` (Obj_LiftRock_C, only in `GanonCastle_Static`, the Great Fairy's golden block, and inside the castle).
+Four High rocks in the castle:
+
+| Rock (Hash) | Where | Effect |
+|---|---|---|
+| Obj_LiftRock_C_01 `7808482170470849591` | Hall, 1.8 m before the Light door | saved by `InsideGanonCastle_Dungeon_Room01_LiftRock` (Room_01_Prefab_cbd5) |
+| Obj_LiftRock_C_01 `6251811700274725607` | Hall, 1.8 m before the **Fire** door | saved by `HavePlayedEvent.Dm_InsideGanonCastle_0035` (Room_01_Prefab_99d3) |
+| Obj_LiftRock_C_01 `3853917559410573871` | Fire room 10, among its silver rupees | the "Inside Pillar" rupee |
+| Obj_LiftRock_C_05 `8144266723486145695` | Shadow room 8, beside the Golden Gauntlets chest `17657623307936361670` | Room_08_Prefab_7f41 binds it to player air wall `12553345302708464522`; beyond, floor switch `8991881348786264121` sets `InsideGanonCastle_Dungeon_Room08_HummerSwitch` and opens core-door lattice `13976063739260614866` (Room_08_Prefab_4fac) |
+
+Kareem's report (a golden boulder before the Light trial, one inside the Shadow trial, and one in the Fire trial)
+matches: the Fire trial has two (its door and its pillar).
+
+**Forest fan room (room 3):** Song of Time block `11362469908826992779` with its sign, under a silver rupee by the
+entrance; extending platform `5390936718397577672` moved by floor switch `7606689984675378176`
+(`InsideGanonCastle_Dungeon_Room03_StepSwitch` -> `ExtendingPlatform_ON`, Room_03_Prefab_fbb4) carrying grapple
+target `13035196076992852431`; grapple target `8131019826575446689` over the entry door; five silver rupees open the
+core door (`Room03_SilverRupee`, Room_03_Prefab_71a7).
+
+**Main's logic already has all of this.** `data/world/remake/adult_ganons_castle.toml` (round 4, `522c4ad`, with
+`tests/test_world_remake_adult_ganons_castle.py`) overrides the base file, and `load_world` gives: Fire door
+`can_use(Golden_Gauntlets) and (tunic)`; Shadow ending `can_use(Golden_Gauntlets) and (lens or Longshot+Hover)`;
+Forest ending `5 silver rupees and can_play(Song_of_Time) and can_use(Hover_Boots) and can_use(Hookshot)`; the Fire
+pillar rupees at `ganons_castle.toml:169,171` stand. No logic change: the tightening slot Claude offered was
+withdrawn after this was posted. Lesson: take a packet's starting items from `load_world`, never the base toml.
+
+**S1 (built).** The castle save with the count-1 edit (`make_save_profiles.py`: count 1, Fire/Water/Shadow/Spirit/
+Light pre-cleared, 6 entries/6 bytes, SHA-256 `1fc145d0...`, identical in both arms), mod `r21-trials1`, control
+`r21-trials-control` (same seed, six trials). Its gear meets the effective Forest rule: Ocarina of Time, Song of
+Time, Hover Boots, Longshot, Din's Fire, Fire and Light Arrows (main's tracker reader on that save), and Kareem
+finished this trial from the same save in S2-a. Launchers `S1 count 1 Forest to the tower.bat` and
+`S1 control six-trial build (optional).bat`; 32/32 dry runs exit 0.
+
+**Tracker note (for the tracker owners, not changed here):** `tracker_logic.toml:427` leaves silver rupees unmapped
+("no audited save field"), so the tracker's in-logic search never reaches a trial ending (here "Ganons Castle Forest
+Trial Ending" stays unreachable on the S1 save, whose gear finishes it in play). Each castle room has a saved clear Bool
+(`InsideGanonCastle_Dungeon_Room03_SilverRupee`, `Room10_`, `Room14_`, `Room16_`) worth auditing.
+
 ## Questions
 
 1. ~~Counts 3-5: New Game, skip, or a documented save edit?~~ Superseded by the save route above (Claude's request):
@@ -227,4 +289,10 @@ product behaviour changed).
 
 ## Played
 
-Nothing in this track was played in game. Boot checks of the eight mods are Claude's.
+Kareem, Longshot 3.0.0, 2026-11-23 (via Claude): P1-1A/1B all ten Very strong stone texts correct; P1-1C entry
+PASS (one Forest beam, "Trials remaining: Forest.", no pots), its Forest trial not finishable (mis-staged); S2-a
+PASS (Forest trial done, Forest beam down, Shadow beam and tower barrier stay); S2-b not finishable (Golden
+Gauntlets). S1 PASS (Kareem, 3.0.0, 2026-11-23): one Forest beam and its line, Forest trial finished, the barrier
+broke, four pots appeared inside the barrier by the elevator, the elevator worked and the tower progressed.
+Save/Continue after the barrier was not reported. With P1's entry (New Game writer) and S2-a (non-final trial keeps
+the tower shut), counts 1 and 2 are played; counts 3-5 (S3-S5) are staged, not played.
