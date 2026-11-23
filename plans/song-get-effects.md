@@ -257,12 +257,13 @@ spoiler). Floor pickups added by `tot_chests.py` (test only, not a seed feature)
 - 4.4: the two pickups in the Temple of Time: floor effect in the song's colours, A collects it, get pose with the
   get-pose effect, song learned and listed.
 
-Results *(BBender, 2026-11-23, Longshot v3.1.1, started from the app with `ocarina-qa/song-lesson-app`, the same
-seed in the app's layout)*: "everything worked as expected". Impa's lesson plays through and Zelda's Lullaby is
-learned (4.3, Lullaby only); both Temple of Time floor pickups show their floor effect, are collected with A, show the
-get pose with its effect (Minuet with the E8 light) and teach the song (4.4); the Fairy Ocarina from the Kokiri Sword
-chest plays them; no crash with the measured `static` entry (4.5). This run was not started by Claude's launcher, so
-its `mods:` lines are not on record; the SONGQA1 lines above show the same files loading.
+Results *(BBender, 2026-11-23, Longshot v3.1.1, started from the app with `ocarina-qa/song-lesson-app`, the same seed
+in the app's layout)*: "everything worked as expected". Impa's lesson plays through and Zelda's Lullaby is learned
+(4.3); the Royal Family's Tomb (Composer brothers' grave) lesson, which in this seed teaches Song of Storms (moved),
+plays through and the song is learned; both Temple of Time floor pickups show their floor effect, are collected with
+A, show the get pose with its effect (Minuet with the E8 light) and teach the song (4.4); the Fairy Ocarina from the
+Kokiri Sword chest plays them; no crash with the measured `static` entry (4.5). This run was not started by Claude's
+launcher, so its `mods:` lines are not on record; the SONGQA1 lines above show the same files loading.
 
 ## In `src/`
 
