@@ -245,6 +245,11 @@ adult weapon; the one explosive rule they touched (`HC Storms Grotto` Deku Nut D
 closed by sticks and is not in the table below. Focused tests on `b1d510d` + this track (`-n 2`, workers 1, game
 running): 252 passed, 312 skipped (dump tests without `OOT_ROMFS`); ruff format and check clean.
 
+After Kareem's 2026-11-23 results (ground Beamos widened, bean-patch shield path dropped, DC boulder and Bomb Flower
+notes): focused tests 418 passed, 312 skipped (hammer, child GS kills, pots, remake play, token routes and packets,
+Master Sword and child sword). `tests/test_master_sword_logic.py`'s fold check now compares GTG's two Beamos rules
+against their rule before with the Hammer widening applied (`HAMMER_WIDENED`); everything else in it unchanged.
+
 Pending, in one gate-lock hold, all on the frozen head (`work/r21-hammer/sweep.py`, workers 6, script outside the
 repo): 200 broad + 50 Defaults + 50 Recommended (seeds 21050000+), plus 50 broad with Master Sword shuffle on (the
 only setting where `adult_weapon` differs from `is_adult`), then the full gate (synthetic `-n 8`/workers 4, dump
