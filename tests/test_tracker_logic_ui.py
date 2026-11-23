@@ -178,17 +178,24 @@ def test_clicking_a_check_the_save_cannot_read_marks_it(tmp_path):
 
 def test_a_markable_not_collected_check_has_the_toggle_and_keeps_in_logic_styling(tmp_path):
     """tracker-auto-checks 3.2: a provisional track read of "not collected" stays open with Mark done; marked, it
-    shows as marked done like a marked unknown check."""
+    shows as marked done like a marked unknown check. Round 21: the row itself is the toggle."""
     snap = snapshot()
     lake = snap["state"]["areas"][1]["checks"]
     lake.append(check("Maybe Gift", False, (True, True, True), markable=True))
     lake.append(check("Kept Gift", False, markable=True, marked=True))
-    rendered = tab(tmp_path, snap, actions=[{"class": "tracker-mark", "index": 2, "event": "click"}])
+    rows = [entry["id"] for entry in tab(tmp_path, snap)["checks"]]
+    rendered = tab(
+        tmp_path, snap, actions=[{"class": "tracker-check", "index": rows.index("Maybe Gift"), "event": "click"}]
+    )
     found = classes(rendered)
-    assert "Mark done" in found["Maybe Gift"]["text"] and styled(rendered, "Maybe Gift") == "in"
-    assert "Unmark" in found["Kept Gift"]["text"] and styled(rendered, "Kept Gift") == "marked"
-    assert "Mark done" not in found["Far Chest"]["text"]  # not collected without markable: no toggle
+    assert not found["Maybe Gift"]["disabled"] and styled(rendered, "Maybe Gift") == "in"
+    assert not found["Kept Gift"]["disabled"] and styled(rendered, "Kept Gift") == "marked"
+    assert found["Far Chest"]["disabled"]  # not collected without markable: no toggle
     assert rendered["posts"] == [{"route": "tracker-mark", "body": {"check": "Maybe Gift", "marked": True}}]
+    unmark = tab(
+        tmp_path, snap, actions=[{"class": "tracker-check", "index": rows.index("Kept Gift"), "event": "click"}]
+    )
+    assert unmark["posts"] == [{"route": "tracker-mark", "body": {"check": "Kept Gift", "marked": False}}]
 
 
 def test_clear_marks_asks_first(tmp_path):
