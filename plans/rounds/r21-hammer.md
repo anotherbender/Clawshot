@@ -250,10 +250,34 @@ notes): focused tests 418 passed, 312 skipped (hammer, child GS kills, pots, rem
 Master Sword and child sword). `tests/test_master_sword_logic.py`'s fold check now compares GTG's two Beamos rules
 against their rule before with the Hammer widening applied (`HAMMER_WIDENED`); everything else in it unchanged.
 
-Pending, in one gate-lock hold, all on the frozen head (`work/r21-hammer/sweep.py`, workers 6, script outside the
-repo): 200 broad + 50 Defaults + 50 Recommended (seeds 21050000+), plus 50 broad with Master Sword shuffle on (the
-only setting where `adult_weapon` differs from `is_adult`), then the full gate (synthetic `-n 8`/workers 4, dump
-`-n 8`/workers 3).
+Rebased onto main `566c159` (PR #40 and trials docs; no world data) as `9a7edf3`, clean; focused tests 422 passed,
+312 skipped; ruff clean. One gate-lock hold from 13:07 (cs21e). The first sweep, on `8455f33`, was stopped at 18 of
+350 rows when main moved: PR #40 changed `patch/__init__.py`, which the sweep's `make_seed` setup runs through. So
+the sweep below ran on `9a7edf3`, the head being merged.
+
+**Sweep, `9a7edf3`** (`work/r21-hammer/sweep.py`, workers 6, `CLAWSHOT_WORKERS=1` per worker, seeds 21050000+, the
+canonical `make_seed` setup per recipe; rows in `work/r21-hammer/sweep-results.json`), 627 s:
+
+| Recipe | Seeds | Exhausted | First-try failures | Max attempts | Median s |
+|---|---|---|---|---|---|
+| Broad (r18 settings) | 200 | 0 | 14 (7.0%) | 3 | 11.5 |
+| Defaults | 50 | 0 | 0 | 1 | 4.9 |
+| Recommended | 50 | 0 | 0 | 1 | 9.1 |
+| Broad + Master Sword shuffle | 50 | 0 | 4 (8.0%) | 2 | 11.8 |
+
+Not a paired run: main's broad first-try rate was 10/200 on other seeds (cs21h, seeds 0-199; cs21d, r20 ranges).
+Whether this branch moves it is not measured; 14/200 here is on a different seed range. Every seed placed; none
+exhausted.
+
+**Full gate, `9a7edf3`, same hold:** ruff format and check clean; synthetic `-n 8`/workers 4: 4388 passed, 838
+skipped; dump `-n 8`/workers 3 (`OOT_ROMFS`, `OOT_NUP`, `OOT_DUMP` = `rounds/r19/sword-layered-dump`): 834 passed,
+1 failed: `test_event_registration.py::test_production_seed_declares_every_event_dependency_it_adds[broad]`, "broad
+no longer runs ['clawshot.patch.scrub_shields']". The recipe's seed 24 had been chosen because it put a shield on a
+scrub sale; this branch's logic moves placements, so seed 24 no longer does, and the scrub-shield writer never runs.
+No patcher fault. Full outputs of broad seeds 1-19 and 24 on this head: none puts a shield on a scrub (16 also loses
+`patch.rewards`). A placement-only search (`work/r21-hammer/shieldseed.py`, research only) found seed 22: a Deku
+Shield at HF Deku Scrub Grotto. **Re-pinned 24 -> 22** (test-only commit; Claude said a new pinned seed is fine);
+`tests/test_event_registration.py` dump tests then 5 passed, synthetic 10 passed. No other test uses the recipe.
 
 ## Every rule, by class
 
