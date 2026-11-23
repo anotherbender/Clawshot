@@ -3834,4 +3834,5 @@ takes it from her back. Isolated to the ActorInfo change (the pack changes alone
 `CalcPriority: After` (the generator does) was clean only when the Fairy Ocarina had been taken from a chest earlier
 in the same session (runs V3, E); the native farewell, where the gift is the first Fairy Ocarina, still glitched with
 it (runs D, D2: two ocarinas overlapping, then hers doubled). Shipped as a known cosmetic issue (BBender's call, D5);
-`skip_saria_farewell` avoids the movie.
+`skip_saria_farewell` avoids the movie. On Longshot 3.0.0 (Kareem, 2026-11-23, `rounds/r21-pr40.md`) the same native
+case showed one normal ocarina with this change, with main 0.2.5 and with no mod at all.

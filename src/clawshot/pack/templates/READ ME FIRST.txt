@@ -68,7 +68,8 @@ KNOWN ISSUES
   that older item-bar jam. play-note.md lists age-locked rewards.
 - Songs from chests show an ocarina. They work normally.
 - If this seed put an ocarina in a chest, Saria's own ocarina can look doubled
-  or merged in her farewell until she plays it. Only cosmetic.
+  or merged in her farewell until she plays it (seen on Longshot v3.1.1, not
+  on 3.0.0). Only cosmetic.
 - The Weird Egg, Zelda's Letter and the adult trading items are not shuffled.
   Child and adult trade items share one inventory slot, which shows an adult
   item first. As a child, wake Talon with the Cucco (and show Zelda's Letter
