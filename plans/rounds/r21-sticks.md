@@ -187,6 +187,22 @@ general fill evaluates with every unplaced child weapon assumed. The pots change
 3 Broad and 22 NoEarlySticks seeds; the token change moves them in every seed that shuffles tokens (Broad,
 NoEarlySticks; Defaults and Recommended keep tokens vanilla). Hints read the same.
 
+## Full gate
+
+FROZEN `f6077d6` (rebased on main `e8dc77d`), in the same gate-lock hold as the second sweep (21:26-22:58; no game
+running at any stage): `uv run ruff format --check` clean (550 files); `uv run ruff check` clean; synthetic
+`CLAWSHOT_WORKERS=4 uv run --with pytest-xdist pytest -n 8`: 4315 passed, 832 skipped (dump-marked, no `OOT_ROMFS`),
+7:11; dump with `OOT_ROMFS`, `OOT_NUP` and the read-only r19 `OOT_DUMP`, `CLAWSHOT_WORKERS=3 ... -m dump -n 8`:
+829 passed, 48:21 (slow under load; no failure). No file joins the working set, so no fixture or pack-list change.
+Logs: `E:/OOTRemake/work/r21-sticks/gate/`. **READY (merge) `f6077d6`**; this record is a plans-only commit on top.
+
+## Handoff
+
+Commits (rebased on `e8dc77d`): `a7df0ca` pot drops (was `9d68e50`), `0a2bc9f` child token kills (was `7b62729`),
+`f6077d6` sweep record, then this gate record. Checked: dump evidence per event, tests that fail on `e9bb0d7`, the
+tracker builder, two sweeps, the full gate. Nothing played; nothing needs play (tightening only). Left for Kareem:
+the two bold questions below.
+
 ## Not in logic, for later (no change made)
 
 - Loose sticks: Deku Tree basement grass, the Lake Hylia floor stick and nut, the Bottom of the Well Deku Baba. Each
