@@ -3,6 +3,7 @@
 import pytest
 
 from clawshot.formats import elink, zsdic
+from clawshot.patch import songs
 
 TABLES = ("ELink2/elink2.Product.100.belnk.zs", "ELink2/elink2.Product.110.belnk.zs")
 
@@ -25,6 +26,8 @@ def decoded_users(table: elink.Elink, names: list[str]) -> dict:
 @pytest.mark.dump
 @pytest.mark.parametrize("rel", TABLES)
 def test_dump_table_round_trips(romfs, rel):
+    if not (romfs / rel).is_file():
+        pytest.skip(f"this dump has no {rel} (an extracted romfs of the updated game may hold only .110)")
     data = load(romfs, rel)
     table = elink.decode(data)
     assert len(table.users) > 1000
@@ -52,3 +55,15 @@ def test_dump_edits_keep_every_native_user(romfs):
     assert again.container("Clawshot_Test_A", "GetDemo")[0] == 3
     heart = before["Obj_Heart_Container"][0]
     assert [c.key for c in again.calls("Clawshot_Test_A")][: len(heart)] == [c[0] for c in heart]
+
+
+@pytest.mark.dump
+def test_dump_song_conditions_are_the_native_donors(romfs):
+    """data/song_effects.toml names condition-table offsets: the floor one is what Obj_Rupee_Red's Wait container
+    child runs under (constant true), the get-pose one what Item_FairyBless_MP's GetRotate children run under."""
+    table = elink.decode(load(romfs, TABLES[1]))
+    effects = songs.load_effects()
+    floor = {c.condition for c in table.calls("Obj_Rupee_Red") if c.key.startswith("Wait_")}
+    get_pose = {c.condition for c in table.calls("Item_FairyBless_MP") if c.key.startswith("GetRotate_")}
+    assert floor == {effects.floor_condition}
+    assert get_pose == {effects.get_pose_condition}

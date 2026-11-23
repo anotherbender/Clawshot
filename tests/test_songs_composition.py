@@ -30,8 +30,6 @@ def song_world(ocarina_world):
     root = ocarina_world
     put(root, songs.ELINK, build_table(HEART_USERS))
     put(root, songs.STATIC, static_doc())
-    for path in getitem.OCARINA_DUMP_FILES:
-        put(root, path, b"animation " + path.encode())
     sizes = rstb.read(raw(root, rstb.TABLE_PATH))
     for path in (songs.ELINK, songs.STATIC):
         sizes.set(path, rstb.required_size(path, len(raw(root, path))))

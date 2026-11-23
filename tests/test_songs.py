@@ -154,8 +154,6 @@ def native_files() -> dict[str, bytes]:
     }
     for song in getitem.SONG_MODELS:
         files[getitem.pack_path(song)] = sarc.write(song_pack(song))
-    for path in getitem.OCARINA_DUMP_FILES:
-        files[path.removesuffix(".zs")] = b"animation " + path.encode()
     return files
 
 
@@ -533,8 +531,6 @@ REJECTIONS = [
     (without(getitem.pack_path("Item_Melody_SunSong")), "Item_Melody_SunSong"),
     (without(getitem.pack_path(songs.EFFECT_DONOR)), "Obj_Heart_Container"),
     (without(getitem.pack_path(songs.PICKUP_DONOR)), "Obj_Arrow_Fire"),
-    (without("Model/Item_Ocarina_Time_Animation.anim.bfres"), "Item_Ocarina_Time_Animation"),
-    (without("AS/Item_Common.root.asb"), "Item_Common.root.asb"),
     (
         edit_rows(
             songs.ACTOR_INFO, lambda rows: rows.pop(next(i for i, r in enumerate(rows) if r["__RowId"] == getitem.TIME))

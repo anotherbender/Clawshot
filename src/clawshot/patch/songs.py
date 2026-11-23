@@ -523,8 +523,9 @@ def moved_songs(placements: Mapping[str, str], world, actors) -> list[str]:
 
 
 def native_inputs() -> tuple[str, ...]:
-    """Every romfs file :func:`build` and its transforms read or require, the dictionaries' pack included, so the
-    app's working set (``clawshot.pack.source.working_files``) holds them."""
+    """Every romfs file :func:`build` and its transforms read, the dictionaries' pack included, so the app's working
+    set (``clawshot.pack.source.working_files``) holds them. The animation files the AnimationParams name are not
+    read (the game loads them from its own romfs): ``tests/test_getitem_ocarina_dump.py`` checks they exist."""
     return (
         zsdic.PACK_PATH,
         ELINK,
@@ -535,7 +536,6 @@ def native_inputs() -> tuple[str, ...]:
         getitem.pack_path(EFFECT_DONOR),
         getitem.pack_path(PICKUP_DONOR),
         *(getitem.pack_path(song) for song in getitem.SONG_MODELS),
-        *getitem.OCARINA_DUMP_FILES,
     )
 
 
