@@ -52,7 +52,7 @@ where a natural adult save reaches a Beamos with the Hammer.**
 | Shadow skull pot | `Obj_ShadowTemple_SkullPot_A_01` | **0** | 100 | | | **kept** (data says no) |
 | Spider web | `Obj_InsideTheDekuTree_SpiderWeb_A_02`, `Obj_InsideGanonCastle_SpiderWeb_A_01` | **0** | 100 | | | **kept** |
 | Icicle, candlestick, beehive | `Obj_FallingIcicle_*`, `Obj_Well_CandleStick_A_03`, `Obj_Kokiri_Beehive_A_01` | **0** | 100 / 1 | | | **kept** (no rule widened) |
-| Bomb Flower | flower `Obj_BombFlower_A_02/_A_03` (no damage table); fruit `Obj_BombFlower_A_01`: `BombFlower_Fruit` Hammer 1.0, Bomb 0.0, MaxLife 1, material `BombFruit` `IsExplode` | 1 (fruit) | 0 (fruit) | 1 | no | **kept**: that a Hammer hit detonates the fruit is not traced (its death-procedure table is unread); staged as an observation |
+| Bomb Flower | flower `Obj_BombFlower_A_02/_A_03` (no damage table); fruit `Obj_BombFlower_A_01`: `BombFlower_Fruit` Hammer 1.0, Bomb 0.0, MaxLife 1, material `BombFruit` `IsExplode` | 1 (fruit) | 0 (fruit) | 1 | Kareem, Longshot 3.0.0, 2026-11-23: a Hammer hit blew a flower up in place | **kept** this round; round 22 candidates listed below |
 | Switch | eye switches (`Obj_EyeSwitch_*`, no damage table); Hammer switches already Hammer-only; crystal switch (`can_jumpslash` names the Hammer) | | | | no | eye-switch rules **kept** |
 | Enemy | every `Enemy_*` an enemy rule names: a generic table, Hammer 1.0 = Bomb 1.0 (Freezard 99, Torch Slug 100); only Jabu's tentacles have Hammer 0 | 1+ | 1 | | yes: "works as an adult weapon" | widen non-boss fights (`adult_weapon`) |
 | Beamos | `Enemy_Beamos`, `Enemy_Beamos_For_High_Place`: the generic enemy table (every named type 1.0), so the table does not say why N64's Beamos needed explosives; it respawns on area reload (`ActorGameDataSetting BancResetNoItemWarp`) | 1 | 1 | 2 | Kareem, Longshot 3.0.0, 2026-11-23: one Hammer hit destroys an `Enemy_Beamos` (both arms) | ground Beamos **widened** (S1, G1, G2); high Beamos kept (out of reach) |
@@ -218,6 +218,24 @@ target is unidentified), the high Beamos (out of Hammer reach), D1 (a question, 
 `Progressive_Strength_Upgrade or is_adult` (`remake/child_death_mountain_trail.toml`, cs 2026-11-07: "no boulder in
 the adult files"), so the adult needs nothing and there is nothing to loosen. The boulder has no damage table (a
 scripted break), so the child side stays Bracelet-only, as before.
+
+## Round 22 candidates: a Hammer hit on a Bomb Flower (no widening now)
+
+Kareem, Longshot 3.0.0, 2026-11-23: a Hammer hit on a Bomb Flower in Dodongo's Cavern blew it up. The data agrees
+in kind: the flower's fruit `Obj_BombFlower_A_01` (`BombFlower_Fruit`) takes Hammer 1.0, MaxLife 1, material
+`BombFruit` `IsExplode` (class table above). That covers a flower exploding **where it grows**; it does not carry
+one anywhere. Rules where such an in-place explosion is the whole requirement and the Hammer is not already accepted
+(scan of every world rule reading explosives with the Strength upgrade or citing a flower, on this head):
+
+| Rule | Today | Why a candidate | What round 22 must show |
+|---|---|---|---|
+| Dodongos Cavern Staircase Room -> Dodongos Cavern Climb (Dodongos Cavern.json, translated) | `has_explosives or Progressive_Strength_Upgrade or can_use(Dins_Fire) or (logic_dc_staircase and can_use(Bow))` | Din's Fire and the Bow already count: igniting the staircase room's flowers where they grow is enough. The nearest flowers to the Compass Chest are `Obj_BombFlower_A_03` 5389039009500383537 and 2287781480195487715 at y 111, about 7 above the chest (y 104) [heights from the dump; Hammer reach not known] | that the adult reaches a flower there with the Hammer and the staircase falls |
+| Dodongos Cavern Lobby -> Dodongos Cavern Lower Right Side (translated) | `has_explosives or Progressive_Strength_Upgrade` | the lobby holds the cavern's only `BombFlowerChainExplosionManager` 10474712916684003797 (-49,105,-43.5) on `Land_DodongoCave_BombFlowerBed_A_01`; if that chain is what opens the lower right side, a hit on its first flower is the whole requirement [inference: which blocker the rule means is not identified, table row 90] | which blocker the rule means, then that a Hammer hit sets the chain off and opens it |
+
+Not candidates: King Dodongo (Kareem's exception), the child-only flower rules (GC Spinning Pot, GC Shop and the
+child Rolling Goron, the cavern's entrance boulder: the Hammer is the adult's), Stop GC Rolling Goron as Adult (a
+bomb or flower at a rolling Goron, not a flower in place), and the lobby rules that already read
+`can_blast_or_smash or Progressive_Strength_Upgrade`.
 
 ## Sweep and gates
 
