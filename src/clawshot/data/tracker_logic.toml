@@ -292,7 +292,7 @@ source = "data/world/remake/child_hyrule_castle.toml, event Time Flows: 'Met Chi
 [story."Goron Bracelet"]
 flag = "HavePlayedEvent.Dm_Goron_0030"
 vanilla_at = "GC Darunias Joy"
-source = "patch/darunia.py SOURCE: native saved Bool (progress.sav, default false, reset type 8) written right after the gift's Event127 in Dm_Goron_0030, in every seed (patch/__init__.py); plans/03-game-data.md, Darunia correction: Kareem via Claude (2026-11-14) confirmed the flag in game. Event127's wrapper writes it even when it skips a redundant Bracelet grant, as seed logic credits Darunia's source. Reading it from a real save in the tracker is not yet confirmed (Kareem's tracker test)."
+source = "patch/darunia.py SOURCE: native saved Bool (progress.sav, default false, reset type 8) written right after the gift's Event127 in Dm_Goron_0030, in every seed (patch/__init__.py); plans/03-game-data.md, Darunia correction: Kareem via Claude (2026-11-14) confirmed the flag in game. Event127's wrapper writes it even when it skips a redundant Bracelet grant, as seed logic credits Darunia's source. Read from real saves by the tracker: cs21g, round 21 (plans/rounds/r21-checks.md, receipt work/r21-checks/darunia-tracker-result.json): Kareem's game-written Longshot before/after pair of 2026-11-13 reads flag false, row not collected, Bracelet 0, then flag true, row collected, Bracelet 1; unchanged with PR #39 (cs21b, plans/rounds/r21-pr39.md)."
 
 # Consumables the save holds as a stock (PouchData.<actor>.StockNum). One held grants `item`, the name the logic
 # helper reads (data/world/helpers.toml: Sticks = Buy_Deku_Stick_1 or ..., Nuts = Buy_Deku_Nut_5 or ...); a bought

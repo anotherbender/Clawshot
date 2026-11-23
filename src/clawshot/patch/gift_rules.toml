@@ -44,6 +44,9 @@ given = ["Dm_FairyFountain_Wisdom/Event10", "TriForcePoint/Event139", "Dm_FairyF
 class = "rewrite"
 gate = "quest SubEvent_GetSwordBigGoron Complete"
 skip = ["Npc_Goron_Biggoron_Adult/Event96", "Npc_Goron_Biggoron_Adult/Event106"]
+track = [
+  { quest = "SubEvent_GetSwordBigGoron", step = "Complete", source = "Npc_Goron_Biggoron_Adult/Event89 sets step Complete on every path through grant Npc_Goron_Biggoron_Adult/Event123 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."DMT Great Fairy Reward"]
 class = "rewrite"
@@ -61,14 +64,23 @@ gate = "hand-in takes Item_EyeDrop"
 [check."Deku Theater Mask of Truth"]
 class = "swap"
 gate = "LostWood_ScrubForestStage_TrueMaskEventLaunched"
+track = [
+  { bool = "LostWood_ScrubForestStage_TrueMaskEventLaunched", source = "LostWood_ScrubForestStageElder_TrueMaskFirst/Event25 sets it on every path through grant LostWood_ScrubForestStageElder_TrueMaskFirst/Event2, LostWood_ScrubForestStageElder_TrueMaskFirst/Event31 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Deku Theater Skull Mask"]
 class = "swap"
 gate = "LostWood_ScrubForestStage_SkullMaskEventLaunched"
+track = [
+  { bool = "LostWood_ScrubForestStage_SkullMaskEventLaunched", source = "LostWood_ScrubForestStageElder_SkullMaskFirst/Event0 sets it on every path through grant LostWood_ScrubForestStageElder_SkullMaskFirst/Event29, LostWood_ScrubForestStageElder_SkullMaskFirst/Event32 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."GC Darunias Joy"]
 class = "swap"
 gate = "the cutscene plays once"
+track = [
+  { played = "Dm_Goron_0030", source = "EventSetting row Dm_Goron_0030; grant Dm_Goron_0030/Event127 on every walk of cut C10; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."GC Medigoron"]
 class = "rewrite"
@@ -82,14 +94,23 @@ gate = "SageOfFire_Step02_DaruniaJr_FirstTalked"
 [check."GC Rolling Goron as Child"]
 class = "swap"
 gate = "GoronCity_GetBombBag_fromGoron006"
+track = [
+  { bool = "GoronCity_GetBombBag_fromGoron006", source = "Npc_Goron_006_Child/Event1 sets it on every path through grant Npc_Goron_006_Child/Event58, Npc_Goron_006_Child/Event92 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."GF HBA 1000 Points"]
 class = "swap"
 gate = "MiniGame_HorsebackArchery_GotaHeart"
+track = [
+  { bool = "MiniGame_HorsebackArchery_GotaHeart", source = "Minigame_HorsebackArchery/Event124 sets it on every path through grant Minigame_HorsebackArchery/Event322 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."GF HBA 1500 Points"]
 class = "swap"
 gate = "MiniGame_HorseBackArchery_Get_Quiver"
+track = [
+  { bool = "MiniGame_HorseBackArchery_Get_Quiver", source = "Minigame_HorsebackArchery/Event115 sets it on every path through grant Minigame_HorsebackArchery/Event319, Minigame_HorsebackArchery/Event320 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."GV Trade Poachers Saw"]
 class = "swap"
@@ -107,10 +128,16 @@ gate = "quest Goto_HyruleCastle step"
 [check."HC Zeldas Letter"]
 class = "swap"
 gate = "the cutscene plays once"
+track = [
+  { played = "Dm_HrlCastle_0050", source = "EventSetting row Dm_HrlCastle_0050; grant Dm_HrlCastle_0050/Event59 on every walk of cut C15; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."HF Ocarina of Time Item"]
 class = "swap"
 gate = "the cutscene plays once"
+track = [
+  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event70 on every walk of cut EntryPoint0; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Hideout Gerudo Membership Card"]
 class = "more"
@@ -120,6 +147,9 @@ reason = "D39: always vanilla; guards and Gerudo entry NPCs check Spirit Step02,
 [check."Kak 10 Gold Skulltula Reward"]
 class = "swap"
 gate = "KakarikoVillage_GatheringTokenGold_GetReward10"
+track = [
+  { bool = "KakarikoVillage_GatheringTokenGold_GetReward10", source = "GatheringTokenGold/Event199 sets it on every path through grant GatheringTokenGold/Event398 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Kak 100 Gold Skulltula Reward"]
 class = "swap"
@@ -128,18 +158,30 @@ gate = "GatheringTokenGold quest Complete"
 [check."Kak 20 Gold Skulltula Reward"]
 class = "swap"
 gate = "..._GetReward20"
+track = [
+  { bool = "KakarikoVillage_GatheringTokenGold_GetReward20", source = "GatheringTokenGold/Event192 sets it on every path through grant GatheringTokenGold/Event75 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Kak 30 Gold Skulltula Reward"]
 class = "swap"
 gate = "..._GetReward30"
+track = [
+  { bool = "KakarikoVillage_GatheringTokenGold_GetReward30", source = "GatheringTokenGold/Event197 sets it on every path through grant GatheringTokenGold/Event194 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Kak 40 Gold Skulltula Reward"]
 class = "swap"
 gate = "..._GetReward40"
+track = [
+  { bool = "KakarikoVillage_GatheringTokenGold_GetReward40", source = "GatheringTokenGold/Event216 sets it on every path through grant GatheringTokenGold/Event200 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Kak 50 Gold Skulltula Reward"]
 class = "swap"
 gate = "..._GetReward50"
+track = [
+  { bool = "KakarikoVillage_GatheringTokenGold_GetReward50", source = "GatheringTokenGold/Event213 sets it on every path through grant GatheringTokenGold/Event219 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Kak Anju Trade Pocket Cucco"]
 class = "swap"
@@ -152,6 +194,9 @@ gate = "GetSwordBigGoron_IsAfterFirstTalk_Npc_Hylia_049_Adult, quest step"
 [check."Kak Anju as Child"]
 class = "swap"
 gate = "MiniGame_CatchCucco_IsCompleted"
+track = [
+  { bool = "MiniGame_CatchCucco_IsCompleted", source = "Minigame_CatchCucco/Event143 sets it on every path through grant Minigame_CatchCucco/Event181 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Kak Granny Trade Odd Mushroom"]
 class = "swap"
@@ -165,10 +210,16 @@ purchase = true
 [check."Kak Man on Roof"]
 class = "swap"
 gate = "Npc_Hylia_001_IsGetHeartPiece"
+track = [
+  { bool = "Npc_Hylia_001_IsGetHeartPiece", source = "Npc_Hylia_001_Adult/Event11 sets it on every path through grant Npc_Hylia_001_Adult/Event4 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Kak Shooting Gallery Reward"]
 class = "swap"
 gate = "MiniGame_HitTarget_Kakariko_Get_Quiver"
+track = [
+  { bool = "MiniGame_HitTarget_Kakariko_Get_Quiver", source = "MiniGame_HitTarget/Event185 sets it on every path through grant MiniGame_HitTarget/Event242, MiniGame_HitTarget/Event381 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."King Dodongo"]
 class = "more"
@@ -178,14 +229,23 @@ reason = "no flow reads the reward; the game's story gates read the dungeon's qu
 [check."LH Adult Fishing"]
 class = "swap"
 gate = "MiniGame_Fishing_GetGoldScale"
+track = [
+  { bool = "MiniGame_Fishing_GetGoldScale", source = "MiniGame_Fishing/Event578, MiniGame_Fishing/Event850 sets it on every path through grant MiniGame_Fishing/Event579, MiniGame_Fishing/Event822 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."LH Child Fishing"]
 class = "swap"
 gate = "MiniGame_Fishing_GetHeartPiece"
+track = [
+  { bool = "MiniGame_Fishing_GetHeartPiece", source = "MiniGame_Fishing/Event572, MiniGame_Fishing/Event848 sets it on every path through grant MiniGame_Fishing/Event573, MiniGame_Fishing/Event821 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."LH Lab Dive"]
 class = "swap"
 gate = "Npc_Hylia_045_HasDived"
+track = [
+  { bool = "Npc_Hylia_045_HasDived", source = "Npc_Hylia_045_Child/Event83 sets it on every path through grant Npc_Hylia_045_Child/Event113 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."LH Trade Eyeball Frog"]
 class = "more"
@@ -195,22 +255,37 @@ reason = "a retry step gives the vanilla item again whenever the player no longe
 [check."LLR Talons Chickens"]
 class = "swap"
 gate = "IsClear_Minigame_FindOutCucco"
+track = [
+  { bool = "IsClear_Minigame_FindOutCucco", source = "Minigame_FindOutCucco/Event89 sets it on every path through grant Minigame_FindOutCucco/Event23 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."LW Gift from Saria"]
 class = "swap"
 gate = "the cutscene plays once"
+track = [
+  { played = "Dm_Kokiri_0155", source = "EventSetting row Dm_Kokiri_0155; grant Dm_Kokiri_0155/Event68 on every walk of cut C01; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."LW Ocarina Memory Game"]
 class = "swap"
 gate = "Minigame_SkullKidSession_IsGetHeartPiece"
+track = [
+  { bool = "Minigame_SkullKidSession_IsGetHeartPiece", source = "Npc_SkullKid_Child_02/Event58 sets it on every path through grant Npc_SkullKid_Child_02/Event24 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."LW Skull Kid"]
 class = "swap"
 gate = "Npc_SkullKid_Child_IsGetHeartPiece"
+track = [
+  { bool = "Npc_SkullKid_Child_IsGetHeartPiece", source = "Npc_SkullKid_Child/Event10 sets it on every path through grant Npc_SkullKid_Child/Event71 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."LW Target in Woods"]
 class = "swap"
 gate = "LostWood_HitTargetOfDekuScrub_FirstClear"
+track = [
+  { bool = "LostWood_HitTargetOfDekuScrub_FirstClear", source = "Dm_LostWood_0040/Event84 sets it on every path through grant Dm_LostWood_0040/Event17, Dm_LostWood_0040/Event30 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."LW Trade Cojiro"]
 class = "more"
@@ -233,18 +308,30 @@ reason = "Gift mode has two deterministic prizes then native filler; the unshuff
 [check."Market Bombchu Bowling First Prize"]
 class = "swap"
 gate = "MiniGame_BombchuBowling_ClearFirstTime; shuffled first win"
+track = [
+  { bool = "MiniGame_BombchuBowling_ClearFirstTime", source = "MiniGame_BombchuBowling/Event89 sets it on every path through grant MiniGame_BombchuBowling/Event304, MiniGame_BombchuBowling/Event306 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Market Bombchu Bowling Second Prize"]
 class = "swap"
 gate = "MiniGame_BombchuBowling_ClearSecondTime; native heart marker ClearThirdTime is set at this grant"
+track = [
+  { bool = "MiniGame_BombchuBowling_ClearSecondTime", source = "MiniGame_BombchuBowling/Event90 sets it on every path through grant MiniGame_BombchuBowling/Event143 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Market Lost Dog"]
 class = "swap"
 gate = "quest SubEvent_FindRichard Complete"
+track = [
+  { quest = "SubEvent_FindRichard", step = "Complete", source = "SubEvent_FindRichard/Event32 sets step Complete on every path through grant SubEvent_FindRichard/Event16 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Market Shooting Gallery Reward"]
 class = "swap"
 gate = "MiniGame_HitTarget_HrlCity_Get_BulletBag"
+track = [
+  { bool = "MiniGame_HitTarget_HrlCity_Get_BulletBag", source = "MiniGame_HitTarget/Event72 sets it on every path through grant MiniGame_HitTarget/Event378, MiniGame_HitTarget/Event241 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Morpha"]
 class = "more"
@@ -270,11 +357,17 @@ reason = "no flow reads the reward; the game's story gates read the dungeon's qu
 class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event69"]
+track = [
+  { played = "Dm_MelodyGet_Spilit", source = "EventSetting row Dm_MelodyGet_Spilit; grant Dm_MelodyGet_Spilit/Event17 on every walk of cut Learn_melody; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Sheik at Temple"]
 class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event71"]
+track = [
+  { played = "Dm_MelodyGet_Shine", source = "EventSetting row Dm_MelodyGet_Shine; grant Dm_MelodyGet_Shine/Event53 on every walk of cut C14_Learn_melody; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Sheik in Crater"]
 class = "rewrite"
@@ -289,41 +382,65 @@ flag = "HavePlayedEvent.Dm_MelodyGet_Fire"
 class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event65"]
+track = [
+  { played = "Dm_MelodyGet_Forest", source = "EventSetting row Dm_MelodyGet_Forest; grant Dm_MelodyGet_Forest/Event22 on every walk of cut Learn_melody_C07-13; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Sheik in Ice Cavern"]
 class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event68"]
+track = [
+  { played = "Dm_MelodyGet_Water", source = "EventSetting row Dm_MelodyGet_Water; grant Dm_MelodyGet_Water/Event29 on every walk of cut C15; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Sheik in Kakariko"]
 class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event70"]
+track = [
+  { played = "Dm_MelodyGet_Shadow", source = "EventSetting row Dm_MelodyGet_Shadow; grant Dm_MelodyGet_Shadow/Event21 on every walk of cut C13; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Song from Impa"]
 class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event59"]
+track = [
+  { played = "Dm_MelodyGet_Zelda", source = "EventSetting row Dm_MelodyGet_Zelda; grant Dm_MelodyGet_Zelda/Event111 on every walk of cut C10; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Song from Malon"]
 class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event60"]
+track = [
+  { played = "Dm_MelodyGet_Epona", source = "EventSetting row Dm_MelodyGet_Epona; grant Dm_MelodyGet_Epona/Event11 on every walk of cut C04; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Song from Ocarina of Time"]
 class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event63"]
+track = [
+  { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event4 on every walk of cut C10; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Song from Royal Familys Tomb"]
 class = "rewrite"
 gate = "RoyalFamilyTomb_MelodyGet_Clear"
 skip = ["Dm_SY_Ocarina/Event62"]
+track = [
+  { bool = "RoyalFamilyTomb_MelodyGet_Clear", source = "GimmickFlow_RoyalFamilyTomb/Event28 sets it after CheckStone_To_MelodyGet_Sun, every walk of which plays Dm_MelodyGet_Sun_03 (grant Dm_MelodyGet_Sun_03/Event34); audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Song from Saria"]
 class = "rewrite"
 gate = "the cutscene plays once"
 skip = ["Dm_SY_Ocarina/Event61"]
+track = [
+  { played = "Dm_MelodyGet_Saria", source = "EventSetting row Dm_MelodyGet_Saria; grant Dm_MelodyGet_Saria/Event109 on every walk of cut C12; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Song from Windmill"]
 class = "rewrite"
@@ -335,6 +452,9 @@ skip = ["Dm_SY_Ocarina/Event64"]
 [check."ToT Light Arrows Cutscene"]
 class = "swap"
 gate = "the cutscene plays once"
+track = [
+  { played = "Dm_TimeTemple_0130", source = "EventSetting row Dm_TimeTemple_0130; grant Dm_TimeTemple_0130/Event85 on every walk of cut C01; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ToT Reward from Rauru"]
 class = "more"
@@ -359,10 +479,16 @@ purchase = true
 [check."ZD Diving Minigame"]
 class = "swap"
 gate = "MiniGame_Diving_Cleared"
+track = [
+  { bool = "MiniGame_Diving_Cleared", source = "MiniGame_Diving/Event64 sets it on every path through grant MiniGame_Diving/Event21 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ZD King Zora Thawed"]
 class = "swap"
 gate = "SageOfWater_KingZora_adult_Talk_Event198"
+track = [
+  { bool = "SageOfWater_KingZora_adult_Talk_Event198", source = "SageOfWater/Event69 sets it on every path through grant SageOfWater/Event242 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ZD Trade Prescription"]
 class = "more"
@@ -377,30 +503,51 @@ given = ["Dm_FairyFountain_Frore/Event11", "TriForcePoint/Event138", "Dm_FairyFo
 [check."ZR Frogs Ocarina Game"]
 class = "swap"
 gate = "MiniGame_FrogTenors_InsectRepellent (first win through Event161 or Event75; SongClear only unlocks the game)"
+track = [
+  { bool = "MiniGame_FrogTenors_InsectRepellent", source = "MiniGame_FrogTenors/Event151 sets it on every path through grant MiniGame_FrogTenors/Event161, MiniGame_FrogTenors/Event75 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ZR Frogs in the Rain"]
 class = "swap"
 gate = "MiniGame_FrogTenors_StormSong, set at Event112 after Event384"
+track = [
+  { bool = "MiniGame_FrogTenors_StormSong", source = "MiniGame_FrogTenors/Event112 sets it on every path through grant MiniGame_FrogTenors/Event384 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ZR Frogs Zeldas Lullaby"]
 class = "swap"
 gate = "MiniGame_FrogTenors_ZeldaLullaby; first-only TeachNewMusic path; variable native rupees"
+track = [
+  { bool = "MiniGame_FrogTenors_ZeldaLullaby", source = "MiniGame_FrogTenors/Event172 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ZR Frogs Eponas Song"]
 class = "swap"
 gate = "MiniGame_FrogTenors_EponaSong; first-only TeachNewMusic path; variable native rupees"
+track = [
+  { bool = "MiniGame_FrogTenors_EponaSong", source = "MiniGame_FrogTenors/Event220 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ZR Frogs Sarias Song"]
 class = "swap"
 gate = "MiniGame_FrogTenors_SariaSong; first-only TeachNewMusic path; variable native rupees"
+track = [
+  { bool = "MiniGame_FrogTenors_SariaSong", source = "MiniGame_FrogTenors/Event221 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ZR Frogs Suns Song"]
 class = "swap"
 gate = "MiniGame_FrogTenors_SunSong; first-only TeachNewMusic path; variable native rupees"
+track = [
+  { bool = "MiniGame_FrogTenors_SunSong", source = "MiniGame_FrogTenors/Event222 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ZR Frogs Song of Time"]
 class = "swap"
 gate = "MiniGame_FrogTenors_TimeSong; first-only TeachNewMusic path; variable native rupees"
+track = [
+  { bool = "MiniGame_FrogTenors_TimeSong", source = "MiniGame_FrogTenors/Event223 passes it to MiniGame_FrogTenors:TeachNewMusic, whose Event164 sets it after the reward; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."ZR Magic Bean Salesman"]
 class = "more"
@@ -410,10 +557,16 @@ reason = "a sale inside SimpleShop (the call returns without giving on cancel or
 [check."Market Potion Shop Bottle"]
 class = "swap"
 gate = "Npc_Hylia_020_Shop_Item_Bottle_Present; shuffled acceptance finishes the bottle-only tutorial"
+track = [
+  { bool = "Npc_Hylia_020_Shop_Item_Bottle_Present", source = "Npc_Hylia_020_Shop_Child/Event14 sets it on every path through grant Npc_Hylia_020_Shop_Child/Event171 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Graveyard Dampe Gravedigging Tour"]
 class = "swap"
 gate = "GraveYard_DiggingHoleTour_Drop_HeartPiece; guard Event449's Event628 grant and save immediately after"
+track = [
+  { bool = "GraveYard_DiggingHoleTour_Drop_HeartPiece", source = "Npc_Hylia_Dampe_001/Event357 sets it on every path through grant Npc_Hylia_Dampe_001/Event628 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
+]
 
 [check."Market Shooting Gallery Expert Reward"]
 class = "swap"

@@ -164,6 +164,132 @@ def test_rules_load_and_refuse_bad_entries():
             gifts.loads(f'[check."X"]\n{body}\n')
 
 
+TRACK_RULES = """
+[check."Bool"]
+class = "swap"
+track = [{ bool = "Npc_Test_IsGetHeartPiece", source = "Npc_Test/Event2; audit A1", accepted = false }]
+
+[check."Played"]
+class = "rewrite"
+skip = ["Flow/Event2"]
+track = [
+  { played = "Dm_Test", source = "EventSetting Dm_Test; A2", accepted = true, played_by = "BB, 1.1.1, 2026-11-22" },
+]
+
+[check."Quest"]
+class = "swap"
+track = [
+  { quest = "SubEvent_Test", step = "Complete", source = "Npc_Quest/Event9; audit A3", accepted = false },
+  { bool = "Other_Flag", source = "Npc_Quest/Event10; audit A3", accepted = false },
+]
+"""
+
+
+def test_track_entries_load_as_immutable_tuples_of_each_kind():
+    rules = gifts.loads(TRACK_RULES)
+    assert rules["Bool"].track == (
+        gifts.TrackEntry("bool", "Npc_Test_IsGetHeartPiece", None, "Npc_Test/Event2; audit A1", False, None),
+    )
+    assert rules["Played"].track == (
+        gifts.TrackEntry("played", "Dm_Test", None, "EventSetting Dm_Test; A2", True, "BB, 1.1.1, 2026-11-22"),
+    )
+    assert [(e.kind, e.name, e.step) for e in rules["Quest"].track] == [
+        ("quest", "SubEvent_Test", "Complete"),
+        ("bool", "Other_Flag", None),
+    ]
+    assert isinstance(rules["Quest"].track, tuple)
+    assert gifts.loads(RULES)["A"].track == ()
+    with pytest.raises(AttributeError):
+        rules["Bool"].track[0].accepted = True  # frozen
+
+
+@pytest.mark.parametrize(
+    ("body", "message"),
+    [
+        ('class = "swap"\ntrack = { bool = "F", source = "s", accepted = false }', "track must be a list"),
+        ('class = "swap"\ntrack = []', "track must be a list"),
+        ('class = "swap"\ntrack = [{ source = "s", accepted = false }]', "exactly one of"),
+        ('class = "swap"\ntrack = [{ bool = "F", played = "D", source = "s", accepted = false }]', "exactly one of"),
+        ('class = "swap"\ntrack = [{ bool = "", source = "s", accepted = false }]', "non-empty"),
+        ('class = "swap"\ntrack = [{ quest = "Q", source = "s", accepted = false }]', "needs a step"),
+        ('class = "swap"\ntrack = [{ bool = "F", step = "S", source = "s", accepted = false }]', "only to a quest"),
+        ('class = "swap"\ntrack = [{ bool = "F", accepted = false }]', "non-empty source"),
+        ('class = "swap"\ntrack = [{ bool = "F", source = " ", accepted = false }]', "non-empty source"),
+        ('class = "swap"\ntrack = [{ bool = "F", source = "s" }]', "accepted must be a Bool"),
+        ('class = "swap"\ntrack = [{ bool = "F", source = "s", accepted = "yes" }]', "accepted must be a Bool"),
+        ('class = "swap"\ntrack = [{ bool = "F", source = "s", accepted = true }]', "played_by"),
+        (
+            'class = "swap"\ntrack = [{ bool = "F", source = "s", accepted = false, colour = 1 }]',
+            "unknown track fields",
+        ),
+        (
+            'class = "rewrite"\ngiven = ["F/E"]\nflag = "HavePlayedEvent.Dm_X"\n'
+            'track = [{ played = "Dm_X", source = "s", accepted = false }]',
+            "beside a flag",
+        ),
+        (
+            'class = "rewrite"\ngiven = ["F/E"]\ntrack = [{ bool = "F", source = "s", accepted = false }]',
+            "added Clawshot.Gift",
+        ),
+        (
+            'class = "rewrite"\nonce = ["F/E"]\ntrack = [{ bool = "F", source = "s", accepted = false }]',
+            "added Clawshot.Gift",
+        ),
+        ('class = "more"\nreason = "r"\ntrack = [{ bool = "F", source = "s", accepted = false }]', "class 'more'"),
+    ],
+)
+def test_bad_track_entries_fail_naming_the_check(body, message):
+    with pytest.raises(GiftPatchError, match=rf"^X: .*{message}"):
+        gifts.loads(f'[check."X"]\n{body}\n')
+
+
+def test_a_gallery_expert_reward_has_an_added_flag_so_no_track():
+    name = gifts.GALLERY_EXPERT_CHECKS["Event202"]
+    body = 'class = "swap"\ntrack = [{ bool = "F", source = "s", accepted = false }]'
+    with pytest.raises(GiftPatchError, match="added Clawshot.Gift"):
+        gifts.loads(f'[check."{name}"]\n{body}\n')
+
+
+def test_track_changes_no_gift_change_or_patched_flow():
+    """D1: the patch ignores track; a rule with track patches a flow exactly as the same rule without it."""
+    entry = gifts.TrackEntry("bool", "Npc_Test_Done", None, "Npc_Test/Event2", False, None)
+    for rule in ({}, {"cls": "rewrite", "skip": (f"{FLOW}/Event5",)}):
+        with_track = change(**dict(rule), track=(entry,))
+        without = change(**dict(rule))
+        assert (with_track.flag, with_track.new_flag) == (without.flag, without.new_flag)
+        assert patched(with_track) == patched(without)
+
+
+AUDIT_RECORD = "plans/tracker-auto-checks-audit.md"
+FAILED_AUDIT = (  # spec tracker-auto-checks "Stays manual": failed the D2 audit
+    "GC Rolling Goron as Adult",
+    "Kak Anju as Adult",
+    "Market 10 Big Poes",
+    "Kak 100 Gold Skulltula Reward",
+    "HC Malon Egg",
+)
+
+
+def test_real_track_entries_are_provisional_cite_the_audit_and_sit_on_shuffled_world_checks():
+    rules = gifts.load()
+    tracked = {name: rule for name, rule in rules.items() if rule.track}
+    assert len(tracked) == 51
+    world = build_world(load_spec())
+    for name, rule in tracked.items():
+        assert name in world.locations, name
+        assert rule.cls != gifts.MORE, name
+        for entry in rule.track:
+            assert entry.accepted is False and entry.played_by is None, name  # D2, 7.2: none played yet
+            assert entry.source.endswith(AUDIT_RECORD), name
+    assert not set(FAILED_AUDIT) & set(tracked)
+
+
+def test_each_check_of_a_shared_cutscene_carries_its_own_track_entry():
+    rules = gifts.load()
+    for name in ("HF Ocarina of Time Item", "Song from Ocarina of Time"):
+        assert [(e.kind, e.name) for e in rules[name].track] == [("played", "Dm_MelodyGet_Time")]
+
+
 def test_plan_groups_steps_by_check_and_refuses():
     defs = [
         Definition(f"{FLOW}/Event1", "npc_gift", "", "a", "Item_Old", "Test Check"),

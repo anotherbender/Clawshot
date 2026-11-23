@@ -386,7 +386,7 @@ function parseTrackerSections(fragment) {
     return {key, notes};
   }
   function checkLine(check, key, filtering) {
-    const open = check.collected === false || (check.collected == null && !check.marked);
+    const open = !check.collected && !check.marked;
     const inLogic = key && open && check.in_logic ? check.in_logic[key] : null;
     const style = check.collected ? " tracker-check-collected" : check.marked ? " tracker-check-marked" :
       inLogic === true ? " tracker-check-in-logic" : inLogic === false ? " tracker-check-out-of-logic" : "";
@@ -401,10 +401,10 @@ function parseTrackerSections(fragment) {
       line.append(" ", tag);
     }
     if (inLogic != null) line.title = inLogic ? "In logic" : "Out of logic";
-    if (check.collected == null) {
+    if (check.markable) {
       const toggle = node("button", "tracker-mark", check.marked ? "Unmark" : "Mark done");
       toggle.type = "button";
-      toggle.title = check.marked ? "Show this check as unknown again" : "The save cannot show this check: mark it done once you have it";
+      toggle.title = check.marked ? "Show this check as the save reads it again" : "The save may not show this check: mark it done once you have it";
       toggle.addEventListener("click", async () => {
         try { render(await request("tracker-mark", {check: check.id, marked: !check.marked})); }
         catch (error) { status.textContent = error.message; }

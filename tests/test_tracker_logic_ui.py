@@ -9,8 +9,10 @@ pytestmark = pytest.mark.skipif(NODE is None, reason="Node is needed only for fr
 AGE_KEY = "clawshot.tracker.age"
 
 
-def check(check_id, collected, in_logic=None, *, marked=False):
+def check(check_id, collected, in_logic=None, *, marked=False, markable=None):
     entry = {"id": check_id, "label": check_id, "where": "", "kind": "chest", "dungeon": None, "collected": collected}
+    if collected is None if markable is None else markable:
+        entry["markable"] = True  # as tracker.state sets it: every unknown check, or a provisional "not collected"
     if in_logic is not None:
         entry["in_logic"] = dict(zip(("child", "adult", "either"), in_logic, strict=True))
     if marked:
@@ -170,6 +172,21 @@ def test_unknown_checks_have_a_mark_toggle(tmp_path):
     assert rendered["posts"] == [{"route": "tracker-mark", "body": {"check": "Adult Chest", "marked": True}}]
     unmark = tab(tmp_path, actions=[{"class": "tracker-mark", "index": 1, "event": "click"}])
     assert unmark["posts"] == [{"route": "tracker-mark", "body": {"check": "Shop Item", "marked": False}}]
+
+
+def test_a_markable_not_collected_check_has_the_toggle_and_keeps_in_logic_styling(tmp_path):
+    """tracker-auto-checks 3.2: a provisional track read of "not collected" stays open with Mark done; marked, it
+    shows as marked done like a marked unknown check."""
+    snap = snapshot()
+    lake = snap["state"]["areas"][1]["checks"]
+    lake.append(check("Maybe Gift", False, (True, True, True), markable=True))
+    lake.append(check("Kept Gift", False, markable=True, marked=True))
+    rendered = tab(tmp_path, snap, actions=[{"class": "tracker-mark", "index": 2, "event": "click"}])
+    found = classes(rendered)
+    assert "Mark done" in found["Maybe Gift"]["text"] and styled(rendered, "Maybe Gift") == "in"
+    assert "Unmark" in found["Kept Gift"]["text"] and styled(rendered, "Kept Gift") == "marked"
+    assert "Mark done" not in found["Far Chest"]["text"]  # not collected without markable: no toggle
+    assert rendered["posts"] == [{"route": "tracker-mark", "body": {"check": "Maybe Gift", "marked": True}}]
 
 
 def test_clear_marks_asks_first(tmp_path):

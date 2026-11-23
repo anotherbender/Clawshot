@@ -577,7 +577,7 @@ class SeedLogic:
         logic["unknown_items"] = list(inv.unknown)
         search = self.search(inv)
         for area in state["areas"]:
-            area["in_logic"] = _flag_open(area["checks"], world, search, marked)
+            area["in_logic"] = _flag_open(area["checks"], world, search)
         grouped: dict[str, list[dict[str, Any]]] = {}
         for row, reading in self._vanilla_readings(seed):
             collected, reason = _collected(row, inv, reading)
@@ -595,6 +595,7 @@ class SeedLogic:
             }
             if collected is None:
                 entry["reason"] = reason
+                entry["markable"] = True  # as for the seed's own `?` checks (tracker.state.markable)
                 if row.location in marked:
                     entry["marked"] = True
             grouped.setdefault(row.area, []).append(entry)
@@ -605,18 +606,18 @@ class SeedLogic:
                 "total": len(checks),
                 "unknown": sum(c["collected"] is None for c in checks),
                 "marked": sum(c.get("marked", False) for c in checks),
-                "in_logic": _flag_open(checks, world, search, marked),
+                "in_logic": _flag_open(checks, world, search),
                 "checks": checks,
             }
             for name, checks in grouped.items()
         ]
 
 
-def _flag_open(checks: list[dict[str, Any]], world: World, search: Search, marked: frozenset[str]) -> dict[str, int]:
+def _flag_open(checks: list[dict[str, Any]], world: World, search: Search) -> dict[str, int]:
     """Give each open check ``in_logic`` (3.1, 3.2) and return how many are in logic per age (3.4)."""
     totals = dict.fromkeys(AGE_KEYS, 0)
     for entry in checks:
-        if entry["collected"] is True or (entry["collected"] is None and entry["id"] in marked):
+        if entry["collected"] is True or entry.get("marked", False):  # entries carry marked only where markable
             continue
         location: Location = world.locations[entry["id"]]
         flags = {

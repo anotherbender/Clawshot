@@ -47,6 +47,7 @@ from clawshot.tracker.seeds import (
     SOURCE_PAIR,
     SOURCE_SAVE_TYPE,
     SOURCE_SAVE_VERSION,
+    TRACK,
     Check,
     Seed,
 )
@@ -519,7 +520,38 @@ def collected(check: Check, save: save_format.Save | None) -> tuple[bool | None,
         return None, "not seen collected; a replaced pickup's saved state is not certified"
     if check.method == SOURCE_PAIR:
         return _source_pair(check, save)
+    if check.method == TRACK:
+        return _track(check, save)
     return None, check.reason or "no audited save record"
+
+
+def track_field(entry: Any) -> str:
+    """The save field one ``gift_rules.toml`` track entry reads (spec tracker-auto-checks 2.1)."""
+    if entry.kind == "played":
+        return "HavePlayedEvent." + entry.name
+    if entry.kind == "quest":
+        return "Step_" + entry.name
+    return entry.name
+
+
+def track_value(entry: Any, save: save_format.Save) -> bool | None:
+    """One track entry's value: the Bool, or whether the quest's step enum is the named step; None when absent."""
+    field = track_field(entry)
+    if entry.kind == "quest":
+        step = save.enum_value(field)
+        return None if step is None else step == save_format.murmur3_32(entry.step.encode("utf-8"))
+    return save.flag(field)
+
+
+def _track(check: Check, save: save_format.Save) -> tuple[bool | None, str | None]:
+    """Any entry true: collected; all present and false: not; else unknown, naming the absent fields (D11)."""
+    values = [track_value(entry, save) for entry in check.track]
+    if any(values):
+        return True, None
+    missing = [track_field(e) for e, v in zip(check.track, values, strict=True) if v is None]
+    if not missing:
+        return False, None
+    return None, "the save has no " + ", ".join(missing) + " field (another seed or game version?)"
 
 
 def _identity(seed: Seed, save: save_format.Save | None) -> dict[str, Any]:
@@ -561,6 +593,12 @@ def _identity(seed: Seed, save: save_format.Save | None) -> dict[str, Any]:
     }
 
 
+def markable(check: Check, state: bool | None) -> bool:
+    """Whether a check can be marked done by hand: its save state is unknown, or a provisional track flag reads it
+    as not collected (spec tracker-auto-checks D4: an unplayed flag may be wrong, so the player's mark is kept)."""
+    return state is None or (state is False and check.method == TRACK and check.provisional)
+
+
 def _check_entry(
     check: Check, save: save_format.Save | None, show_locations: bool, marks: frozenset[str] = frozenset()
 ) -> dict[str, Any]:
@@ -576,6 +614,8 @@ def _check_entry(
     }
     if state is None:
         entry["reason"] = reason
+    if markable(check, state):
+        entry["markable"] = True  # Mark done is offered; on a `—` check it is the only sign of a provisional read (D9)
         if check.location in marks:
             entry["marked"] = True  # marked done by hand (tracker.marks); never shows the item (D7)
     if show_locations or state is True:
@@ -590,7 +630,8 @@ def areas(
     """Checks grouped by area in the seed's world order. Without ``show_locations`` an entry names its item only once
     collected; ``collected`` is ``None`` (counted under ``unknown``) wherever the save cannot say. An unknown check in
     ``marks`` (marked done by hand) has ``marked: true`` and is counted under ``marked`` as well as ``unknown``; a
-    save-confirmed state wins over a mark (D8)."""
+    save-confirmed state wins over a mark (D8). ``markable: true`` marks every check that can be marked: unknown
+    ones, and a provisional track read of "not collected" (spec tracker-auto-checks D4), whose mark is kept."""
     grouped: dict[str, list[dict[str, Any]]] = {}
     for check in seed.checks:
         grouped.setdefault(check.area, []).append(_check_entry(check, save, show_locations, marks))

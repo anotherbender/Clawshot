@@ -178,7 +178,7 @@ def test_seed_checks_kinds_and_dungeon_totals(tmp_path, places):
         "Forest Key Chest": ("chest", "named_bool"),
         "DMT Great Fairy Reward": ("gift", "named_bool"),
         "Song from Windmill": ("gift", "named_bool"),
-        "LW Skull Kid": ("gift", "none"),
+        "LW Skull Kid": ("gift", "track"),  # its native once-flag (gift_rules.toml track, tracker-auto-checks)
         "DMC Deku Scrub": ("scrub", "named_bool"),
         "Test Shop Item": ("shop", "none"),
         "Test Boss Heart": ("boss_heart", "placement_hash"),
