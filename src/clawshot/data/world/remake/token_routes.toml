@@ -15,7 +15,8 @@ type = "GS Token"
 vanilla = "Gold Skulltula Token"
 # Round 19 Master Sword shuffle (remake/master_sword.toml header): the dropped Skulltula is killed with adult_sword;
 # it folds to the rule before while shuffle_master_sword is false.
-rule = "can_bonk and (adult_sword or can_child_attack)"
+# Round 21 cs21e: adult_weapon (the Megaton Hammer too; Enemy_Skulltula_Gold Hammer 1.0, r21-hammer.md class enemy).
+rule = "can_bonk and (adult_weapon or can_child_attack)"
 source = "cs15c, accepted r15-tokens-spec section 4 N9/N11 (e0f3ccfa): Enemy_Skulltula_Gold Hash 2177746409373494991 in Banc/HyruleField/HyruleField_{Child,Adult}_Static.bcett.byml.zs, tree-roll binding near (71,167,264); r3-census.md:52-58 and r4-logic-child.md:363-374. Roll/bonk, kill (adult, or child attack) and touch-retrieve the low drop. No Nocturnal field, and Kareem's rc.3 route packet (Claude, 2026-11-14) observed the child collecting it by day, so the spec's conservative night restriction and its child Time Flows gate are removed; the daytime appearance is native, no patch. Its source pair is set on the packet's newest reload (21/21); the unplayed final revisit is not claimed."
 
 [locations."LLR GS Tower"]
@@ -33,8 +34,8 @@ source = "cs15c, accepted r15-tokens-spec section 4 N9/N10 (e0f3ccfa): wetlands 
 
 [exits."Hyrule Field"."HF Wetland Grotto"]
 new = true
-rule = "has_explosives"
-source = "Accepted r15-tokens-spec section 4: explosive opening at (40,145,342), r3-census.md:57 and r4-logic-child.md:372-374. Use the existing supported has_explosives capability, including remake/bombs.toml's Bomb Bag plus age-appropriate lift strength; no Echo Gem, note-reading, Hammer-only opening or assumed persistent open cover substitutes for access."
+rule = "can_blast_or_smash"
+source = "Accepted r15-tokens-spec section 4: explosive opening at (40,145,342), r3-census.md:57 and r4-logic-child.md:372-374, including remake/bombs.toml's Bomb Bag plus age-appropriate lift strength; no Echo Gem, note-reading or assumed persistent open cover substitutes for access. Round 21 cs21e (plans/rounds/r21-hammer.md, class grotto cover): the cover Land_HrlField_HidingHoleCover_A_01 2786334400301738354 inherits Land_HidingHoleCover_BrokenBomb_Base, whose CrackStoneObject damage table takes Hammer 100 (= Bomb 100, MaxLife 6); Kareem opened bomb grottos with the Hammer on 0.2.5, so the Megaton Hammer opens it too."
 
 [exits."HF Wetland Grotto"."Hyrule Field"]
 new = true

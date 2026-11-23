@@ -20,3 +20,8 @@ source = "Overworld.json:1528. Kareem, 2026-11-22, in game: the Gold Skulltula p
 rule = "is_child and can_bonk and can_child_attack"
 was = "is_child and can_bonk"
 source = "Overworld.json:2686. The Lon Lon Ranch tree's kind (Kareem, 2026-11-22, in game, played there, not here): ZoraFountain_Child_Static Enemy_Skulltula_Gold Hash 17355397719442343054 (49,110,32), AppearPopOut, the same pop-out enemy whose death drops the token. Tightening. plans/rounds/r21-sticks.md."
+
+[locations."LW GS Bean Patch Near Theater"]
+rule = "can_plant_bugs and can_child_attack"
+was = "can_plant_bugs and (can_child_attack or (shuffle_scrubs == 'off' and Deku_Shield))"
+source = "Overworld.json:374. OoT Randomizer's second way (the nearby Deku Scrub's nut, reflected by the Deku Shield, kills the Gold Skulltula) is dropped: Kareem, 2026-11-23, players cannot be assumed to know it (answers the question in plans/rounds/r21-sticks.md; recorded in plans/rounds/r21-hammer.md). Tightening; the kill stays can_child_attack, as the other child tokens here."

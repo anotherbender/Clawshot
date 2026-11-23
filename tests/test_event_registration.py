@@ -452,9 +452,10 @@ RECIPES: dict[str, tuple[int, Settings, dict]] = {
     # Every shuffle kind and opt-in flow writer: released dungeon items and jail keys, dungeon rewards with the
     # owned-Stones Door, the shuffled Master Sword with free time travel, a reward bridge, every flow-editing fast
     # start, Saria's opt-in farewell handoff, and the runtime module's receive event and "your" get lines.
-    # Seed 24 also puts a shield on a scrub sale.
+    # Seed 22 also puts a shield on a scrub sale (a Deku Shield at HF Deku Scrub Grotto); re-pinned from 24 in round 21
+    # when the Hammer logic moved placements (plans/rounds/r21-hammer.md).
     "broad": (
-        24,
+        22,
         Settings(
             shuffle=(*RECOMMENDED, "Freestanding", "Token"),
             dungeon_items="all_anywhere",

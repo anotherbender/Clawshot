@@ -74,6 +74,20 @@ game: the Skulltula pops out of the tree or crate and must be killed), `ZF GS Tr
 night tokens (`remake/child_gs_kills.toml`, `remake/child_kakariko.toml`) were the OoT Randomizer rules
 without one. [Audit](../plans/rounds/r21-sticks.md).
 
+**Megaton Hammer as explosives and as an adult weapon (round 21):** every cracked wall, cracked floor
+and boulder actor inherits `WallCrack`, whose damage table gives the Hammer the same rate as bombs
+(100; arrows, the Hookshot, fire and most other attacks 0); bomb-grotto covers share that table.
+Kareem broke walls of that actor, boulders and bomb grottos with the Hammer on 0.2.5. Rules whose
+explosives open one of those actors read `can_blast_or_smash` (explosives or the adult's Hammer);
+`remake/hammer.toml` holds the translated ones, and each entry names its actor. Ordinary enemy
+fights read the world helper `adult_weapon`
+(a durable blade or the Hammer), which matters only with Master Sword shuffle on. The ground Beamos
+(`Enemy_Beamos`, Spirit Temple's Beamos hall and Gerudo Training Ground's Beamos room) also takes the
+Hammer: Kareem destroyed one with a single Hammer hit (Longshot 3.0.0, 2026-11-23). Unchanged: King
+Dodongo (bombs, or Bomb Flowers with the Bracelet), the Shadow Temple skull pots and spider webs
+(their damage tables give the Hammer 0), eye switches, Bomb Flower chains, the high Beamos, and the
+boss fights. [Class-by-class evidence](../plans/rounds/r21-hammer.md).
+
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
 Boots or Serenade are shuffled. Claude chose the r16 precaution on 2026-11-17; Kareem was informed.

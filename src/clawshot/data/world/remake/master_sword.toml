@@ -29,6 +29,10 @@
 # reflected rock), the DMT Gold Skulltulas above Dodongo's Cavern (the Megaton Hammer they need also kills).
 # Additional native enemy-counter/chest bindings were audited by cs19c (r19-sword.md). Ungated map/glass chests
 # do not acquire an invented combat rule merely because their N64 name mentions an enemy.
+# Round 21 cs21e (plans/rounds/r21-hammer.md, class enemy): entries marked "adult_weapon" read the world.toml helper
+# adult_weapon (adult_sword or can_use(Megaton_Hammer)) instead: the enemies they fight take Hammer damage in the dump
+# (DamageRates Hammer 1.0 or more) and Kareem played the Hammer as an adult weapon. Off, it folds like adult_sword.
+# Bosses (Phantom Ganon, Morpha, Bongo Bongo, Twinrova) and Ganondorf keep their sword rules.
 
 # Helpers (OoT Randomizer LogicHelpers.json).
 
@@ -210,37 +214,44 @@ source = "LogicHelpers.json:165. Round 19 Master Sword shuffle (cs19c; plans/rou
 # Region rules, in world file order.
 
 [events."KF Outside Deku Tree"."Deku Stick Drop"]
-rule = "(adult_sword and not entrance_shuffle) or can_use(Kokiri_Sword) or can_use(Boomerang)"
+# adult_weapon: Enemy_Dekubaba Hammer 1.0.
+rule = "(adult_weapon and not entrance_shuffle) or can_use(Kokiri_Sword) or can_use(Boomerang)"
 was = "(is_adult and not entrance_shuffle) or can_use(Kokiri_Sword) or can_use(Boomerang)"
 source = "Overworld.json:225. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult's Deku Babas are cut down: adult_sword (no adult alternative named)."
 
 [events."KF Outside Deku Tree"."Deku Nut Drop"]
-rule = "adult_sword and not entrance_shuffle"
+# adult_weapon: Enemy_Dekubaba Hammer 1.0.
+rule = "adult_weapon and not entrance_shuffle"
 was = "is_adult and not entrance_shuffle"
 source = "Overworld.json:226. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult's Deku Babas are cut down: adult_sword (no adult alternative named)."
 
 [locations."SFM Wolfos Grotto Chest"]
-rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
+# adult_weapon: Enemy_Wolfos Hammer 1.0.
+rule = "adult_weapon or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
 was = "is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Overworld.json:2954. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the grotto's Wolfos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Hideout 1 Torch Jail"."Hideout 1 Torch Jail Gerudo"]
-rule = "adult_sword or (is_child and Kokiri_Sword)"
+# adult_weapon: Enemy_MiddleBoss_GerudoThief Hammer 1.0.
+rule = "adult_weapon or (is_child and Kokiri_Sword)"
 was = "is_adult or Kokiri_Sword"
 source = "Overworld.json:887. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the jail guard's fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Hideout 2 Torches Jail"."Hideout 2 Torches Jail Gerudo"]
-rule = "adult_sword or (is_child and Kokiri_Sword)"
+# adult_weapon: Enemy_MiddleBoss_GerudoThief_02 Hammer 1.0.
+rule = "adult_weapon or (is_child and Kokiri_Sword)"
 was = "is_adult or Kokiri_Sword"
 source = "Overworld.json:914. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the jail guard's fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Hideout 3 Torches Jail"."Hideout 3 Torches Jail Gerudo"]
-rule = "adult_sword or (is_child and Kokiri_Sword)"
+# adult_weapon: Enemy_MiddleBoss_GerudoThief_03 Hammer 1.0.
+rule = "adult_weapon or (is_child and Kokiri_Sword)"
 was = "is_adult or Kokiri_Sword"
 source = "Overworld.json:944. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the jail guard's fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Hideout 4 Torches Jail"."Hideout 4 Torches Jail Gerudo"]
-rule = "adult_sword or (is_child and Kokiri_Sword)"
+# adult_weapon: Enemy_MiddleBoss_GerudoThief_04 Hammer 1.0.
+rule = "adult_weapon or (is_child and Kokiri_Sword)"
 was = "is_adult or Kokiri_Sword"
 source = "Overworld.json:965. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the jail guard's fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
@@ -265,32 +276,38 @@ was = "is_adult or can_child_attack"
 source = "Deku Tree.json:37. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the Gold Skulltula: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [locations."Dodongos Cavern GS Side Room Near Lower Lizalfos"]
-rule = "adult_sword or has_explosives or (is_child and (Sticks or Slingshot or Boomerang or Kokiri_Sword))"
+# adult_weapon: Enemy_Skulltula_Gold Hammer 1.0.
+rule = "adult_weapon or has_explosives or (is_child and (Sticks or Slingshot or Boomerang or Kokiri_Sword))"
 was = "is_adult or has_explosives or Sticks or Slingshot or Boomerang or Kokiri_Sword"
 source = "Dodongos Cavern.json:48. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [locations."Forest Temple First Stalfos Chest"]
-rule = "adult_sword or (is_child and Kokiri_Sword)"
+# adult_weapon: Enemy_Stalfos_Weak Hammer 1.0 (can_kill_stalfos already names the Hammer).
+rule = "adult_weapon or (is_child and Kokiri_Sword)"
 was = "is_adult or Kokiri_Sword"
 source = "Forest Temple.json:21. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the Stalfos fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Forest Temple NW Outdoors"."Deku Stick Drop"]
-rule = "adult_sword or (is_child and (Kokiri_Sword or Boomerang))"
+# adult_weapon: Enemy_Dekubaba Hammer 1.0.
+rule = "adult_weapon or (is_child and (Kokiri_Sword or Boomerang))"
 was = "is_adult or Kokiri_Sword or Boomerang"
 source = "Forest Temple.json:48. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Forest Temple NW Outdoors"."Deku Nut Drop"]
-rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
+# adult_weapon: Enemy_Dekubaba Hammer 1.0.
+rule = "adult_weapon or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
 was = "is_adult or Slingshot or Sticks or has_explosives or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Forest Temple.json:49. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Forest Temple NE Outdoors"."Deku Stick Drop"]
-rule = "adult_sword or (is_child and (Kokiri_Sword or Boomerang))"
+# adult_weapon: Enemy_Dekubaba Hammer 1.0.
+rule = "adult_weapon or (is_child and (Kokiri_Sword or Boomerang))"
 was = "is_adult or Kokiri_Sword or Boomerang"
 source = "Forest Temple.json:89. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Forest Temple NE Outdoors"."Deku Nut Drop"]
-rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
+# adult_weapon: Enemy_Dekubaba Hammer 1.0.
+rule = "adult_weapon or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
 was = "is_adult or Slingshot or Sticks or has_explosives or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Forest Temple.json:90. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
@@ -315,7 +332,8 @@ was = "can_use(Hookshot) or (logic_water_morpha and (is_adult or Kokiri_Sword))"
 source = "Bosses.json:141. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): r18-master-sword-design.md section 7 (Bosses.json:141): the nucleus is struck after the Hookshot pull, conservatively with a sword; the trick branch's Kokiri Sword is the child's."
 
 [locations."Shadow Temple Hover Boots Chest"]
-rule = "not shuffle_master_sword or adult_sword"
+# adult_weapon: Enemy_DeadHand Hammer 1.0, Enemy_DeadHand_Hand 1.0.
+rule = "not shuffle_master_sword or adult_weapon"
 was = "True"
 source = "Shadow Temple.json:18. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): native N64 layout: Dead Hand guards the Hover Boots. OoT Randomizer names no other Dead Hand weapon (its Bottom of the Well fight reads the Kokiri Sword), so conservatively adult_sword. OoT Randomizer's True relied on the always-held sword; only an adult reaches this region, so off it is True for every reachable age."
 
@@ -335,27 +353,33 @@ was = "can_use(Mirror_Shield)"
 source = "Bosses.json:194. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): r18-master-sword-design.md section 7 (Bosses.json:194): Twinrova's final strikes after the Mirror Shield reflections need adult_sword."
 
 [exits."Ice Cavern Beginning"."Ice Cavern Spinning Scythe Room"]
-rule = "here(adult_sword or has_explosives or can_use(Dins_Fire))"
+# adult_weapon: Enemy_Freezard Hammer 99.0.
+rule = "here(adult_weapon or has_explosives or can_use(Dins_Fire))"
 was = "here(is_adult or has_explosives or can_use(Dins_Fire))"
 source = "Ice Cavern.json:13. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the opening room's Freezards (its explosives and Din's Fire are can_kill_freezard's): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [locations."Ice Cavern Iron Boots Chest"]
-rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
+# adult_weapon: Enemy_Wolfos_White Hammer 1.0.
+rule = "adult_weapon or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
 was = "is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Ice Cavern.json:78. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the end room's Wolfos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [locations."Gerudo Training Ground Stalfos Chest"]
-rule = "adult_sword or (is_child and Kokiri_Sword)"
+# adult_weapon: Enemy_Stalfos Hammer 1.0.
+rule = "adult_weapon or (is_child and Kokiri_Sword)"
 was = "is_adult or Kokiri_Sword"
 source = "Gerudo Training Ground.json:8. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the Stalfos fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [locations."Gerudo Training Ground Beamos Chest"]
-rule = "has_explosives and (adult_sword or (is_child and Kokiri_Sword))"
+# adult_weapon for the fight; the Beamos (Enemy_Beamos 2867582777575272608, 0.0 from the chest) takes the Hammer too:
+# Kareem, Longshot 3.0.0, 2026-11-23, one Hammer hit destroyed an Enemy_Beamos (r21-hammer.md, Beamos G1).
+rule = "can_blast_or_smash and (adult_weapon or (is_child and Kokiri_Sword))"
 was = "has_explosives and (is_adult or Kokiri_Sword)"
 source = "Gerudo Training Ground.json:9. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the room's fight after the Beamos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [exits."Gerudo Training Ground Lobby"."Gerudo Training Ground Boulder Room"]
-rule = "adult_sword or (is_child and Kokiri_Sword)"
+# adult_weapon: Enemy_Stalfos Hammer 1.0.
+rule = "adult_weapon or (is_child and Kokiri_Sword)"
 was = "is_adult or Kokiri_Sword"
 source = "Gerudo Training Ground.json:27. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): through the Stalfos room: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
@@ -370,32 +394,38 @@ was = "True"
 source = "Gerudo Training Ground.json:164. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): conservative, native N64 layout not verified in the remake: the room is cleared of its Torch Slugs and Fire Keese for this chest. OoT Randomizer's True relied on the always-held sword; only an adult reaches this region, so off it is True for every reachable age."
 
 [locations."Ganons Castle Forest Trial Chest"]
-rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
+# adult_weapon: Enemy_Wolfos Hammer 1.0.
+rule = "adult_weapon or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
 was = "is_adult or Slingshot or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Ganons Castle.json:36. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the trial's Wolfos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Ganons Castle Water Trial"."Blue Fire"]
-rule = "has_bottle and (adult_sword or (is_child and (Sticks or Kokiri_Sword)) or has_explosives)"
+# adult_weapon: Enemy_Freezard Hammer 99.0.
+rule = "has_bottle and (adult_weapon or (is_child and (Sticks or Kokiri_Sword)) or has_explosives)"
 was = "has_bottle and (is_adult or Sticks or Kokiri_Sword or has_explosives)"
 source = "Ganons Castle.json:75. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the trial's Freezards: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [events."Ganons Castle Water Trial"."Fairy"]
-rule = "Blue_Fire and (adult_sword or has_explosives or can_use(Dins_Fire))"
+# adult_weapon: Enemy_Freezard Hammer 99.0.
+rule = "Blue_Fire and (adult_weapon or has_explosives or can_use(Dins_Fire))"
 was = "Blue_Fire and (is_adult or has_explosives or can_use(Dins_Fire))"
 source = "Ganons Castle.json:77. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the trial's Freezards (its alternatives are can_kill_freezard's): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [locations."Ganons Castle Water Trial Fairy Pot Drop"]
-rule = "Blue_Fire and (adult_sword or has_explosives or can_use(Dins_Fire))"
+# adult_weapon: Enemy_Freezard Hammer 99.0.
+rule = "Blue_Fire and (adult_weapon or has_explosives or can_use(Dins_Fire))"
 was = "Blue_Fire and (is_adult or has_explosives or can_use(Dins_Fire))"
 source = "Ganons Castle.json:76. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the trial's Freezards (its alternatives are can_kill_freezard's): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [locations."Ganons Tower Boss Key Chest"]
-rule = "adult_sword or (is_child and Kokiri_Sword)"
+# adult_weapon: the tower's Dinolfos, Stalfos and Iron Knuckles take Hammer 1.0.
+rule = "adult_weapon or (is_child and Kokiri_Sword)"
 was = "is_adult or Kokiri_Sword"
 source = "Bosses.json:222. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the tower's fights: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
 [exits."Ganons Castle Tower"."Ganons Castle Tower Below Boss"]
-rule = "(adult_sword or (is_child and Kokiri_Sword)) and (Boss_Key_Ganons_Castle or (shuffle_pots != 'off'))"
+# adult_weapon: the tower's Dinolfos, Stalfos and Iron Knuckles take Hammer 1.0.
+rule = "(adult_weapon or (is_child and Kokiri_Sword)) and (Boss_Key_Ganons_Castle or (shuffle_pots != 'off'))"
 was = "(is_adult or Kokiri_Sword) and (Boss_Key_Ganons_Castle or (shuffle_pots != 'off'))"
 source = "Bosses.json:226. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the tower's fights: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 

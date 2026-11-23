@@ -77,9 +77,9 @@ was = "can_blast_or_smash and has_bottle"
 source = "Remake splits N64's shield/fairy grave: no wall or fairy pool in the ReDead/shield grave. Fairy source moved to Graveyard Fairy Grave; cs7f placement audit, build e0f3ccfa"
 
 [events."Graveyard Fairy Grave".Fairy]
-rule = "has_explosives and has_bottle"
+rule = "can_blast_or_smash and has_bottle"
 new = true
-source = "WallCrack 9366825990748670811 blocks the fairy pool under the flower-marked grave (4,101.5,5.75); eight Obj_Fairy, no chest/check. Kareem via Claude, 2026-11-08: wall needs bombs. Explosives required; no unverified Hammer bypass. cs7f read-only placement audit, build e0f3ccfa"
+source = "WallCrack 9366825990748670811 blocks the fairy pool under the flower-marked grave (4,101.5,5.75); eight Obj_Fairy, no chest/check. Kareem via Claude, 2026-11-08: wall needs bombs. cs7f read-only placement audit, build e0f3ccfa. Round 21 cs21e (plans/rounds/r21-hammer.md, class cracked wall): WallCrack's CrackStoneObject damage table takes Hammer 100 (= Bomb 100); Kareem broke the same actor class on Death Mountain Trail with the Hammer (0.2.5), so the Megaton Hammer opens it too"
 
 # The Royal Family's Tomb: Keese room, ReDead room, Sun's Song tablet. No torches and no chest.
 

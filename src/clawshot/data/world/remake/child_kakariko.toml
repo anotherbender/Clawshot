@@ -60,8 +60,9 @@ source = "leaving the grotto (Hyrule Field Banc, entrance at (163,151,27)) retur
 
 [locations."Kak Redead Grotto Chest"]
 # Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword, child
-# weapons the child's; it folds to the translated rule while shuffle_master_sword is false.
-rule = "adult_sword or (is_child and (Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
+# weapons the child's; it folds to the translated rule while shuffle_master_sword is false. Round 21 cs21e:
+# adult_weapon (the Megaton Hammer too; Enemy_ReDead Hammer 1.0, r21-hammer.md class enemy).
+rule = "adult_weapon or (is_child and (Sticks or Kokiri_Sword)) or can_use(Dins_Fire)"
 was = "is_adult or Sticks or Kokiri_Sword or can_use(Dins_Fire)"
 area = "HyruleField"
 source = "census: the chest is HyruleField's 5755485285664292988 ('Hyrule Field Chest (TBox_Rupee_Purple)'), in the grotto above; its rule (kill the two ReDeads: the pedestal chest appears) is OoT Randomizer's, unchanged"
