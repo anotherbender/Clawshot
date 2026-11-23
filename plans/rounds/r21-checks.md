@@ -21,7 +21,7 @@ launcher references `hookshot.exe` (grep). Times are estimates, not measured. En
 | # | Packet (seed) | Covers | Parts | Time | Status |
 |---|---|---|---|---|---|
 | 1 | P1 (21217000) | New Game writer at count 1 (beams, line); Very strong hints, 10 stones; zero-stone bridge | 1A, 1B, 1C | 45-70 min | **played 2026-11-23**: stones PASS, entry PASS; Forest end not finishable with P1's items |
-| 1b | S1 (castle save + one edit; mod of seed 21217000) | Count 1 end: Forest trial, barrier scene, pots, elevator, Continue | one | 15-25 min | staged, dry run pass, boot check owed (Claude) |
+| 1b | S1 (castle save + one edit; mod of seed 21217000) | Count 1 end: Forest trial, barrier scene, pots, elevator, Continue | one | 15-25 min | **played 2026-11-23 PASS** (Save/Continue not reported) |
 | - | Darunia tracker | Tracker reads `Dm_Goron_0030` from real saves | none | 0 | **checked by agent** (below) |
 | 2 | C1 control (21217000, six trials) | Native six beams and line; only if P1 is unclear | one | 8-10 min | staged |
 | 3 | S2 (castle save + one edit; mod of seed 21217026) | Count 2: a non-final core keeps the tower shut | S2-a (S2-b withdrawn) | 10-15 min | **S2-a played PASS**; S2-b needs Golden Gauntlets |
@@ -292,4 +292,7 @@ product behaviour changed).
 Kareem, Longshot 3.0.0, 2026-11-23 (via Claude): P1-1A/1B all ten Very strong stone texts correct; P1-1C entry
 PASS (one Forest beam, "Trials remaining: Forest.", no pots), its Forest trial not finishable (mis-staged); S2-a
 PASS (Forest trial done, Forest beam down, Shadow beam and tower barrier stay); S2-b not finishable (Golden
-Gauntlets). Boot checks of the S1 launchers are Claude's.
+Gauntlets). S1 PASS (Kareem, 3.0.0, 2026-11-23): one Forest beam and its line, Forest trial finished, the barrier
+broke, four pots appeared inside the barrier by the elevator, the elevator worked and the tower progressed.
+Save/Continue after the barrier was not reported. With P1's entry (New Game writer) and S2-a (non-final trial keeps
+the tower shut), counts 1 and 2 are played; counts 3-5 (S3-S5) are staged, not played.

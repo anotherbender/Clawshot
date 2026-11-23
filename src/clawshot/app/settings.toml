@@ -78,8 +78,8 @@ kind = "integer"
 min = 0
 max = 6
 group = "World"
-# Played evidence: plans/rounds/r20-trials.md, zero trials on the fixed TEST-COPY (2026-11-21, Longshot 3.0.0 stable).
-help = "Six keeps vanilla. Zero clears all trials; one to five selects that many remaining trials from a dedicated seeded stream. The spoiler, play note and first barrier-view text name them. New games only. Zero played on Longshot 3.0.0 (on an adjusted save, not a fresh game): no barrier, and the tower lift works and keeps working after Save/Continue. One to five are not played yet."
+# Played evidence: plans/rounds/r20-trials.md (zero, 2026-11-21) and plans/rounds/r21-checks.md (one and two, 2026-11-23), Longshot 3.0.0 stable.
+help = "Six keeps vanilla. Zero clears all trials; one to five selects that many remaining trials from a dedicated seeded stream. The spoiler, play note and first barrier-view text name them. New games only. Played on Longshot 3.0.0: zero (on an adjusted save, not a fresh game) has no barrier and a working tower lift after Save/Continue; one passed end to end (a new game's beams and text, then the last trial, barrier scene, pots and lift from a castle save with a documented count edit); two passed for its first trial keeping the tower shut. Three to five are not played yet."
 [songs]
 label = "Song placement"
 kind = "choice"

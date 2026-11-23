@@ -84,7 +84,9 @@ shows neither. The maintainers' in-game check of in-logic and marks is still pen
   Partial trial seeds name the remaining trials in the spoiler, play note and first barrier-view dialogue.
   On Longshot 3.0.0 (2026-11-21) a 16-token bridge stayed shut at 15, opened at 16 and persisted after
   Save/Continue; zero trials' barrier and tower lift passed on an adjusted save copy, not a fresh new game.
-  Partial counts 1–5 are built, not played ([trials play record](plans/rounds/r20-trials.md)).
+  Counts 1 and 2 passed on Longshot 3.0.0 (2026-11-23; count 1 end to end, via a new game plus a castle save with a
+  documented count edit; count 2's first trial); counts 3–5 are built, not played
+  ([trials play record](plans/rounds/r20-trials.md), [round 21 checks](plans/rounds/r21-checks.md)).
 - **Not shuffled yet:** cows, pots, crates and loose rupees.
 - **Excluded locations:** pick checks by area/search in Settings, or use `--exclude-locations` with exact
   world check names. They never hold progression; impossible lists are refused. [Reference](docs/settings.md#excluded-locations).
