@@ -1,7 +1,7 @@
 # Round 21, Track fill — cs21h
 
 Branch `r21/fill`, starting main `e9bb0d77270fbc92a455df53dac1f4099b6bc859` (0.2.5 plus the round 20 close records).
-Model: `anthropic/claude-opus-5-5`. Status: **candidate 2 accepted on paired run 2; full gate on `1673def` (see below)**.
+Model: `anthropic/claude-opus-5-5`. Status: **READY (merge) `37572a9`**: candidate 2 accepted, full gate passed.
 External scripts and receipts: `E:/OOTRemake/work/r21-fill/`.
 
 No game started, personal seed opened, save edited or game/runtime folder written. This is a generator-only
@@ -206,7 +206,19 @@ chest holding non-progression that the source may take. Verified on the real dum
 `CLAWSHOT_WORKERS=1`, no game running): **6 passed, 179.91 s** (`ocarina-dump-fix.log`). Not a re-pin: the seed stays
 7 and every assertion is unchanged.
 
-The dump stage must rerun on the head carrying this fix; synthetic is unaffected (the file is dump-only).
+Dump stage rerun on `37572a9` (test fix `7694c08`, touching only `tests/test_getitem_ocarina_dump.py`, +20 −2, plus
+this plans commit), 21:04–21:53 under the lock, `-n 8`, `CLAWSHOT_WORKERS=3`, all three variables, no game running:
+**835 passed, 2919.75 s** (`work/r21-fill/gate2/dump.log`). With the synthetic/format/lint pass on `1673def`
+(unaffected by a dump-only test), the gate is complete.
+
+## Handoff
+
+- READY (merge): `r21/fill` head `37572a9` on main `aeba6df`. Product: `5f6e2e1` (tokens first, chest reserve) +
+  `1673def` (reserve accounting); test fix `7694c08`; the rest plans-only.
+- Measured: broad first-try failures 6/200 → 1/200, 0 exhausted in all three recipes, Defaults and Recommended
+  unchanged; generator-only, nothing to play.
+- For review: `plans/04-world-format.md` stage 6 now describes the item order and the chest reserve.
+- Next for cs21h: `r21/dungeon-hold` from main after this merges (Claude, 2026-11-23).
 
 ## Lock note
 
