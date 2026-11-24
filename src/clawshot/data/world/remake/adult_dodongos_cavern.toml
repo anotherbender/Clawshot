@@ -1,0 +1,58 @@
+# Round 22 cs22d; plans/rounds/r22-logic.md has the complete per-rule audit and staged unknowns.
+# Only existing local Bomb Flower routes gain the adult fixed-Bracelet/Low capability. No new transport path,
+# remote flower, bag, strength copy or global rock capability is invented. Generated rules stay unchanged.
+
+[exits."Dodongos Cavern Beginning"."Dodongos Cavern Lobby"]
+rule = "here(can_blast_or_smash or dc_bomb_flower) or dodongos_cavern_shortcuts"
+was = "here(can_blast_or_smash or Progressive_Strength_Upgrade) or dodongos_cavern_shortcuts"
+source = "WallCrack 17059737893961516233 (0,101.5,14.2); room-0 flowers 12361535549877235172 / 12696080931756852015, 9.8 / 11.6 m away: carry. WallCrack CrackStoneObject Bomb100/Hammer100, life6; death removes wall/collision. Existing local route plus played adult Low-lift capability (Kareem, Longshot 3.2.0, 0.2.6, before bag). dc_bomb_flower; r22-logic.md."
+
+[events."Dodongos Cavern Lobby".Fairy]
+rule = "(can_blast_or_smash or dc_bomb_flower) and can_summon_gossip_fairy and has_bottle"
+was = "(can_blast_or_smash or Progressive_Strength_Upgrade) and can_summon_gossip_fairy and has_bottle"
+source = "Gossip Stone alcove WallCrack 5587238701582185492 (23,99.8,-36.5); flower 971877315955590573, 18 m away: carry. WallCrack damage/death chain as entrance. Only the existing local lift alternative changes; song/bottle remain. dc_bomb_flower's played adult Low capability; r22-logic.md."
+
+[locations."Dodongos Cavern Gossip Stone"]
+rule = "here(can_blast_or_smash or dc_bomb_flower)"
+was = "here(can_blast_or_smash or Progressive_Strength_Upgrade)"
+source = "Same WallCrack 5587238701582185492 and carried flower 971877315955590573 as the lobby Fairy event; no in-place detonation at the flower reaches it. dc_bomb_flower; r22-logic.md."
+
+[locations."Dodongos Cavern Map Chest"]
+rule = "can_blast_or_smash or dc_bomb_flower"
+was = "can_blast_or_smash or Progressive_Strength_Upgrade"
+source = "WallCrack 5641837233975145227 (-23.3,99.8,-38); flower 18295893136718890181, 11.7 m away: carry. WallCrack CrackStoneObject Bomb100/Hammer100, life6, death removes collision. Existing local flower route plus dc_bomb_flower's played adult Low capability; r22-logic.md."
+
+[exits."Dodongos Cavern Lobby"."Dodongos Cavern Lower Right Side"]
+rule = "can_blast_or_smash or dc_bomb_flower"
+was = "has_explosives or Progressive_Strength_Upgrade"
+source = "WallCrack 4200731794857161328 (29.25,98.7,-8), room1 AiGroup Room_01_Prefab_bb1f _610d, room2's only room1 opening; flower 971877315955590573 is 15 m away: carry. WallCrack CrackStoneObject Hammer100 = Bomb100, life6; death removes collision. Kareem broke this wall class with Hammer on 0.2.5 (r21-hammer.md). R21 candidate2's premise was wrong: manager10474712916684003797 belongs to room10 staircase, not this exit. Add Hammer for this wall, and dc_bomb_flower's played adult Low lift; no Hammer-on-flower inference. r22-logic.md."
+
+[locations."Dodongos Cavern Deku Scrub Side Room Near Dodongos"]
+rule = "can_blast_or_smash or dc_bomb_flower"
+was = "can_blast_or_smash or Progressive_Strength_Upgrade"
+source = "WallCrack14949303250999372259 (63,100.5,-83.5); flower10492269415332841231, 11.1 m away: carry. Same WallCrack damage/death chain; only existing local lift alternative gains adult fixed Bracelet/Low. dc_bomb_flower; r22-logic.md."
+
+[locations."Dodongos Cavern Compass Chest"]
+rule = "can_blast_or_smash or dc_bomb_flower"
+was = "can_blast_or_smash or Progressive_Strength_Upgrade"
+source = "WallCrack8412887615091849594 (-49,101.7,-14); use room10 flower1336635945291484747 about13m away: carry. Room11 flowers4486732909606887122 /10991141202112217462 are closer but on the far side, so not the route. Same WallCrack damage/death chain; dc_bomb_flower's played adult Low lift. r22-logic.md."
+
+[exits."Dodongos Cavern Staircase Room"."Dodongos Cavern Climb"]
+rule = "has_explosives or dc_bomb_flower or can_use(Dins_Fire) or (logic_dc_staircase and can_use(Bow))"
+was = "has_explosives or Progressive_Strength_Upgrade or can_use(Dins_Fire) or (logic_dc_staircase and can_use(Bow))"
+source = "Existing carried-flower staircase route only: room10 loose flowers3319219522422689056 /1336635945291484747; BombFruit blast matches bag bombs. Manager10474712916684003797 expects4 explosions within3frames, then EventRequest15736379894023753157 plays Dm_DodongoCave_0010 and swaps stair7755736649088098775 ->900149935771582689. Only lifting's adult fixed-Bracelet Low capability changes; Hammer in-place chain startup remains unproven and is staged, not admitted. r22-logic.md."
+
+[exits."Dodongos Cavern Climb"."Dodongos Cavern Before Upper Lizalfos"]
+rule = "here(can_blast_or_smash or dc_bomb_flower)"
+was = "here(can_blast_or_smash or Progressive_Strength_Upgrade)"
+source = "WallCrack4510904998256755578 (56.8,114.8,-7.8); room13 flower2675786713662170296, 8.5m away by block2195788520120900949: carry. Same WallCrack damage/death chain; existing local flower route gains adult fixed Bracelet/Low. No flower from below is assumed to reach the separate Bomb Bag ledge wall. dc_bomb_flower; r22-logic.md."
+
+[exits."Dodongos Cavern Lower Right Side"."Dodongos Cavern Torch Room"]
+rule = "adult_weapon or can_use(Bow) or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs"
+was = "Sticks or Slingshot or Bombs or Kokiri_Sword"
+source = "Room5 lower-Lizalfos counter8075926014768809555 opens shutter9415944883117694992 toward rooms6-8. Same Enemy_MiddleBoss_Lizalfos Arrow1.0 table as Kareem's played upper-pair arrow kill (Longshot3.2.0, 0.2.6). Add the adult weapon/Bow fight route, and age-guard child-only weapons (adult ownership of Sticks does not light or fight with them). Room5 Chest uses the same fight. The separate unplayed lobby ledge route is unchanged; r22-logic.md."
+
+[events."King Dodongo Boss Room"."Defeat King Dodongo"]
+rule = "((can_use(Megaton_Hammer) and logic_dc_hammer_floor) or has_explosives or king_dodongo_shortcuts) and (((Bombs or dc_bomb_flower) and can_jumpslash) or deadly_bonks == 'ohko')"
+was = "((can_use(Megaton_Hammer) and logic_dc_hammer_floor) or has_explosives or king_dodongo_shortcuts) and (((Bombs or Progressive_Strength_Upgrade) and can_jumpslash) or deadly_bonks == 'ohko')"
+source = "Only the existing Bomb Flower lift branch gains adult fixed Bracelet/Low; floor, jump-slash and shortcut requirements are unchanged. Room22 flowers16232085853275649945/14326755281814874501/13131113113479567980/3488340387747474622 produce Obj_BombFlower_A_01. Its native actor tag is Bomb, and King Dodongo PerceptionSetTargetBomb selects ground, uncarried Bomb-tagged actors (not Bombchus). This is the same fruit used by the preexisting Strength branch; dc_bomb_flower changes capability, not boss mechanics. King Dodongo still requires bombs or a carried flower, never Hammer as the fight substitute (r21-hammer.md exception). r22-logic.md."

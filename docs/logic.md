@@ -52,9 +52,10 @@ removed. The cow-shed pickup does exist, with its own actor and map anchor in al
 variants; its owl/Hookshot roof route is unchanged. The nonexistent Ice Cavern loose blue rupee
 is excluded. Native tokens have a different, liftable pickup contract: this is not a blanket
 Boomerang ban. [Per-rule evidence and unplayed alternatives](../plans/rounds/r20-audit.md).
-Dodongo's torch-room exit also needs usable fire rather than adult age/sword ownership alone.
-Child Sticks and Din's remain valid; the adult Fire Arrows branch retains the existing shuffled-sword
-guard. Ordinary-Bow torch chaining there remains unplayed and is not newly admitted.
+Dodongo's torch-room route accepts plain adult arrows through its permanently lit candle: Kareem
+played that method on Longshot 3.2.0 (0.2.6), without Fire Arrows. Child Sticks and Din's remain valid.
+Its three candles open the room-8 door to the room-9 floor switch, which opens the staircase door;
+they do not directly open the latter. The adult's possible 3 m lobby ledge shortcut remains unplayed.
 
 **Deku Sticks and Nuts (0.2.6): pots are not a source.** A child has sticks in logic only from a
 shop's Deku Stick (`Buy Deku Stick (1)`/`(5)`, or a shuffled `Deku Stick (1)`) or from the Deku Babas a
@@ -83,10 +84,20 @@ explosives open one of those actors read `can_blast_or_smash` (explosives or the
 fights read the world helper `adult_weapon`
 (a durable blade or the Hammer), which matters only with Master Sword shuffle on. The ground Beamos
 (`Enemy_Beamos`, Spirit Temple's Beamos hall and Gerudo Training Ground's Beamos room) also takes the
-Hammer: Kareem destroyed one with a single Hammer hit (Longshot 3.0.0, 2026-11-23). Unchanged: King
-Dodongo (bombs, or Bomb Flowers with the Bracelet), the Shadow Temple skull pots and spider webs
-(their damage tables give the Hammer 0), eye switches, Bomb Flower chains, the high Beamos, and the
-boss fights. [Class-by-class evidence](../plans/rounds/r21-hammer.md).
+Hammer: Kareem destroyed one with a single Hammer hit (Longshot 3.0.0, 2026-11-23). The adult's
+Mirror Shield also kills it by **redirecting its beam back onto it**, not merely blocking (Kareem,
+Longshot 3.2.0, 0.2.6); only Beamos-kill predicates gain that alternative, not cracked walls.
+King Dodongo (bombs, or Bomb Flowers with the Bracelet), the Shadow Temple skull pots and webs
+(Hammer rate 0), eye switches, in-place Bomb Flower chains, high-Beamos Hammer reach and boss
+fights keep their prior requirements. [Hammer evidence](../plans/rounds/r21-hammer.md).
+
+**Adult Bomb Flowers:** audited Dodongo's Cavern local flower routes admit a fixed Goron Bracelet
+as adult Low lift without inventing a progressive strength copy. The same played capability now
+opens Goron City's Lost Woods shortcut and stops its adult Rolling Goron; other Goron City flower
+routes remain conservative. In Dodongo's Cavern, ordinary adult arrows also kill the Lizalfos pairs,
+so Bracelet + Bow reaches the Bomb Bag without bag explosives or a durable sword. Flowers must be
+carried to each cited wall; a Hammer hitting a growing fruit does not imply transport or a working
+staircase chain. No global strength/rock policy changes. [Per-rule audit](../plans/rounds/r22-logic.md).
 
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
