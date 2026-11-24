@@ -268,7 +268,7 @@ track = [
 
 [check."LW Ocarina Memory Game"]
 class = "swap"
-gate = "Minigame_SkullKidSession_IsGetHeartPiece"
+gate = "Minigame_SkullKidSession_IsGetHeartPiece; shuffled prize on first won round, then native repeats"
 track = [
   { bool = "Minigame_SkullKidSession_IsGetHeartPiece", source = "Npc_SkullKid_Child_02/Event58 sets it on every path through grant Npc_SkullKid_Child_02/Event24 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]

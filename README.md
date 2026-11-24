@@ -126,6 +126,11 @@ shooting-gallery prizes give the seed's rewards (`R10-MINIGAMES-CHILD-JABU`,
 `R10-MINIGAMES-ADULT`). Later wins give the game's usual rupees. Expert galleries stay unshuffled:
 their native rewards are repeatable wallet rupees (Market 30, Kakariko 70), not unique first prizes.
 
+**In every seed, the Lost Woods ocarina memory game's first won round gives its prize once**, whether
+shuffled or the vanilla Heart Piece; later sessions retain native payouts. Built, not played on Longshot 3.2.0.
+The separate **Bag bombs without the Bracelet** option is experimental and off by default; it keeps the
+Bomb Bag requirement and leaves Bomb Flowers unchanged. [Checks and evidence](plans/rounds/r22-games.md).
+
 **New with Gift shuffle:** the child Market Potion Shop bottle tutorial and Dampé's graveyard
 digging prize now give shuffled rewards. Both passed their in-game checks on 2026-11-10
 (`R10-MARKET-BOTTLE-FIX`, `R10-DIGGING`). The shop's corrected swap passed re-entry and shopping;

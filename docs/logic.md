@@ -88,6 +88,14 @@ Dodongo (bombs, or Bomb Flowers with the Bracelet), the Shadow Temple skull pots
 (their damage tables give the Hammer 0), eye switches, Bomb Flower chains, the high Beamos, and the
 boss fights. [Class-by-class evidence](../plans/rounds/r21-hammer.md).
 
+**Bag bombs without the Bracelet (experimental, default off):** `bombs_without_bracelet` is paired with
+`patch.bombs`, which lowers only `Item_Bomb`'s required lift grade. `remake/bombs.toml` then requires the
+Bomb Bag but no strength for `Bombs`; `can_use(Bombs)`, explosives and both Octorok bomb shortcuts inherit it.
+Bomb Flowers, child Dodongo's Cavern entrance and other local lift routes retain strength; Bombchus remain
+independent and still need their bag. Built, not played on Longshot 3.2.0.
+[Native trigger chain and checks](../plans/rounds/r22-games.md).
+
+
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
 Boots or Serenade are shuffled. Claude chose the r16 precaution on 2026-11-17; Kareem was informed.

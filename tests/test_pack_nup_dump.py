@@ -68,6 +68,7 @@ def resource_modes():
     for forest in CATALOG["forest"]:
         yield f"forest-{forest}", replace(all_kinds, forest=forest, fast_start=skips)
     yield "free-travel", replace(all_kinds, logic={"free_time_travel": True})
+    yield "bombs-without-bracelet", replace(all_kinds, logic={"bombs_without_bracelet": True})
     yield "master-sword", Settings(shuffle_master_sword=True, logic={"free_time_travel": True})
     yield "mixed-master-sword", replace(all_kinds, shuffle_master_sword=True, logic={"free_time_travel": True})
     yield (

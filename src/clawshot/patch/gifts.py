@@ -85,6 +85,10 @@ BOWLING_FIRST = "Market Bombchu Bowling First Prize"
 BOWLING_SECOND = "Market Bombchu Bowling Second Prize"
 BOWLING_CHECKS = (BOWLING_FIRST, BOWLING_SECOND)
 
+SKULL_KID_CHECK = "LW Ocarina Memory Game"
+SKULL_KID_FLOW = "Npc_SkullKid_Child_02"
+SKULL_KID_FLAG = "Minigame_SkullKidSession_IsGetHeartPiece"
+
 DAMPE_CHECK = "Graveyard Dampe Gravedigging Tour"
 DAMPE_FLAG = "GraveYard_DiggingHoleTour_Drop_HeartPiece"
 
@@ -781,6 +785,65 @@ def _bowling_order(fc: evfl.Flowchart) -> None:
         ):
             raise GiftPatchError(f"{fc.name}: stale bowling prize order: {event!r}")
         event.cases = [(case, _index(fc, fc.name, name)) for case, name in enumerate(targets)]
+
+
+def _skull_kid_first_win(fc: evfl.Flowchart) -> None:
+    """Give the unclaimed prize after a complete win, at the native serial reward boundary."""
+    join = fc.events[_index(fc, fc.name, "Event178")]
+    dispatch = _index(fc, fc.name, "Event9")
+    grade = fc.events[_index(fc, fc.name, "Event12")]
+    gate = fc.events[_index(fc, fc.name, "Event64")]
+    grant = fc.events[_index(fc, fc.name, "Event24")]
+    flag = fc.events[_index(fc, fc.name, "Event58")]
+    if (
+        not isinstance(join, evfl.JoinEvent)
+        or join.next != dispatch
+        or not isinstance(grade, evfl.ActionEvent)
+        or fc.actors[grade.actor].name != GAME_DATA_ACTOR
+        or fc.actors[grade.actor].actions[grade.action] != "EventTriggerSetGameDataInt"
+        or grade.params
+        != {"GameDataName": "Minigame_SkullKidSession_CurrentGradeSoundNumForSession", "Index": -1, "Value": 8}
+        or grade.next != _index(fc, fc.name, "Event23")
+        or not isinstance(gate, evfl.SwitchEvent)
+        or fc.actors[gate.actor].name != GAME_DATA_ACTOR
+        or fc.actors[gate.actor].queries[gate.query] != READ_QUERY
+        or gate.params != {"GameDataName": SKULL_KID_FLAG, "Index": -1}
+        or gate.cases != [(0, _index(fc, fc.name, "Event154")), (1, _index(fc, fc.name, "Event24"))]
+        or not isinstance(grant, evfl.SubFlowEvent)
+        or (grant.flowchart, grant.entry_point, grant.next)
+        != ("Dm_SY_GetInEvent", "GetInEvent_NotTurn_NotNpc", _index(fc, fc.name, "Event58"))
+        or not isinstance(flag, evfl.ActionEvent)
+        or fc.actors[flag.actor].name != GAME_DATA_ACTOR
+        or fc.actors[flag.actor].actions[flag.action] != SET_ACTION
+        or flag.params != {"GameDataName": SKULL_KID_FLAG, "Index": -1, "Value": True}
+    ):
+        raise GiftPatchError(f"{fc.name}: stale memory-game reward boundary: {join!r}, {grade!r}, {gate!r}")
+    # Native Bool queries use 0=true, 1=false. A completed source keeps the entire native dispatcher.
+    first = deepcopy(gate)
+    first.name = f"{NEW_EVENT_PREFIX}SkullKidFirstWin"
+    first.cases = [(0, dispatch), (1, len(fc.events) + 1)]
+    completed_grade = deepcopy(grade)
+    completed_grade.name = f"{NEW_EVENT_PREFIX}SkullKidPrizeGrade"
+    # Match the native third-win state, then its rally reset, camera, gift, once-flag and Ready tail.
+    completed_grade.next = _index(fc, fc.name, "Event68")
+    join.next = len(fc.events)
+    fc.events.extend((first, completed_grade))
+
+
+def skull_kid_changes() -> dict[str, Callable[[bytes], bytes]]:
+    """Every seed gives the memory game's native or shuffled prize on its first complete win."""
+
+    def transform(data: bytes) -> bytes:
+        tree = evfl.read(data)
+        if tree.flowchart is None or tree.flowchart.name != SKULL_KID_FLOW:
+            raise GiftPatchError(f"{SKULL_KID_FLOW}: the file holds no flowchart of that name")
+        _skull_kid_first_win(tree.flowchart)
+        out = evfl.write(tree)
+        if evfl.read(out) != tree:
+            raise GiftPatchError(f"{SKULL_KID_FLOW}: the written flow does not read back as the changed tree")
+        return out
+
+    return {f"Event/EventFlow/{SKULL_KID_FLOW}.bfevfl.zs": transform}
 
 
 def _dampe_reward(fc: evfl.Flowchart, step: Gift) -> None:
