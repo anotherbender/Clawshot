@@ -3,8 +3,9 @@
 Investigation by Claude with BBender, 2026-11-22 to 2026-11-23. Clawshot `feature/ocarina-get-model` (on `b3d0ad1`),
 dump 1.1.1 (update v131072), Longshot v3.1.1. BBender reviewed every visual in game; Claude built the test mods.
 Observations marked *(BBender)* are BBender's; every other claim comes from the dump (research scripts outside the
-repository) or a run's log. **Implemented in `src/` on `feature/song-get-effects` (spec and plan:
-`docs/specs/song-get-effects/`); not committed yet.** This file records the final visuals, how the research build
+repository) or a run's log. **Implemented in `src/` by PR #41 (`feature/song-get-effects`).** Its spec and plan
+(`docs/specs/song-get-effects/`, cited in the code as S1-S14 and "plan" task numbers) stay outside the repository;
+the spec decisions are copied under "Spec decisions (PR #41)" below. This file records the final visuals, how the research build
 made them, and the results of the implementation (oracle, in-game checks). The experiment history (runs SA1 to T16, dead ends, the light-arrow ring and
 the near-camera fade) is archived outside the repository in `ocarina-qa/_archive/song-effects/`.
 
@@ -269,8 +270,8 @@ launcher, so its `mods:` lines are not on record; the SONGQA1 lines above show t
 
 `formats/byml.py` (version 5), `formats/elink.py`, `formats/vfx.py`, `formats/rstb.py` (section 51 formulas),
 `patch/songs.py` with `data/song_effects.toml`, wired in `patch/__init__.py` for seeds whose settings let songs move
-(Gift shuffle on; see "Scope by setting"). Decisions made while implementing: `docs/specs/song-get-effects/plan.md`,
-"Decisions made during implementation".
+(Gift shuffle on; see "Scope by setting"). The spec's decisions are under "Spec decisions (PR #41)" below; the spec
+and plan themselves (`docs/specs/song-get-effects/`) stay outside the repository.
 
 ## Scope by setting (PR #41 review, 2026-11-24)
 
@@ -286,3 +287,29 @@ Defaults stay byte-identical until the change has been played more widely; "ever
 - A placement the settings rule does not cover (another placer's) is refused with a `PatchError` instead of showing
   the wrong model (S8; proposed by Claude).
 
+## Spec decisions (PR #41)
+
+Copied from PR #41's body (BBender with Claude, 2026-11-23) so the code's S-numbers resolve in the repository.
+
+| # | Decision | Proposed by |
+|---|---|---|
+| S1 | Feature name `song-get-effects` | BBender |
+| S2 | Scope: every seed; changed during implementation to seeds with a moved song, then by setting (above) | Claude, accepted; changed by BBender; the maintainers |
+| S3 | Floor pickups built and written, not placed; placing songs on the floor is a later feature and a maintainer call | BBender |
+| S4 | Oracle: byte-identical to the gallery build, checked once, result in the record | Claude (oracle), BBender (one-off) |
+| S5 | ELink users `Clawshot_Song_<Song>` copied from `Obj_Heart_Container`; clones `Clawshot_ChargeSpark/Aura/Light` | Claude, accepted |
+| S6 | BYML v5 in `formats/byml.py`, not a separate module | Claude, accepted |
+| S7 | Effect-file size entry: measure first, no margin; stop if no constant fits | BBender (measure), Claude (no margin) |
+| S8 | A broken native lesson or get path: stop and report, no silent fallback | Claude, accepted |
+| S9 | Effect values in `data/song_effects.toml` with their source | Claude, accepted |
+| S10 | Branch off PR #40, rebased onto `main` once it merges | Claude, accepted |
+| S11 | The unwired song swap in `getitem.py` is replaced | Claude, accepted |
+| S12 | Only `.110` is patched; `.100` and `.110` both round-trip in tests (a dump holding only `.110` skips `.100`) | Claude, accepted |
+| S13 | No user-facing docs; only `plans/song-get-effects.md` | BBender |
+| S14 | In-game checks by Claude with permission; changed: BBender ran them all himself | Claude, accepted; changed by BBender |
+
+Made during implementation (PR #41's body): song rows gain the ocarina's `InstanceHeapSize` and the larger
+`PreActorRenderInfoHeapSize` (BBender); the ELink table entry is the larger of the two fitting formulas (BBender);
+`static` has a formula of its own (BBender, S7); E8 (BBender); names interned, no copy of the gallery's duplicate
+name (Claude); pickups as new files, the writer copying from a changed pack, pickup rows as the gallery (Claude).
+"Animation files as step inputs" (Claude) was reverted at review: the step never reads them (`rounds/r21-pr41.md`).
