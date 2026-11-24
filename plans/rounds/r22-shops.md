@@ -39,6 +39,32 @@ Proposed by cs22c from build `e0f3ccfa`; no reachability rule is loosened. Sourc
 - No new event writer, flag or resource input. King Zora's existing tracker completion flag remains; Goron's pre-grant dialogue flag is not promoted to completion.
 - Focused tunic/shared-contract run: **90 passed**, 173.66 s; receipt `work/r22-shops/tunic-focused.log`. Metadata citation additions and post-rebase registration proof still require the final focused run.
 
+## Longshot 3.2.0 staged checks
+
+Private seed **922301**; candidate and main `2091387` control are independently composed by the same recipe (Chest + Shop + Gift, affordable shuffled shelves, forest/door open, free-time-travel logic). Deterministic, pool-preserving cycles put the same four test items on the same potion shelves. Candidate includes both new gift checks; main retains their native tunics, so other random assignments are not claimed identical. Production external-placement validation passes. Full beatability replay restores the spoiler's omitted fixed native rewards: **18 candidate / 23 control spheres**, all six test targets reachable. The first replay mistakenly used shuffled-only spoiler placements; printed its stalled inventory, restored the 1,031 fixed rewards, then proved the complete assignments. No reroll or product-rule change.
+
+Packet root: `E:/OOTRemake/work/r22-shops/ingame/`. Every `*-candidate-v1.bat` has a `*-control-v1.bat`, pins **Longshot 3.2.0** at `builds/stable/v3.2.0/bin/longshot.exe`, unsets `HOS_FS_OVERLAY`, and loads only its arm's mod. Each case/arm has a separate disposable `user-*` save folder. All **eight cmd dry-runs exited 0**, copied-save readback matches its fixture, and binary readback proves both native grant wrappers/continuations plus all-language missing-label difference. Receipts: `stage-proof-{candidate,control}.json`, `launcher-fixtures.json`, `launchers.log`, and `*-dry-run.log`.
+
+Natural saves: the post-Forest adult backup (Temple of Time thumbnail) for cases01/03/04; the after-Jabu child backup (Zora's Domain thumbnail) for case02. Both gift checks are unclaimed, both tunics/Ice Arrows/Mirror Shield absent. Adult has 148 rupees and an empty bottle; child has 58 rupees and 20/20 nuts. **Only case01 has one documented edit**, applied identically to both arms: `PouchData.Weapon_Shield_Deku.StockNum` 1→0 (one changed byte). The scanned natural adult backups had the Deku Shield; this recreates Kareem's no-shield condition without age/story changes. Original backups remain untouched; cases02/03/04 are byte-identical natural copies.
+
+Run control then candidate for each pair; close Longshot between arms. Debug **teleport and clock only**; never debug age change. Do not inspect a map after a teleport. Record visible inventory/rupees and the log proof, not just a correct-looking shelf.
+
+| Pair (each filename ends `-{control,candidate}-v1.bat`) | Estimated total for both arms |
+|---|---|
+| `01-kak-potions` | 8–12 min |
+| `02-market-potion` | 6–8 min |
+| `03-goron-gift` | 10–14 min |
+| `04-zora-gift` | 14–20 min |
+
+Each launcher is below 30 minutes; four independent natural-break pairs total approximately 38–54 minutes.
+
+1. **Kakariko potion sales:** `01-kak-potions-*`. Continue the adult Temple of Time copy; teleport to Kakariko if desired, set daytime, then walk into the potion shop. Confirm the Deku Shield is absent. Select the shield (vanilla Half Milk, Item3), accept, and inspect inventory and rupees. Candidate: readable adult offer, one shield added, exactly10 rupees charged; main control: the old missing-offer/no-sale behavior, not a claimed played result. Then try the Goron Tunic (Item1) and Zora Tunic (Item2), each10 rupees; candidate should sell and show/equip both normally, control retains missing generic non-bottle dialogue. Retry an owned tunic: candidate must refuse clearly with no additional charge. Do not infer success from a model alone. Keep `mods: Mals/<active-language>.Product.110.sarc.zs <- <candidate/control mod path>` from the arm's `longshot_log.txt`. This also exercises tunics remaining obtainable in potion stock.
+2. **Market partial-capacity sale:** `02-market-potion-*`. Continue the child Zora's Domain copy. Outside dialogue, use five nuts so the bag is15/20. Teleport to child Market if desired, set daytime, then walk into the potion shop and select Deku Nuts(10), Item3. Candidate: native partial-capacity confirmation, accept, nuts15→20 and rupees58→48; no empty bottle should be needed. Main control: old missing `Shop_04` confirmation prevents the partial sale. At full capacity, retry: candidate must refuse clearly without charging. Keep the active-language Mals load line. Do not buy bottle contents for this test.
+3. **Rolling Goron gift:** `03-goron-gift-*`. Continue the untouched natural adult Temple of Time copy. Teleport to Goron City if desired; let its native arrival scene finish. Stop Darunia Jr with a bomb, talk, and complete the fire-temple/Volvagia conversation until the native hand-over. Candidate: **Ice Arrows**, not the Goron Tunic; control: **Goron Tunic**. Inspect the inventory after control returns, reopen dialogue and re-enter the area: no second grant, doors/story progression intact, no stuck reaction/fade. Keep `mods: Event/EventFlow/SageOfFire.bfevfl.zs <- <arm mod path>`. Do not buy the tunic first or use another shuffled check.
+4. **King Zora gift:** `04-zora-gift-*`. Continue the untouched natural adult copy. Use the existing empty bottle: collect Blue Fire in Ice Cavern (teleport to its entrance is allowed; no map check), return to adult Zora's Domain and release it beside King Zora's red ice. Let the complete native thaw/thanks/handover finish. Candidate: **Mirror Shield**, not the Zora Tunic; control: **Zora Tunic**. After control returns, inspect inventory and re-talk/re-enter: no duplicate grant or stuck fade/camera, normal King Zora interaction remains. Keep `mods: Event/EventFlow/SageOfWater.bfevfl.zs <- <arm mod path>`. No injected bottle, ice/story flag or age edit.
+
+Runtime-load lines and observed outcomes are still for Kareem to supply. No agent game launch or boot check was performed; Claude owns boot checks.
+
 ## Verification and played limits
 
-Tunic focused checks, staged paired launchers, sweep and gate pending. No played claim is made. No product decision or new option proposed.
+All staged behavior is **built, not played**. Post-rebase focused registration, serialized 200/50/50 paired sweep and full gate pending. No new setting or product-scope decision proposed.

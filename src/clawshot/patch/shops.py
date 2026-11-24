@@ -326,8 +326,7 @@ def changes(
         owners.setdefault(slot.pack, []).append((slot, sale))
     messages = {}
     if any(
-        slot.shop in POTION_SHOPS
-        and not sales.get(slot.location, "Shop_Bottle_").startswith("Shop_Bottle_")
+        slot.shop in POTION_SHOPS and not sales.get(slot.location, "Shop_Bottle_").startswith("Shop_Bottle_")
         for slot in slots
     ):
         from clawshot.patch.text import archive_path, languages
