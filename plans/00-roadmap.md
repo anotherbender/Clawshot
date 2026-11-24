@@ -48,7 +48,8 @@ The standing Settings backlog below was separated from round 8, not discarded.
 | 18 | 2026-11-18–19 | Repairs, more checks, key/reward options and bounded played acceptance; released 0.2.3. | [Round 18](rounds/r18-overview.md) |
 | 19 | 2026-11-19–20 | Scene handoffs (no-ocarina lessons, Saria farewell), Light Arrows logic, 100-token reward, Master Sword shuffle, startup-test fix; cows research, fill rejected; released 0.2.4. | [Round 19](rounds/r19-overview.md) |
 | 20 | 2026-11-20–21 | Hint and shop text, excluded locations, starting inventory, trials count and token bridge, logic audit; cows and the Fortress played; open fountain research, fill rejected; PRs #37 and #38; released 0.2.5. | [Round 20](rounds/r20-overview.md) |
-| 21 | 2026-11-22– | In progress: tracker Checks tab and overlay, PRs #39 and #40, stick pots out of logic, Megaton Hammer audit, Richard's quest, pending play checks, fill retry. | [Round 21](rounds/r21-overview.md) |
+| 21 | 2026-11-22–24 | Tracker Checks tab and overlay, PRs #39 and #40, stick pots out of logic, Megaton Hammer as explosives, Richard and Cojiro, trials 1–2 played, chest reserve and dungeon-item hold, placement audit; released 0.2.6, then 0.2.7 (Dampé's first-race chest). | [Round 21](rounds/r21-overview.md) |
+| 22 | 2026-11-24– | In progress: Dampé's first race, Bombchus need the bag, potion shops and the tunic gifts, adult Dodongo's Cavern, story-scene presentation, Skull Kid's first win, bombs without the Bracelet (opt-in), PR #41. | [Round 22](rounds/r22-overview.md) |
 
 Outside the rounds, awaiting a maintainer's played check: tracker auto checks (gifts read from native flags,
 [design record](tracker-auto-checks.md)), checklist [tracker-auto-checks-play.md](tracker-auto-checks-play.md), static

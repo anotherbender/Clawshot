@@ -46,4 +46,33 @@ Kareem isn't playing tonight, but the round 20 caps stand (they keep Claude's wa
 
 ## Outcome
 
-(Written at round close.)
+Closed 2026-11-24 by Claude. Released **0.2.6** (2026-11-24, tag `v0.2.6` = `1330185`) and the **0.2.7** hotfix the
+same day (`v0.2.7` = `b1081f4`). Checks were played on Longshot 3.0.0 until the launcher replaced it with 3.2.0
+(2026-11-24); Clawshot's mods boot on 3.2.0 (main and PR #41's candidate).
+
+| Track | Outcome | Played | Record |
+|---|---|---|---|
+| cs21a tracker | Merged `ff78b5e`: Checks tab, row toggles and skips, leaner OBS overlay, Longshot 3.1 `save-work` fix. | Kareem's 0.2.6 seed (3.2.0) | [r21-tracker](r21-tracker.md) |
+| cs21b pr39 | PR #39 merged `47505ff`; ten gift rows accepted from play (`aeba6df`). | Kareem, 3.0.0, seed 921101 | [r21-pr39](r21-pr39.md) |
+| cs21c pr40 | PR #40 merged `99743ca`; follow-up `7f4070a`: Saria's doubled ocarina is the remake's own, before Gohma only (fix proposed for round 22). | Kareem, 3.0.0 (arms 10/11) | [r21-pr40](r21-pr40.md) |
+| cs21d sticks | Merged `3667df5`: pot-only Deku Stick and Nut sources out of logic; child Gold Skulltulas need a kill. | no (tightening) | [r21-sticks](r21-sticks.md) |
+| cs21e hammer | Merged `5078acb`: the Megaton Hammer counts as explosives and an adult weapon where the remake allows; King Dodongo kept. | Kareem, 3.0.0 | [r21-hammer](r21-hammer.md) |
+| cs21f npcs | Merged `b1d510d`: Richard needs the Kakariko gate open; Cojiro needs Epona freed. | no (tightening) | [r21-npcs](r21-npcs.md) |
+| cs21g checks | Merged `f7ba65f`, `e8dc77d`, `566c159`: round 20's staged checks, Darunia's tracker read, trials counts 1 and 2 played. | Kareem, 3.0.0 | [r21-checks](r21-checks.md) |
+| cs21h fill | Merged `1b27482` (the chest reserve keeps first-try fills from running dry) and `aded22d` (keys, maps and compasses stay in chests; Ice Cavern tightened). | no | [r21-fill](r21-fill.md) |
+| cs21i pr41 | Carried into round 22: BBender switched to option 2 (by setting) on 2026-11-24; targets 0.2.8. | Kareem, 3.0.0 (first head) | round 22 |
+| cs21j placement-audit | Merged `efdea7c`: every placement limit with its evidence class. | no (doc) | [r21-placement-audit](r21-placement-audit.md) |
+
+**Release gates.** 0.2.6 on `1330185`: 300-seed sweep 0 exhausted; synthetic 4391 passed; dump 836 passed. 0.2.7 on
+`b1081f4`: Dampé sweep 0 of 400 unfinishable (93 before); 300-seed sweep 0 exhausted; synthetic 4398 passed; dump on
+`1329d78` (identical `src/`) plus the two re-pinned test files.
+
+**Lessons recorded.**
+- A location whose native flow branches on owning its own vanilla item can be unreachable once that item is placed
+  elsewhere. Dampé's flow runs only the second race when a Hookshot or Longshot is owned, so the first-race chest never
+  appears; since 0.2.3 about one seed in four could put a required item there (0.2.7 limits it to non-progression;
+  round 22 fixes the flow). Trace such branches before a location takes progression.
+- A logic or fill change that moves placements can drop a pinned test seed's coverage
+  (`tests/test_event_registration.py`'s scrub-shield seed): re-pin with a placement search, confirmed in the dump tier.
+- The first-start check must run with Windows PowerShell's own module path: an inherited PowerShell 7 path hides
+  `Get-FileHash` and the starter reports a wrong hash (round 22 makes the starter independent of it).
