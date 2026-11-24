@@ -16,6 +16,7 @@ names it.
 | cs22d | logic | Adult Dodongo's Cavern with the Bracelet and Bomb Flowers (Kareem finished it that way before the bag): rule-by-rule evidence, loosening only with a cited trigger chain or a played check; round 21's Hammer-on-flower candidates. Zora's River downstream reads the same wall as upstream (a tightening). Stage the compass-from-Sheik check. Sweep. | play-held |
 | cs22e | scenes | The moat window names the shuffled item, not the Ocarina of Time; Talon's Cucco table stops showing milk and a bottle when its prize is shuffled; Saria's doubled ocarina before Gohma (round 21's proposed fix). | play-held |
 | cs22f | games | The Lost Woods Skull Kid ocarina game gives its prize on the first win, like the other minigames. An opt-in setting so bombs work without the Goron's Bracelet. The starter's uv hash check works from a PowerShell 7 window. | play-held |
+| cs22g | lifts | Added mid-round (Kareem OK): the placement audit's cheap lifts. Deku Stick and Nut capacities at Skulltulas (played family) and in chests; eight gift-only items tried in chests (Light Arrows, Nayru's Love, Farore's Wind, Stone of Agony, Double Defense, Biggoron's Sword, a Bottle, Rupees (200)); the ocarina hand-over exclusion retested on Longshot 3.2.0. Each lift merges after its play. | play-held |
 | cs21i | pr41 | Carried from round 21: BBender's PR #41 at `e0156b7` (option 2 by setting, `patch.steps`, a `PatchError` for uncovered placements). Review, merge `main` in, say which packet rows need replay, gate. Targets 0.2.8. | play-held |
 
 Not this round: rebuilding a seed from an older release with the same placements (Kareem: too big for this round);
@@ -33,8 +34,10 @@ BBender's floor-songs PR, which follows #41.
 - scenes: the new `display` field in `gift_rules.toml`, the display rewrite in `gifts.patch_flowchart`, Talon's flow,
   the `Dm_Kokiri_0155` edit.
 - games: the Skull Kid flow, the bombs-without-Bracelet setting and its patch, `scripts/start-windows.ps1`.
+- lifts: the capacity hold in `patch/scrubs.py`, its `token_rewards.toml` lines, new `[chest_verified]` entries and the
+  `[hand_over]` exclusion in `data/settings.toml`.
 - pr41: the files PR #41 touches (`patch/getitem.py`, the song get flows, `patch.steps` in the spoiler).
-- Shared-additive: `patch/gifts.py` (shops adds the tunics, scenes the display), the `Settings` dataclass in
+- Shared-additive: `patch/gifts.py` (shops adds the tunics, scenes the display, lifts the hand-over lines), the `Settings` dataclass in
   `generate/fill.py`, `app/settings.toml`, `data/settings.toml`, `docs/settings.md`, `docs/logic.md`, `README.md`, the
   world TOMLs. Add or change only your own lines; the later-merging track keeps both sides.
 
