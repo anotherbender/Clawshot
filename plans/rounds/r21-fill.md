@@ -259,3 +259,25 @@ Tests:
 - Focused, no game running, `-n 2`, `CLAWSHOT_WORKERS=1` (20 fill/key/dungeon files): **513 passed**.
 
 Docs: `docs/settings.md` (dungeon items paragraph), `plans/04-world-format.md` (placement modes).
+
+Sweep and full gate on `806de40`, one hold under the lock, 22:05–23:10, no game running at any stage (receipts in
+`work/r21-fill/`: `hold-hold.log`, `hold-sweep.log`, `hold-rows.jsonl`, `hold-summary.json`, `hold-gate/`). Inputs
+recaptured from `efdea7c` (`inputs-hold.pkl`). Every completed seed also asserted the exact normalized stock and that
+no held type sits at a non-chest, non-floor-key-source check: all 350 completed.
+
+| Recipe | Seeds | Exhausted | First failures | Mean / max attempts | Median s |
+|---|---:|---:|---:|---|---:|
+| Broad | 200 | 0 | 1 (seed 89, late map/compass, as on main) | 1.005 / 2 | 10.03 |
+| Defaults | 50 | 0 | 0 | 1 / 1 | 4.25 |
+| Recommended | 50 | 0 | 2 (36, 45, `Kokiri Sword`, as on main) | 1.04 / 2 | 7.56 |
+| Chest + Gift, songs anywhere | 50 | 0 | 0 | 1 / 1 | 5.70 |
+
+The fourth recipe is cs21j's reproduction recipe: the broad recipe already shuffles Gift with songs anywhere, so
+"broad with Gift and songs anywhere" would have repeated it.
+
+Gate: `ruff format --check` 560 files already formatted; `ruff check` clean; synthetic `-n 8`/4 **5166 passed, 63
+skipped, 795.28 s**; dump `-n 8`/3 with `OOT_ROMFS`, `OOT_NUP`, `OOT_DUMP` **836 passed, 2633.17 s** (one more than
+main: the new seed-1 regression).
+
+**READY (merge)** `r21/dungeon-hold` (gated head `806de40`, plus this plans-only commit). A tightening; built, nothing
+to play. The loosening check (a compass from Sheik's lesson) is round 22's.
