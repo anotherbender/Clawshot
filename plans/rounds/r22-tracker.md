@@ -82,7 +82,7 @@ and the next post explicitly corrected it.
 
 ## Checks and handoff
 
-Rebased onto current local main `4f4ff42`: focused contracts 195 passed; real-dump event registration 5 passed.
+Rebased onto current local main `5bc5577`; focused and real-dump registration contracts pass (receipts below).
 Final 1280/1920 browser screenshots pass. Ordered paired sweeps and full gate remain.
 
 ## Bombchu generator safety and local shortcuts
@@ -169,6 +169,10 @@ GTG lava's encounter/appear history must not credit its rupees.
   130.73 seconds (`CLAWSHOT_WORKERS=1 uv run --with pytest-xdist pytest -n 2 -q tests/test_tracker*.py
   tests/test_baba_drops.py tests/test_world_bombchus.py tests/test_world_remake_bombs.py tests/test_shop_logic.py
   tests/test_master_sword_logic.py tests/test_settings.py tests/test_app_schema.py`).
+- Final complete silver mapping: 29 passed with tracker logic-data contracts; targeted format/lint clean.
+- After rebasing onto main `5bc5577`: **204 focused passed** in 95.25 seconds; **5 dump event-registration
+  passed** in 240.72 seconds, including its deterministic scrub-shield coverage (no re-pin).
+  Logs: `focused-main5bc.txt`, `registration-main5bc.txt` in the external work folder.
 - Source-marker regression cases exercise cross-age sources, transitive exit gates, alternatives versus
   conjunctions, saved stock, inventory invalidation and finished rows. Reachability is compared with direct Search.
 - Headless Chromium (`source_shots.py`): shipped page, loopback server, synthetic backend snapshot, no page errors
