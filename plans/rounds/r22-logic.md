@@ -6,7 +6,7 @@ Branch `r22/logic`, base `2091387` (0.2.7 plus round records). Work/research and
 
 Product commits before final rebase/gate: `5b6041f` downstream wall; `fb3b676` explicit Ice gift credit (admission
 held); `55a6568` reflected Beamos kills; `0440ac8` two Goron flower uses; `387df4c` adult DC flower/arrows.
-Ice packet is staged/dry-run/read-back verified and **play-held**; DC physics packets are building serially.
+Ice and three paired DC physics checks are staged, dry-run/read-back verified, **built, not played**.
 No sweep/full-gate acceptance is claimed yet.
 
 ## Scope and acceptance
@@ -410,8 +410,12 @@ Claude boot-checks first. No game or boot was started by cs22d.
 
 All DC loading logs: each `ingame/user-r22-<check>-<arm>-next/longshot_log.txt` must show
 `mods: Banc/DodongoCavern/DodongoCavern_{Static,Dynamic}.bcett.byml.zs <- ...<arm>...`.
-`prove_dc_packets.py` checks actor/AiGroup equality against the native dump except chest rewards, and complete
-candidate/control runtime digests; dry-run receipts and final file counts will be recorded after the serial builds.
+`prove_dc_packets.py` passed: each pair has identical settings, explicit assignments, source-save hash and every
+runtime-file digest. File counts per arm: flower/candle116, Hammer117, ledge116; **5228 non-chest actor instances
+per pair** plus all AiGroups match the native dump. Source save hashes remain intact. Six launcher dry runs passed:
+pinned stable3.2.0 executable, separate private user folders, exactly one mod each, overlay unset. No game started.
+Each manifest lists both DC Banc files for the loading proof. **READY for Claude's boot check**, then Kareem's play;
+the unresolved physics alternatives remain held regardless of generator/gate results.
 
 ## Focused verification and decisions
 
