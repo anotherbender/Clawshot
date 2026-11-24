@@ -247,7 +247,13 @@ Updated the exhaustive public-schema contract with the new option; no production
 Cause-aimed full application/shared/UI rerun: **949 passed** (198.46 s), workers1 / -n2.
 Includes every `test_app*.py` / `test_ui*.py`, settings, native-logic validation and bomb option contracts.
 All four Windows installer cases and all eight disconnect cases pass; full log:
-`work/r22-games/focused-app-schema-fixed.log`. Native output/parity/registration focus is now running.
+`work/r22-games/focused-app-schema-fixed.log`.
+
+Ordered-pipeline native focus: **44 passed** (1259.64 s), workers1 / -n2, all three dump inputs set
+with the private `games-layered-dump`. Includes first-win/native repeat and Defaults Heart Piece output,
+all seed-output field/RSTB parity and two-process determinism, all event-registration production recipes,
+both NUP and layered-dump working-set checks, and the new option-on cache/full-dump byte-parity row for
+both sources. No seed re-pin or new dependency gap. Log: `work/r22-games/focused-native-post-rebase.log`.
 
 Player detection now uses CIM exact names excluding `*bootcheck*`, as Claude instructed on the thread.
 It initially reported one player, then zero at the successful rerun. Focused caps stay -n2/workers1;
