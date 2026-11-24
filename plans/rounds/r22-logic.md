@@ -431,3 +431,18 @@ the unresolved physics alternatives remain held regardless of generator/gate res
 - No new setting, version bump, saved field or game-resource filename. The explicit Ice gift credit is a runtime
   repair; its admission loosening remains a separate final commit after the paired play. All other loosenings cite
   native trigger/Low-lift chains or Kareem's attributed play; the staircase Hammer and ledge/flower ignition stay held.
+
+## Exact-head gate preparation
+
+Rebased onto current main `5bc5577` (deterministic scrub-shield event-registration coverage; no seed re-pin).
+Focused native-enabled run after rebase: **223 passed in396.23s**, `-n2`, `CLAWSHOT_WORKERS=1`, all three dump
+environment paths from the round brief. Files: `test_story_steps_river`, the three `test_r22_*` logic suites,
+`test_gift_dungeon_items`, `test_master_sword_logic`, `test_ranged_pickups`, `test_world_remake_hammer`,
+`test_gifts`, `test_gifts_dump`, **`test_event_registration`**. Log: `work/r22-logic/rebased-focus.log`.
+The Hammer fixture's starting flags were also printed: adult; candle, room9 switch and staircase event all false.
+
+Queued sweep plan, not results: paired current-main/head,200 Broad +50 Defaults +50 Recommended per arm, plus50
+`BroadAdultFlowers` per arm. The added cohort opens forest/door, shuffles the Master Sword, enables free travel,
+and starts with Time Ocarina/Lullaby/Saria's Song/Bow. Compare opaque placement/sphere digests and bagless adult
+Bracelet+Bow DC chest-access counts; no placement lists published. Generator exhaustions must be zero.
+Full format/lint, synthetic then dump gate follows under the assigned lock. No gate or sweep has run yet.
