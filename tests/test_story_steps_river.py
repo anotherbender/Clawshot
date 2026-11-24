@@ -15,7 +15,7 @@ def worlds():
     spec = load_spec()
     return {
         start: build_world({**spec, "start": start})
-        for start in ("ZR Front", "Lost Woods", "ZR Behind Waterfall", "Zoras Domain")
+        for start in ("ZR Front", "Zora River", "Lost Woods", "ZR Behind Waterfall", "Zoras Domain")
     }
 
 
@@ -82,3 +82,36 @@ def test_reverse_domain_route_is_not_blanket_gated_by_explosives(worlds):
     search = Search.adult_after_pull(worlds["Zoras Domain"])
     assert search.can_reach("Zora River", ADULT)
     assert search.holds(SOURCE)
+
+
+@pytest.mark.parametrize(
+    "age,items",
+    [
+        (CHILD, ()),
+        (ADULT, ()),
+        (CHILD, ("Bomb Bag",)),
+        (ADULT, ("Bomb Bag",)),
+        (CHILD, ("Megaton Hammer",)),
+    ],
+)
+def test_downstream_wall_blocks_without_an_age_usable_rock_breaker(worlds, age, items):
+    constructor = Search.child_only if age == CHILD else Search.adult_after_pull
+    search = constructor(worlds["Zora River"], items)
+    assert not search.can_reach("ZR Front", age), {"age": age, "items": items}
+    assert not search.holds(SOURCE)
+
+
+@pytest.mark.parametrize(
+    "age,items",
+    [
+        (CHILD, ("Bomb Bag", "Goron Bracelet")),
+        (ADULT, ("Bomb Bag", "Silver Gauntlets")),
+        (ADULT, ("Megaton Hammer",)),
+        (CHILD, (SOURCE,)),
+        (ADULT, (SOURCE,)),
+    ],
+)
+def test_downstream_wall_opens_with_the_same_sources_as_upstream(worlds, age, items):
+    constructor = Search.child_only if age == CHILD else Search.adult_after_pull
+    search = constructor(worlds["Zora River"], items)
+    assert search.can_reach("ZR Front", age), {"age": age, "items": items}

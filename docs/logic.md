@@ -99,6 +99,12 @@ Ice end-chest state enables entry; which of the two values matters was not separ
 played save-edit control, not a normal-progression or modded Clawshot certification. See
 [the Water gate evidence](../plans/rounds/r16-water-gate.md).
 
+**Zora's River entrance wall:** both directions between `ZR Front` and `Zora River` require
+`can_blast_or_smash` or the native `Zora River Domain Arrival` event. Entering from the Lost Woods
+does not bypass the downstream wall. Kareem met it going downstream on Longshot 3.2.0 (0.2.6);
+this mirrors the already verified upstream predicate, a tightening only.
+[Evidence](../plans/rounds/r22-logic.md).
+
 ## Rule language
 
 Rules are parsed expressions, **not Python to execute**. The compiler validates and folds settings
