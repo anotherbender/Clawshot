@@ -97,6 +97,22 @@ def test_items_without_an_acquired_once_rule_count_only_when_held(world):
     assert inv(world, {"IsGet.Item_Boomerang": True}, stock("Item_Boomerang")).counts["Boomerang"] == 1
 
 
+@pytest.mark.parametrize("remaining", [0, 10])
+def test_bought_bombchus_need_the_bag_even_when_ever_acquired(remaining):
+    world = logic_world(Settings())[1]
+    bought = stock("Item_Bombchu", remaining) | {
+        f"PouchData.Item_BombBag_{size}.StockNum": 0 for size in ("Small", "Medium", "Large")
+    }
+    history = {"IsGet.Item_Bombchu": True}
+    before = inv(world, history, bought)
+    assert "Bombchus" not in before.counts
+    # Keep the inventory display truthful even when this stock cannot yet be used.
+    cell = next(c for c in tracker_state.items(parse(history, bought)) if c["id"] == "bombchus")
+    assert cell["count"] == remaining and cell["ever"] is True
+    after = inv(world, history, bought | stock("Item_BombBag_Small"))
+    assert after.counts["Bombchus"] == 1
+
+
 # Q6: seed child logic takes the Goron Bracelet from Darunia's gift only. The tracker reads the gift from its cutscene's
 # saved Bool (patch/darunia.py SOURCE); a copy Bracelet or adult gauntlets (the strength cell) never stand in for it.
 DARUNIA = "HavePlayedEvent.Dm_Goron_0030"

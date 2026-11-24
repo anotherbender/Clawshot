@@ -158,6 +158,7 @@ SINGLES: tuple[tuple[str, str, str, str, bool], ...] = (
     ("dins_fire", "items", "Din's Fire", "Item_DinFire", False),
     ("farores_wind", "items", "Farore's Wind", "Item_FaroreWind", False),
     ("nayrus_love", "items", "Nayru's Love", "Item_NayruLove", False),
+    # Saved stock, not usability: tracker_logic requires the Bomb Bag (Kareem, Longshot 3.2.0, round 22).
     ("bombchus", "items", "Bombchus", "Item_Bombchu", True),
     ("magic_beans", "items", "Magic Beans", "Item_MagicBean", True),
     ("kokiri_sword", "equipment", "Kokiri Sword", "Weapon_Sword_Kokiri", False),

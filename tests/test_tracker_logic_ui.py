@@ -311,7 +311,7 @@ def test_rows_have_no_prefix_symbols_and_the_legend_names_each_state(tmp_path):
     rendered = tab(tmp_path)
     assert not [entry["text"] for entry in rendered["checks"] if entry["text"][:1] in "?—✓☑"]
     [legend] = rendered["legend"]
-    assert legend["text"] == "CollectedMarkedIn logicOut of logicMark by hand"  # one line, a word each
+    assert all(word in legend["text"] for word in ("Collected", "Marked", "In logic", "Out of logic", "Mark by hand"))
     assert "Skipped" not in legend["text"] and legend["shown"]  # no check offers a skip
 
 
@@ -462,3 +462,55 @@ def test_obs_never_shows_warnings(tmp_path):
     snap["state"]["warnings"] = ["The save has none of this seed's chest records."]
     assert render_tracker(tmp_path, snap, obs=True)["warnings"] == [""]
     assert "Cannot confirm" in tab(tmp_path, snap)["warnings"][0]
+
+
+def source_snapshot():
+    snap = snapshot()
+    # The adult has a direct route; only the child route borrows an adult-supplied resource.
+    snap["state"]["areas"][0]["checks"][0]["in_logic"]["adult"] = True
+    snap["state"]["areas"][0]["checks"][0]["assumed_sources"] = {
+        "child": [
+            {
+                "item": "Deku Nut Drop",
+                "sources": [
+                    {
+                        "region": "KF Outside Deku Tree",
+                        "ages": ["adult"],
+                        "rule": "can_use(Bow)",
+                    }
+                ],
+            }
+        ],
+        "adult": [],
+        "either": [],
+    }
+    return snap
+
+
+def test_source_marker_follows_the_selected_age_and_names_the_derived_source_not_a_reward(tmp_path):
+    actions = [
+        {"id": "tracker-age", "value": "child", "event": "change"},
+        {"class": "tracker-check", "index": 0, "event": "pointerover"},
+    ]
+    rendered = tab(tmp_path, source_snapshot(), actions=actions)
+    row = classes(rendered)["Child Chest"]
+    assert "tracker-check-needs-source" in row["className"]
+    assert "Deku Nuts" not in row["text"]  # details, not the check's hidden reward
+    body = rendered["details"]["body"]
+    assert "Needs a source" in body and "Deku Nuts (Deku Nut Drop)" in body
+    assert "Deku Babas in Kokiri Forest, outside the Deku Tree, as adult" in body
+    assert "Not saved stock" in body and "One sufficient route" in body
+    either = tab(
+        tmp_path, source_snapshot(), actions=actions + [{"id": "tracker-age", "value": "either", "event": "change"}]
+    )
+    assert "tracker-check-needs-source" not in classes(either)["Child Chest"]["className"]
+    assert "Needs a source" not in either["details"]["body"]
+    assert "Needs a source" in rendered["legend"][0]["text"]
+
+
+@pytest.mark.parametrize("done", ["collected", "marked", "skipped"])
+def test_finished_checks_never_show_a_stale_source_marker(tmp_path, done):
+    snap = source_snapshot()
+    snap["state"]["areas"][0]["checks"][0][done] = True
+    rendered = tab(tmp_path, snap, storage={AGE_KEY: "child"})
+    assert "tracker-check-needs-source" not in classes(rendered)["Child Chest"]["className"]
