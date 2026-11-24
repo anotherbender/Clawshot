@@ -509,7 +509,9 @@ _OPT_IN = _modules(
     "receive_event",
     "reward_bridge",
     "rewards",
+    "scene_gifts",
     "scrub_shields",
+    "talon",
     "text",
 )
 WRITERS = {

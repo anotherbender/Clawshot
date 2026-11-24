@@ -58,7 +58,7 @@ def compiled(request):
                 data = step[path](data)
         return data
 
-    names = {keys.POUCH, *(scene.flow for scene in scenes)}
+    names = {keys.POUCH, "Dm_SY_Get", *(scene.flow for scene in scenes)}
     names.update(ref.split("/")[0] for scene in scenes for ref in (*scene.grants, *scene.before, *scene.after))
     charts = {name: evfl.read(read(keys.flow_path(name))).flowchart for name in sorted(names)}
     charts[handoff.FLOW] = evfl.read(result.new_files[handoff.FLOW_PATH].data).flowchart

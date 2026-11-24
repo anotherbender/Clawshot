@@ -443,6 +443,9 @@ def _plain_entry(chart: evfl.Flowchart, scene: Scene, documents: dict[str, evfl.
             raise PatchError(f"scene handoff: unsupported source grant {ref}: {event}")
         if not isinstance(content, str) or isinstance(content, evfl.Argument) or not content:
             raise PatchError(f"scene handoff: {ref}: reward is not a literal actor: {content!r}")
+        # Match the native NPC post-grant path, without another item window or grant.
+        # This also covers the moat and farewell when their original scenes are bypassed.
+        onward = append(evfl.SubFlowEvent(f"Heal{number}", "Dm_SY_Get", "CheckHeart", onward, {"ActorName": content}))
         onward = append(
             evfl.SubFlowEvent(
                 f"Grant{number}",
