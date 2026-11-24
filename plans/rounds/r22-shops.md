@@ -1,7 +1,7 @@
 # Round 22 shops — cs22c
 
 Branch `r22/shops`, base `2091387`; model `openai-codex/gpt-6.1-sol`.
-Status: potion repair built and focused-tested; tunic gift implementation in progress. All behavior changes are **built, not played** until Kareem's Longshot 3.2.0 checks.
+Status: potion repair and both tunic gift sources implemented and focused-tested. Staging, sweep and gate pending. All behavior changes are **built, not played** until Kareem's Longshot 3.2.0 checks.
 Research/output root: `E:/OOTRemake/work/r22-shops/` (outside this repository).
 
 ## Scope and order
@@ -27,6 +27,17 @@ No game started; no personal seed, game folder or original save is modified. Nat
 - Applied whenever a selected potion shelf has a non-bottle sale, regardless of shelf index or normal/Alternative copy. No fill restriction or palette change; native child-tunic and Blue Fire holds remain.
 - Inputs/output are already covered by `pack/resources.toml`'s existing `Mals/*.Product.110.sarc.zs` pattern. No new native input or event writer. No new working-set fixture needed.
 - Focused command: `CLAWSHOT_WORKERS=1 OOT_ROMFS=E:/Games/Hookshot/romfs uv run --with pytest-xdist pytest -n 2 -q tests/test_potion_shops.py tests/test_potion_shops_dump.py tests/test_shops.py tests/test_shop_settings.py`: **62 passed**, 17.52 s pytest time; no game process at stage start. Receipt `work/r22-shops/potion-focused.log`.
+
+## Tunic gifts: native trigger and grant contract
+
+Proposed by cs22c from build `e0f3ccfa`; no reachability rule is loosened. Source-only location citations are in `data/world/remake/gifts.toml`. Decoded native evidence stays outside the repo in `work/r22-shops/tunic-trace/`.
+
+- **Goron:** adult GoronCity Static/Alternative Static bind Prefab118a's `Npc_Goron_DaruniaJr_Adult_a893`; the module reads `SageOfFire_GenerateDaruniaJr`, bomb-hit and quest progress, not tunic ownership. `RSDB/Challenge`'s `SageOfFire` Ready/StopDaruniaJr/TalkDaruniaJr steps select their participant schedules in `Pack/AIScheduleParam.pack.zs`. The TalkDaruniaJr schedule's default `…_C1_T` event row resolves through `RSDB/EventSetting` to `Step02_Npc_Goron_DaruniaJr_Adult_Talk`; conditional slots use native talked/crying Bools. `Event320` routes first versus repeat dialogue; choices and Navi interludes reach `Event38` (Handover_Child dialogue in parallel with a wait), join36, then **Event18**, the existing `Dm_SY_GetInEvent:GetInEvent_NotTurn` grant. Its continuation calls local `Step02_DoorOpen` and `Step02_Npc_Goron_DaruniaJr_Adult_AfterTalk`, reaching **Event13**, which advances the quest to `MoveStatue`. `FirstTalked` is set by pre-grant crying dialogue and is not completion. Keep the existing `Stop GC Rolling Goron as Adult` event requirement; stopping-method changes belong to cs22d.
+- **King Zora:** adult ZoraDomain Static/Alternative Static bind Common1b33's red ice and `EventRequestActor_9be2`, Hash `11896564388441894476`, `RequestEventName=SageOfWater_KingZora_IsMelted_Ice`. Graph nodes0/7/8/9 require `isHitBlueFire` and an unplayed melt event. EventSetting resolves to `SageOfWater:KingZora_IsMelted_Ice`; Event209 ends frozen state, the native thanks dialogue reaches fork156 (Handover animation / wait), join158, then **Event242**, `Dm_SY_GetInEvent:GetInEvent_NotTurn_PosCamera`. Event198 dialogue is followed by **Event69**, saving `SageOfWater_KingZora_adult_Talk_Event198`. The existing adult + Blue Fire thaw requirement is retained.
+- **Early vanilla-item audit (rule m):** Goron tunic reads in SageOfFire Events185/215 are the Navi heat hint only. Zora tunic reads in SageOfWater Events136/243 affect hint/BGM; the NPC flow's Event184 is separate adult-trade dialogue. None gates either native grant or its trigger. Moving a tunic early does not bypass the source's quest state writes; patching the actor parameter leaves all those writes intact.
+- **Native scene contract (rule f):** retain these existing NPC get-item wrappers and continuations; insert no window or scene. GiftChange/plan projects the two `Shop_Armor_*` identities to their native `Obj_Armor_*` gift actors. Native `PouchActorInfo` rows are identical except `__RowId`, verified by the dump test. Shelf actors stay unchanged. Tunics remain admitted at their existing shop/chest destinations rather than acquiring the generic gift-only hold.
+- No new event writer, flag or resource input. King Zora's existing tracker completion flag remains; Goron's pre-grant dialogue flag is not promoted to completion.
+- Focused tunic/shared-contract run: **90 passed**, 173.66 s; receipt `work/r22-shops/tunic-focused.log`. Metadata citation additions and post-rebase registration proof still require the final focused run.
 
 ## Verification and played limits
 
