@@ -103,6 +103,8 @@ def test_bombchus_and_hammer_do_not_inherit_the_bomb_lift_gate(age):
     world = build_world(spec)
     chus = Search(world, ["Bombchus (5)"])
     assert not chus.can_access(world.locations["Bomb-only wall"], age)
+    assert not chus.can_access(world.locations["Explosive wall"], age)
+    chus.collect("Bomb Bag")
     assert chus.can_access(world.locations["Explosive wall"], age)
     assert chus.can_access(world.locations["Rock"], age)
     hammer = Search(world, ["Megaton Hammer"])

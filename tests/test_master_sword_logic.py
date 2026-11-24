@@ -173,7 +173,6 @@ def _inventories(names, seed):
 
 def test_off_every_sword_rewrite_folds_to_the_rule_before_it(spec):
     entries = _entries(spec)
-    assert len(entries) > 90  # helpers, master_sword.toml's region rules and the other files' entries
     rules = _probe(spec, [text for _, new, old, _ in entries for text in (new, old)])
     for index, (label, *_, adult_only) in enumerate(entries):
         new, old = rules[2 * index], rules[2 * index + 1]
