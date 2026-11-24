@@ -240,6 +240,10 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
 
 ### Known issues
 
+- **Dampé's first-race prize can't be collected.** With a Hookshot or Longshot in hand (which the race needs),
+  Dampé always runs his second race, so the first-race chest never appears. From 0.2.7 it only ever holds a minor
+  item; skip it on the tracker. Seeds from 0.2.3 to 0.2.6 can need the item placed there and may not be
+  finishable: look up `Graveyard Dampe Race Hookshot Chest` in that seed's `spoiler.json`.
 - **Saves started with older builds:** after an age-unusable item pickup, Save and Continue before using
   other items; changing areas does not clear the old item-bar jam. Newly generated seeds initialize an empty
   nut slot (0/20). Kareem verified child Bow first, then Boomerang use without a reload on 2026-11-12.

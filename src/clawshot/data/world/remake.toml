@@ -60,7 +60,13 @@ source = "plans/03-game-data.md section 47 (Round 14 native census, build e0f3cc
 
 [locations."Graveyard Dampe Race Hookshot Chest"]
 vanilla_fixed = "Hookshot"
-source = "D16; census 'Graveyard Dampe Race Hookshot Chest' holds Item_Hookshot"
+# Round 22 hotfix: never progression. Dampe's flow picks the second race whenever the Hookshot is owned
+# (Finish_Npc_Hylia_Dampe_002_StepStart Event442 IsExistInPouch(Item_Hookshot) raises
+# MiniGame_DampeRace_ClearCount at every finish), and since 0.2.3 the race needs a Hookshot or Longshot, so this
+# chest never spawns. Kareem in game, 0.2.6 on Longshot 3.2.0, 2026-11-24 (save: ClearCount 2, HookShot_Event63
+# false). Without this, 93 of 400 release-recipe seeds were unfinishable (work/r22-dampe/report.md).
+nonprogression_only = true
+source = "D16; census 'Graveyard Dampe Race Hookshot Chest' holds Item_Hookshot; r22 hotfix: work/r22-dampe/report.md"
 
 [locations."Water Temple Longshot Chest"]
 vanilla_fixed = "Longshot"
