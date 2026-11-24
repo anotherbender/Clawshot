@@ -4,6 +4,11 @@ Branch `r22/logic`, base `2091387` (0.2.7 plus round records). Work/research and
 `E:/OOTRemake/work/r22-logic/`. No game or boot check run by this agent. Runtime for every new checklist:
 **Longshot 3.2.0**, stable `builds/stable/v3.2.0/bin/longshot.exe`.
 
+Product commits before final rebase/gate: `5b6041f` downstream wall; `fb3b676` explicit Ice gift credit (admission
+held); `55a6568` reflected Beamos kills; `0440ac8` two Goron flower uses; `387df4c` adult DC flower/arrows.
+Ice packet is staged/dry-run/read-back verified and **play-held**; DC physics packets are building serially.
+No sweep/full-gate acceptance is claimed yet.
+
 ## Scope and acceptance
 
 1. Audit every Dodongo's Cavern explosives rule against adult-accessible Bomb Flowers and its target's damage/material
@@ -312,9 +317,113 @@ set-true action -> the control's exact native continuation; control has no dunge
 Fact-only source/save survey: `work/r22-logic/save-findings.md`, `scan_saves.py`, `saves-scan.jsonl` (2963 slots,
 777 distinct saves); no GPL implementation or decoded data in the repo.
 
-## Decisions and open work
+## Unresolved DC physics packets (built, not played)
 
-Proposed by cs22d: keep uncertain chains conservative; stage them rather than infer physical flower reach from a
-nearby coordinate. No settings, runtime changes or new game resource planned. No version bump.
+All use **Longshot 3.2.0**, current Longshot template, pinned stable executable, one mod only, overlay unset.
+Each pair is this track versus main `2091387`, identical explicit assignments. These checks measure the game's own
+physics: neither arm patches flowers, candles, switches, collision or Hammer damage. Both arms should therefore
+behave alike; the old logic is not an in-game gate. The paired controls remain available.
 
-Audit, packet manifests/checklists, exact commands, gate and sweep numbers will be recorded here as completed.
+### Saves and packet boundaries
+
+The save survey found **no natural adult pre-bag save** in `save-backups`: natural adult main-game saves already
+finished DC as child. Best unedited alternative is test-lineage
+`2026-11-19_133536-r18-door-v2-15/<UID>/slot_05`, SHA256
+`60cc357a68fbae9b29813d8b81df56f21b42f97138e419f7edc9003f208611f0`. It came from the natural child
+`2026-11-07_1630/slot_01`; Kareem played the owned-Stones Door packet and **pulled the sword naturally**, with no
+age/inventory/flag cheats (`r18-rewards.md:594-601`). It is adult (`Sequence_IsChildhood=false`), Bracelet1,
+Master Sword1, Slingshot1, no Bow/fire items/Hammer/bag tier/bombs/Bombchus. Time Ocarina equipped.
+Its kit stones/Fire Medallion and two already-open lobby chests are disclosed test history, not vanilla progression.
+The entrance wall and two western alcoves are already broken, so these packets cannot retest them. Candles,
+staircase and Bomb Bag chest remain unused. Thumbnail viewed:
+`work/r22-logic/thumbs/2026-11-19_133536-r18-door-v2-15__slot_05.jpg`, Link on the Temple of Time pedestal dais.
+
+Hammer fixture requires **one documented item grant**, identical in both arms, because no naturally Hammer-owned
+save has the staircase unsolved. `stage_hammer_save.py` creates `work/r22-logic/fixture-hammer/` from that source:
+only `IsGet.Item_Hammer` (Bool0x7227efd8) and `PouchData.Item_Hammer.StockNum` (Int0x1aafdb66) change 0->1.
+Age, story, chest Bools, all Bool64 actor flags and every other entry are unchanged; original hash verified intact.
+Fixture hash `a8fc96aa2fb086de42a6d7a2303d171faa32fa9abc1feba6d856bc5acc4b1e89`, proof `hammer-save-proof.json`.
+No debug inventory or age change is prescribed. Hammer packets enable already-played free time travel so a normal
+child return/sword pull can prepare the candle door if the adult ledge is impassable; both arms get the same option.
+
+| Check | Launchers under `work/r22-logic/` (candidate/control) | Private seed | Save / estimated play |
+|---|---|---|---|
+| Ledge + optional Hookshot arch | `r22-ledge-{candidate,control}-next.bat` | 22040004 | natural main-fire-hammer slot04, no edits; ~5–8min/arm |
+| Adult flower blast -> timed candle | `r22-dc-{candidate,control}-next.bat` | 22040001 | naturally-aged Door-v2 adult pre-bag, no edits; ~10–15min/arm |
+| Hammer on growing staircase fruit | `r22-hammer-{candidate,control}-next.bat` | 22040002 | same pre-bag source + single Hammer grant; ~10min/arm if ledge works, 20–30min/arm with native child prep |
+
+Long checks are separate launchers at the arm boundary; do not combine saves. Time is estimated, not measured.
+If an arm exceeds 30 minutes, save its private copy at a safe point and resume that same launcher later.
+Claude boot-checks first. No game or boot was started by cs22d.
+
+### Ledge checklist — Longshot 3.2.0
+
+1. Launch candidate, Continue the natural adult Hammer/statue thumbnail. Teleport only to the mountain outside
+   DC, then walk through the entrance. No Debug age change, inventory or flag edits.
+2. On the lobby's east side, south of the Gossip Stone alcove, find the archway to the elevated floor-switch
+   passage. Try to jump/grab/climb onto that ledge **without items**. Report standing on the switch, or inability
+   to climb it; do not infer success from the staircase door, which this main-game save already opened.
+3. If bare climbing fails, try the owned Hookshot on the archway and report whether it actually carries Link up.
+   Native ledge top is y103 versus floor100; adult parameter limit2.81m, collision not decoded. Neither result is
+   assumed by this packet. The test decides the existing adult ledge clause and a possible Hookshot alternative.
+4. Quit. Repeat with control's independent original copy. Expected same physics. Save/reload optional for a pure
+   climb observation; the source switch is already set, so its persistence is **not** this check.
+
+### Flower/candle checklist — Longshot 3.2.0
+
+1. Launch candidate, Continue Temple pedestal thumbnail. This is adult from a real pull; no Debug age change.
+   Teleport to the mountain outside DC and walk in. **No Bomb Bag, bombs, Bombchus, Bow, fire spell or Hammer.**
+2. From the lobby, carry a local flower to the eastern lower-right cracked wall, then follow that route, defeat
+   the lower Lizalfos with the already-owned Master Sword, and reach room8's three timed candles. Do not rely on
+   the unplayed lobby ledge. Stay adult and do not light them as child.
+3. Use the flower near the far candle: plant8988246658738172741 (49.9,100,-70.1), candle1677399996748274653
+   (49.5,100,-64.1), about6m apart. Carry its fruit, set it down next to that **unlit** candle, and stand clear.
+   Record whether the blast lights the candle. A flower exploding without the candle burning is a failure of this
+   proposed ignition method, not a pass. Do not keep repeating unchanged failures.
+4. If it lights, test whether all three can be lit within their 15-second window using carried flowers only.
+   Record separately: one candle ignites; all three lit; room8->9 door opens; stepping on room9's floor switch
+   opens the staircase door. Do not substitute arrows (that method already passed in Kareem's seed).
+5. If the door opens, Save/Continue and re-enter through DC's entrance; record `DodongoCavern_CandleStick` and
+   `DodongoCavern_StepSwitch_01` from the private save. Quit; repeat on control's independent original copy.
+   Expected same native result. This check does not certify using a flower on a distant ledge or skull-eye socket.
+
+### Hammer staircase checklist — Longshot 3.2.0
+
+1. Launch candidate, Continue Temple pedestal thumbnail. Adult pre-bag plus the documented Hammer grant; no
+   other inventory/story edit. If the ledge check passed bare climbing, use that normal route to the room9
+   switch, then enter the staircase room. **Do not start the flower bed by throwing anything at it.**
+2. If the adult cannot reach that switch without a fire method, prepare it through normal age travel:
+   return the sword at the pedestal to become child (free time travel is enabled in both arms), obtain native
+   Deku Sticks from the Kokiri shop or a Deku Baba using the already-owned Kokiri Sword, enter DC, clear the
+   lower route with the Slingshot/sword, light the candles with a lit Stick, and stand on the room9 switch.
+   Leave the staircase bed untouched. Leave the dungeon, return to the Temple and **pull the sword naturally**
+   to become adult; return through DC's entrance. Never use Longshot's Debug age change.
+3. Verify that the staircase is still raised. At the front of the sixteen-flower bed, hit a growing bulb once
+   with the Hammer (front plants371439288973712559 /13867111007212989923, fruit just above the floor).
+   Do not pick up/throw a flower or use bombs. Record three distinct results: bulb explodes; row/bed chains;
+   staircase lowers and can be climbed. **Pass requires the last, not merely the explosion.**
+4. Save, leave/re-enter through the entrance and Continue; record the stair remaining down and
+   `HavePlayedEvent.Dm_DodongoCave_0010=true` in the private save. If ignition fails, stop/report the exact
+   fruit/position and which of the three steps failed, not repeated swings.
+5. Quit and repeat with control's independent identical Hammer fixture. Both should behave alike: no native
+   Hammer/flower code differs. The current logic **does not** count Hammer for this staircase until this pass.
+
+All DC loading logs: each `ingame/user-r22-<check>-<arm>-next/longshot_log.txt` must show
+`mods: Banc/DodongoCavern/DodongoCavern_{Static,Dynamic}.bcett.byml.zs <- ...<arm>...`.
+`prove_dc_packets.py` checks actor/AiGroup equality against the native dump except chest rewards, and complete
+candidate/control runtime digests; dry-run receipts and final file counts will be recorded after the serial builds.
+
+## Focused verification and decisions
+
+- ZR regression:24 passed.
+- Initial combined synthetic focus:210 passed,2 skipped,1 old sword-off comparison failure. Printed payload showed
+  Mirror Shield accepted by the new Beamos rule but not the comparison's r21 kill contract; updated that contract.
+- Native-enabled focus:216 passed,3 failed. Both Map/Compass native credit cases passed. Two new DC cases supplied
+  fixed `Bow` in a copies-only seed world: printed adult inventory had no Bow count, while `Progressive Quiver`
+  aliases Bow1. Fixtures now supply that raw copy, not change product logic. A child Bow-only matrix case could
+  not reach the torch room at all; supply child Bracelet/Slingshot to isolate the intended candle refusal.
+- Cause-directed DC/ranged/Hammer/Master-Sword rerun: **104 passed in24.25s**. No game running.
+- Targeted ruff format/check passed before the last fixture-layout change; final rebase/gate checks pending.
+- No new setting, version bump, saved field or game-resource filename. The explicit Ice gift credit is a runtime
+  repair; its admission loosening remains a separate final commit after the paired play. All other loosenings cite
+  native trigger/Low-lift chains or Kareem's attributed play; the staircase Hammer and ledge/flower ignition stay held.
