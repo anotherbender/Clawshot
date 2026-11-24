@@ -3834,5 +3834,13 @@ takes it from her back. Isolated to the ActorInfo change (the pack changes alone
 `CalcPriority: After` (the generator does) was clean only when the Fairy Ocarina had been taken from a chest earlier
 in the same session (runs V3, E); the native farewell, where the gift is the first Fairy Ocarina, still glitched with
 it (runs D, D2: two ocarinas overlapping, then hers doubled). Shipped as a known cosmetic issue (BBender's call, D5);
-`skip_saria_farewell` avoids the movie. On Longshot 3.0.0 (Kareem, 2026-11-23, `rounds/r21-pr40.md`) the same native
-case showed one normal ocarina with this change, with main 0.2.5 and with no mod at all.
+`skip_saria_farewell` avoids the movie. On Longshot 3.0.0 (Kareem, 2026-11-23, `rounds/r21-pr40.md`) the farewell from
+his natural save just before it (after the Deku Tree) showed one normal ocarina with this change, with main 0.2.5 and
+with no mod at all. But he also saw the doubled ocarina on 3.0.0 in a New Game built from main `e9bb0d7`, without this
+change (round 21 P1 packet, fast start, `--forest open`), and again on 3.0.0 from a pre-Gohma New Game save with **no
+mod** and with main (launchers 10 and 11, Kareem 2026-11-23). So the glitch is the remake's own and predates PR #40:
+it shows whenever the farewell plays before Gohma, which only `forest = closed_deku/open` allows (the unmodified game
+keeps the bridge shut until Gohma; Defaults use `forest = closed`, D24). Leading cause [static, `rounds/r21-pr40.md`]:
+before Gohma, Saria's `Npc_Kokiri_Saria_Child_WarpDone` schedule holds her own `Npc_Equipment_009` on `Weapon_R`,
+and Event7 binds the prop to the same bone turned 180 degrees. The round 22 fix proposed there stows her equipment
+first; `skip_saria_farewell` already avoids it.
