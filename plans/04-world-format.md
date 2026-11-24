@@ -453,7 +453,9 @@ resources under `<dir>/romfs/` plus `<dir>/spoiler.json`:
       Progression items whose holds include Token remain in shared progression instead; normal held items keep
       this constrained stage so general tokens cannot consume their last compatible destinations.
       With Gift and Token enabled, the chest-safety-derived holds also include Token for independently admitted
-      `token_rewards.toml` members, without admitting their chest path. Songs and Scrub-only capacity holds stay intact.
+      `token_rewards.toml` members, without admitting their chest path. Songs keep their holds. Fixed Nut/Stick
+      capacities admit Scrub and Token (played Nut native30 family, structurally checked Stick native20 sibling);
+      their chest hold remains (`rounds/r22-lifts.md`).
    5. D25's bomb and Bombchu packs, only where the Bomb Bag is needed.
    6. Shared progression, native-display items first (with Shop, so the second shield finds a way past Mido), then
       the tokens held to chests and Skulltulas, then the rest in seeded order (round 21: placed in seeded order,
