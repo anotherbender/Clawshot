@@ -56,7 +56,7 @@ Dodongo's torch-room exit also needs usable fire rather than adult age/sword own
 Child Sticks and Din's remain valid; the adult Fire Arrows branch retains the existing shuffled-sword
 guard. Ordinary-Bow torch chaining there remains unplayed and is not newly admitted.
 
-**Deku Sticks and Nuts (round 21): pots are not a source.** A child has sticks in logic only from a
+**Deku Sticks and Nuts (0.2.6): pots are not a source.** A child has sticks in logic only from a
 shop's Deku Stick (`Buy Deku Stick (1)`/`(5)`, or a shuffled `Deku Stick (1)`) or from the Deku Babas a
 weapon kills (`Deku Stick Drop` in KF Outside Deku Tree, the Deku Tree Lobby and the Forest Temple's two
 courtyards: the Kokiri Sword or Boomerang as a child). Nuts likewise come from shops, a shuffled
@@ -68,13 +68,13 @@ by chance). Loose sticks outside pots (Deku Tree grass, a Lake Hylia floor stick
 The tracker's in-logic view rebuilds the same world, so it follows.
 [Per-event evidence](../plans/rounds/r21-sticks.md).
 
-**Child Gold Skulltulas need a kill (round 21).** A token is the death drop of its Gold Skulltula, so a
+**Child Gold Skulltulas need a kill (0.2.6).** A token is the death drop of its Gold Skulltula, so a
 child token needs `can_child_attack` like the rest: `LLR GS Tree` and `Market GS Guard House` (Kareem, in
 game: the Skulltula pops out of the tree or crate and must be killed), `ZF GS Tree` and Kakariko's four
 night tokens (`remake/child_gs_kills.toml`, `remake/child_kakariko.toml`) were the OoT Randomizer rules
 without one. [Audit](../plans/rounds/r21-sticks.md).
 
-**Megaton Hammer as explosives and as an adult weapon (round 21):** every cracked wall, cracked floor
+**Megaton Hammer as explosives and as an adult weapon (0.2.6):** every cracked wall, cracked floor
 and boulder actor inherits `WallCrack`, whose damage table gives the Hammer the same rate as bombs
 (100; arrows, the Hookshot, fire and most other attacks 0); bomb-grotto covers share that table.
 Kareem broke walls of that actor, boulders and bomb grottos with the Hammer on 0.2.5. Rules whose
@@ -288,10 +288,10 @@ requires Dodongo's completion and available night. Sources: `remake/child_hyrule
 Kareem verified Saria before Darunia and the Step03 escape/reload controls on Longshot on
 2026-11-13; Bombchu Shop's entrance correction remains native-data evidence.
 
-**Richard and Cojiro (round 21).** Richard the Lost Dog's Heart Piece also requires `Kakariko Village Gate Open`:
+**Richard and Cojiro (0.2.6).** Richard the Lost Dog's Heart Piece also requires `Kakariko Village Gate Open`:
 the findable Richard exists only after the Kakariko gate guard has read Zelda's Letter; before that the owner keeps
 him (at night both stay in her back-alley house, as Kareem saw). Static event-data evidence, a tightening, not played
-([round 21 npcs](../plans/rounds/r21-npcs.md)). `Cojiro Access` also requires `Epona`: Kareem found in game that
+([NPC record](../plans/rounds/r21-npcs.md)). `Cojiro Access` also requires `Epona`: Kareem found in game that
 woken adult Talon stays until Epona is freed from Ingo. Sources: `remake/child_market.toml`, `remake/gifts.toml`.
 
 **Song lessons and no-instrument safety.** Logic conservatively requires an Ocarina for all twelve

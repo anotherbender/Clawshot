@@ -91,6 +91,7 @@ Steps:
    bin or missing mod-loader support must stop Play, never fall back to the root launcher or vanilla game.
    Start a new game the first time; later plays continue this pack's saves. Longshot v3.0.0-rc.2
    passed Kareem's Windows app Play check on 2026-11-13: isolated saves/options, shuffled rewards and reload.
+   Later checks were played on Longshot 3.0.0; seeds also start on 3.2.0, not played there yet.
 4. **Old overlay launchers crash on Hookshot 2.0.12+.** Use a newly built pack and the
    [current seed-pack guide](../seed-pack.md), not a zip or launcher from before the loading change.
    Hookshot 2.1.0 shows Switch icons in ordinary text while a seed is loaded.
@@ -178,10 +179,11 @@ not yet player-accepted; its staged check uses Longshot. See the [README](../../
 New games initialize an empty nut slot (0/20); child Bow first followed by Boomerang use without a
 reload passed Kareem's 2026-11-12 check. Saves started with older builds are unchanged: after an
 age-unusable pickup, Save and Continue before using other items; changing areas does not clear that jam.
-Known issues: songs may use a stand-in model; with an open forest, Saria's own ocarina looks doubled in her farewell if it plays before Gohma, as in the unmodified game (cosmetic; Defaults never reach it; the farewell skip avoids it). Hookshot 2.0.12+
+Known issues: a song found in a chest shows a green rupee (it works normally); with an open forest, Saria's own ocarina looks doubled in her farewell if it plays before Gohma, as in the unmodified game (cosmetic; Defaults never reach it; the farewell skip avoids it). Hookshot 2.0.12+
 loads seeds as mods, not through the crashing overlay route; Hookshot 2.1.0 text uses Switch icons.
 Play also supports Longshot (https://longshot.magicbean.dev/download). Its v3.0.0-rc.2 app check passed
-on 2026-11-13, including game options, Xbox prompts, shuffled rewards and save/reload.
+on 2026-11-13, including game options, Xbox prompts, shuffled rewards and save/reload. Later checks were
+played on Longshot 3.0.0; seeds also start on 3.2.0, which is not played yet.
 Paste settings strings inside single backticks (or use Copy for Discord): Discord drops their `_` otherwise.
 
 Full disclosure: Kareem directs AI coding agents building Clawshot. Automated checks test formats,

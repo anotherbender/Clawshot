@@ -302,11 +302,14 @@ Older seed folders and saves are not retroactively changed. New-game empty nut-s
 With `--shuffle Chest Gift`, `--songs song` (default) keeps songs on song checks;
 `--songs anywhere` releases all twelve for chest placement, subject to other destination restrictions.
 Storms, Minuet and Epona have been played from chests; the rest use the shared grant path but are
-**inferred, not individually verified**. Songs can show a stand-in model. Both chest ocarinas work
-and show their model in small and big chests (played by BBender and Claude on Longshot v3.1.1,
-2026-11-22, `plans/chest-ocarina-model.md`; small chests in both orders, with the Ocarina of Time staying
-equipped, by Kareem on Longshot 3.0.0, 2026-11-23, `plans/rounds/r21-pr40.md`); the Ocarina of Time plays
-songs. Din's Fire and Adult's Wallet have chest evidence.
+**inferred, not individually verified**. A song in a chest shows a green rupee with the song's own text.
+Both chest ocarinas work and show their model in small and big chests; only seeds that can put an ocarina
+in a chest (Chest and Gift shuffle) change the ocarinas' get model. BBender and Claude played small and big
+chests on Longshot v3.1.1 (2026-11-22, [chest ocarina record](../plans/chest-ocarina-model.md)). Kareem
+played small chests in both orders on Longshot 3.0.0 (2026-11-23): the Ocarina of Time stayed the equipped
+one, also after Save and Continue, and Saria's farewell, Zelda's escape and the moat looked as before
+([chest ocarina check](../plans/rounds/r21-pr40.md#played-results-kareem-longshot-300-2026-11-23-pass)).
+The Ocarina of Time plays songs. Din's Fire and Adult's Wallet have chest evidence.
 Other gift actors remain subject to the sourced chest allowlist and destination holds, not blanket
 permission for every gift to go in a chest. Authoritative restrictions: `data/settings.toml`.
 
@@ -552,15 +555,14 @@ it does not add a quest step.
 Partial counts retain the real last-core scene. Remaining trials still need their usual
 route and Light Arrows. The tower boss key and finale are unchanged.
 Zero trials passed on Longshot 3.0.0 (Kareem, 2026-11-21): the barrier was gone and, after the lift fix,
-the tower lift was down, rode up, returned and persisted after Save/Continue. That check used a copy of a
-zero-trials save with two documented Bool changes (age false, barrier-clear scene history true, as the fixed
-build writes for a new game), not a fresh new game.
+the tower lift was down, rode up, returned and persisted after Save/Continue. That check was played on an
+adjusted save, not a fresh new game.
 Count one passed end to end on Longshot 3.0.0 (Kareem, 2026-11-23) in two parts. A new game showed one beam and
-the line naming the remaining trial. Then a copy of Kareem's castle save, edited only to the count and cleared trials
-a count-one new game writes, finished the last trial: the barrier-breaking scene played, the barrier went down, four
-pots appeared by the elevator and the lift carried him up. Count two passed for its first trial: that beam went
-down while the other beam and the tower barrier stayed. Counts 3–5 are **built, not played**.
-Evidence: [trials play record](../plans/rounds/r20-trials.md), [round 21 checks](../plans/rounds/r21-checks.md).
+the line naming the remaining trial. Then Kareem's castle save, adjusted to one remaining trial, finished that
+trial: the barrier-breaking scene played, the barrier went down, four pots appeared inside the barrier by the
+elevator and the lift carried him up. Count two passed for its first trial: that beam went down while the other
+beam and the tower barrier stayed. Counts 3–5 are **built, not played**.
+Evidence: [trials play record](../plans/rounds/r20-trials.md), [count 1 and 2 checks](../plans/rounds/r21-checks.md#played).
 
 
 ## Master Sword shuffle
@@ -774,7 +776,8 @@ The generator also accepts `--hint-distribution strong`, `very_strong` and `usel
 Strong favors required routes and barren areas; Very strong raises those weights and
 allows more dungeon-area hints. Useless gives only original joke lines. No distribution
 changes placements, item eligibility or D29's no-junk location clues; an exhausted useful
-hint pool still falls back to jokes. All four are app choices; Very strong remains built, not played.
+hint pool still falls back to jokes. All four are app choices. Very strong was played in one new game on
+Longshot 3.0.0 (Kareem, 2026-11-23): all ten Gossip Stone texts he checked were correct.
 
 **Static text (partially played):** with dungeon rewards shuffled or a count-mode
 bridge, the Temple of Time altar lists reward regions and the selected Door/bridge

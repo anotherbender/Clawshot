@@ -158,6 +158,8 @@ is refused before anything is written. Neither Hookshot nor Longshot has a macOS
 the maintainers in game**; Linux Make verification does not certify the Linux UI.
 Windows app Play on **Longshot v3.0.0-rc.2** passed Kareem's 2026-11-13 seed-101 check:
 isolated saves, game options including Ocarina controls, shuffled rewards, Xbox prompts and reload.
+His later in-game checks ran on **Longshot 3.0.0**. On **Longshot 3.2.0** two seeds started without a crash,
+loaded a save and loaded their mod (start-up check, 2026-11-24); nothing has been played on 3.2.0 yet.
 
 ## Keyboard and layout
 
@@ -311,7 +313,9 @@ gets the input-type advice.
 Use a current Hookshot or Longshot with mod loading. Clawshot checks the program for that support
 (its `HOS_MODS` marker), not just its version number. On Hookshot, **2.0.14** has been played and seeds
 also start on **2.1.0**. Longshot **v3.0.0-rc.2** passed Kareem's Windows app Play check on
-2026-11-13, including isolated saves/options, a shuffled chest and reload persistence.
+2026-11-13, including isolated saves/options, a shuffled chest and reload persistence. His later checks
+were played on Longshot **3.0.0**. Seeds also start on Longshot **3.2.0** (start-up checked 2026-11-24),
+but nothing has been played on it yet.
 
 - **Hookshot:** on Game, choose the Hookshot Builder game folder containing `bin/hookshot.exe` on Windows
   or `bin/hookshot` on Linux, then press **Detect**. Update or repair Hookshot if refused. A Linux

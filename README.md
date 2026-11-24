@@ -47,7 +47,9 @@ Hookshot's GitHub repository has been offline since 2026-11-13. Get Longshot's l
 **<https://longshot.magicbean.dev/download>** (project: <https://git.magicbean.dev/MagicBeanDev/Longshot>); it builds
 the game on your PC from your own dump. Kareem verified app Play on **Longshot v3.0.0-rc.2**
 on 2026-11-13: the seed loaded with isolated saves, game options carried over, shuffled rewards matched,
-Xbox prompts displayed correctly, and progress survived reload. Not every runtime/item combination is played.
+Xbox prompts displayed correctly, and progress survived reload. His later in-game checks ran on **Longshot 3.0.0**.
+On **Longshot 3.2.0**, two seeds started without a crash, loaded a save and loaded their mod (a start-up check on
+2026-11-24); nothing has been played on 3.2.0 yet. Not every runtime/item combination is played.
 
 Keep the terminal open. **My seeds** finds your earlier seeds after a restart. Copy the number,
 settings and short hash to share a seed recipe, never the generated game files. **On Discord, use
@@ -58,7 +60,8 @@ Keyboard/mouse only: **gamepad and Steam Deck controller input are not done**.
 The [Tracker tab](docs/tracker.md) reads saved inventory and per-dungeon keys, with a compact OBS view.
 It also highlights the open checks that are in logic for what your save holds, for seeds made by the same
 Clawshot version, and lets you mark checks the save cannot show (shop items, a few gifts) as done; the OBS view
-shows neither. The maintainers' in-game check of in-logic and marks is still pending
+shows neither. It reads many gifts from the game's own records: ten of them read as collected after Kareem got
+them in game. The maintainers' in-game check of in-logic and marks is still pending
 ([design record](plans/tracker-in-logic.md)).
 
 <table>
@@ -84,9 +87,9 @@ shows neither. The maintainers' in-game check of in-logic and marks is still pen
   Partial trial seeds name the remaining trials in the spoiler, play note and first barrier-view dialogue.
   On Longshot 3.0.0 (2026-11-21) a 16-token bridge stayed shut at 15, opened at 16 and persisted after
   Save/Continue; zero trials' barrier and tower lift passed on an adjusted save copy, not a fresh new game.
-  Counts 1 and 2 passed on Longshot 3.0.0 (2026-11-23; count 1 end to end, via a new game plus a castle save with a
-  documented count edit; count 2's first trial); counts 3–5 are built, not played
-  ([trials play record](plans/rounds/r20-trials.md), [round 21 checks](plans/rounds/r21-checks.md)).
+  Counts 1 and 2 passed on Longshot 3.0.0 (2026-11-23): count 1 end to end, from a new game and then a castle save
+  adjusted to one remaining trial; count 2 for its first trial. Counts 3–5 are built, not played
+  ([trials play record](plans/rounds/r20-trials.md), [count 1 and 2 checks](plans/rounds/r21-checks.md)).
 - **Not shuffled yet:** cows, pots, crates and loose rupees.
 - **Excluded locations:** pick checks by area/search in Settings, or use `--exclude-locations` with exact
   world check names. They never hold progression; impossible lists are refused. [Reference](docs/settings.md#excluded-locations).
@@ -220,6 +223,19 @@ Kareem reported these played checks:
   and the owned child/adult round trip passed. This is not a full playthrough or finale-refusal check
   ([round 19 sword](plans/rounds/r19-sword.md#final-acceptance--candidate-v4-played-pass--ready)).
 
+**Longshot 3.0.0 stable (2026-11-22/23):**
+
+- **Ocarinas in chests:** the Fairy Ocarina and the Ocarina of Time show their model and text, in either order.
+  The Ocarina of Time stays the one you play, also after Save and Continue. Only seeds that can put an ocarina in
+  a chest (Chest and Gift shuffle) change. Saria's farewell, Zelda's escape and the moat looked as before.
+- **Megaton Hammer:** one Hammer hit destroys a ground Beamos. Logic now also counts the adult's Hammer for cracked
+  walls, boulders and bomb grottos, which Kareem broke with it in game, and as an adult weapon. King Dodongo, the
+  Shadow Temple's skull pots and webs, eye switches, Bomb Flowers and the bosses keep their usual requirements
+  ([logic reference](docs/logic.md)).
+- **Ganon's trials:** count 1 end to end and count 2's first trial (see At a glance).
+- **Very strong hints:** all ten Gossip Stone texts checked in a new game were correct.
+- **Tracker:** ten gift checks read as collected from the game's own records ([Tracker guide](docs/tracker.md)).
+
 Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
 
 ### Known issues
@@ -235,8 +251,8 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
   receive it from her; that native hand-over clears the fortress, not merely finding the card.
   Older Gift seeds could move it without clearing the guards; existing seeds and saves are not repaired.
   This follows the [static game-data trace](plans/rounds/r13-gerudo-card.md), not a played D39 acceptance test.
-- Songs can show an ocarina stand-in rather than a normal item model. Only some songs have been
-  individually played from chests. (Chest ocarinas now show their model.)
+- A song found in a chest shows a green rupee with the song's own text; the song works normally. Only some
+  songs have been individually played from chests. Chest ocarinas show their own model.
 - Saria's own ocarina looks doubled or mirrored in her farewell at the Lost Woods bridge when the farewell plays
   before Gohma, which only an open forest (`forest = closed_deku` or `open`) allows. The unmodified game does
   the same; Defaults (`forest = closed`) never reach it. Cosmetic; `skip_saria_farewell` skips the movie.

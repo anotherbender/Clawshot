@@ -32,6 +32,8 @@ player-facing summary (steps, known issues, the Discord link); this file has the
    `HOS_MODS=<pack>` (only `seed` is a mod) and `--user <pack>\user`.
    Hookshot needs a build that can load mods (tested on 2.0.13). Longshot v3.0.0-rc.2 passed
    Kareem's Windows app Play check on 2026-11-13: isolated saves/options, shuffled reward and reload.
+   Later checks were played on Longshot 3.0.0. Seeds also start on Longshot 3.2.0 (start-up checked
+   2026-11-24); nothing has been played on it yet.
    Packs share that checked starter. If Play says your game cannot load mods, update it and try again.
    Detection checks the game's binary for `HOS_MODS`, not version labels or log wording.
    No seed copy or link is made.

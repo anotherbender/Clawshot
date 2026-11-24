@@ -88,7 +88,7 @@ can be marked.
   tracker counts it once the save records the cutscene in which Darunia hands it over, not from a
   Bracelet found in a chest or from the adult gauntlets. Confirmed on real saves: Kareem's Longshot saves
   from just before and just after Darunia's dance (2026-11-13) read the Bracelet as not held, then held, and
-  the vanilla **Darunia's Dance** row as open, then collected (round 21, `plans/rounds/r21-checks.md`).
+  the vanilla **Darunia's Dance** row as open, then collected ([check record](../plans/rounds/r21-checks.md)).
 - **Unknown fields.** Anything the save cannot show counts as not held, and the side panel's **In logic**
   row names it for the check you point at: in-logic may then be more cautious than the game.
 
@@ -134,6 +134,10 @@ Poes and the 100 Gold Skulltula reward). Until each of these records has been co
 game, a gift it reads as not given yet keeps the square and can be marked done, and your mark on it stays
 (and keeps its reward hidden) until the record reads given. That square is the only sign that a record
 is still unconfirmed: no label or style shows it.
+Ten records are confirmed so far: each read as given after Kareem got that gift on Longshot 3.0.0
+(2026-11-23). They are the Zora's River frogs' prizes for Zelda's Lullaby, Saria's Song and Sun's Song, the
+Hyrule Field moat item and the Song of Time, Malon's song, Talon's Cuccos, Sheik at the Temple of Time, the
+Kakariko Shooting Gallery prize and the man on the Kakariko roof. These show no square.
 Reading these records needs a seed made by this same Clawshot version; for other seeds the tracker says
 so in one line and reads gifts as before ([design record](../plans/tracker-auto-checks.md)).
 
@@ -170,9 +174,10 @@ Do not choose the game dump or a generated `romfs` folder as a save folder.
 
 Clawshot **Play** uses the same per-seed `user` layout for a supported Longshot installation.
 Leave **Save folder** empty when using it. If you manually copied the seed to Longshot's mods,
-choose the Longshot **user** folder where that run saves instead. Clawshot only reads it. Longshot 3.1
-also keeps a working copy in `user/save-work/` beside `user/save/`; the tracker reads only the finished
-saves in `save/` and ignores `save-work`.
+choose the Longshot **user** folder where that run saves instead. Clawshot only reads it. From Longshot 3.1 on,
+the game also keeps a working copy in `user/save-work/` beside `user/save/`; the tracker reads only the finished
+saves in `save/` and ignores `save-work`, so each slot is listed once (checked on a copy of a Longshot 3.1.1
+user folder).
 
 For an emulator, choose this game's save folder (containing `slot_NN`), or its enclosing
 user/save folder. Nested user-ID/title-ID folders are searched. Multiple profiles can contain
