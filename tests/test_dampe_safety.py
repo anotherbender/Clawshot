@@ -1,4 +1,4 @@
-"""A no-Hookshot refusal must leave Link outside, not below the one-way descent."""
+"""Tool admission remains separate from chest-open-based first/second race selection."""
 
 from copy import deepcopy
 
@@ -6,7 +6,7 @@ import pytest
 
 from clawshot.formats import byml, evfl
 from clawshot.formats.zsdic import Dictionaries
-from clawshot.patch import dampe_safety
+from clawshot.patch import dampe_first_race, dampe_safety
 
 
 def race():
@@ -116,3 +116,13 @@ def test_native_pouch_result_codes_admit_either_tool_before_original_race_action
             while isinstance(event := after.events[index], evfl.SwitchEvent):
                 index = dict(event.cases)[0 if event.params["Actor"] in owned else 1]
             assert index == before.entry_point(entry).main_event, (entry, owned, after.events[index])
+
+
+@pytest.mark.dump
+@pytest.mark.parametrize("entry", dampe_safety.ENTRIES)
+def test_first_race_repair_preserves_the_no_tool_refusal(romfs, entry):
+    dictionaries = Dictionaries.from_romfs(romfs)
+    raw = dictionaries.decompress(dampe_safety.FLOW, (romfs / dampe_safety.FLOW).read_bytes())
+    before = evfl.read(dampe_safety.patch(raw)).flowchart
+    after = evfl.read(dampe_first_race.patch(dampe_safety.patch(raw))).flowchart
+    assert actions(after, entry, set()) == actions(before, entry, set())

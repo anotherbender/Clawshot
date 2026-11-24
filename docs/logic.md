@@ -223,6 +223,13 @@ not the N64 Song of Time. Ordinary windmill access from Kakariko is unchanged. K
 check on Longshot rc.7 (2026-11-19) refused the race and faded back in front of Dampé, with normal
 movement and the existing warp back up usable. It did not return Link to the surface.
 
+**Dampé's first race (Round 22, built, not played).** The native first-race prize has no one-minute
+condition: finish the course and open its chest. The descent still requires a usable Hookshot (either tier).
+New flows select that race until `IsTreasureBoxOpen.16041366920820397198` is true, including saves that
+already finished the second race. Spawning the chest is not collection. After collection, the native
+second race and its timed Heart Piece prize resume. The chest remains non-progression-only pending
+Kareem's Longshot 3.2.0 check. [Native trigger chain and play gate](../plans/rounds/r22-dampe.md).
+
 Child Bolero and both-age Requiem arrivals require an already playable Minuet, Serenade, Nocturne or
 Prelude. The final Wasteland leg into Colossus has the same guard, before its one-way boundary.
 Kareem ruled Colossus warp-exit-only at either age: reverse desert walking is impractical. Neither

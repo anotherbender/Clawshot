@@ -218,6 +218,7 @@ def make_seed(
 
         changes += (age_changes(out.placements, free_time_travel=True),)
     from clawshot.patch import (
+        dampe_first_race,
         dampe_safety,
         door,
         equipment,
@@ -232,6 +233,7 @@ def make_seed(
         equipment.changes(),
         *([master_sword.changes(out.placements)] if settings.shuffle_master_sword else []),
         dampe_safety.changes(),
+        dampe_first_race.changes(),
     )
     changes += (reward_bridge.changes(mode=settings.bridge, count=settings.bridge_count),)
     scrub_previews = {name: out.placements[name] for name in out.shuffled if name in scrubs.SALES}
