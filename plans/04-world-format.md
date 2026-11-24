@@ -452,10 +452,15 @@ resources under `<dir>/romfs/` plus `<dir>/spoiler.json`:
       With Gift and Token enabled, the chest-safety-derived holds also include Token for independently admitted
       `token_rewards.toml` members, without admitting their chest path. Songs and Scrub-only capacity holds stay intact.
    5. D25's bomb and Bombchu packs, only where the Bomb Bag is needed.
-   6. Shared progression, native-display items first (with Shop, so the second shield finds a way past Mido).
+   6. Shared progression, native-display items first (with Shop, so the second shield finds a way past Mido), then
+      the tokens held to chests and Skulltulas, then the rest in seeded order (round 21: placed in seeded order,
+      the last tokens found every reachable chest and Skulltula taken by earlier tokens).
       Skulltula rewards and spilled tokens participate in this same assumed fill, with the same `allowed` predicate
       and stage-local swaps; no earlier Token palette commits progression while borrowing later openers.
-      Token items retain the same seeded random candidate ordering as other progression; no weight or reserved quota.
+      Each item's candidate locations keep the seeded random order; no weight or reserved quota. Once the empty
+      chests are no more than the items only a chest takes (this stage's and the filler's: released keys, maps and
+      compasses), other items try their non-chest candidates first (round 21: flexible progression took the last
+      chests from late maps and compasses).
    7. Remaining Skulltulas: a seeded deterministic bipartite match from the non-progression pool. Each item copy
       has edges only to locations accepted by `allowed`, including existing container screens. Match mandatory
       Token-only copies first, then optional copies in shuffled-pool order. Augmenting paths preserve capacity

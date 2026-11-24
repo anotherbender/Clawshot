@@ -7,6 +7,7 @@ import pytest
 
 from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.generate import Settings
+from clawshot.generate.fill import allowed
 from clawshot.patch import getitem, gifts, make_seed, ocarina, write_seed
 from clawshot.patch.shops import actor_path, member_path
 from clawshot.world.load import load_spec
@@ -24,13 +25,30 @@ ROW_STEPS = {
 
 
 def chest_ocarina_seed(romfs):
-    """As the CLI builds a Gift seed (``gifts.seed_setup``), then both ocarinas swapped into :data:`CHESTS`."""
+    """As the CLI builds a Gift seed (``gifts.seed_setup``), then both ocarinas moved into :data:`CHESTS`.
+
+    The chest's item goes to the ocarina's source when that source may hold it; otherwise (a token cannot go to a
+    gift) through the first chest holding non-progression that the source may take, so the swap never depends on
+    what the fill happened to put in the chest."""
     spec, settings, step = gifts.seed_setup(romfs, load_spec(), SETTINGS)
     filled = make_seed(romfs, 7, settings, spec, extra_steps=[step])
+    world, effective = filled.seed.world, filled.seed.settings
     placements = {name: filled.seed.placements[name] for name in filled.seed.shuffled}
     for chest, item in CHESTS.items():
         source = next(name for name, placed in placements.items() if placed == item)
-        placements[source], placements[chest] = placements[chest], item
+        displaced = placements[chest]
+        if not allowed(world, effective, source, displaced):
+            via = next(
+                name
+                for name, placed in placements.items()
+                if name not in CHESTS
+                and world.locations[name].type == "Chest"
+                and not world.items[placed].progression
+                and allowed(world, effective, source, placed)
+                and allowed(world, effective, name, displaced)
+            )
+            placements[via], displaced = displaced, placements[via]
+        placements[source], placements[chest] = displaced, item
     return make_seed(romfs, 7, settings, spec, extra_steps=[step], placements=placements)
 
 

@@ -303,3 +303,44 @@ def test_shop_filler_leaves_chests_for_released_maps_and_compasses():
             "Compass (Temple)",
         }, (number, seed.placements)
         assert seed.placements["First Gift"] == seed.placements["Second Gift"] == "Coin"
+
+
+def test_flexible_progression_leaves_the_last_chest_to_a_released_map():
+    # Round 20's late-filler failures: flexible progression took the last chests, and the map could use no NPC.
+    spec = {
+        "start": "Village",
+        "goal": "Tool_A and Tool_B",
+        "items": {
+            "Map (Temple)": {"type": "Map", "class": "priority"},
+            "Tool A": {},
+            "Tool B": {},
+            "Coin": {"class": "normal"},
+        },
+        "regions": [
+            {
+                "name": "Village",
+                "exits": {"Temple": "True"},
+                "locations": {
+                    "First NPC": {"type": "NPC", "vanilla": "Tool A", "rule": "True"},
+                    "Second NPC": {"type": "NPC", "vanilla": "Tool B", "rule": "True"},
+                },
+            },
+            {
+                "name": "Temple",
+                "dungeon": "Temple",
+                "locations": {
+                    "First Chest": {"type": "Chest", "vanilla": "Map (Temple)", "rule": "True"},
+                    "Second Chest": {"type": "Chest", "vanilla": "Coin", "rule": "True"},
+                },
+            },
+        ],
+    }
+    settings = Settings(shuffle=("Chest", "NPC"), dungeon_items="all_anywhere")
+    tools_in_chests = 0
+    for number in range(20):
+        seed = generate(spec, number, settings, attempts=1)
+        assert sorted(seed.placements.values()) == ["Coin", "Map (Temple)", "Tool A", "Tool B"]
+        chests = {seed.placements[name] for name in ("First Chest", "Second Chest")}
+        assert "Map (Temple)" in chests, (number, seed.placements)
+        tools_in_chests += bool(chests & {"Tool A", "Tool B"})
+    assert tools_in_chests  # a spare chest still takes progression: only the last one is kept
