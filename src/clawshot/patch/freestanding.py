@@ -1,4 +1,5 @@
-"""Saved heart-piece floor checks with D27's native pickup palette (default off).
+"""Saved heart-piece floor checks with D27's native pickup palette, plus the ocarinas' and songs' world actors
+(``drops.floor_items``; default off).
 
 Anchors are map markers, not checks. Preserve the linked pickup's Hash and every
 age/Alternative copy. Keys and scripted/renewable pickups do not share this contract;
@@ -14,7 +15,9 @@ from clawshot.census.scan import FREESTANDING, Location
 from clawshot.formats import byml
 from clawshot.generate import Settings
 from clawshot.generate.fill import shuffled_locations
-from clawshot.patch.drops import NATIVE_ITEMS
+from clawshot.patch import items as item_actors
+from clawshot.patch.drops import NATIVE_ITEMS as NATIVE_ITEMS  # the native palette, shared with drops
+from clawshot.patch.drops import PICKUPS, floor_items, place
 from clawshot.patch.plan import PatchError
 from clawshot.patch.write import FileChanges
 from clawshot.world.model import World
@@ -52,15 +55,16 @@ def _saved_heart(loc: Location) -> bool:
 
 
 def changes(placements: Mapping[int, str], census: Sequence[Location]) -> FileChanges:
-    """Replace only Gyaml on all copies of saved, ungrouped heart-piece pickups."""
+    """Replace only Gyaml on all copies of saved, ungrouped heart-piece pickups (and lift a generated ocarina or song
+    actor, ``drops.place``)."""
     locations = {loc.id: loc for loc in census}
     files: dict[str, dict[int, tuple[str, str]]] = {}
     for actor_id, pickup in placements.items():
         loc = locations.get(actor_id)
         if loc is None or not _saved_heart(loc):
             raise PatchError(f"{actor_id}: not a saved freestanding heart piece")
-        if pickup not in NATIVE_ITEMS.values():
-            raise PatchError(f"{actor_id}: {pickup!r} is not a supported native floor pickup")
+        if pickup not in PICKUPS:
+            raise PatchError(f"{actor_id}: {pickup!r} is not a supported floor pickup")
         for path in loc.files:
             files.setdefault(path, {})[actor_id] = (loc.actor, pickup)
     return {path: _transform(path, targets) for path, targets in sorted(files.items())}
@@ -87,7 +91,7 @@ def _transform(path: str, targets: Mapping[int, tuple[str, str]]):
                 raise PatchError(f"{path}: heart {actor_id} gained an unaudited script binding: {references!r}")
             edits.append((found[0], pickup))
         for actor, pickup in edits:
-            actor["Gyaml"] = pickup
+            place(path, actor, pickup)
         out = byml.dump(document)
         if byml.difference(tree, byml.read(out)) is not None:
             raise PatchError(f"{path}: changed freestanding pickups do not read back")
@@ -103,7 +107,7 @@ def seed_setup(
     definitions: Sequence[Definition],
     vanilla: Mapping[str, str],
 ):
-    """Link selected hearts; restrict Freestanding destinations to the native palette
+    """Link selected hearts; restrict Freestanding destinations to ``drops.floor_items``
     (``Settings.location_type_items``), intersecting a palette already given."""
     shuffled = shuffled_locations(world, settings)
     checks = [name for name in shuffled if world.locations[name].type == SHUFFLE]
@@ -117,19 +121,21 @@ def seed_setup(
         if not _saved_heart(loc) or loc.area != world.locations[name].area:
             raise PatchError(f"{name}: not a saved native heart piece in its world area")
         linked[name] = loc
+    pickups = floor_items(world, settings, item_actors.load())
     palettes = dict(settings.location_type_items)
-    palette = [item for item in NATIVE_ITEMS if item in palettes.get(SHUFFLE, NATIVE_ITEMS)]
+    palette = [item for item in pickups if item in palettes.get(SHUFFLE, pickups)]
+    pickups = {item: pickups[item] for item in palette}
     settings = replace(settings, location_type_items={**palettes, SHUFFLE: tuple(palette)})
 
     def step(placements: Mapping[str, str]) -> FileChanges:
         targets = {}
         for name, loc in linked.items():
             item = placements[name]
-            if item not in NATIVE_ITEMS:
-                raise PatchError(f"{name}: {item!r} has no supported native floor pickup")
+            if item not in pickups:
+                raise PatchError(f"{name}: {item!r} has no floor pickup in this seed's palette")
             # An unmoved piece retains its native GV variant, physics and AI too.
             if item != "Piece of Heart":
-                targets[loc.id] = NATIVE_ITEMS[item]
+                targets[loc.id] = pickups[item]
         return changes(targets, census)
 
     return settings, step
