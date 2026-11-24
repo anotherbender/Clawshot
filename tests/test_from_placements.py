@@ -68,6 +68,10 @@ def test_a_seed_from_given_placements_has_no_opening_route_instead_of_failing_th
     placements = {
         name: "Rupees (5)" if item.startswith(("Bombs (", "Bombchus (")) else item for name, item in placements.items()
     }
+    # Round 22: Dampe's first-race chest never opens, so it takes no progression; its vanilla Hookshot swaps with a
+    # vanilla junk chest instead.
+    dampe, junk = "Graveyard Dampe Race Hookshot Chest", "KF Midos Top Left Chest"
+    placements[dampe], placements[junk] = placements[junk], placements[dampe]
     out = from_placements(spec, 1, settings, placements)
     assert all(out.placements[name] == item for name, item in placements.items())
     assert spoiler(out)["opening_route"] is None
