@@ -446,3 +446,106 @@ Queued sweep plan, not results: paired current-main/head,200 Broad +50 Defaults 
 and starts with Time Ocarina/Lullaby/Saria's Song/Bow. Compare opaque placement/sphere digests and bagless adult
 Bracelet+Bow DC chest-access counts; no placement lists published. Generator exhaustions must be zero.
 Full format/lint, synthetic then dump gate follows under the assigned lock. No gate or sweep has run yet.
+
+## Urgent GC grotto and sign puzzle correction (Claude/Kareem, 2026-11-24)
+
+This supersedes FROZEN `446e2f5`; both corrections ship together. No rebase onto later main: Claude will merge the
+gated head with `--no-ff`. Audit-only slot3b is separate from this track's full gate at6.
+
+### Played facts and copied save inventory
+
+- Kareem2026-11-24: **no Time Block anywhere in Goron City**. He does not remember whether he had the Hookshot
+  on the grotto visit; Hover Boots was a question, not a played route. No Hookshot/Longshot/Hover route is claimed
+  as verified from that recollection.
+- `plans/playtest/answers.md`, XC07/XC08 GC sign puzzle,2026-11-09: wrong order creates the left green chest and
+  locks attempts until leaving/re-entering Goron City; correct order creates the right purple chest. This proves
+  the puzzle was visited, not its entry method.
+- Copied30 natural main slots **before parsing**, then read only the copies; every source SHA256 is unchanged.
+  No seed, spoiler, `save-work` or live game profile was read. Proofs:
+  `work/r22-logic/{nov09,nov10}-main-save-copies/inventory-proof.json`.
+
+| Backup | Slots | Era | Hookshot | Longshot | Hover Boots | Green opened | Purple opened |
+|---|---:|---|---:|---:|---:|---|---|
+| Nov09_0954 main-after-jabu | 6 | child | 0 | 0 | 0 | false | false |
+| Nov09_1022 main-adult-first | 6 | 2 adult /4 child | 0 | 0 | 0 | false | false |
+| Nov09_1347 main-after-forest | 6 | adult | 1 | 0 | 0 | false | false |
+| Nov10_1254 main-fire-temple | 6 | adult | 1 | 0 | 0 | true | false |
+| Nov10_1402 main-fire-hammer | 6 | adult | 1 | 0 | 0 | true | false |
+
+Fields: `PouchData.Item_Hookshot.StockNum`, `PouchData.Item_Longshot.StockNum`,
+`PouchData.Armor_Adult_HoverBoot.StockNum`, `Sequence_IsChildhood`;
+chests `IsTreasureBoxOpen.9159710900681116662` and `.10944569637726152230`.
+The opened green chest in the successor saves corroborates an actual grotto visit. Under normal permanent-item
+ownership it excludes Longshot/Hover Boots as necessary for that historical approach; it **does not prove the
+Hookshot was used**, nor supply a staged Longshot3.2.0 route proof. Both Nov10 batches also own Goron Tunic1.
+
+### Current native trace
+
+Direct current-romfs read: all four `Banc/GoronCity/GoronCity_{Adult,Child}_{Static,Dynamic}.bcett.byml.zs`,
+2609 actor instances total, **zero** `TimeBlock`/`SongOfTime` placements. Current proof:
+`work/r22-logic/gc-native-placement-facts.json`. The GC logic/event cache has no Time Block reference; the global
+Time Block ocarina flow requires contact with an existing block, not creation of a GC block. This corroborates
+Kareem's absence report, not a claim to have exhaustively decoded every ActorHolder.
+
+Real targets: A_01 hashes13785392151857853269 at(-40.615,114.735,32.550),
+7261889099542506008 at(-29.839,111.245,30.990),11469250601875506713 at(-16.495,112.235,28.800);
+entry trigger10542229093882165730 at(-40,114,28). All are in the GC native files, not inferred N64 blocks.
+Current `dm_pack.py <actor> .bgyml` decoding of both target and both weapon packs succeeded:
+
+| Native parameter | Value |
+|---|---|
+| `Obj_HookShotTarget_A_01` physical entity `EnableSubLayerHitMask` | `HitOnlyHookshot` |
+| Its physical box `MaterialPresets` | `Wall_StickHookshot` (with Metal/camera filter) |
+| `Component/HookshotParam/Weapon_Range_Hookshot.game__component__HookshotParam.bgyml:Range` | 10m |
+| Corresponding Longshot override `Range` | 20m |
+
+Target-center gaps are11.43/13.56m, **not** a proof of Longshot-only access: standing/shot-origin offsets,
+approach terrain and landing clearance remain unverified. Hookable surfaces prove target class, not the complete
+path to the entry trigger. No Hover Boots alternative is admitted. Full native component output stays outside
+the repo: `work/r22-logic/gc-grapple-native.txt`; the earlier cache's Effect-v5 errors were not a limit on these
+current bgyml decodes.
+
+### Decision and scope
+
+**cs22d, under Claude's explicit fallback instruction:** no end-to-end approach is proved, so native
+`Goron City -> GC Grotto Platform = False`, the strictest rule tolerated by the focused native production recipes.
+Both inherited Time Block clauses disappear from native logic: inbound and the outbound Song-of-Time+Longshot
+term. Other outbound damage/defense terms stay. Ported N64 reference text remains unchanged; guarded remake
+overrides follow the existing convention.
+
+All six modelled grotto locations are out of reach from the overworld. The three inherited scrub checks and
+beehive have no native actors/census targets; they gain no destinations. The green failure chest remains
+`keep_vanilla`, out of logic and unshuffled. The native purple solution chest remains a shuffled destination,
+but its unproved region cannot supply progression; non-progression filler is allowed. Reopen only after an
+access method is established, not on an item-ownership guess.
+
+Separately, Kareem2026-11-24 played **swords, bombs and Hookshot** completing the sign puzzle. Replace the
+solution chest's `True`/“needs no item” with
+`can_use(Kokiri_Sword) or adult_sword or (is_adult and Giants_Knife) or Bombs or can_use(Hookshot)`.
+This includes usable Master/Biggoron/Kokiri swords and Giant's Knife for a strike, ordinary usable bombs,
+Hookshot/Longshot; excludes Hammer, Bombchus, Bow, Slingshot, Boomerang and magic until played. The chest attack
+rule is tested from inside the grotto independently of the entry exclusion.
+
+### Verification and hotfix measurement
+
+Initial focus:32 passed/3 failed. Printed causes: two fixtures enabled the remake's unverified/locked
+`logic_goron_grotto` trick; a “Bombchus-only” fixture also supplied a usable bomb bag+strength, so ordinary bombs
+correctly satisfied the new rule. Removed impossible trick settings and isolated Bombchus without usable bombs.
+After the conservative entry decision, cause-directed native-enabled focus:
+**47 passed in235.44s**, `-n2`, `CLAWSHOT_WORKERS=1`, including `test_event_registration.py`; targeted format/lint
+passed. No coverage seed re-pin. These production recipes tolerate the region exclusion; full gate/sweep pending.
+
+Audit helper `work/r22-logic/grotto_audit.py` changes **only original main's inbound SoT alternative**, keeping its
+old Hookshot/hazard branch, return rule, sign `True`, settings and placements. This is deliberately narrower than
+the conservative candidate: it measures the released-model SoT risk without confounding the other tightenings.
+Two constructed placement oracles (no generation) pass: a required Hookshot inside the grotto becomes a genuine
+self-lock; an outside Hookshot preserves the goal and is not misclassified. Oracle setup first printed
+`Rule.fn` init=False and `World.age_return` property constructor errors; corrected fixture construction uses
+`Rule.test` and settings. Real audit worlds retain every actual return guarantee.
+
+Claude assigned audit-only slot3b after cs22b's explicit release. Regenerate exactly the shared main5bc standard300,
+cross-check every placement/sphere digest and effective setting against its immutable cache, then count by recipe:
+required grotto items lost under the isolated tightening; goal failures/joint dependencies; Hookshot-family
+placements or its only logical route inside the grotto; mere delays separately. Errors/incomplete rows are never
+zero-risk results. Publish counts only and release immediately. This is model-based hotfix evidence, **not**
+an assertion that a particular seed was proved unwinnable in game. Full gate remains line6 after cs22g.

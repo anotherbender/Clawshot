@@ -13,3 +13,13 @@ source = "Kareem, Longshot 3.2.0, 0.2.6, adult with a strength-copy Bracelet bef
 rule = "is_adult and (Progressive_Strength_Upgrade or 'Goron Bracelet' or has_explosives or Bow or (logic_link_goron_dins and can_use(Dins_Fire)))"
 was = "is_adult and (Progressive_Strength_Upgrade or has_explosives or Bow or (logic_link_goron_dins and can_use(Dins_Fire)))"
 source = "Kareem, Longshot 3.2.0, 0.2.6, adult with a strength-copy Bracelet before the Bomb Bag: used Bomb Flowers to stop the Rolling Goron. GoronCity_Adult_Dynamic places Obj_BombFlower_A_03 along the middle ring: 7043415660827355832 (-18.8,105.0,-9.1), 2438703331718758676 (-3.1,104.8,13.9), 9316970488062789031 (-7.8,104.8,10.9), and the eastern pair cited above. Exact flower was not reported. Played Low-lift capability, not a new Hammer/arrow or passive-flower claim; the adult gate and all existing alternatives stay. plans/rounds/r22-logic.md."
+
+[exits."Goron City"."GC Grotto Platform"]
+rule = "False"
+was = "is_adult and ((can_play(Song_of_Time) and ((damage_multiplier != 'ohko' and damage_multiplier != 'quadruple') or Goron_Tunic or Longshot or can_use(Nayrus_Love))) or (Hookshot and ((damage_multiplier != 'ohko' and Goron_Tunic) or can_use(Nayrus_Love) or (damage_multiplier != 'ohko' and damage_multiplier != 'quadruple' and logic_goron_grotto))))"
+source = "Kareem, played report 2026-11-24: no Time Block anywhere in Goron City. All four GC Banc files (both ages) agree; real Hookshot targets have Wall_StickHookshot, but target-center gaps and Range 10/20 do not prove the standable approach/landing chain. Nov09/10 copied main saves record a grotto visit with Hookshot1, Longshot0, HoverBoot0, not which method was used. No end-to-end access method is verified: use the strictest fill-tolerated rule until one is played (Claude's 2026-11-24 instruction). This excludes progression at the solution chest, not its played attack methods. plans/rounds/r22-logic.md."
+
+[exits."GC Grotto Platform"."Goron City"]
+rule = "(damage_multiplier != 'ohko' and (damage_multiplier != 'quadruple' or can_use(Goron_Tunic))) or can_use(Nayrus_Love)"
+was = "(damage_multiplier != 'ohko' and (damage_multiplier != 'quadruple' or can_use(Goron_Tunic))) or can_use(Nayrus_Love) or (can_play(Song_of_Time) and can_use(Longshot))"
+source = "Kareem, played report 2026-11-24: no Time Block anywhere in Goron City; native placement/event trace corroborates absence. Remove the inherited return's Song of Time + Longshot block route too; remaining damage/defense alternatives are unchanged. plans/rounds/r22-logic.md."
