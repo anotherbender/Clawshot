@@ -1,7 +1,7 @@
 # Round 21, Track fill — cs21h
 
 Branch `r21/fill`, starting main `e9bb0d77270fbc92a455df53dac1f4099b6bc859` (0.2.5 plus the round 20 close records).
-Model: `anthropic/claude-opus-5-5`. Status: **candidate 1 rejected on the paired run; candidate 2 (aimed at its printed cause) awaiting a paired slot**.
+Model: `anthropic/claude-opus-5-5`. Status: **candidate 2 accepted on paired run 2; full gate on `1673def` (see below)**.
 External scripts and receipts: `E:/OOTRemake/work/r21-fill/`.
 
 No game started, personal seed opened, save edited or game/runtime folder written. This is a generator-only
@@ -161,6 +161,52 @@ is an order preference, not a guarantee. Not a measurement; only the paired run 
 
 Focused (same command, no game running): **375 passed, 10 skipped, 23.26 s** (`focused-6.log`); ruff clean.
 Candidate files kept: `candidate1_fill.py`, `candidate2_fill.py`.
+
+## Paired run 2: candidate 2 accepted (2026-11-23 18:12–18:30, under the lock)
+
+Claude placed this one rerun (rule 9, after the printed cause) at 18:11. Head `1673def` on main `aeba6df`; same
+frozen main fill, same `aeba6df` inputs and seed numbers as run 1. Six workers, `CLAWSHOT_WORKERS=6`, no game running
+at any stage; 1,080.97 s. Receipts: `paired-r21b.log`, `paired-r21b-rows.jsonl`, `paired-r21b-summary.json`.
+
+| Recipe | Seeds per arm | First failures main → candidate | Exhausted | Mean / max attempts main → candidate | Median s main → candidate | Median paired delta s |
+|---|---:|---:|---:|---|---|---:|
+| Broad | 200 | 6 → 1 | 0 → 0 | 1.04 / 3 → 1.005 / 2 | 11.884 → 11.589 | −0.270 |
+| Defaults | 50 | 0 → 0 | 0 → 0 | 1 / 1 → 1 / 1 | 4.873 → 4.869 | −0.006 |
+| Recommended | 50 | 2 → 2 | 0 → 0 | 1.04 / 2 → 1.04 / 2 | 9.532 → 9.457 | +0.046 |
+
+Broad recovered 17, 122, 138, 157, 172, 195 (all of main's: four Token, two small keys); introduced 89 only, the
+late map/compass residual the aimed trace predicted. Recommended's two are the same seeds (36, 45) and error
+(`Kokiri Sword`) in both arms. Main's arm reproduced run 1's six failures exactly. All 600 completed generations
+passed the production goal/softlock search and the exact normalized shuffled-stock assertion.
+
+**Decision (cs21h, under the rule fixed at 10:30): accept.** Broad first failures dropped 6 → 1 (3.0% → 0.5%), zero
+exhausted in every recipe, Defaults and Recommended unchanged. Nothing reachable changes: `allowed`, logic, pools,
+swaps and the ten-attempt bound are untouched; only the order of items (tokens first) and of reachable candidates
+(the chest reserve) changes, and every seed still passes the beatability search. Placements change, as expected.
+
+Rule (2) sweep: Claude agreed (17:47) that the candidate arm counts as the sweep on this exact head: 200 broad + 50
+Defaults + 50 Recommended, 0 exhausted. The change adds no option, so no extra recipe applies.
+
+## Full gate on `1673def` (same hold; 20:10–20:57)
+
+The first gate run (18:30) died with the session at ~18:35, synthetic at 99%, no result; the lock then sat idle,
+held by cs21h, until 20:09 (posted on the thread). Rerun detached, logs `work/r21-fill/gate/` (`gate.log`):
+
+- `ruff format --check`: 558 files already formatted; `ruff check`: all checks passed.
+- Synthetic `-n 8`, `CLAWSHOT_WORKERS=4`: **4389 passed, 838 skipped, 423.35 s**.
+- Dump `-n 8`, `CLAWSHOT_WORKERS=3`, `OOT_ROMFS`, `OOT_NUP`, `OOT_DUMP` as the round brief: **830 passed, 5 errors,
+  2484.21 s**. All five are the setup of `tests/test_getitem_ocarina_dump.py` (PR #40's file), printed payload:
+  `placements do not fit this world: LW Gift from Saria: may not hold 'Gold Skulltula Token'`.
+
+Cause: the fixture took seed 7's placements and swapped whatever sat in `KF Midos Top Left Chest` into the Fairy
+Ocarina's source. Under the new fill that chest holds a Gold Skulltula Token, which a gift may not take. The fixture
+depended on the fill's incidental placement, not on anything the test checks. Fix (cs21h, own commit on top; BBender's
+commit and the maintainer commit untouched): when the source may not take the chest's item, it goes through the first
+chest holding non-progression that the source may take. Verified on the real dump (same three variables, `-n 2`,
+`CLAWSHOT_WORKERS=1`, no game running): **6 passed, 179.91 s** (`ocarina-dump-fix.log`). Not a re-pin: the seed stays
+7 and every assertion is unchanged.
+
+The dump stage must rerun on the head carrying this fix; synthetic is unaffected (the file is dump-only).
 
 ## Lock note
 
