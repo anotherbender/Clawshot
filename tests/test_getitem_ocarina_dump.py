@@ -1,7 +1,8 @@
 """The chest ocarinas' get model in a real generated seed, against the dump (plans/chest-ocarina-model.md, run O).
 
 A Chest + Gift + Token seed with both ocarinas in chests, so ActorInfo also carries another step's rows; every
-difference from the dump is named. A seed with no ocarina in a chest carries none of it (Q1 option b)."""
+difference from the dump is named. Settings without Gift shuffle carry none of it
+(by setting: PR #41, the maintainers' option 2)."""
 
 import pytest
 
@@ -68,8 +69,9 @@ def seed(romfs, tmp_path_factory):
 
 
 @pytest.mark.dump
-def test_a_seed_without_a_chest_ocarina_keeps_the_native_rows_and_packs(romfs, tmp_path):
+def test_settings_without_gift_shuffle_keep_the_native_rows_and_packs(romfs, tmp_path):
     output = make_seed(romfs, 7, Settings(shuffle=("Chest", "Token")))  # Chest-only kinds: no ocarina in the pool
+    assert output.steps == ()
     written = {info.path for info in write_seed(output, romfs, tmp_path / "seed")}
     assert not written & set(map(getitem.pack_path, getitem.OCARINAS)), sorted(written)
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)
@@ -87,8 +89,8 @@ def step_module(transform):
 
 
 def ocarina_step(output) -> int:
-    """The index of the ocarina get model's step. Only the song get effects may follow it (a Gift seed moves songs,
-    so it gets them; song-get-effects): last on ActorInfo and the song packs."""
+    """The index of the ocarina get model's step. Only the song get effects may follow it (Gift shuffle lets songs
+    move, so the seed gets them; song-get-effects): last on ActorInfo and the song packs."""
     steps = [{step_module(t) for t in step.values()} for step in output.extra_changes]
     index = max(i for i, modules in enumerate(steps) if getitem.__name__ in modules)
     assert steps[index] == {getitem.__name__}, steps[index]

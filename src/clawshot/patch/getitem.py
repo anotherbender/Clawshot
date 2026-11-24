@@ -1,8 +1,9 @@
 """Get-item display: what an item shows in Link's get pose; no inventory or chest-admission policy changes.
 
-The ocarinas' get model (:func:`ocarina_changes`, in seeds that put an ocarina in a chest: :func:`chest_ocarinas`):
-the two ``ActorInfo`` rows lose ``CalcPriority`` and each ocarina pack gets the pouch get-pose performer, the common
-animation set and its own AnimationParam (plans/chest-ocarina-model.md, run O). Equipment components stay native.
+The ocarinas' get model (:func:`ocarina_changes`, when the settings could put an ocarina in a chest:
+:func:`chest_ocarinas_possible`): the two ``ActorInfo`` rows lose ``CalcPriority`` and each ocarina pack gets the
+pouch get-pose performer, the common animation set and its own AnimationParam (plans/chest-ocarina-model.md, run O).
+Equipment components stay native.
 
 Songs show these ocarinas (:data:`SONG_MODELS`) with an effect of their own: ``clawshot.patch.songs``. The writer
 sizes their changed ModelInfo with :func:`member_growth`.
@@ -144,15 +145,30 @@ def native_inputs() -> tuple[str, ...]:
     )
 
 
+def gift_kinds(shuffle: Iterable[str]) -> set[str]:
+    """The gift kinds among ``shuffle`` (``Gift`` or one of the types it expands to, ``patch.gifts.GIFT_TYPES``)."""
+    from clawshot.patch.gifts import GIFT_TYPES, SHUFFLE
+
+    return set(shuffle) & {SHUFFLE, *GIFT_TYPES}
+
+
+def chest_ocarinas_possible(shuffle: Iterable[str]) -> bool:
+    """Whether the settings could put an ocarina in a chest (Chest and Gift shuffle both on): a seed gets
+    :func:`ocarina_changes` exactly then, so the settings string says which build a seed has (PR #41, the
+    maintainers' option 2, 2026-11-23). Other seeds keep these files byte-identical to the dump."""
+    shuffle = tuple(shuffle)
+    return "Chest" in shuffle and bool(gift_kinds(shuffle))
+
+
 def chest_ocarinas(placements: Mapping[str, str], chests: Iterable[str], actors: ItemActors) -> list[str]:
-    """The chests (in ``chests`` order) whose placed item is an ocarina: a seed gets :func:`ocarina_changes` only
-    when there is one. Elsewhere the change shows nothing and would only alter Saria's native farewell, where her
-    own ocarina is drawn wrong without the instrument's ``CalcPriority`` (plans/chest-ocarina-model.md, runs D, D2)."""
+    """The chests (in ``chests`` order) whose placed item is an ocarina. ``make_seed`` refuses a seed that has one
+    when :func:`chest_ocarinas_possible` says the settings cannot: the chest would show the wrong model."""
     return [name for name in chests if actors.actors.get(placements.get(name, "")) in OCARINAS]
 
 
 def ocarina_changes(romfs: str | Path) -> dict[str, Callable[[bytes], bytes]]:
-    """The chest-ocarina get model: ActorInfo rows and both ocarina packs (``make_seed`` asks :func:`chest_ocarinas`).
+    """The chest-ocarina get model: ActorInfo rows and both ocarina packs (``make_seed`` asks
+    :func:`chest_ocarinas_possible`).
 
     Compose last on these files (after ``ocarina.changes``): it checks only the native fields it changes."""
     romfs = Path(romfs)

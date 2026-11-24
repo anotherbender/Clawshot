@@ -64,15 +64,25 @@ class SeedOutput:
     """Files the dump does not hold: custom item/Skulltula actor packs and receive-event flow."""
     token_sources: tuple[tokens.SourceChange, ...] = ()
     """Every shuffled Token location's source and grant, for the spoiler's ``patch.tokens``."""
+    steps: tuple[str, ...] = ()
+    """The optional cosmetic steps that ran (:data:`OPTIONAL_STEPS`, in that order), for the spoiler's
+    ``patch.steps``: a bug report shows which build a seed has without working it out from the settings."""
 
     def spoiler(self) -> dict[str, Any]:
         patch = self.plan.as_dict()
         if self.token_sources:
             patch["tokens"] = [source.as_dict() for source in self.token_sources]
+        patch["steps"] = list(self.steps)
         return spoiler(self.seed, self.item_names) | {"patch": patch}
 
     def spoiler_json(self) -> str:
         return json.dumps(self.spoiler(), indent=2, ensure_ascii=False) + "\n"
+
+
+OCARINA_GET_MODEL = "ocarina_get_model"
+SONG_GET_EFFECTS = "song_get_effects"
+OPTIONAL_STEPS = (OCARINA_GET_MODEL, SONG_GET_EFFECTS)
+"""The optional cosmetic get-display steps ``make_seed`` runs when the settings could produce what they show."""
 
 
 def make_seed(
@@ -271,20 +281,29 @@ def make_seed(
     plan, progressive_changes = progressive.changes(romfs, plan, prior_changes=changes)
     changes += (progressive_changes, bags.changes(romfs))
     changes += (ocarina.changes(romfs, prior_changes=changes),)
-    # Only seeds that put an ocarina in a chest (Q1 option b, Claude 2026-11-22, pending Kareem): the get model
-    # changes Saria's native farewell cosmetically. Last on ActorInfo and the ocarina packs, after every row edit.
-    if getitem.chest_ocarinas(out.placements, chests, table):
+    # Cosmetic get-display steps run when the settings could produce what they show (PR #41, the maintainers'
+    # option 2, 2026-11-23), so the settings string says which build a seed has; the spoiler's ``patch.steps`` names
+    # them. A placement the settings rule does not cover is refused rather than shown with the wrong model (S8).
+    steps: list[str] = []
+    # The chest-ocarina get model: when Chest and Gift shuffle are both on. Last on ActorInfo and the ocarina packs,
+    # after every row edit.
+    if getitem.chest_ocarinas_possible(settings.shuffle):
         changes += (getitem.ocarina_changes(romfs),)
-    # Only seeds with a song away from its vanilla place (as the ocarina get model, BBender 2026-11-23): songs show
-    # an ocarina with their own effect, and the floor pickups are written but placed nowhere (song-get-effects S3).
-    # Last on ActorInfo and the song packs.
-    if songs.moved_songs(out.placements, out.world, table):
+        steps.append(OCARINA_GET_MODEL)
+    elif found := getitem.chest_ocarinas(out.placements, chests, table):
+        raise PatchError(f"{found} hold an ocarina, but the settings do not run the ocarina get model")
+    # Song get effects: when the settings let songs leave their places. Songs show an ocarina with their own effect,
+    # and the floor pickups are written but placed nowhere (song-get-effects S3). Last on ActorInfo and the song packs.
+    if songs.songs_can_move(settings.shuffle):
         delivery = songs.build(romfs)
         changes += (delivery.changes,)
         if overlap := sorted(new_files.keys() & delivery.new_files.keys()):
             raise PatchError(f"another step and the song pickups both create {overlap}")
         new_files.update(delivery.new_files)
-    return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files, token_rows)
+        steps.append(SONG_GET_EFFECTS)
+    elif moved := songs.moved_songs(out.placements, out.world, table):
+        raise PatchError(f"{moved} hold a moved song, but the settings do not run the song get effects")
+    return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files, token_rows, tuple(steps))
 
 
 def custom_step(

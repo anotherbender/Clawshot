@@ -1,6 +1,7 @@
 """The song get effects on the player's dump (plan 8.2-8.5, 8.9): the step's output decodes to the data file's values
-and keeps every native user, effect, member and row; a seed with moved songs writes them all and places no pickup;
-a seed without one writes none of them; the same seed gives the same folder in two processes."""
+and keeps every native user, effect, member and row; a Gift seed writes them all and places no pickup;
+a seed whose settings keep songs home writes none of them and refuses a moved song; the same seed gives the same
+folder in two processes."""
 
 import math
 import os
@@ -13,9 +14,9 @@ from test_elink_dump import decoded_users
 
 from clawshot.formats import byml, elink, rstb, sarc, vfx, zsdic
 from clawshot.generate import Settings
-from clawshot.patch import getitem, gifts, make_seed, songs, write_seed
+from clawshot.patch import OCARINA_GET_MODEL, SONG_GET_EFFECTS, getitem, gifts, make_seed, songs, write_seed
 from clawshot.patch import items as item_actors
-from clawshot.patch.plan import Plan
+from clawshot.patch.plan import PatchError, Plan
 from clawshot.patch.shops import actor_path, member_path
 from clawshot.patch.write import write
 from clawshot.world.load import load_spec
@@ -136,10 +137,11 @@ def song_seed(romfs, tmp_path_factory):
 
 
 @pytest.mark.dump
-def test_dump_a_seed_with_moved_songs_writes_every_feature_file_and_places_no_pickup(romfs, song_seed):
+def test_dump_a_gift_seed_writes_every_feature_file_and_places_no_pickup(romfs, song_seed):
     """2.1-2.4 in a seed: the files are written, .100 is not, and no placement file names a pickup (S3)."""
     output, files, out = song_seed
-    assert songs.moved_songs(output.seed.placements, output.seed.world, item_actors.load())
+    assert output.steps == (OCARINA_GET_MODEL, SONG_GET_EFFECTS)  # Chest and Gift shuffle: both steps, by setting
+    assert output.spoiler()["patch"]["steps"] == list(output.steps)
     assert set(FEATURE_FILES) <= set(files)
     assert "ELink2/elink2.Product.100.belnk.zs" not in files
     assert songs.ELINK in output.extra_changes[-1]  # last on ActorInfo and the song packs
@@ -153,11 +155,22 @@ def test_dump_a_seed_with_moved_songs_writes_every_feature_file_and_places_no_pi
 
 
 @pytest.mark.dump
-def test_dump_a_seed_without_moved_songs_writes_none_of_the_feature_files(romfs, tmp_path):
-    output = make_seed(romfs, seed=4242, settings=Settings())
+def test_dump_a_seed_whose_settings_keep_songs_home_writes_none_of_the_feature_files(romfs, tmp_path):
+    output = make_seed(romfs, seed=4242, settings=Settings())  # the defaults: no Gift shuffle
+    assert output.steps == ()
     assert not songs.moved_songs(output.seed.placements, output.seed.world, item_actors.load())
     assert all(songs.ELINK not in step for step in output.extra_changes)
     assert not set(FEATURE_FILES) & set(output.new_files)
+
+
+@pytest.mark.dump
+def test_dump_a_moved_song_the_settings_do_not_allow_is_refused(romfs):
+    """S8: a placement the settings rule does not cover (another placer's) stops the seed; no rupee-model song."""
+    filled = make_seed(romfs, seed=4242, settings=Settings())
+    chest = filled.seed.shuffled[0]
+    placements = {name: filled.seed.placements[name] for name in filled.seed.shuffled} | {chest: "Zeldas Lullaby"}
+    with pytest.raises(PatchError, match="do not run the song get effects"):
+        make_seed(romfs, seed=4242, settings=Settings(), placements=placements)
 
 
 @pytest.mark.dump

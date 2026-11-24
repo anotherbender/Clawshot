@@ -652,3 +652,18 @@ def test_only_a_song_away_from_its_vanilla_place_asks_for_the_song_effects():
     assert songs.moved_songs(swapped, world, actors) == ["Song from Impa", "Song from Windmill"]
     in_chest = {**vanilla, "Chest A": "Zeldas Lullaby", "Song from Impa": "Bow"}
     assert songs.moved_songs(in_chest, world, actors) == ["Chest A"]
+
+
+@pytest.mark.parametrize(
+    ("shuffle", "runs"),
+    [
+        (("Chest", "Gift"), True),
+        (("Gift",), True),
+        (("Chest", "NPC", "Song", "Cutscene", "Boss"), True),  # Gift as the types it expands to
+        (("Chest",), False),  # the defaults: every song stays home
+        (("Chest", "Token"), False),
+        ((), False),
+    ],
+)
+def test_song_effects_run_when_the_settings_let_songs_leave_their_places(shuffle, runs):
+    assert songs.songs_can_move(shuffle) is runs

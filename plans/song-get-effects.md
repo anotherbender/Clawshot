@@ -268,5 +268,21 @@ launcher, so its `mods:` lines are not on record; the SONGQA1 lines above show t
 ## In `src/`
 
 `formats/byml.py` (version 5), `formats/elink.py`, `formats/vfx.py`, `formats/rstb.py` (section 51 formulas),
-`patch/songs.py` with `data/song_effects.toml`, wired in `patch/__init__.py` for seeds with a moved song. Decisions
-made while implementing: `docs/specs/song-get-effects/plan.md`, "Decisions made during implementation".
+`patch/songs.py` with `data/song_effects.toml`, wired in `patch/__init__.py` for seeds whose settings let songs move
+(Gift shuffle on; see "Scope by setting"). Decisions made while implementing: `docs/specs/song-get-effects/plan.md`,
+"Decisions made during implementation".
+
+## Scope by setting (PR #41 review, 2026-11-24)
+
+The maintainers (hiKareeem, PR #41, 2026-11-23) picked option 2 of the PR's scope question: a cosmetic get-display
+step runs whenever the settings *could* produce what it shows, so the settings string says which build a seed has.
+Defaults stay byte-identical until the change has been played more widely; "every seed" may follow later.
+
+- Ocarina get model: Chest and Gift shuffle both on (`getitem.chest_ocarinas_possible`).
+- Song get effects: Gift shuffle on (`songs.songs_can_move`); later, the song settings.
+- "Gift" counts as itself or any type it expands to (`patch.gifts.GIFT_TYPES`), as the effective settings name them.
+- The spoiler's `patch.steps` lists the optional steps that ran (`ocarina_get_model`, `song_get_effects`), always
+  present, empty when none ran (Claude's proposal, accepted in the review).
+- A placement the settings rule does not cover (another placer's) is refused with a `PatchError` instead of showing
+  the wrong model (S8; proposed by Claude).
+

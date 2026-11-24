@@ -20,7 +20,7 @@ import bisect
 import copy
 import math
 import tomllib
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
@@ -502,11 +502,18 @@ class Delivery:
     new_files: Mapping[str, NewFile]
 
 
+def songs_can_move(shuffle: Iterable[str]) -> bool:
+    """Whether the settings let songs leave their places (today: Gift shuffle on): a seed gets :func:`build` exactly
+    then, as the ocarina get model runs when the settings could put an ocarina in a chest
+    (``getitem.chest_ocarinas_possible``). One rule for both steps, so the settings string says which build a seed
+    has (PR #41, the maintainers' option 2, 2026-11-23); other seeds keep these files byte-identical to the dump."""
+    return bool(getitem.gift_kinds(shuffle))
+
+
 def moved_songs(placements: Mapping[str, str], world, actors) -> list[str]:
-    """The locations (sorted) holding a song that is not their vanilla item: a seed gets :func:`build` only when
-    there is one, as the ocarina get model runs only in seeds with an ocarina in a chest (``getitem.chest_ocarinas``,
-    r21 Q1): other seeds stay byte-identical to the release (BBender, 2026-11-23). ``actors`` maps item names to
-    actors (``clawshot.patch.items.ItemActors``)."""
+    """The locations (sorted) holding a song that is not their vanilla item. ``make_seed`` refuses a seed that has
+    one when :func:`songs_can_move` says the settings cannot: the song would show the green rupee. ``actors`` maps
+    item names to actors (``clawshot.patch.items.ItemActors``)."""
     out = []
     for name, item in placements.items():
         location = world.locations.get(name)

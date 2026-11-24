@@ -291,6 +291,22 @@ def test_the_app_working_set_holds_the_ocarina_inputs():
     assert set(getitem.native_inputs()) <= wanted, sorted(set(getitem.native_inputs()) - wanted)
 
 
+@pytest.mark.parametrize(
+    ("shuffle", "runs"),
+    [
+        (("Chest", "Gift"), True),
+        (("Chest", "Gift", "Token"), True),
+        (("Chest", "NPC", "Song", "Cutscene", "Boss"), True),  # Gift as the types it expands to
+        (("Chest",), False),  # the defaults: no ocarina can reach a chest
+        (("Chest", "Token"), False),
+        (("Gift",), False),  # gifts move, chests stay: no ocarina can reach a chest
+        ((), False),
+    ],
+)
+def test_the_ocarina_get_model_runs_when_chest_and_gift_shuffle_are_both_on(shuffle, runs):
+    assert getitem.chest_ocarinas_possible(shuffle) is runs
+
+
 def test_only_a_chest_holding_an_ocarina_asks_for_the_get_model():
     from clawshot.patch.items import ItemActors
 
