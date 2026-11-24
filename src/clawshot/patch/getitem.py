@@ -1,9 +1,9 @@
 """Get-item display: what an item shows in Link's get pose; no inventory or chest-admission policy changes.
 
-The ocarinas' get model (:func:`ocarina_changes`, when the settings could put an ocarina in a chest:
-:func:`chest_ocarinas_possible`): the two ``ActorInfo`` rows lose ``CalcPriority`` and each ocarina pack gets the
-pouch get-pose performer, the common animation set and its own AnimationParam (plans/chest-ocarina-model.md, run O).
-Equipment components stay native.
+The ocarinas' get model (:func:`ocarina_changes`, when the settings could make an ocarina show its own item actor:
+:func:`shown_ocarinas_possible`, in a chest, at a show-item hand-over or a scrub sale): the two ``ActorInfo`` rows lose
+``CalcPriority`` and each ocarina pack gets the pouch get-pose performer, the common animation set and its own
+AnimationParam (plans/chest-ocarina-model.md, run O). Equipment components stay native.
 
 Songs show these ocarinas (:data:`SONG_MODELS`) with an effect of their own: ``clawshot.patch.songs``. The writer
 sizes their changed ModelInfo with :func:`member_growth`.
@@ -17,6 +17,7 @@ from clawshot.formats import byml, sarc, zsdic
 from clawshot.patch.items import ItemActors
 from clawshot.patch.plan import PatchError
 from clawshot.patch.shops import actor_path, member_path, resolve_member
+from clawshot.world.model import World
 
 ACTOR_INFO = "RSDB/ActorInfo.Product.111.rstbl.byml.zs"
 FAIRY = "Item_Ocarina_Fairy"
@@ -160,10 +161,27 @@ def chest_ocarinas_possible(shuffle: Iterable[str]) -> bool:
     return "Chest" in shuffle and bool(gift_kinds(shuffle))
 
 
+def shown_ocarinas_possible(shuffle: Iterable[str]) -> bool:
+    """Whether the settings could make an ocarina show its own item actor: a Gift kind is on, so the ocarinas can
+    move, and each of chests (with Chest), show-item hand-overs (the Gift kinds themselves) and scrub sales shows it
+    (ocarina-song-drops-everywhere). Wider than :func:`chest_ocarinas_possible`: without the get model an ocarina at a
+    hand-over crashed (R11, reproduced on Longshot 3.1.1 in run 4.1), so it is not cosmetic there."""
+    return bool(gift_kinds(shuffle))
+
+
 def chest_ocarinas(placements: Mapping[str, str], chests: Iterable[str], actors: ItemActors) -> list[str]:
     """The chests (in ``chests`` order) whose placed item is an ocarina. ``make_seed`` refuses a seed that has one
     when :func:`chest_ocarinas_possible` says the settings cannot: the chest would show the wrong model."""
     return [name for name in chests if actors.actors.get(placements.get(name, "")) in OCARINAS]
+
+
+def get_model_ocarinas(placements: Mapping[str, str], world: World, actors: ItemActors) -> list[str]:
+    """The locations (in world order) whose grant shows the ocarina's own item actor and that hold an ocarina: chests
+    and the show-item hand-overs and scrub sales ``gifts.restrict_spec`` marks (``Location.hand_over``). A seed gets
+    :func:`ocarina_changes` only when there is one (O6: without it a hand-over crashed, r11-ocarina.md). Direct
+    story grants and GetPouchContent scenes create no item actor; floor and Skulltula pickups show their own."""
+    shown = [name for name, location in world.locations.items() if location.type == "Chest" or location.hand_over]
+    return chest_ocarinas(placements, shown, actors)
 
 
 def ocarina_changes(romfs: str | Path) -> dict[str, Callable[[bytes], bytes]]:

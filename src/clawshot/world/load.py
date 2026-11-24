@@ -491,6 +491,9 @@ def build_world(spec: Mapping[str, Any], logic: Mapping[str, Any] | None = None)
                 nonprogression_only = info.get("nonprogression_only", False)
                 if not isinstance(nonprogression_only, bool):
                     raise WorldError(f"{where}: nonprogression_only must be a boolean")
+                hand_over = info.get("hand_over", False)
+                if not isinstance(hand_over, bool):
+                    raise WorldError(f"{where}: hand_over must be a boolean")
                 if nonprogression_only:
                     excluded_items = sorted(
                         set(excluded_items) | {name for name, item in items.items() if item.progression}
@@ -507,6 +510,7 @@ def build_world(spec: Mapping[str, Any], logic: Mapping[str, Any] | None = None)
                     keep_vanilla=info.get("keep_vanilla"),
                     override=info.get("override"),
                     excluded_items=tuple(excluded_items),
+                    hand_over=hand_over,
                 )
                 if location.type == HINT_STONE:
                     if vanilla is not None:

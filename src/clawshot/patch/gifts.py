@@ -1131,10 +1131,11 @@ def seed_checks(
 def restrict_spec(
     spec: Mapping[str, Any], shuffled: Iterable[str], steps: Mapping[str, tuple[Gift, ...]] | None = None
 ) -> dict[str, Any]:
-    """Keep unsupported gifts vanilla and exclude unsafe items at show-item hand-overs.
+    """Keep unsupported gifts vanilla, and mark show-item hand-overs (``hand_over``) and exclude unsafe items there.
 
     Direct pouch grants and the ordinary GetPouchContent wrapper do not create the
     item actor. All other admitted gift wrappers, plus scrub sales, do (r11-ocarina).
+    The mark tells ``make_seed`` that an ocarina there needs the get model (``getitem.get_model_ocarinas``).
     """
     keep = set(shuffled)
     steps = steps or {}
@@ -1154,6 +1155,7 @@ def restrict_spec(
         if hand_over:
             info = {
                 **info,
+                "hand_over": True,
                 "excluded_items": tuple(
                     dict.fromkeys((*info.get("excluded_items", ()), *CATALOG["hand_over"]["excluded_items"]))
                 ),
