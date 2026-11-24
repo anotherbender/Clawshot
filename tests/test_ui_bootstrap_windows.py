@@ -18,7 +18,7 @@ def uv_archive(tmp_path_factory):
     folder = tmp_path_factory.mktemp("synthetic-uv")
     source = folder / "Uv.cs"
     source.write_text('class Uv { static int Main() { System.Console.WriteLine("synthetic uv"); return 0; } }')
-    compiler = Path(os.environ["SystemRoot"]) / "Microsoft.NET/Framework64/v4.0.30319/csc.exe"
+    compiler = Path(os.environ["SYSTEMROOT"]) / "Microsoft.NET/Framework64/v4.0.30319/csc.exe"
     executable = folder / "uv.exe"
     subprocess.run([str(compiler), "/nologo", f"/out:{executable}", str(source)], check=True, capture_output=True)
     archive = folder / "uv.zip"
@@ -30,8 +30,8 @@ def uv_archive(tmp_path_factory):
 @pytest.mark.parametrize("modules", ["normal", "ps7"])
 @pytest.mark.parametrize("valid", [True, False], ids=["verified", "corrupt"])
 def test_installer_verifies_download_without_module_hash_cmdlet(tmp_path, uv_archive, modules, valid):
-    powershell = Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe"
-    ps7_modules = Path(os.environ["ProgramFiles"]) / "PowerShell/7/Modules"
+    powershell = Path(os.environ["SYSTEMROOT"]) / "System32/WindowsPowerShell/v1.0/powershell.exe"
+    ps7_modules = Path(os.environ["PROGRAMFILES"]) / "PowerShell/7/Modules"
     if modules == "ps7" and not ps7_modules.is_dir():
         pytest.skip("PowerShell 7 modules are not installed")
     archive, executable = uv_archive
@@ -40,7 +40,9 @@ def test_installer_verifies_download_without_module_hash_cmdlet(tmp_path, uv_arc
     scripts.mkdir(parents=True)
     # Keep the shipped installer and pins, replacing only the transport and test archive's expected digest.
     prefix = (ROOT / "scripts/start-windows.ps1").read_text(encoding="ascii").split("$onPath =", 1)[0]
-    command = prefix + """
+    command = (
+        prefix
+        + """
 function Invoke-WebRequest {
     param($Uri, $OutFile, $TimeoutSec, [switch]$UseBasicParsing)
     if ($Uri -notlike 'https://github.com/astral-sh/uv/releases/download/*') { throw 'Unexpected URL' }
@@ -52,11 +54,12 @@ Install-PinnedUv
 & $UvExe --version
 exit $LASTEXITCODE
 """
+    )
     script = scripts / "installer.ps1"
     script.write_text(command, encoding="ascii")
-    normal = f"{Path(os.environ['ProgramFiles']) / 'WindowsPowerShell/Modules'};{powershell.parent / 'Modules'}"
+    normal = f"{Path(os.environ['PROGRAMFILES']) / 'WindowsPowerShell/Modules'};{powershell.parent / 'Modules'}"
     env = os.environ | {
-        "PSModulePath": str(ps7_modules) if modules == "ps7" else normal,
+        "PSMODULEPATH": str(ps7_modules) if modules == "ps7" else normal,
         "TEST_UV_ARCHIVE": str(archive),
         "TEST_UV_DIGEST": expected,
     }
