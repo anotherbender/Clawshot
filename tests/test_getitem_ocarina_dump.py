@@ -9,7 +9,7 @@ import pytest
 from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.generate import Settings
 from clawshot.generate.fill import allowed
-from clawshot.patch import getitem, gifts, make_seed, ocarina, songs, write_seed
+from clawshot.patch import getitem, gifts, make_seed, ocarina, ocarina_pickup, songs, write_seed
 from clawshot.patch.shops import actor_path, member_path
 from clawshot.world.load import load_spec
 
@@ -89,12 +89,14 @@ def step_module(transform):
 
 
 def ocarina_step(output) -> int:
-    """The index of the ocarina get model's step. Only the song get effects may follow it (Gift shuffle lets songs
-    move, so the seed gets them; song-get-effects): last on ActorInfo and the song packs."""
+    """The index of the ocarina get model's step. Only the song get effects (Gift shuffle lets songs move, so the seed
+    gets them; song-get-effects) and the ocarina world actors (Gift and Token: ``ocarina_pickup.pickups_possible``)
+    may follow it, each adding rows of its own to ActorInfo; neither touches the ocarina packs."""
     steps = [{step_module(t) for t in step.values()} for step in output.extra_changes]
     index = max(i for i, modules in enumerate(steps) if getitem.__name__ in modules)
     assert steps[index] == {getitem.__name__}, steps[index]
-    assert all(modules == {songs.__name__} for modules in steps[index + 1 :]), steps[index + 1 :]
+    after = {songs.__name__, ocarina_pickup.__name__}
+    assert all(modules <= after for modules in steps[index + 1 :]), steps[index + 1 :]
     return index
 
 
@@ -110,11 +112,12 @@ def test_a_chest_ocarina_seed_runs_the_ocarina_step_last_on_its_files(seed):
             path,
             [step_module(output.extra_changes[i][path]) for i in touching],
         )
-    # It comes after ocarina.changes (the Time-stays-equipped receipts) in the recipe; only the song step follows.
+    # It comes after ocarina.changes (the Time-stays-equipped receipts) in the recipe; only the song and ocarina
+    # pickup steps follow.
     steps = [{step_module(t) for t in step.values()} for step in output.extra_changes]
     assert max(i for i, m in enumerate(steps) if ocarina.__name__ in m) < ocarina_step(output)
     for step in output.extra_changes[ocarina_step(output) + 1 :]:
-        assert not set(map(getitem.pack_path, getitem.OCARINAS)) & set(step), "the song step leaves the ocarinas"
+        assert not set(map(getitem.pack_path, getitem.OCARINAS)) & set(step), "later steps leave the ocarinas"
 
 
 @pytest.mark.dump
@@ -138,7 +141,7 @@ def test_actor_info_differs_from_the_dump_only_by_the_calc_priorities_and_named_
         if row["__RowId"] == getitem.SARIA_PROP:
             assert "CalcPriority" not in row, row
             row["CalcPriority"] = "After"
-    # The song step after it (its own tests check its rows): applied to the expected table as the seed applies it.
+    # The song and ocarina pickup steps after it (their own tests check their rows): applied as the seed applies them.
     expected_data = byml.dump(byml.Document(expected_rows))
     for transform in later:
         expected_data = transform(expected_data)

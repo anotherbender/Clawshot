@@ -513,8 +513,9 @@ _OPT_IN = _modules(
 )
 WRITERS = {
     "defaults": _EVERY_RECIPE | _modules("text"),
-    "song_door": _EVERY_RECIPE | _modules("door", "gifts"),
-    "broad": _EVERY_RECIPE | _OPT_IN,
+    # Gift with Token or a floor kind runs the ocarina pickups' receipt in Dm_SY_Get (ocarina-song-drops-everywhere).
+    "song_door": _EVERY_RECIPE | _modules("door", "gifts", "ocarina_pickup"),
+    "broad": _EVERY_RECIPE | _OPT_IN | _modules("ocarina_pickup"),
     "starting": _EVERY_RECIPE | _modules("text", "start_items"),
 }
 FLOW_WRITERS = frozenset().union(*WRITERS.values())
