@@ -224,6 +224,7 @@ def make_seed(
         master_sword,
         mido_schedule,
         reward_bridge,
+        saria_equipment,
     )
 
     changes += (
@@ -232,6 +233,7 @@ def make_seed(
         equipment.changes(),
         *([master_sword.changes(out.placements)] if settings.shuffle_master_sword else []),
         dampe_safety.changes(),
+        saria_equipment.changes(),
     )
     changes += (reward_bridge.changes(mode=settings.bridge, count=settings.bridge_count),)
     scrub_previews = {name: out.placements[name] for name in out.shuffled if name in scrubs.SALES}
