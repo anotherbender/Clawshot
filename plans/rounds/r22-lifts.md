@@ -111,7 +111,8 @@ minimal writer diagnostics, not normal fills or goal-certified seeds; public pol
 
 All five profiles copy the natural child save just before Saria's farewell, from
 `2026-11-09_1558-seed8-gatehouse-crash`. It has neither instrument (both IsGet=false, stock0), an empty
-`PlayerStatus.EquipOcarina`, the child-gallery first-win flag=false, and78 rupees. No save edit.
+`PlayerStatus.EquipOcarina`, the child-gallery first-win flag=false, and78 rupees. D-pad is enabled, all12
+learned-song flags are false, and the remote activation chest's named open flag=true. No save edit.
 On Continue **immediately teleport to Market before walking across the forest bridge**: taking Saria's
 Fairy Ocarina first invalidates the first-instrument test.
 
@@ -127,7 +128,8 @@ gallery fee; its own fresh copy has78 rupees. Teleport/clock only; never a debug
 | `10 - gallery Fairy native packs.bat` | Fairy Ocarina; original dump packs/ActorInfo | NOT PLAYED |
 
 For each candidate: win, record hand-over model and get window, no crash/freeze, movement restored; pause
-inventory owns the actual instrument, D-pad plays it, and a learned song works. **Do not count IsGet alone:**
+inventory owns the actual instrument and D-pad plays audible manual notes (this checkpoint has no learned
+songs; do not claim a learned-song pass). **Do not count IsGet alone:**
 read `PlayerStatus.EquipOcarina` in the private saved copy and observe the instrument played. Leave/re-enter,
 verify the first prize does not repeat, Save/quit/Continue, verify the instrument remains playable and the
 first prize remains consumed. On failure stop that arm, preserve its log, report exactly where it failed;
@@ -162,6 +164,10 @@ silently omitting them. Kareem can batch A, B and C independently. No original s
 changes. Only the existing played Token-family hold correction is a product-code candidate now; every
 new chest/hand-over admission remains a separate post-play commit.
 
+Staging choices proposed by **cs22g, 2026-11-24**: natural post-Forest adult rather than reopening chests
+in a save; independent capacity profiles; both conditional PR40 states before any global hand-over lift.
+These do not change product policy.
+
 ## Verification so far
 
 - Focused synthetic: `CLAWSHOT_WORKERS=1 uv run --with pytest-xdist pytest tests/test_scrub_seed.py
@@ -190,5 +196,8 @@ new chest/hand-over admission remains a separate post-play commit.
 
 ## Work remaining
 
-Finish the requested deterministic registration coverage verification/early handoff, then capacity sweep
-and full gate under the round order. Final chest/hand-over admissions await Kareem's corresponding play.
+Capacity sweep and full gate remain under the round order. The early test-only fix is ready for Claude's
+integration gate; rebase onto the resulting local main and rerun focused contracts before FROZEN.
+Prepared paired arms:200 broad (`work/r18-fill/settings.txt`),50 Defaults,50 Recommended, plus50
+Chest/Scrub/Token capacity-binding seeds each. Record placement/sphere digest comparison as counts only.
+Final chest/hand-over admissions await Kareem's corresponding play.
