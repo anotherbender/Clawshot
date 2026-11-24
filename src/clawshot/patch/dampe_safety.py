@@ -1,8 +1,8 @@
-"""Require an escape tool before either race start, returning refusals to the surface.
+"""Refuse races without an escape tool, explain why, and return Link to the surface.
 
-The descent itself is one-way. Merely refusing to open the starting shutter would
-leave Link in the lower lobby. Reuse native fade/anchor-warp actions to the existing
-surface StartPos instead; no timer, race step, prize or inventory write is performed.
+The descent is one-way. Check after InitTalk, before race/talk state or positioning;
+keep Ready/Start guards as backup. Native dialogue precedes the existing safe return.
+No timer, race step, prize or inventory write is performed on a refusal.
 """
 
 from copy import deepcopy
@@ -14,6 +14,7 @@ from clawshot.patch.write import FileChanges
 FLOW = "Event/EventFlow/MiniGame_DampeRace.bfevfl.zs"
 SURFACE = "GraveYard_KakarikoSide"
 ENTRIES = ("MiniGame_DampeRace_Ready", "MiniGame_DampeRace_Start")
+REFUSAL_MESSAGE = "EventFlowMsg/Npc_Hylia_Dampe_002:ClawshotNoEscapeTool"
 
 
 def patch(data: bytes) -> bytes:
@@ -26,6 +27,22 @@ def patch(data: bytes) -> bytes:
         raise PatchError("Dampe safety: already patched")
     pouch = next(i for i, actor in enumerate(fc.actors) if actor.name == "PouchSystemActor")
     query = fc.actors[pouch].queries.index("EventQueryIsExistInPouch")
+    named = {event.name: i for i, event in enumerate(fc.events)}
+    talk = by_name["Event109"]
+    if (
+        not isinstance(talk, evfl.SubFlowEvent)
+        or (talk.flowchart, talk.entry_point) != ("InitTalk", "InitTalk")
+        or talk.next != named["Event59"]
+    ):
+        raise PatchError(f"Dampe safety: unexpected talk initialization {talk!r}")
+    refusal = deepcopy(by_name["Event3"])
+    if (
+        not isinstance(refusal, evfl.ActionEvent)
+        or fc.actors[refusal.actor].actions[refusal.action] != "EventTalk"
+        or refusal.params.get("MessageId") != "EventFlowMsg/Npc_Hylia_Dampe_002:Talk_01"
+        or refusal.params.get("ChoiceNumber") != 0
+    ):
+        raise PatchError(f"Dampe safety: unexpected dialogue donor {refusal!r}")
     # Native pouch queries return 0 when held and 1 when absent.
     # These donors are native race reset actions, not a new transition protocol.
     fade_out = deepcopy(by_name["Event92"])
@@ -47,18 +64,17 @@ def patch(data: bytes) -> bytes:
     if warp.params.get("ActorName") != "StartPos" or warp.params.get("InstanceName") != "4":
         raise PatchError(f"Dampe safety: changed native race reset anchor {warp.params!r}")
     tail = len(fc.events)
-    fade_out.name, fade_out.next = "ClawshotDampeSurfaceFadeOut", tail + 1
-    warp.name, warp.next = "ClawshotDampeSurfaceWarp", tail + 2
+    refusal.name, refusal.next = "ClawshotDampeNoToolTalk", tail + 1
+    refusal.params["MessageId"] = REFUSAL_MESSAGE
+    fade_out.name, fade_out.next = "ClawshotDampeSurfaceFadeOut", tail + 2
+    warp.name, warp.next = "ClawshotDampeSurfaceWarp", tail + 3
     fade_in.name, fade_in.next = "ClawshotDampeSurfaceFadeIn", evfl.NONE
-    for action in (fade_out, warp, fade_in):
+    for action in (refusal, fade_out, warp, fade_in):
         action.params = {**action.params, "IsWaitEnd": True}
     warp.params["InstanceName"] = SURFACE
-    fc.events.extend([fade_out, warp, fade_in])
-    for name in ENTRIES:
-        entry = fc.entry_point(name)
-        original = entry.main_event
-        if not isinstance(fc.events[original], evfl.ActionEvent):
-            raise PatchError(f"Dampe safety: unexpected {name} entry {fc.events[original]!r}")
+    fc.events.extend([refusal, fade_out, warp, fade_in])
+
+    def admission(name: str, original: int) -> int:
         gate = len(fc.events)
         fc.events.extend(
             [
@@ -78,7 +94,17 @@ def patch(data: bytes) -> bytes:
                 ),
             ]
         )
-        entry.main_event = gate
+        return gate
+
+    # Refuse before reset, offer-history writes, either acceptance speech or positioning.
+    # A later visit with a naturally acquired tool sees the untouched native race state.
+    talk.next = admission("Talk", talk.next)
+    for name in ENTRIES:
+        entry = fc.entry_point(name)
+        original = entry.main_event
+        if not isinstance(fc.events[original], evfl.ActionEvent):
+            raise PatchError(f"Dampe safety: unexpected {name} entry {fc.events[original]!r}")
+        entry.main_event = admission(name, original)
     result = evfl.write(file)
     if evfl.read(result) != file:
         raise PatchError("Dampe safety: read-back differs")

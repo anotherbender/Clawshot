@@ -234,6 +234,7 @@ def make_seed(
         *([master_sword.changes(out.placements)] if settings.shuffle_master_sword else []),
         dampe_safety.changes(),
         dampe_first_race.changes(),
+        text.dampe_refusal_changes(romfs),
     )
     changes += (reward_bridge.changes(mode=settings.bridge, count=settings.bridge_count),)
     scrub_previews = {name: out.placements[name] for name in out.shuffled if name in scrubs.SALES}

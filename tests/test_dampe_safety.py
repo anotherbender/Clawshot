@@ -1,8 +1,7 @@
 """Tool admission remains separate from chest-open-based first/second race selection."""
 
-from copy import deepcopy
-
 import pytest
+from dampe_flow import COUNT, FOREST, HEART, play
 
 from clawshot.formats import byml, evfl
 from clawshot.formats.zsdic import Dictionaries
@@ -17,8 +16,13 @@ def race():
             actors=[
                 evfl.Actor("PouchSystemActor", queries=["EventQueryIsExistInPouch"]),
                 evfl.Actor("UISystemActor", actions=["EventEventFadeOut", "EventEventFadeIn"]),
-                evfl.Actor("Player_Event", actions=["EventPlayerWarpToStarterLinkAnchor"]),
-                evfl.Actor("ChallengeSystemActor", actions=["EventTriggerMiniGameTimerSetting", "StartRace"]),
+                evfl.Actor("Player_Event", actions=["EventPlayerWarpToStarterLinkAnchor", "EventPlayerMoveToAnchor"]),
+                evfl.Actor(
+                    "ChallengeSystemActor",
+                    actions=["EventTriggerMiniGameTimerSetting", "StartRace"],
+                    queries=["EventQueryMiniGameTimerIsCounting"],
+                ),
+                evfl.Actor("Npc_EventStarter", actions=["EventTalk"]),
             ],
             events=[
                 evfl.ActionEvent("Timer", 3, 0),
@@ -26,8 +30,23 @@ def race():
                 evfl.ActionEvent("Event92", 1, 0, 3, {"Color": 0, "Length": 1}),
                 evfl.ActionEvent("Event90", 2, 0, 4, {"ActorName": "StartPos", "InstanceName": "4"}),
                 evfl.ActionEvent("FadeIn", 1, 1, params={"Color": 0, "Length": 1}),
+                evfl.SwitchEvent("Event59", 3, 0, [(1, 6)]),
+                evfl.SwitchEvent("Event444", 0, 0, [(0, 7), (1, 7)], {"Actor": "Item_Hookshot", "Num": 1}),
+                evfl.ActionEvent(
+                    "Event3",
+                    4,
+                    0,
+                    8,
+                    {"MessageId": "EventFlowMsg/Npc_Hylia_Dampe_002:Talk_01", "ChoiceNumber": 0},
+                ),
+                evfl.ActionEvent("Move", 2, 1, 0),
+                evfl.SubFlowEvent("Event109", flowchart="InitTalk", entry_point="InitTalk", next=5),
             ],
-            entry_points=[evfl.EntryPoint(dampe_safety.ENTRIES[0], 0), evfl.EntryPoint(dampe_safety.ENTRIES[1], 1)],
+            entry_points=[
+                evfl.EntryPoint(dampe_safety.ENTRIES[0], 0),
+                evfl.EntryPoint(dampe_safety.ENTRIES[1], 1),
+                evfl.EntryPoint("Accept", 9),
+            ],
         ),
     )
 
@@ -39,7 +58,16 @@ def actions(fc, entry, owned):
         event = fc.events[index]
         if isinstance(event, evfl.SwitchEvent):
             # Native pouch query results: held=0, absent=1.
-            index = dict(event.cases)[0 if event.params["Actor"] in owned else 1]
+            query = fc.actors[event.actor].queries[event.query]
+            if query == "EventQueryMiniGameTimerIsCounting":
+                code = 1
+            else:
+                assert query == "EventQueryIsExistInPouch", event
+                code = 0 if event.params["Actor"] in owned else 1
+            index = dict(event.cases)[code]
+        elif isinstance(event, evfl.SubFlowEvent):
+            assert (event.flowchart, event.entry_point) == ("InitTalk", "InitTalk"), event
+            index = event.next
         else:
             out.append((fc.actors[event.actor].actions[event.action], event.params))
             index = event.next
@@ -57,33 +85,55 @@ def test_start_or_refusal_always_has_a_safe_destination(entry, owned):
         ]
     else:
         assert [name for name, _ in trace] == [
+            "EventTalk",
             "EventEventFadeOut",
             "EventPlayerWarpToStarterLinkAnchor",
             "EventEventFadeIn",
         ]
-        assert trace[1][1]["InstanceName"] == dampe_safety.SURFACE
+        assert trace[0][1]["MessageId"] == dampe_safety.REFUSAL_MESSAGE
+        assert trace[0][1]["IsWaitEnd"] is True
+        assert trace[2][1]["InstanceName"] == dampe_safety.SURFACE
+
+
+@pytest.mark.parametrize("owned", [set(), {"Item_Hookshot"}, {"Item_Longshot"}])
+def test_acceptance_explains_refusal_before_start_speech_or_positioning(owned):
+    fc = evfl.read(dampe_safety.patch(evfl.write(race()))).flowchart
+    trace = actions(fc, "Accept", owned)
+    if owned:
+        assert [name for name, _ in trace] == [
+            "EventTalk",
+            "EventPlayerMoveToAnchor",
+            "EventTriggerMiniGameTimerSetting",
+        ]
+        assert trace[0][1]["MessageId"] == "EventFlowMsg/Npc_Hylia_Dampe_002:Talk_01"
+    else:
+        assert [name for name, _ in trace] == [
+            "EventTalk",
+            "EventEventFadeOut",
+            "EventPlayerWarpToStarterLinkAnchor",
+            "EventEventFadeIn",
+        ]
+        assert trace[0][1]["MessageId"] == dampe_safety.REFUSAL_MESSAGE
+        assert trace[0][1]["IsWaitEnd"] is True
+        assert trace[2][1]["InstanceName"] == dampe_safety.SURFACE
 
 
 @pytest.mark.dump
-def test_native_race_guard_keeps_every_original_event_and_returns_to_a_real_surface_anchor(romfs):
+def test_native_refusal_explains_and_returns_to_a_real_surface_anchor(romfs):
     dictionaries = Dictionaries.from_romfs(romfs)
     original = dictionaries.decompress(dampe_safety.FLOW, (romfs / dampe_safety.FLOW).read_bytes())
-    before = evfl.read(original)
     after = evfl.read(dampe_safety.patch(original))
-    assert after.flowchart.events[: len(before.flowchart.events)] == before.flowchart.events
-    expected = deepcopy(before)
-    for entry in dampe_safety.ENTRIES:
-        expected.flowchart.entry_point(entry).main_event = after.flowchart.entry_point(entry).main_event
-    expected.flowchart.events.extend(after.flowchart.events[len(before.flowchart.events) :])
-    assert expected == after
     for entry in dampe_safety.ENTRIES:
         trace = actions(after.flowchart, entry, set())
         assert [name for name, _ in trace] == [
+            "EventTalk",
             "EventEventFadeOut",
             "EventPlayerWarpToStarterLinkAnchor",
             "EventEventFadeIn",
         ]
-        assert trace[1][1]["InstanceName"] == dampe_safety.SURFACE
+        assert trace[0][1]["MessageId"] == dampe_safety.REFUSAL_MESSAGE
+        assert trace[0][1]["IsWaitEnd"] is True
+        assert trace[2][1]["InstanceName"] == dampe_safety.SURFACE
     path = "Banc/Graveyard/Graveyard_Adult_Dynamic.bcett.byml.zs"
     placed = byml.read(dictionaries.decompress(path, (romfs / path).read_bytes()))["Actors"]
     anchors = [a for a in placed if a.get("Gyaml") == "StartPos" and a.get("Name") == dampe_safety.SURFACE]
@@ -126,3 +176,76 @@ def test_first_race_repair_preserves_the_no_tool_refusal(romfs, entry):
     before = evfl.read(dampe_safety.patch(raw)).flowchart
     after = evfl.read(dampe_first_race.patch(dampe_safety.patch(raw))).flowchart
     assert actions(after, entry, set()) == actions(before, entry, set())
+
+
+@pytest.mark.dump
+@pytest.mark.parametrize("opened", [False, True])
+def test_native_ready_talk_refuses_before_acceptance_and_positioning(romfs, opened):
+    dictionaries = Dictionaries.from_romfs(romfs)
+    raw = dictionaries.decompress(dampe_safety.FLOW, (romfs / dampe_safety.FLOW).read_bytes())
+    fc = evfl.read(dampe_first_race.patch(dampe_safety.patch(raw))).flowchart
+    state = {FOREST: "Complete", COUNT: 2, HEART: True, dampe_first_race.CHEST_OPEN: opened}
+    initial = state.copy()
+    trace = play(fc, "Ready_Npc_Hylia_Dampe_002_Talk", state, set())
+    assert "ClawshotDampeNoToolTalk" in trace
+    assert trace.index("ClawshotDampeNoToolTalk") < trace.index("ClawshotDampeSurfaceFadeOut")
+    assert not {"Event3", "Event67", "Event286", "Event149", "Event16", "Event130", "Event131"}.intersection(trace)
+    assert state == initial
+
+
+@pytest.mark.dump
+@pytest.mark.parametrize("owned", [{"Item_Hookshot"}, {"Item_Longshot"}])
+@pytest.mark.parametrize("talked", [False, True])
+def test_refusal_then_natural_tool_acquisition_keeps_the_first_race_available(romfs, owned, talked):
+    dictionaries = Dictionaries.from_romfs(romfs)
+    raw = dictionaries.decompress(dampe_safety.FLOW, (romfs / dampe_safety.FLOW).read_bytes())
+    fc = evfl.read(dampe_first_race.patch(dampe_safety.patch(raw))).flowchart
+    state = {
+        FOREST: "Step06",
+        COUNT: 0,
+        HEART: False,
+        dampe_first_race.CHEST_OPEN: False,
+        "Npc_HaveTalked": talked,
+        "MiniGame_TimerMinute": 2,
+        "MiniGame_TimerSecond": 10,
+        "MiniGame_TimerMilliSecond": 0,
+    }
+    initial = state.copy()
+    refusal = play(fc, "Ready_Npc_Hylia_Dampe_002_Talk", state, set())
+    assert "ClawshotDampeNoToolTalk" in refusal
+    assert state == initial  # no race, treasure, quest or offer-history writes
+    # Native actor talk history may remember the interaction; neither variant may block racing.
+    state["Npc_HaveTalked"] = True
+    play(fc, "Ready_Npc_Hylia_Dampe_002_Talk", state, owned)
+    assert state["MiniGame_DampeRace"] == "Playing"
+    play(fc, "Finish_Npc_Hylia_Dampe_002_StepStart", state, owned)
+    play(fc, "Result", state, owned)
+    assert state[COUNT] == 0
+    assert state["Minigame_DampeRace_TreasureBoxState"] == "AppearHookShot"
+
+
+@pytest.mark.dump
+@pytest.mark.parametrize("owned", [{"Item_Hookshot"}, {"Item_Longshot"}])
+@pytest.mark.parametrize("opened", [False, True])
+def test_held_tools_keep_both_native_race_action_sequences(romfs, owned, opened):
+    dictionaries = Dictionaries.from_romfs(romfs)
+    raw = dictionaries.decompress(dampe_safety.FLOW, (romfs / dampe_safety.FLOW).read_bytes())
+    before = evfl.read(dampe_first_race.patch(raw)).flowchart
+    after = evfl.read(dampe_first_race.patch(dampe_safety.patch(raw))).flowchart
+    initial = {FOREST: "Complete", COUNT: 2, HEART: True, dampe_first_race.CHEST_OPEN: opened}
+    states, actions_seen = [], []
+    for fc in (before, after):
+        state = initial.copy()
+        trace = play(fc, "Ready_Npc_Hylia_Dampe_002_Talk", state, owned)
+        named = {event.name: event for event in fc.events}
+        actions_seen.append(
+            [
+                (fc.actors[event.actor].name, fc.actors[event.actor].actions[event.action], event.params)
+                for name in trace
+                if isinstance(event := named[name], evfl.ActionEvent)
+            ]
+        )
+        states.append(state)
+    assert states[1] == states[0]
+    assert states[1]["MiniGame_DampeRace"] == ("PlayingSecond" if opened else "Playing")
+    assert actions_seen[1] == actions_seen[0]
