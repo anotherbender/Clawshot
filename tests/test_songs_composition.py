@@ -75,9 +75,15 @@ def song_world(ocarina_world):
     return root
 
 
+@pytest.fixture(params=[False, True], ids=["seed", "pickups"])
+def pickups(request):
+    """``seed``: the step as seeds run it (no floor pickups); ``pickups``: the full step the code keeps."""
+    return request.param
+
+
 @pytest.fixture
-def composed(song_world, tmp_path):
-    delivery = songs.build(song_world)
+def composed(song_world, tmp_path, pickups):
+    delivery = songs.build(song_world, pickups=pickups)
     steps = (*map(insert_row, STAND_INS), getitem.ocarina_changes(song_world), delivery.changes)
     return write_combined(song_world, tmp_path / "seed", later_steps=steps, later_files=delivery.new_files)
 
@@ -91,14 +97,16 @@ def chain(composed, path):
     return data
 
 
-def test_every_edit_lands_in_order_and_the_song_step_runs_last(composed):
+def test_every_edit_lands_in_order_and_the_song_step_runs_last(composed, pickups):
     steps = composed.output.extra_changes
-    assert songs.ELINK in steps[-1] and steps[-1][songs.ACTOR_INFO] is songs.patch_actor_info
+    actor_info = steps[-1][songs.ACTOR_INFO]
+    assert songs.ELINK in steps[-1] and getattr(actor_info, "func", actor_info) is songs.patch_actor_info
     for path in (*tokens.REGISTRIES, songs.ELINK, songs.STATIC, *map(getitem.pack_path, getitem.SONG_MODELS)):
         assert composed.read(path) == chain(composed, path), path
     rows = {row["__RowId"]: row for row in byml.read(composed.read(tokens.ACTOR_INFO))}
     native = {row["__RowId"] for row in byml.read(composed.native(tokens.ACTOR_INFO))}
-    pickups = {songs.pickup_name(s) for s in getitem.SONG_MODELS}
+    names = {songs.pickup_name(s) for s in getitem.SONG_MODELS}
+    pickups = names if pickups else set()
     assert set(rows) == native | set(STAND_INS) | set(CUSTOM_ACTORS) | set(PICKUPS) | pickups
     for actor in getitem.OCARINAS:  # the ocarina get model's edit is kept under the song step's
         assert "CalcPriority" not in rows[actor]
@@ -107,7 +115,9 @@ def test_every_edit_lands_in_order_and_the_song_step_runs_last(composed):
     for path in tokens.REGISTRIES:
         ids = [row["__RowId"] for row in byml.read(composed.read(path))]
         assert ids == sorted(set(ids), key=lambda name: name.encode("utf-8")), path
-        assert pickups <= set(ids), path
+        assert pickups <= set(ids) and not (names - pickups) & set(ids), path
+    melody = {path for path in composed.output.new_files if "Obj_Clawshot_Melody_" in path}
+    assert melody == {getitem.pack_path(name) for name in pickups}
 
 
 def test_every_changed_file_reads_back(composed):
@@ -130,7 +140,7 @@ def test_every_changed_file_reads_back(composed):
             assert byml.write(byml.read(data)) == data, path
 
 
-def test_every_new_or_changed_entry_uses_its_formula_and_none_is_lowered(composed):
+def test_every_new_or_changed_entry_uses_its_formula_and_none_is_lowered(composed, pickups):
     """8.7: song and pickup members, the ELink table, static and the tables; every native entry kept or raised."""
     original = rstb.read(composed.native(rstb.TABLE_PATH))
     table = rstb.read(composed.read(rstb.TABLE_PATH))
@@ -154,6 +164,8 @@ def test_every_new_or_changed_entry_uses_its_formula_and_none_is_lowered(compose
         before = sarc.read(composed.native(getitem.pack_path(song)))[model]
         growth = max(0, ((len(pack[model]) + 31) // 32 - (len(before) + 31) // 32) * 32)
         assert table.get(model) == MODEL_ENTRY + growth
+        if not pickups:
+            continue
         pickup = songs.pickup_name(song)
         path = getitem.pack_path(pickup)
         new = composed.output.new_files[path]

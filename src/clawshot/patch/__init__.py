@@ -292,8 +292,9 @@ def make_seed(
         steps.append(OCARINA_GET_MODEL)
     elif found := getitem.chest_ocarinas(out.placements, chests, table):
         raise PatchError(f"{found} hold an ocarina, but the settings do not run the ocarina get model")
-    # Song get effects: when the settings let songs leave their places. Songs show an ocarina with their own effect,
-    # and the floor pickups are written but placed nowhere (song-get-effects S3). Last on ActorInfo and the song packs.
+    # Song get effects: when the settings let songs leave their places. Songs show an ocarina with their own effect;
+    # the floor pickups stay unwritten until a feature places them (Kareem, 2026-11-23, rounds/r21-pr41.md
+    # finding 4). Last on ActorInfo and the song packs.
     if songs.songs_can_move(settings.shuffle):
         delivery = songs.build(romfs)
         changes += (delivery.changes,)

@@ -168,11 +168,12 @@ def write_romfs(root, zsdic_pack, files: dict[str, bytes]) -> zsdic.Dictionaries
     return dictionaries
 
 
-def run(root, zsdic_pack, files=None) -> tuple[songs.Delivery, dict[str, bytes]]:
-    """Build the step on a synthetic romfs and apply every change to its native file."""
+def run(root, zsdic_pack, files=None, *, pickups=True) -> tuple[songs.Delivery, dict[str, bytes]]:
+    """Build the step on a synthetic romfs and apply every change to its native file (``pickups``: the full step,
+    floor pickups included, which the code keeps for a later feature; seeds build without them)."""
     files = native_files() if files is None else files
     write_romfs(root, zsdic_pack, files)
-    delivery = songs.build(root)
+    delivery = songs.build(root, pickups=pickups)
     out = {}
     for path, transform in delivery.changes.items():
         out[path] = transform(files[path if path in files else path.removesuffix(".zs")])
@@ -370,7 +371,7 @@ def test_actor_info_works_on_a_table_earlier_steps_changed():
 
 
 def test_pickup_rows_come_from_the_arrow_and_the_song():
-    info = rows_by_id(songs.patch_actor_info(doc(actor_info())))
+    info = rows_by_id(songs.patch_actor_info(doc(actor_info()), pickups=True))
     game = byml.read(songs.patch_game_actor_info(doc(game_actor_info())))
     pouch = byml.read(songs.patch_pouch_actor_info(doc(pouch_actor_info())))
     before = {r["__RowId"]: r for r in actor_info()}
@@ -463,6 +464,23 @@ def test_build_changes_exactly_the_feature_files(built):
     )
     assert sorted(delivery.new_files) == sorted(getitem.pack_path(songs.pickup_name(s)) for s in getitem.SONG_MODELS)
     assert "ELink2/elink2.Product.100.belnk.zs" not in delivery.changes
+
+
+def test_a_seed_build_writes_no_pickup_pack_or_row(tmp_path, zsdic_pack):
+    """Kareem, 2026-11-23 (rounds/r21-pr41.md finding 4): until a feature places the floor pickups, the step a seed
+    runs writes none of their packs and no row for them; GameActorInfo and PouchActorInfo stay untouched, and the
+    songs' own rows and packs change as with the pickups."""
+    seed, seed_out = run(tmp_path / "seed", zsdic_pack, pickups=False)
+    full, full_out = run(tmp_path / "full", zsdic_pack)
+    assert seed.new_files == {}
+    assert sorted(seed.changes) == sorted(set(full.changes) - {songs.GAME_ACTOR_INFO, songs.POUCH_ACTOR_INFO})
+    ids = [row["__RowId"] for row in byml.read(seed_out[songs.ACTOR_INFO])]
+    assert ids == [row["__RowId"] for row in actor_info()]
+    assert not any(i.startswith("Obj_Clawshot_Melody_") for i in ids)
+    full_rows = rows_by_id(full_out[songs.ACTOR_INFO])
+    assert {i: full_rows[i] for i in ids} == rows_by_id(seed_out[songs.ACTOR_INFO])
+    for path in (songs.ELINK, songs.STATIC, *(getitem.pack_path(s) for s in getitem.SONG_MODELS)):
+        assert seed_out[path] == full_out[path], path
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -597,13 +615,15 @@ def test_a_pickup_pack_already_in_the_dump_is_refused(tmp_path, zsdic_pack):
 # 7.8P inputs
 
 
-def test_native_inputs_name_every_dump_file_the_step_reads(tmp_path, zsdic_pack):
-    inputs = songs.native_inputs()
+@pytest.mark.parametrize("pickups", [False, True])
+def test_native_inputs_name_every_dump_file_the_step_reads(tmp_path, zsdic_pack, pickups):
+    inputs = songs.native_inputs(pickups=pickups)
     assert len(inputs) == len(set(inputs))
-    write_romfs(tmp_path, zsdic_pack, native_files())
+    keep = {path.removesuffix(".zs") for path in inputs}
+    write_romfs(tmp_path, zsdic_pack, {k: v for k, v in native_files().items() if k.removesuffix(".zs") in keep})
     present = {p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*") if p.is_file()}
     assert present == set(inputs)
-    assert songs.build(tmp_path).changes
+    assert songs.build(tmp_path, pickups=pickups).changes
 
 
 def test_the_app_working_set_holds_the_song_inputs():

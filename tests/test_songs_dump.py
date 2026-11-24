@@ -1,7 +1,8 @@
 """The song get effects on the player's dump (plan 8.2-8.5, 8.9): the step's output decodes to the data file's values
-and keeps every native user, effect, member and row; a Gift seed writes them all and places no pickup;
-a seed whose settings keep songs home writes none of them and refuses a moved song; the same seed gives the same
-folder in two processes."""
+and keeps every native user, effect, member and row; a Gift seed writes them all and no floor pickup (rounds/r21-pr41.md
+finding 4); a seed whose settings keep songs home writes none of them and refuses a moved song; the same seed gives
+the same folder in two processes. The full step, pickups included, is still checked on the dump (``applied``, the
+sizing test)."""
 
 import math
 import os
@@ -23,19 +24,15 @@ from clawshot.world.load import load_spec
 
 EFFECTS = songs.load_effects()
 SONG_SEED = ("--seed", "4242", "--shuffle", "Chest", "Gift", "--songs", "anywhere")  # all twelve songs move
-FEATURE_FILES = (
-    songs.ELINK,
-    songs.STATIC,
-    *(getitem.pack_path(s) for s in getitem.SONG_MODELS),
-    *(getitem.pack_path(songs.pickup_name(s)) for s in getitem.SONG_MODELS),
-)
+FEATURE_FILES = (songs.ELINK, songs.STATIC, *(getitem.pack_path(s) for s in getitem.SONG_MODELS))
+PICKUP_FILES = tuple(getitem.pack_path(songs.pickup_name(s)) for s in getitem.SONG_MODELS)
 
 
 @pytest.fixture(scope="module")
 def applied(romfs):
     """The step built on the dump and every change applied to its native file."""
     dicts = zsdic.Dictionaries.from_romfs(romfs)
-    delivery = songs.build(romfs)
+    delivery = songs.build(romfs, pickups=True)
     native = {path: dicts.decompress(path, (romfs / path).read_bytes()) for path in delivery.changes}
     return delivery, native, {path: transform(native[path]) for path, transform in delivery.changes.items()}
 
@@ -137,17 +134,20 @@ def song_seed(romfs, tmp_path_factory):
 
 
 @pytest.mark.dump
-def test_dump_a_gift_seed_writes_every_feature_file_and_places_no_pickup(romfs, song_seed):
-    """2.1-2.4 in a seed: the files are written, .100 is not, and no placement file names a pickup (S3)."""
+def test_dump_a_gift_seed_writes_every_feature_file_and_no_pickup(romfs, song_seed):
+    """2.1-2.3 in a seed: the files are written, .100 is not; no pickup pack, no pickup row in any actor table, and
+    no placement file names a pickup (Kareem, 2026-11-23: written only once a feature places them)."""
     output, files, out = song_seed
     assert output.steps == (OCARINA_GET_MODEL, SONG_GET_EFFECTS)  # Chest and Gift shuffle: both steps, by setting
     assert output.spoiler()["patch"]["steps"] == list(output.steps)
     assert set(FEATURE_FILES) <= set(files)
+    assert not set(PICKUP_FILES) & (set(files) | set(output.new_files))
     assert "ELink2/elink2.Product.100.belnk.zs" not in files
     assert songs.ELINK in output.extra_changes[-1]  # last on ActorInfo and the song packs
+    assert {songs.GAME_ACTOR_INFO, songs.POUCH_ACTOR_INFO}.isdisjoint(output.extra_changes[-1])
     dicts = zsdic.Dictionaries.from_romfs(romfs)
     for path in files:
-        if path.startswith("Banc/"):
+        if path.startswith("Banc/") or path in (songs.ACTOR_INFO, songs.GAME_ACTOR_INFO, songs.POUCH_ACTOR_INFO):
             assert b"Obj_Clawshot_Melody_" not in dicts.decompress(path, (out / "romfs" / path).read_bytes()), path
     table = rstb.read(dicts.decompress(rstb.TABLE_PATH, (out / "romfs" / rstb.TABLE_PATH).read_bytes()))
     static = files[songs.STATIC]
@@ -160,7 +160,7 @@ def test_dump_a_seed_whose_settings_keep_songs_home_writes_none_of_the_feature_f
     assert output.steps == ()
     assert not songs.moved_songs(output.seed.placements, output.seed.world, item_actors.load())
     assert all(songs.ELINK not in step for step in output.extra_changes)
-    assert not set(FEATURE_FILES) & set(output.new_files)
+    assert not (set(FEATURE_FILES) | set(PICKUP_FILES)) & set(output.new_files)
 
 
 @pytest.mark.dump
@@ -188,9 +188,9 @@ def test_dump_song_seed_same_folder_in_two_processes(romfs, tmp_path):
     with ThreadPoolExecutor(2) as pool:
         first, second = pool.map(run, ("1", "2"))
     assert first == second
-    named = (songs.ELINK, songs.STATIC, getitem.pack_path("Item_Melody_SunSong"))
-    for path in (*named, getitem.pack_path(songs.pickup_name("Item_Melody_FireBolero"))):
+    for path in (songs.ELINK, songs.STATIC, getitem.pack_path("Item_Melody_SunSong")):
         assert f"romfs/{path}" in first, path
+    assert not any("Obj_Clawshot_Melody_" in path for path in first)
 
 
 @pytest.mark.dump
@@ -200,7 +200,7 @@ def test_dump_song_step_sizes_every_changed_and_new_member(romfs, tmp_path):
     copied members keep the entry of what they copy, and the song ModelInfo keeps its native entry plus its rounded
     growth."""
     dicts = zsdic.Dictionaries.from_romfs(romfs)
-    delivery = songs.build(romfs)
+    delivery = songs.build(romfs, pickups=True)
     out = tmp_path / "songs"
     written = write(Plan([], [], []), romfs, out, extra_changes=(delivery.changes,), new_files=delivery.new_files)
     original = rstb.read(dicts.decompress(rstb.TABLE_PATH, (romfs / rstb.TABLE_PATH).read_bytes()))

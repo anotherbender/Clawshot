@@ -10,8 +10,9 @@ instead of the green rupee every ``Item_Melody_*`` natively shows (plans/song-ge
 - each ``Item_Melody_*`` pack: the ocarina's model with the common get-pose animation, the effect user, the heart
   container's ASInfo and the resident XLink component (:func:`patch_song_pack`), and its ActorInfo row
   (:func:`patch_actor_info`);
-- twelve floor pickups ``Obj_Clawshot_Melody_<Song>`` built from ``Obj_Arrow_Fire`` (:func:`pickup_pack`) with their
-  ActorInfo, GameActorInfo and PouchActorInfo rows. No seed places them (spec S3).
+- with ``pickups`` only: twelve floor pickups ``Obj_Clawshot_Melody_<Song>`` built from ``Obj_Arrow_Fire``
+  (:func:`pickup_pack`) with their ActorInfo, GameActorInfo and PouchActorInfo rows. Seeds build without them:
+  they are written only once a feature places them (Kareem, 2026-11-23, rounds/r21-pr41.md finding 4).
 
 The effect values live in ``data/song_effects.toml`` (:func:`load_effects`).
 """
@@ -384,12 +385,12 @@ def _insert(document: byml.Document, path: str, new: list[dict]) -> bytes:
     return out
 
 
-def patch_actor_info(data: bytes) -> bytes:
+def patch_actor_info(data: bytes, *, pickups: bool = False) -> bytes:
     """Song rows get the ocarina's model fields, ``ELinkUserName`` and heaps (``InstanceHeapSize`` plus the
-    ocarina's, ``PreActorRenderInfoHeapSize`` the larger: as the gallery confirmed in game); the pickups' rows,
-    copied from ``Obj_Arrow_Fire``'s, are inserted by name. Works on a table earlier steps changed."""
+    ocarina's, ``PreActorRenderInfoHeapSize`` the larger: as the gallery confirmed in game); with ``pickups`` the
+    pickups' rows, copied from ``Obj_Arrow_Fire``'s, are inserted by name. Works on a table earlier steps changed."""
     document, rows = _rows(data, ACTOR_INFO)
-    _need(rows, ACTOR_INFO, *getitem.SONG_MODELS, *getitem.OCARINAS, PICKUP_DONOR)
+    _need(rows, ACTOR_INFO, *getitem.SONG_MODELS, *getitem.OCARINAS, *([PICKUP_DONOR] if pickups else []))
     new = []
     for song, ocarina in getitem.SONG_MODELS.items():
         row, donor = rows[song], rows[ocarina]
@@ -404,6 +405,8 @@ def patch_actor_info(data: bytes) -> bytes:
         render = "PreActorRenderInfoHeapSize"
         row[render] = type(row[render])(max(int(row[render]), int(donor[render])))
         row["ELinkUserName"] = user_name(song)
+        if not pickups:
+            continue
         pickup = copy.deepcopy(rows[PICKUP_DONOR])
         pickup["__RowId"] = pickup_name(song)
         for field in getitem.MODEL_FIELDS:
@@ -495,8 +498,8 @@ def pickup_pack(song: str, *, arrow: bytes, song_pack: bytes) -> NewFile:
 
 @dataclass(frozen=True)
 class Delivery:
-    """``changes`` for the common writer's ``extra_changes`` and ``new_files`` (the pickup packs) for its
-    ``new_files``."""
+    """``changes`` for the common writer's ``extra_changes`` and ``new_files`` (the pickup packs, with ``pickups``)
+    for its ``new_files``."""
 
     changes: FileChanges
     new_files: Mapping[str, NewFile]
@@ -522,7 +525,7 @@ def moved_songs(placements: Mapping[str, str], world, actors) -> list[str]:
     return sorted(out)
 
 
-def native_inputs() -> tuple[str, ...]:
+def native_inputs(*, pickups: bool = False) -> tuple[str, ...]:
     """Every romfs file :func:`build` and its transforms read, the dictionaries' pack included, so the app's working
     set (``clawshot.pack.source.working_files``) holds them. The animation files the AnimationParams name are not
     read (the game loads them from its own romfs): ``tests/test_getitem_ocarina_dump.py`` checks they exist."""
@@ -531,26 +534,27 @@ def native_inputs() -> tuple[str, ...]:
         ELINK,
         STATIC,
         ACTOR_INFO,
-        GAME_ACTOR_INFO,
-        POUCH_ACTOR_INFO,
+        *((GAME_ACTOR_INFO, POUCH_ACTOR_INFO) if pickups else ()),
         getitem.pack_path(EFFECT_DONOR),
-        getitem.pack_path(PICKUP_DONOR),
+        *((getitem.pack_path(PICKUP_DONOR),) if pickups else ()),
         *(getitem.pack_path(song) for song in getitem.SONG_MODELS),
     )
 
 
-def build(romfs: str | Path) -> Delivery:
-    """The song get effects for a seed: changes to the ELink table, ``static``, the song packs and the three actor
-    tables, and the twelve pickup packs as new files. Raises :class:`PatchError` when a native input is missing or
-    not as the record describes it."""
+def build(romfs: str | Path, *, pickups: bool = False) -> Delivery:
+    """The song get effects for a seed: changes to the ELink table, ``static``, the song packs and ActorInfo; with
+    ``pickups`` also the twelve pickup packs as new files and their rows in ActorInfo, GameActorInfo and
+    PouchActorInfo (no seed asks for them until a feature places them). Raises :class:`PatchError` when a native
+    input is missing or not as the record describes it."""
     romfs = Path(romfs)
-    for path in native_inputs():
+    for path in native_inputs(pickups=pickups):
         if not (romfs / path).is_file():
             raise PatchError(f"the dump has no {path}, which the song get effects read")
-    for song in getitem.SONG_MODELS:
-        path = getitem.pack_path(pickup_name(song))
-        if (romfs / path).exists():
-            raise PatchError(f"the dump already has {path}")
+    if pickups:
+        for song in getitem.SONG_MODELS:
+            path = getitem.pack_path(pickup_name(song))
+            if (romfs / path).exists():
+                raise PatchError(f"the dump already has {path}")
     try:
         effects = load_effects()
     except SongEffectsError as error:
@@ -561,18 +565,20 @@ def build(romfs: str | Path) -> Delivery:
         return dictionaries.decompress(path, (romfs / path).read_bytes())
 
     heart = read(getitem.pack_path(EFFECT_DONOR))
-    arrow = read(getitem.pack_path(PICKUP_DONOR))
     changes: dict = {
         ELINK: partial(patch_elink, effects=effects),
         STATIC: partial(patch_static, effects=effects),
-        ACTOR_INFO: patch_actor_info,
-        GAME_ACTOR_INFO: patch_game_actor_info,
-        POUCH_ACTOR_INFO: patch_pouch_actor_info,
+        ACTOR_INFO: partial(patch_actor_info, pickups=True) if pickups else patch_actor_info,
     }
+    if pickups:
+        changes[GAME_ACTOR_INFO] = patch_game_actor_info
+        changes[POUCH_ACTOR_INFO] = patch_pouch_actor_info
+        arrow = read(getitem.pack_path(PICKUP_DONOR))
     new_files = {}
     for song in getitem.SONG_MODELS:
         path = getitem.pack_path(song)
         changes[path] = partial(patch_song_pack, song=song, effect_donor=heart)
-        changed = patch_song_pack(read(path), song=song, effect_donor=heart)
-        new_files[getitem.pack_path(pickup_name(song))] = pickup_pack(song, arrow=arrow, song_pack=changed)
+        if pickups:
+            changed = patch_song_pack(read(path), song=song, effect_donor=heart)
+            new_files[getitem.pack_path(pickup_name(song))] = pickup_pack(song, arrow=arrow, song_pack=changed)
     return Delivery(changes, new_files)
