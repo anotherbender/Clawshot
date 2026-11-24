@@ -237,9 +237,9 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
   This follows the [static game-data trace](plans/rounds/r13-gerudo-card.md), not a played D39 acceptance test.
 - Songs can show an ocarina stand-in rather than a normal item model. Only some songs have been
   individually played from chests. (Chest ocarinas now show their model.)
-- Saria's own ocarina can look doubled or mirrored in her farewell at the Lost Woods bridge (seen on Longshot
-  3.0.0 in a New Game built without the chest-ocarina change, and on v3.1.1; not seen from a save made just
-  before the farewell after the Deku Tree; cause open). Cosmetic; `skip_saria_farewell` skips the movie.
+- Saria's own ocarina looks doubled or mirrored in her farewell at the Lost Woods bridge when the farewell plays
+  before Gohma, which only an open forest (`forest = closed_deku` or `open`) allows. The unmodified game does
+  the same; Defaults (`forest = closed`) never reach it. Cosmetic; `skip_saria_farewell` skips the movie.
 - Previously generated seeds can lose boss keys, maps and compasses placed in small chests,
   despite showing their pickup text. Repaired map/compass saves and menus, boss-key credit,
   pickup indicator and normal boss-door opening passed in-game. Rebuilding cannot re-award opened chests.

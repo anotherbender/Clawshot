@@ -408,9 +408,9 @@ give the version, OS and whole UI error text (terminal error if it never opens).
   a fresh seed with a newer Clawshot and start a new game; keep the old folder and saves.
   Newer versions never put keys there while dungeon items stay home; with **Small keys
   anywhere** a hand chest can hold a small key named to its own dungeon, so it is not lost.
-- Saria's own ocarina can look doubled or mirrored in her farewell (seen on Longshot 3.0.0 in a New Game built
-  without the chest-ocarina change, and on v3.1.1; not seen from a save made just before the farewell after the
-  Deku Tree; cause open). It is only cosmetic; **Skip Saria's bridge farewell** skips the movie.
+- Saria's own ocarina looks doubled or mirrored in her farewell when it plays before Gohma, which only an open
+  forest (Forest: closed_deku or open) allows. The unmodified game does the same; Defaults (forest closed) never
+  reach it. It is only cosmetic; **Skip Saria's bridge farewell** skips the movie.
 - Dampé's digging prize and Bombchu Bowling prizes show the original prize but give the seed's item.
 - **Saves started with older builds:** Save and Continue after an age-unusable pickup before using other
   items; changing areas does not clear the old item-bar jam. New games initialize an empty nut slot (0/20);
