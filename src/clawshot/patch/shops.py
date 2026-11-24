@@ -17,6 +17,60 @@ from clawshot.settings import DEFAULTS, shop_price
 
 SHOPS_TOML = Path(__file__).resolve().parents[1] / "data" / "shops.toml"
 POUCH_TABLE = "RSDB/PouchActorInfo.Product.111.rstbl.byml.zs"
+POTION_SHOPS = ("Kak Potion Shop", "Market Potion Shop")
+POTION_MESSAGES = "EventFlowMsg/Npc_Hylia_020_Shop_Child.msbt"
+# DisplayShop remaps these native sale/stock messages to the seller's ActorNameRef.
+# Both potion sellers name Npc_Hylia_020_Shop_Child, whose bottle-only table lacks
+# the equipment, ammo, health and magic branches (r22-shops.md).
+POTION_MESSAGE_DONORS = {
+    "Npc_Kokiri_001_Shop_Child": (
+        "Shop_01_Shield_Adult",
+        "Shop_01_Shield_Adult_02_1",
+        "Shop_01_Shield_Adult_02_2",
+        "Shop_01_Shield_Adult_02_3",
+        "Shop_03",
+        "Shop_04",
+        "Shop_05",
+        "Shop_06",
+        "Shop_07_2",
+        "Shop_07_4",
+        "Shop_08",
+        "Shop_21",
+    ),
+    "Npc_Hylia_018_Shop_Child": (
+        "Shop_09_04",
+        "Shop_09_05",
+        "Shop_10",
+        "Shop_12",
+        "Shop_15",
+        "Shop_16",
+        "Shop_31",
+        "Shop_41",
+        "Shop_42",
+    ),
+    # This repeat refusal is item-neutral, unlike the other sellers' tunic/shield lines.
+    "Npc_Goron_011_Shop_Child": ("Shop_32",),
+}
+
+
+def potion_messages(data: bytes) -> bytes:
+    """Supply native non-bottle dialogue without changing sale, payment or bottle gates."""
+    from clawshot.formats import msbt
+    from clawshot.patch.text import add_messages
+
+    files = sarc.read(data)
+    target = msbt.read(files[POTION_MESSAGES]).messages
+    additions = {}
+    for actor, labels in POTION_MESSAGE_DONORS.items():
+        file = f"EventFlowMsg/{actor}.msbt"
+        source = msbt.read(files[file]).messages
+        for label in labels:
+            if label not in target:
+                additions[label] = source[label]
+    # The common flow's direct no-quiver message uses Shop_09; ordinary sellers
+    # normally reach the same refusal through Outofstock_SelectArrow's first line.
+    additions["Shop_09"] = msbt.read(files["EventFlowMsg/Npc_Hylia_018_Shop_Child.msbt"]).messages["Shop_09_04"]
+    return add_messages({POTION_MESSAGES: additions})(data)
 
 
 @dataclass(frozen=True)
@@ -270,9 +324,19 @@ def changes(
         if display != slot.vanilla_item:
             shelves.setdefault(slot.file, []).append((slot, sale))
         owners.setdefault(slot.pack, []).append((slot, sale))
+    messages = {}
+    if any(
+        slot.shop in POTION_SHOPS
+        and not sales.get(slot.location, "Shop_Bottle_").startswith("Shop_Bottle_")
+        for slot in slots
+    ):
+        from clawshot.patch.text import archive_path, languages
+
+        messages = {archive_path(language): potion_messages for language in languages(romfs)}
     return {
         **{path: partial(patch_shelves, changes=tuple(rows)) for path, rows in shelves.items()},
         **{path: partial(patch_goods, changes=tuple(rows)) for path, rows in owners.items()},
+        **messages,
     }
 
 
