@@ -208,6 +208,8 @@ FAMILIES = {
     ),
     # Only a donor that carries its own AnimationRef composes: Obj_Ocarina_Time, not the Item_ ocarinas.
     "ocarina": Family(_shape("KeyItem", "KeyItem", frozenset({"Small", "Large"}), "Ocarina")),
+    # A song learned (Melody deal); its donors are the generated Obj_Clawshot_Melody_* (patch.songs).
+    "song": Family(_shape("KeyItem", "KeyItem", "Small", "Melody", BundleActorNum=1)),
 }
 
 
@@ -259,15 +261,36 @@ NATIVE_INPUTS = (
 )
 
 
+GENERATED_PREFIX = "Obj_Clawshot_"
+"""Reward actors the generator creates (``patch.ocarina_pickup``, ``patch.songs``): never read from the dump; build()
+takes them as :class:`GeneratedDonor`."""
+
+
 def native_inputs(rewards: Iterable[str]) -> tuple[str, ...]:
-    """Every romfs file build() may read for these reward actors (a token keeps the native drop: no pack of its own)."""
-    packs = {pack_path(actor) for actor in rewards if actor != TOKEN_ITEM} - set(NATIVE_INPUTS)
+    """Every romfs file build() may read for these reward actors (a token keeps the native drop: no pack of its own;
+    a generated donor is not in the dump)."""
+    packs = {
+        pack_path(actor) for actor in rewards if actor != TOKEN_ITEM and not actor.startswith(GENERATED_PREFIX)
+    } - set(NATIVE_INPUTS)
     return (*NATIVE_INPUTS, *sorted(packs))
+
+
+@dataclass(frozen=True)
+class GeneratedDonor:
+    """A reward actor this seed creates instead of reading it from the dump: its pack as the seed writes it (``copied``
+    names each member's source pack) and its row in each registry (as its own step inserts it, after this one)."""
+
+    file: NewFile
+    rows: Mapping[str, dict]  # registry path -> the donor's row
 
 
 IDENTITY = ("ActorNameRef", "PouchContentRef", "ModelInfoRef", "AnimationRef")
 WORLD_DISPLAY = ("ASInfoRef", "ASRef", "ELinkRef", "SLinkRef", "GameParameterTableRef")
 GENERIC_WORLD_DISPLAY = ("ASInfoRef", "ASRef")
+SPIN = "Rotate_Obj"
+"""The state the token's ASInfo autoplays (its AI never asks for it): the spin, and the song effects' floor trigger."""
+SPIN_DONORS = ("Obj_Ocarina_Time",)
+"""Native donors whose drop spins like a token (see :func:`spins`)."""
 # Touch collection, and get events for repeated and full-pouch acquisitions (section 10.3).
 POLICY = {"DefaultAutoGet": True, "PlayGetEventManyTimes": True, "IsPlayGetEventPouchMax": True}
 GRANT_KEY = "PouchActor"  # the inventory actor a pouch component grants (see pouch_grant)
@@ -487,6 +510,32 @@ def _is_world_pickup(sources: actor_packs.Sources, actor: str) -> bool:
     return actor_member(ITEM_BASE) in actor_packs.resolve(sources, actor_member(actor))[1]
 
 
+def spins(item: str) -> bool:
+    """Whether ``item``'s Skulltula drop autoplays the token's spin: the ocarina and song donors (T1-b,
+    ocarina-song-drops-everywhere plan 19). Their world pickups use ``Item_Obj``, which autoplays nothing (their floor
+    AI starts :data:`SPIN`); under the token's AI the drop stood still and the song effect, which waits for
+    :data:`SPIN`, never showed (BBender, run T1, 2026-11-24). The played Boomerang and Hylian Shield drops keep their
+    own display."""
+    return item in SPIN_DONORS or item.startswith(GENERATED_PREFIX)
+
+
+def _spin_asinfo(item, token_pack, donor_pack, token, donor) -> str:
+    """The ASInfo reference ``item``'s drop uses: the token's when the donor's equals it but for an empty autoplay;
+    the donor's own when that already autoplays."""
+    token_ref, donor_ref = token.components["ASInfoRef"], donor.components["ASInfoRef"]
+    token_node = byml.read(token_pack[reference(token_ref)])
+    donor_node = byml.read(donor_pack[reference(donor_ref)])
+    if token_node.get("AutoPlayASName") != SPIN:
+        raise PatchError(f"{TOKEN}: its ASInfo autoplays {token_node.get('AutoPlayASName')!r}, not {SPIN!r}")
+    if donor_node.get("AutoPlayASName"):
+        return donor_ref
+    if {k: v for k, v in donor_node.items() if k != "AutoPlayASName"} != {
+        k: v for k, v in token_node.items() if k != "AutoPlayASName"
+    }:
+        raise PatchError(f"{item}: its ASInfo differs from the token's beyond AutoPlayASName")
+    return token_ref
+
+
 def compose(
     item: str,
     token_pack: Mapping[str, bytes],
@@ -514,6 +563,8 @@ def compose(
                 components[key] = donor.components[key]
             else:
                 components.pop(key, None)
+        if spins(item):
+            components["ASInfoRef"] = _spin_asinfo(item, token_pack, donor_pack, token, donor)
     else:
         for key in GENERIC_WORLD_DISPLAY:
             components[key] = generic.components[key]
@@ -546,6 +597,50 @@ def compose(
     return Pickup(item, actor, NewFile(data, copied=copied), rows)
 
 
+def generated_donors(
+    romfs: str | Path, steps: Iterable[tuple[FileChanges, Mapping[str, NewFile]]]
+) -> dict[str, GeneratedDonor]:
+    """The generated donors (:data:`GENERATED_PREFIX`) among the steps' new packs: each pack and its row in every
+    registry, as its own step's table transforms insert it into the dump's table."""
+    native = Romfs(romfs)
+    out = {}
+    for changes, new_files in steps:
+        for path, file in sorted(new_files.items()):
+            actor = PurePosixPath(path).name.removesuffix(".pack.zs")
+            if path != pack_path(actor) or not actor.startswith(GENERATED_PREFIX):
+                continue
+            rows = {}
+            for registry in REGISTRIES:
+                table = byml.read(changes[registry](native.read(registry))) if registry in changes else []
+                found = [row for row in table if row.get("__RowId") == actor]
+                if len(found) != 1:
+                    raise PatchError(f"{actor}: its step gives no {registry} row")
+                rows[registry] = found[0]
+            if actor in out:
+                raise PatchError(f"{actor}: two steps generate it")
+            out[actor] = GeneratedDonor(file, rows)
+    return out
+
+
+def _from_generated(pickup: Pickup, item: str, donor: GeneratedDonor) -> Pickup:
+    """``pickup`` with each member :func:`compose` declared copied from the generated donor's pack (which the dump
+    lacks) declared copied from that member's own source instead, or left undeclared (a new member, sized by formula,
+    which the writer checks equals the donor pack's copy)."""
+    own = pack_path(item)
+    donor_members = sarc.read(donor.file.data)
+    pack = sarc.read(pickup.file.data)
+    copied = {}
+    for name, source in pickup.file.copied.items():
+        if source != own:
+            copied[name] = source
+            continue
+        if donor_members.get(name) != pack[name]:
+            raise PatchError(f"{pickup.actor}: member {name} is not the generated donor {item}'s")
+        if name in donor.file.copied:
+            copied[name] = donor.file.copied[name]
+    return Pickup(pickup.item, pickup.actor, NewFile(pickup.file.data, copied=copied), pickup.rows)
+
+
 def _check_pickup(item, actor, sources, packed, token, donor, generic, world) -> None:
     """Mechanism equals the token's, identity the reward's, pickup policy holds, nothing new is depended on."""
     mechanism = set(token.components) - set(IDENTITY) - set(WORLD_DISPLAY)
@@ -561,6 +656,8 @@ def _check_pickup(item, actor, sources, packed, token, donor, generic, world) ->
             raise PatchError(f"{actor}: {key} is not {item}'s")
     if world:
         expected = {key: donor.components.get(key) for key in WORLD_DISPLAY}
+        if spins(item):
+            expected["ASInfoRef"] = _spin_asinfo(item, *(dict(source) for source in sources[1:3]), token, donor)
     else:
         expected = {key: generic.components[key] for key in GENERIC_WORLD_DISPLAY}
         expected |= {"ELinkRef": None, "SLinkRef": None}
@@ -705,7 +802,12 @@ def _set_drops(data: bytes, *, path: str, drops: Mapping[int, str]) -> bytes:
 
 
 def build(
-    romfs: str | Path, placements: Mapping[int, str], census: Sequence[Location], *, rewards: Mapping[str, str]
+    romfs: str | Path,
+    placements: Mapping[int, str],
+    census: Sequence[Location],
+    *,
+    rewards: Mapping[str, str],
+    generated: Mapping[str, GeneratedDonor] | None = None,
 ) -> Delivery:
     """Delivery for explicit Skulltula assignments: source Hash -> native grant actor (``Item_Token_Gold`` keeps the
     native drop).
@@ -714,13 +816,26 @@ def build(
     members ``clawshot.generate.tokens`` admits, a diagnostic its own. A placed actor outside it, or whose native
     ``PouchActorInfo`` row does not have the declared family's shape, is refused. Validates the census identities,
     both saved collection rows of every assigned source, the native enemy and token contracts, and each generated
-    pickup, before any output; the returned transforms re-check their inputs."""
+    pickup, before any output; the returned transforms re-check their inputs.
+
+    ``generated`` gives the reward actors this seed creates (:data:`GENERATED_PREFIX`): their pack and rows replace
+    the dump's, their rows are not expected in the native tables (their own step inserts them after this one), and
+    each member the pickup takes from such a pack is declared copied from that member's own source, or is new."""
+    generated = dict(generated or {})
+    if stray := sorted(actor for actor in generated if not actor.startswith(GENERATED_PREFIX)):
+        raise PatchError(f"generated donors must be named {GENERATED_PREFIX}*: {stray}")
+    for actor in sorted(set(placements.values())):
+        if actor.startswith(GENERATED_PREFIX) and actor not in generated:
+            raise PatchError(f"Gold Skulltula delivery needs {pack_path(actor)}, a pack this seed generates")
+    for actor, donor in sorted(generated.items()):
+        if missing := sorted(set(REGISTRIES) - set(donor.rows)):
+            raise PatchError(f"generated donor {actor}: no row for {missing}")
     if unknown := sorted({family for family in rewards.values() if family not in FAMILIES}):
         raise PatchError(f"unknown grant families {unknown}; known: {sorted(FAMILIES)}")
     if stray := sorted(actor for actor, family in rewards.items() if (family == "token") != (actor == TOKEN_ITEM)):
         raise PatchError(f"only {TOKEN_ITEM}, the native drop, is the token family: {stray}")
     locations = {location.id: location for location in census}
-    generated: dict[int, str] = {}
+    moved: dict[int, str] = {}
     for source, actor in sorted(placements.items()):
         location = locations.get(source)
         if (
@@ -736,20 +851,24 @@ def build(
                 f"{source}: {actor!r} is not an allowed reward of this build ({', '.join(sorted(rewards))})"
             )
         if actor != TOKEN_ITEM:
-            generated[source] = actor
+            moved[source] = actor
     native = Romfs(romfs)
     check_save_rows(byml.read(native.read(GAME_DATA_LIST)), list(placements))
     check_source(native)
     token_pack = check_token(native)
     tables = {path: byml.read(native.read(path)) for path in REGISTRIES}
     registries = {path: {row["__RowId"]: row for row in table} for path, table in tables.items()}
+    for path in REGISTRIES:
+        if clash := sorted(set(generated) & set(registries[path])):
+            raise PatchError(f"{path}: the dump already has rows for the generated donors {clash}")
+    lookup = {path: {**registries[path], **{a: d.rows[path] for a, d in generated.items()}} for path in REGISTRIES}
     for actor in sorted(set(placements.values())):
-        row = registries[POUCH_ACTOR_INFO].get(actor)
+        row = lookup[POUCH_ACTOR_INFO].get(actor)
         if row is None:
             raise PatchError(f"{actor}: no native {POUCH_ACTOR_INFO} row to classify its grant")
         if (family := grant_family(row)) != rewards[actor]:
             raise PatchError(f"{actor}: native grant family {family!r}, not the declared {rewards[actor]!r}: {row!r}")
-    if not generated:
+    if not moved:
         return Delivery({}, {}, {}, {}, tuple(native.inputs))
     ids = {path: [row["__RowId"] for row in table] for path, table in tables.items()}
     for path, names in ids.items():
@@ -757,24 +876,28 @@ def build(
             raise PatchError(f"{path}: rows are not uniquely sorted by __RowId")
     if ids[ACTOR_INFO] != ids[GAME_ACTOR_INFO]:
         raise PatchError(f"{ACTOR_INFO} and {GAME_ACTOR_INFO} do not list the same rows in the same order")
-    actors = sorted(set(generated.values()))
+    actors = sorted(set(moved.values()))
     pickups = []
     for item in actors:
-        pickup = compose(item, token_pack, native.pack(item), native.pack(GENERIC_DISPLAY), registries)
+        donor_pack = sarc.read(generated[item].file.data) if item in generated else native.pack(item)
+        pickup = compose(item, token_pack, donor_pack, native.pack(GENERIC_DISPLAY), lookup)
+        if item in generated:
+            pickup = _from_generated(pickup, item, generated[item])
         for path in REGISTRIES:
             if pickup.actor in registries[path]:
                 raise PatchError(f"{path}: {pickup.actor} already exists")
         pickups.append(pickup)
-    drops = {source: pickup_name(item) for source, item in generated.items()}
+    drops = {source: pickup_name(item) for source, item in moved.items()}
     per_file: dict[str, dict[int, str]] = {}
     for source, pickup in drops.items():
         for path in locations[source].files:
             per_file.setdefault(path, {})[source] = pickup
     changes: dict = {path: partial(_set_drops, path=path, drops=targets) for path, targets in sorted(per_file.items())}
+    native_actors = tuple(actor for actor in actors if actor not in generated)
     donors = {
-        ACTOR_INFO: (TOKEN, *actors),
+        ACTOR_INFO: (TOKEN, *native_actors),
         GAME_ACTOR_INFO: (TOKEN,),
-        POUCH_ACTOR_INFO: tuple(actors),
+        POUCH_ACTOR_INFO: native_actors,
     }
     for path in REGISTRIES:
         changes[path] = partial(
@@ -865,9 +988,11 @@ def seed_delivery(
     census: Sequence[Location],
     *,
     rewards: Mapping[str, tuple[str, str]],
+    generated: Mapping[str, GeneratedDonor] | None = None,
 ) -> tuple[Delivery, tuple[SourceChange, ...]]:
     """A Token seed's delivery and spoiler rows: each linked location's placed logic item, through ``rewards`` (logic
-    item -> native grant actor and its family, the policy's admitted members), at its source."""
+    item -> native grant actor and its family, the policy's admitted members), at its source. ``generated``: the
+    seed's generated donors (:func:`generated_donors`)."""
     families: dict[str, str] = {}
     for _, (actor, family) in sorted(rewards.items()):
         if families.setdefault(actor, family) != family:
@@ -878,7 +1003,7 @@ def seed_delivery(
         if item not in rewards:
             raise PatchError(f"{name}: {item!r} is not an admitted Token reward ({', '.join(sorted(rewards))})")
         assignments[source.id] = rewards[item][0]
-    delivery = build(romfs, assignments, census, rewards=families)
+    delivery = build(romfs, assignments, census, rewards=families, generated=generated)
     rows = tuple(
         SourceChange(
             name,

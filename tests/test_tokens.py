@@ -898,6 +898,7 @@ GRANT_ROWS = {
         "scrub_seed",
     ),
     "ocarina of time": (_key(PouchGetType="Large", PouchSpecialDeal="Ocarina"), "ocarina"),
+    "song": (_key(PouchGetType="Small", PouchSpecialDeal="Melody"), "song"),
     # No shape: bought goods, policy-excluded grants and departures from a family's native fields.
     "bought bottle content": (
         _item(PouchCategory="Material", PouchSpecialDeal="NotPushToPouch", AssignableItem="BottleA", BottleItem="F"),
@@ -905,7 +906,6 @@ GRANT_ROWS = {
     ),
     "bought heart": (_small(**CURE, HitPointRecover=I32(4)), None),
     "boss key": (_key(PouchGetType="Large", PouchSpecialDeal="NotPushToPouch"), None),
-    "song": (_key(PouchGetType="Small", PouchSpecialDeal="Melody"), None),
     "magic meter": (_key(PouchGetType="Heart", PouchSpecialDeal="FairyBlessMP", **MAGIC), None),
     "bow": (_gear(PouchCategory="Bow"), None),
     "shield without an equipment target": (_gear(PouchCategory="Shield"), None),
@@ -1219,7 +1219,7 @@ def test_spoiler_names_the_optional_steps_that_ran():
     assert SeedOutput(seed, Links({}, {}, []), Plan([], [], [])).spoiler()["patch"]["steps"] == []
     output = SeedOutput(seed, Links({}, {}, []), Plan([], [], []), steps=(SONG_GET_EFFECTS,))
     assert output.spoiler()["patch"]["steps"] == ["song_get_effects"]
-    assert OPTIONAL_STEPS == ("ocarina_get_model", "song_get_effects")
+    assert OPTIONAL_STEPS == ("ocarina_get_model", "song_get_effects", "ocarina_pickups")
 
 
 @pytest.mark.parametrize(
@@ -1254,3 +1254,139 @@ def test_seed_delivery_refuses_an_unadmitted_item_or_a_twice_declared_actor(worl
     twice = {**SEED_REWARDS, "Shield Again": ("Obj_Shield_Hylian", "fixed_major")}
     with pytest.raises(PatchError, match="Obj_Shield_Hylian is declared in two grant families"):
         tokens.seed_delivery(world, {GS_NAMES[TREE]: "Boomerang"}, linked, {}, census(), rewards=twice)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Generated donors (ocarina-song-drops-everywhere 2.3): a reward actor the seed itself creates (the Fairy Ocarina's
+# and the songs' Obj_Clawshot_* world actors) is not in the dump; build() takes its pack and rows from the step that
+# makes it. Synthetic: the shield's world pickup, renamed and given an AnimationParam of its own.
+
+GENERATED = "Obj_Clawshot_Shield"
+GENERATED_ANIMATION = f"Component/AnimationParam/{GENERATED}.engine__component__AnimationParam.bgyml"
+
+
+def generated_donor():
+    from clawshot.patch.write import NewFile
+
+    native = shield_pack()
+    pack = {name: data for name, data in native.items() if name != actor("Obj_Shield_Hylian")}
+    pack.pop(member(SHIELD_COMPONENTS["AnimationRef"]))
+    tree = byml.read(native[actor("Obj_Shield_Hylian")])
+    tree["Components"]["AnimationRef"] = ref(GENERATED_ANIMATION)
+    pack[actor(GENERATED)] = w(tree)
+    pack[GENERATED_ANIMATION] = w({"AnimationResources": [{"ModelProjectName": "Generated_Animation"}]})
+    copied = {name: tokens.pack_path("Obj_Shield_Hylian") for name in pack if name in native}
+    shield_row = next(row for row in actor_rows() if row["__RowId"] == "Obj_Shield_Hylian")
+    pouch_row = next(row for row in pouch_rows() if row["__RowId"] == "Obj_Shield_Hylian")
+    rows = {
+        tokens.ACTOR_INFO: {
+            **shield_row,
+            "AnimationResources": [{"ModelProjectName": "Generated_Animation"}],
+            "__RowId": GENERATED,
+        },
+        tokens.GAME_ACTOR_INFO: {"__RowId": GENERATED},
+        tokens.POUCH_ACTOR_INFO: {**pouch_row, "__RowId": GENERATED},
+    }
+    return tokens.GeneratedDonor(NewFile(sarc.write(pack), copied=copied), rows)
+
+
+GENERATED_REWARDS = {**ALLOWED, GENERATED: "equipment"}
+
+
+def test_a_generated_donor_composes_from_its_own_pack_and_rows(world):
+    donor = generated_donor()
+    delivery = tokens.build(
+        world, {TOWER: GENERATED}, census(), rewards=GENERATED_REWARDS, generated={GENERATED: donor}
+    )
+    pickup = tokens.pickup_name(GENERATED)
+    assert delivery.drops == {TOWER: pickup} and delivery.pickups == {GENERATED: pickup}
+    file = delivery.new_files[tokens.pack_path(pickup)]
+    pack = sarc.read(file.data)
+    effective = actor_packs.closure([pack], pickup).components
+    assert effective["AnimationRef"] == ref(GENERATED_ANIMATION)
+    assert pack[GENERATED_ANIMATION] == sarc.read(donor.file.data)[GENERATED_ANIMATION]
+    # Every declared copy names a pack the writer can read (native, never the generated donor's), byte-identical.
+    for name, source in file.copied.items():
+        assert source != tokens.pack_path(GENERATED)
+        assert sarc.read(raw(world, source))[name] == pack[name], name
+    # The donor's own new members are new here too (sized by formula, equal to the donor pack's copy).
+    assert GENERATED_ANIMATION not in file.copied
+    rows = {path: byml.read(delivery.changes[path](raw(world, path))) for path in tokens.REGISTRIES}
+    for path in tokens.REGISTRIES:
+        ids = [row["__RowId"] for row in rows[path]]
+        assert pickup in ids and GENERATED not in ids  # the donor's own step inserts its rows later
+    new = next(row for row in rows[tokens.ACTOR_INFO] if row["__RowId"] == pickup)
+    assert new["AnimationResources"] == [{"ModelProjectName": "Generated_Animation"}]
+    pouch = next(row for row in rows[tokens.POUCH_ACTOR_INFO] if row["__RowId"] == pickup)
+    assert byml.same({**pouch, "__RowId": GENERATED}, donor.rows[tokens.POUCH_ACTOR_INFO])
+
+
+def test_a_generated_donor_without_its_pack_is_refused(world):
+    with pytest.raises(PatchError, match=f"needs Pack/Actor/{GENERATED}.pack.zs"):
+        tokens.build(world, {TOWER: GENERATED}, census(), rewards=GENERATED_REWARDS)
+
+
+def test_a_generated_donors_row_must_have_the_declared_family(world):
+    donor = generated_donor()
+    with pytest.raises(PatchError, match=f"{GENERATED}: native grant family 'equipment', not the declared"):
+        tokens.build(
+            world,
+            {TOWER: GENERATED},
+            census(),
+            rewards={**ALLOWED, GENERATED: "fixed_major"},
+            generated={GENERATED: donor},
+        )
+
+
+def test_common_writer_sizes_a_generated_donors_pickup(world, tmp_path):
+    donor = generated_donor()
+    delivery = tokens.build(
+        world, {TOWER: GENERATED}, census(), rewards=GENERATED_REWARDS, generated={GENERATED: donor}
+    )
+    new_files = {**delivery.new_files, tokens.pack_path(GENERATED): donor.file}
+    out = tmp_path / "out"
+    write(Plan([], [], []), world, out, extra_changes=(delivery.changes,), new_files=new_files)
+    table = rstb.read(raw(out / "romfs", rstb.TABLE_PATH, world))
+    content = sarc.read(donor.file.data)[GENERATED_ANIMATION]
+    assert table.get(GENERATED_ANIMATION) == rstb.required_size(GENERATED_ANIMATION, len(content), resources=1)
+    pickup = tokens.pickup_name(GENERATED)
+    assert raw(out / "romfs", tokens.pack_path(pickup), world) == delivery.new_files[tokens.pack_path(pickup)].data
+
+
+def test_native_inputs_never_ask_the_dump_for_a_generated_donor():
+    inputs = tokens.native_inputs(["Obj_Clawshot_Ocarina_Fairy", "Obj_Clawshot_Melody_ZeldaLullaby", "Item_Hammer"])
+    assert tokens.pack_path("Item_Hammer") in inputs
+    assert not [path for path in inputs if "Obj_Clawshot_" in path]
+
+
+def test_songs_are_their_own_grant_family():
+    song = _key(PouchGetType="Small", PouchSpecialDeal="Melody")
+    assert tokens.grant_family({**song, "__RowId": "Item_Melody_ZeldaLullaby"}) == "song"
+    fairy = _key(PouchGetType="Small", PouchSpecialDeal="Ocarina", OcarinaTypeValue=I32(1))
+    assert tokens.grant_family({**fairy, "__RowId": "Item_Ocarina_Fairy"}) == "ocarina"
+
+
+def _adding(row):
+    def transform(data):
+        rows = [*byml.read(data), row]
+        return byml.write(sorted(rows, key=lambda r: r["__RowId"].encode()))
+
+    return transform
+
+
+def test_generated_donors_take_each_new_packs_rows_from_its_own_steps_tables(world):
+    donor = generated_donor()
+    changes = {path: _adding(donor.rows[path]) for path in tokens.REGISTRIES}
+    other = {tokens.pack_path("Obj_Native_Looking"): donor.file}  # not generated by name: not a donor
+    found = tokens.generated_donors(world, [(changes, {tokens.pack_path(GENERATED): donor.file, **other})])
+    assert list(found) == [GENERATED]
+    assert found[GENERATED].file == donor.file
+    for path in tokens.REGISTRIES:
+        assert byml.same(found[GENERATED].rows[path], donor.rows[path])
+
+
+def test_a_generated_pack_whose_step_inserts_no_row_is_refused(world):
+    donor = generated_donor()
+    changes = {path: _adding(donor.rows[path]) for path in tokens.REGISTRIES[:2]}
+    with pytest.raises(PatchError, match=f"{GENERATED}: its step gives no {tokens.POUCH_ACTOR_INFO} row"):
+        tokens.generated_donors(world, [(changes, {tokens.pack_path(GENERATED): donor.file})])
