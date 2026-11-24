@@ -113,8 +113,6 @@ def test_download_selection_covers_native_architectures(scripts):
         assert "Install uv yourself from" in text
 
 
-
-
 def test_unix_verifies_before_extracting_or_running_download(scripts):
     text = scripts["clawshot.sh"]
     steps = (
