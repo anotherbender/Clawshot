@@ -1,7 +1,7 @@
 # Round 22 shops — cs22c
 
 Branch `r22/shops`, base `2091387`; model `openai-codex/gpt-6.1-sol`.
-Status: potion repair and both tunic gift sources implemented and focused-tested. Staging, sweep and gate pending. All behavior changes are **built, not played** until Kareem's Longshot 3.2.0 checks.
+Status: implementation, paired staging and post-rebase focused contracts complete; serialized sweep/full gate pending. All behavior changes are **built, not played** until Kareem's Longshot 3.2.0 checks.
 Research/output root: `E:/OOTRemake/work/r22-shops/` (outside this repository).
 
 ## Scope and order
@@ -37,7 +37,7 @@ Proposed by cs22c from build `e0f3ccfa`; no reachability rule is loosened. Sourc
 - **Early vanilla-item audit (rule m):** Goron tunic reads in SageOfFire Events185/215 are the Navi heat hint only. Zora tunic reads in SageOfWater Events136/243 affect hint/BGM; the NPC flow's Event184 is separate adult-trade dialogue. None gates either native grant or its trigger. Moving a tunic early does not bypass the source's quest state writes; patching the actor parameter leaves all those writes intact.
 - **Native scene contract (rule f):** retain these existing NPC get-item wrappers and continuations; insert no window or scene. GiftChange/plan projects the two `Shop_Armor_*` identities to their native `Obj_Armor_*` gift actors. Native `PouchActorInfo` rows are identical except `__RowId`, verified by the dump test. Shelf actors stay unchanged. Tunics remain admitted at their existing shop/chest destinations rather than acquiring the generic gift-only hold.
 - No new event writer, flag or resource input. King Zora's existing tracker completion flag remains; Goron's pre-grant dialogue flag is not promoted to completion.
-- Focused tunic/shared-contract run: **90 passed**, 173.66 s; receipt `work/r22-shops/tunic-focused.log`. Metadata citation additions and post-rebase registration proof still require the final focused run.
+- Initial tunic/shared-contract run: **90 passed**, 173.66 s; receipt `work/r22-shops/tunic-focused.log`. Rebased onto current local main **5bc5577**, retaining its deterministic scrub-shield coverage without re-pinning. Final focused run: **148 passed**, 405.95 s, including both potion/tunic suites, shop/gift shared contracts and **tests/test_event_registration.py** in the real-dump tier. Narrow format/lint clean. Receipt `work/r22-shops/focused-rebased.log`. The first format check printed two potion formatting differences; applied those exact differences before the successful run.
 
 ## Longshot 3.2.0 staged checks
 
@@ -67,4 +67,4 @@ Runtime-load lines and observed outcomes are still for Kareem to supply. No agen
 
 ## Verification and played limits
 
-All staged behavior is **built, not played**. Post-rebase focused registration, serialized 200/50/50 paired sweep and full gate pending. No new setting or product-scope decision proposed.
+All staged behavior is **built, not played**. Serialized 200/50/50 paired sweep and full gate pending Claude's order and the preceding owner's explicit release. Comparison source snapshot: local main `5bc5577`; staged gameplay control: release main `2091387` (the intervening main changes are documentation/test-only). No new setting or product-scope decision proposed.
