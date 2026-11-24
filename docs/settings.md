@@ -74,9 +74,9 @@ in chests only; see [Progressive items](#progressive-items).
 | `Shop` | Ordinary shop shelves, native-display items only; slot swaps, restock and Castle Town purchases have in-game evidence. Bought goods (refills, ammo, Bombchus, bottle contents, hearts and magic jars) go only to shop shelves in every seed; no setting moves one to a chest, gift, scrub, floor pickup or Skulltula. Mask loans stay unchanged. |
 | `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper and all seven frog checks. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the unaccepted checks below. |
 | `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. The adult Mirror Shield purchase that previously froze now finishes; other item/age combinations are not all played. |
-| `BossHeart` | Eight boss-heart checks, off by default. Limited to the five native floor pickups below. King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
-| `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
-| `Token` | All 100 native Gold Skulltulas, off in both presets; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, all rupee colours, Heart Pieces/Containers, fixed Nut/Stick capacity, ordinary arrow/bomb/nut/stick bundles, Bombchus, magic jars/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed and Ocarina of Time. Core, packets1–3 and the separate first-Time-ocarina part passed on rc.3; each catalogue member still needs its own native structural check, not every member/boundary was played. See `src/clawshot/data/token_rewards.toml`. Tokens spill only into shuffled chests; non-token grants add no token. The Field tree works by day, the ranch tower needs night/retrieval, and wetlands needs the child wall kill before the adult crate. |
+| `BossHeart` | Eight boss-heart checks, off by default. Limited to the floor palette below (five native pickups, both ocarinas, songs with `--songs anywhere`). King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
+| `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same floor palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
+| `Token` | All 100 native Gold Skulltulas, off in both presets; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, all rupee colours, Heart Pieces/Containers, fixed Nut/Stick capacity, ordinary arrow/bomb/nut/stick bundles, Bombchus, magic jars/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed, both ocarinas and (with `--songs anywhere`) the twelve songs. Core, packets1–3 and the separate first-Time-ocarina part passed on rc.3; each catalogue member still needs its own native structural check, not every member/boundary was played. See `src/clawshot/data/token_rewards.toml`. Tokens spill only into shuffled chests; non-token grants add no token. The Field tree works by day, the ranch tower needs night/retrieval, and wetlands needs the child wall kill before the adult crate. |
 
 The windmill floor check is in logic only through its adult approach from Dampé's grave, not
 child Boomerang retrieval. The cow-shed roof pickup remains a separate native check, not the
@@ -97,7 +97,7 @@ The legacy labels **Deku Nuts (5)** and **Deku Stick (1)** each deliver the nati
 Scrub Business Seed is not an ammo bundle or N64 Magic Bean: the played pickup added one seed; using it
 without buying anything **does not consume it**, which is native behavior.
 
-**Excluded at Skulltulas:** Fairy Ocarina; songs; progressive copies and their fixed tiers; keys, maps and
+**Excluded at Skulltulas:** songs unless `--songs anywhere`; progressive copies and their fixed tiers; keys, maps and
 compasses; every `Buy*`/shop-stock item (including refills and bottle contents); trade items; and Gerudo Pass
 (Gerudo Membership Card). Their existing destination/pool holds remain unchanged. Fire Arrows and other
 out-of-pool items are not silently added.
@@ -135,13 +135,20 @@ Maintainer packet/checker tools live in `tools/token_packets/`, outside the rele
 From the repository root, run `uv run python -m tools.token_packets.token_family_packet`
 with `--manifest`, `--baseline`, `--save` and `--phase` to check a staged family or route packet read-only.
 
-**Fairy Ocarina stays excluded at Skulltulas:** its native actor has no AnimationRef and there is no native
-world-pickup donor. **Ocarina of Time is admitted** using its native `Obj_Ocarina_Time` donor: a fresh S1
-pickup, Sun's Song on the new instrument and saved ownership after reload all passed. No animation/common
-adapter or Fairy Ocarina admission is implied.
+**Ocarinas and songs at Skulltulas and on floors.** Both ocarinas and the twelve songs have world
+pickups of their own, generated in every seed that needs them (`Obj_Clawshot_Ocarina_*`,
+`Obj_Clawshot_Melody_*`; the native moat `Obj_Ocarina_Time` is no longer used). An ocarina pickup glows
+warm white on the ground; a song pickup shows its own song effect; both float a little above the spot and
+spin, also as a Skulltula drop. An ocarina from a pickup plays at once and the Ocarina of Time stays
+selected once owned. **Known issue:** when the Ocarina of Time comes from a Skulltula while the Fairy Ocarina
+is already owned, it is owned and selected, but Link keeps playing the Fairy Ocarina until Save and Continue. Played by BBender on Longshot v3.1.1, 2026-11-24
+(`plans/ocarina-song-drops-everywhere.md`): both ocarinas, Prelude of Light and Zelda's Lullaby at Deku
+Tree Skulltulas, at Queen Gohma's heart and on free-standing heart spots. The other ten songs are
+**inferred, not individually played**. Songs go to Skulltulas and floors only with `--songs anywhere`.
 
-The floor palette is **Heart Container, Piece of Heart, Deku Shield, Hylian Shield and red rupee**.
-Major items on the floor can crash. Heart Containers from chests have no recorded in-game acceptance.
+The floor palette (BossHeart, Freestanding) is **Heart Container, Piece of Heart, Deku Shield, Hylian
+Shield and red rupee**, plus **both ocarinas** and, with `--songs anywhere`, **the twelve songs**. Other
+major items on the floor can crash. Heart Containers from chests have no recorded in-game acceptance.
 
 ### Starting inventory (experimental)
 
@@ -305,8 +312,8 @@ With `--shuffle Chest Gift`, `--songs song` (default) keeps songs on song checks
 `--songs anywhere` releases all twelve for chest placement, subject to other destination restrictions.
 Storms, Minuet and Epona have been played from chests; the rest use the shared grant path but are
 **inferred, not individually verified**. A song in a chest shows a green rupee with the song's own text.
-Both chest ocarinas work and show their model in small and big chests; only seeds that can put an ocarina
-in a chest (Chest and Gift shuffle) change the ocarinas' get model. BBender and Claude played small and big
+Both chest ocarinas work and show their model in small and big chests; only seeds that can move an ocarina
+(Gift shuffle) change the ocarinas' get model. BBender and Claude played small and big
 chests on Longshot v3.1.1 (2026-11-22, [chest ocarina record](../plans/chest-ocarina-model.md)). Kareem
 played small chests in both orders on Longshot 3.0.0 (2026-11-23): the Ocarina of Time stayed the equipped
 one, also after Save and Continue, and Saria's farewell, Zelda's escape and the moat looked as before
@@ -315,10 +322,11 @@ The Ocarina of Time plays songs. Din's Fire and Adult's Wallet have chest eviden
 Other gift actors remain subject to the sourced chest allowlist and destination holds, not blanket
 permission for every gift to go in a chest. Authoritative restrictions: `data/settings.toml`.
 
-Shuffled ocarinas avoid show-item hand-overs: ordinary gifts, minigame prizes, frog rewards,
-digging rewards and Deku Scrub purchases exclude both instruments before fill, including external
-placements. Chests and direct story grants remain allowed; Ocarina of Time also has its separately
-played Skulltula pickup. The show-item crash is not established to be age-specific.
+Shuffled ocarinas may also be show-item hand-overs (ordinary gifts, minigame prizes, frog rewards,
+digging rewards) and Deku Scrub purchases. Every seed with Gift shuffle carries the ocarina get-model patch,
+which removes the old show-item crash (reproduced without it, then played with it at the Kokiri
+shopkeeper's gift and the Lost Woods scrub, both orders, by BBender on Longshot v3.1.1, 2026-11-24).
+Shops never sell an ocarina or a song.
 
 Ocarinas remain separate fixed items, **not progressive copies**. Newly generated seeds still give the
 Fairy Ocarina when found, but keep the Ocarina of Time selected if it is already owned, at either age.
@@ -332,7 +340,7 @@ Existing seed folders and saves are not repaired.
 ### Cross-age equipment receipts
 
 Age restrictions govern **use**, not ownership. There is no blanket matching-age placement rule.
-Native shops still refuse child tunic purchases; unsupported shelf displays and the five-item
+Native shops still refuse child tunic purchases; unsupported shelf displays and the
 boss-heart/floor palette remain restricted. Trade-cell items stay vanilla.
 
 Newly generated scrub shield sales keep the native inventory grant and one-frame yield, then
