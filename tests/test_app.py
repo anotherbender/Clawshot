@@ -118,7 +118,10 @@ def test_schema_is_exhaustive_and_replay_preserves_values():
         "skippable_story"
     }
     switches = {row["key"]: row["logic_override"] for row in rows if "logic_override" in row}
-    assert switches == {"free_time_travel": "free_time_travel"}  # presentations of logic overrides
+    assert switches == {  # presentations of logic overrides
+        "free_time_travel": "free_time_travel",
+        "bombs_without_bracelet": "bombs_without_bracelet",
+    }
     settings = validate(
         {"dungeon_items": "anywhere", "forest": "open", "shop_slots": 3, "logic": {"free_time_travel": True}}
     )

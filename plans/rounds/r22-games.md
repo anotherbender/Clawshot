@@ -174,7 +174,7 @@ Detailed outside-repo checklist: `CHECKLIST.md`. Each pair is an independent sit
 | Check | Candidate / main-control launchers | Private seed / setup | Time including control |
 |---|---|---|---|
 | First won song | `r22-skull-candidate-v1.bat` / `r22-skull-control-v1.bat` | 22060101; Chest + Gift; forest exit open (`closed_deku`), starting Fairy Ocarina; pool-preserving placement gives Boomerang at memory game | 20–25 min |
-| Bag bombs | `r22-bomb-candidate-v1.bat` / `r22-bomb-control-v1.bat` | 22060102; both start Bomb Bag + Boomerang, no Bracelet; option on only in candidate; New Game in empty profiles | 12–15 min |
+| Bag bombs | `r22-bomb-candidate-v2.bat` / `r22-bomb-control-v1.bat` | 22060102; both start Bomb Bag + Boomerang, no Bracelet; option on only in candidate; New Game in empty profiles | 12–15 min |
 
 Skull Kid save: identical untouched copies of the natural child `2026-11-08_0802-before-adult` slot00,
 in Kokiri Forest, Fairy Ocarina equipped (`PlayerStatus.EquipOcarina=Item_Ocarina_Fairy`), Boomerang absent,
@@ -213,24 +213,47 @@ seed, no code/logic bypass. This is a staging recipe correction proposed by cs22
 
 Both arms built from canonical `make_seed`, pool-preserving validated external placements, an explicit
 beatability replay, then the production `write_seed`; no partial/unproved packet was written.
-Control source is main `2091387`; current `4f4ff42` adds only the new track's overview row, no game code.
+Control source is main `2091387`; later `4f4ff42` / `5bc5577` are docs/test-only changes, no game code.
 
 | Pair | Control files / spheres | Candidate files / spheres | Placements |
 |---|---|---|---|
 | Skull Kid | 158 / 24 | 158 / 24 | identical |
-| Bag bombs | 119 / 26 | 120 / 26 | identical |
+| Bag bombs (candidate v2 / control v1) | 119 / 26 | 121 / 26 | identical |
 
 Readback compares every output game-file SHA-256. Skull pair differs only in its event flow and RSTB;
-both Event24 actors are `Item_Boomerang`, only candidate retargets join178. Bomb pair differs only in
-Item_Bomb pack and RSTB; only candidate contains that override, private component is None, original is Low.
+both Event24 actors are `Item_Boomerang`, only candidate retargets join178. Bomb v2 differs in Item_Bomb,
+the now-always-on Skull Kid flow, and RSTB; private bomb grade is None, original is Low; no control override.
 Both Skull profiles match the four copied original save files byte-for-byte; bomb profiles have no progress
 save. No edited save or unrelated slot. All four `cmd.exe` launchers with `CLAWSHOT_DRY_RUN=1` exit 0,
 name the exact Longshot 3.2.0 executable, unset overlay and enable only their own mod. No game started.
-Research results: `packet-verification-skull-v1.json`, `packet-verification-bomb-v1.json`,
-`packet-{skull,bomb}-{control,candidate}-v1.json`; detailed settings and manifests stay outside the repo.
+Research results: `packet-verification-skull-v1.json`, `packet-verification-bomb-v2.json`;
+the versioned per-arm settings/manifests remain outside the repo. Old bomb v1/profile preserved, not reused.
 Posted both pairs for Claude's boot-check / Kareem's play batch; neither behavior is claimed played.
+
+Every-seed clarification: applied the current always-on transform to the staged Skull main-control flow;
+its result is byte-identical to the staged candidate (`91bd2e1119a67fbe15e4d0d2d43384717d61413d491785a0acf16561710d8a51`).
+No Skull packet/save rewrite was needed. Bomb v2 was rebuilt through production, adding the unshuffled
+first-win Heart Piece flow; dry-run/readback passed with the unchanged main control. No game boot.
+The first every-seed native/public Defaults + Gift focused run passed **68 tests** (137.82 s), before
+pinning normalization ahead of Gift/bag guards. Final post-rebase ordered-pipeline contracts follow below.
+
+## Post-rebase focused contracts
+
+Rebased game work onto main `5bc5577`, retaining the new deterministic scrub-shield registration recipe
+unchanged. Post-rebase application focus printed **1 failed, 133 passed** (80.26 s):
+`tests/test_app.py::test_schema_is_exhaustive_and_replay_preserves_values` still expected only
+`free_time_travel`; actual schema correctly exposed that and `bombs_without_bracelet`.
+Updated the exhaustive public-schema contract with the new option; no production workaround.
+Cause-aimed full application/shared/UI rerun: **949 passed** (198.46 s), workers1 / -n2.
+Includes every `test_app*.py` / `test_ui*.py`, settings, native-logic validation and bomb option contracts.
+All four Windows installer cases and all eight disconnect cases pass; full log:
+`work/r22-games/focused-app-schema-fixed.log`. Native output/parity/registration focus is now running.
+
+Player detection now uses CIM exact names excluding `*bootcheck*`, as Claude instructed on the thread.
+It initially reported one player, then zero at the successful rerun. Focused caps stay -n2/workers1;
+no sweep has started.
 
 ## Remaining work
 
-Finish paired packets/dry-runs, focused shared contracts, main rebase, FROZEN gate queue, locked full gates
-and at least 200 broad + 50 Defaults + 50 Recommended seeds, with main digests and a binding cohort.
+Post-rebase focused shared/native contracts, FROZEN gate queue, locked full gates and at least
+200 broad + 50 Defaults + 50 Recommended seeds, with main digests and a binding cohort.
