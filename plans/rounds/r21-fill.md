@@ -225,3 +225,37 @@ this plans commit), 21:04–21:53 under the lock, `-n 8`, `CLAWSHOT_WORKERS=3`, 
 cs21h took the lock at 17:29 out of turn: a retry loop acquired it when the directory was free, not on the
 predecessor's LOCK RELEASED. Claude allowed the attribution to finish; the chained paired run was cancelled before
 it started. From then on cs21h acquires only on its predecessor's LOCK RELEASED.
+
+## Dungeon hold (branch `r21/dungeon-hold`, from main `efdea7c`)
+
+Asked by Claude after Kareem approved cs21j's tightening (`r21-placement-audit.md` section 6), 2026-11-23. A
+tightening: no play check (the loosening test, a compass from Sheik's lesson, goes in round 22's batch).
+
+Change (`generate/fill.py`): `allowed()` holds `SmallKey`, `BossKey`, `GanonBossKey`, `Map` and `Compass` to Chest
+checks in every mode, inside their own dungeon too (`CHEST_HELD_DUNGEON_TYPES`). Choices made by cs21h:
+
+- **Exception: a released floor-key source** (`KeyPickup`, today only the Well) may still hold its own native small
+  key. That is the game's own pickup, already palette-limited to its key or a red rupee (`key_families`), played on
+  Longshot rc.7 (docs/settings.md). Every native source of these types is a Chest or one of those two floor keys
+  (census: 65 Chest, 2 Collectable).
+- **Ganon's boss key included** (same rationale, a further tightening); **key rings and silver rupees excluded**:
+  they have no chest grant and keep their own-dungeon rule (`test_generate_dungeon_areas.py` pins that).
+
+Before the change, `allowed()` let these types take (printed by a scan of every shuffled non-chest location):
+Sheik in Ice Cavern (Map, Compass) with Gift + songs anywhere, broad recipe included; with Freestanding or Scrub
+shuffled and no Freestanding palette, the Well's floor rupees (Map, Compass, keys), Fire/Ganon's Castle recovery
+hearts (boss keys) and the Dodongo's Cavern and Jabu scrubs (Map, Compass). Defaults and Recommended: none.
+
+Tests:
+
+- New synthetic `test_dungeon_items_go_only_to_chests_even_beside_other_kinds_in_their_dungeon` (`tests/test_fill.py`):
+  a dungeon with four chests, a lesson, an NPC and a scrub, every mode, ten seeds each. Main's fill fails it at
+  `own_dungeon` seed 0 (`Boss Key (Temple)` on a non-chest check).
+- New dump `tests/test_dungeon_hold_dump.py`: cs21j's seed 1 (Chest + Gift, songs anywhere) through `gifts.seed_setup`
+  and `make_seed`. Main's fill: `{'Sheik in Ice Cavern': 'Compass (Ice Cavern)'}`; with the hold: passes.
+- Three contract tests pinned the old rule (own dungeon takes these types at any kind) and are updated to the new one:
+  `test_generate_tokens.py` (palette-free Skulltula), `test_key_model.py` (`Forest Floor`),
+  `test_generate_dungeon_areas.py` (`Temple Floor`).
+- Focused, no game running, `-n 2`, `CLAWSHOT_WORKERS=1` (20 fill/key/dungeon files): **513 passed**.
+
+Docs: `docs/settings.md` (dungeon items paragraph), `plans/04-world-format.md` (placement modes).

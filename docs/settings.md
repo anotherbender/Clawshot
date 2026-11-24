@@ -681,6 +681,11 @@ presets keep it. While it is set, the two chests on the Desert Colossus statue's
 hold Spirit Temple keys, maps or compasses: a generic grant there would credit the wrong
 dungeon or nothing.
 
+In every mode, small keys, boss keys, maps and compasses go only to chests, even inside
+their own dungeon (Kareem, 2026-11-23): a song lesson, gift, scrub or floor pickup grants the generic
+item without the dungeon's flag write, which has not been played. The one exception is a released
+floor-key source holding its own native key.
+
 `--dungeon-items anywhere` (the UI choice **Small keys anywhere**) moves **small keys only**,
 into shuffled chests whose access and native opening contracts permit it, including other dungeons
 and the overworld. An off-dungeon key is delivered as a named chest grant; no other shuffled kind can grant one.

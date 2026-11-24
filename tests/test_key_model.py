@@ -261,7 +261,7 @@ def test_anywhere_releases_only_small_keys_and_only_into_chests(world):
     assert allowed(world, anywhere, "Field Chest", FOREST_KEY)
     assert allowed(world, anywhere, "Fire Key Chest", FOREST_KEY)  # another dungeon's chest is a chest too
     assert not allowed(world, anywhere, "Field Floor", FOREST_KEY)  # no named grant on a floor pick-up
-    assert allowed(world, anywhere, "Forest Floor", FOREST_KEY)  # its own dungeon takes it anywhere, as before
+    assert not allowed(world, anywhere, "Forest Floor", FOREST_KEY)  # chests only, its own dungeon too (round 21)
     for item in (FIRE_BOSS_KEY, FIRE_MAP, FIRE_COMPASS):
         for settings in (own, anywhere):
             assert allowed(world, settings, "Fire Map Chest", item)

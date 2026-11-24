@@ -371,7 +371,10 @@ no-save-warp entry guards. Separate regressions prove those refusals; generated 
 **Dungeon-item placement modes (Round 17, #14).** `own_dungeon` retains physical Banc
 attribution. `anywhere` releases ordinary small keys only; `all_anywhere` also releases
 maps, compasses, boss keys and Ganon's boss key. Released items remain chest-only outside
-their own Banc, with every physical copy checked against the source-opening contract.
+their own Banc, with every physical copy checked against the source-opening contract. From round 21
+every mode holds those types to chests inside their own Banc too (`fill.CHEST_HELD_DUNGEON_TYPES`;
+a released floor-key source may keep its own native key): another kind's generic grant writes no
+`DungeonInfo` flag (`rounds/r21-placement-audit.md` section 6; Kareem, 2026-11-23).
 The new mode normalizes `keysanity=true` metadata; no live remake rule reads it. Existing
 `anywhere` recipes retain their released metadata. The translated Fire non-keysanity
 shortcut is overridden by an unconditional eight-key requirement in the remake. Boss-door rules require each dungeon's

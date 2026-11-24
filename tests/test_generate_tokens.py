@@ -158,7 +158,7 @@ def test_small_keys_and_unadmitted_items_never_take_a_skulltula_even_in_their_du
     settings = Settings(shuffle=("Chest", SHUFFLE), dungeon_items=dungeon_items)
     effective, world = prepare(spec, settings)
     unheld = replace(effective, location_type_items={})
-    assert allowed(world, unheld, "Temple GS 1", "Small Key (Temple)")  # in its dungeon: only the palette stops it
+    assert not allowed(world, unheld, "Temple GS 1", "Small Key (Temple)")  # the dungeon-item hold stops it too
     assert not allowed(world, effective, "Temple GS 1", "Small Key (Temple)")
     assert allowed(world, effective, "Temple GS 1", ADMITTED_RUPEES)
     assert not allowed(world, effective, "Temple GS 1", FAIRY)
