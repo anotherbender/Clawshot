@@ -33,7 +33,7 @@ def _intended(fc: evfl.Flowchart, flow: str, changes) -> set[int]:
         out |= {index[s.event] for s in change.steps if s.flow == flow}
         out |= {
             index[r.split("/")[1]]
-            for r in (*change.rule.given, *change.rule.writes, *change.rule.once)
+            for r in (*change.rule.given, *change.rule.writes, *change.rule.once, *change.rule.display)
             if r.split("/")[0] == flow
         }
         if (
