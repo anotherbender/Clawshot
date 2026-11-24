@@ -39,7 +39,7 @@ entry has been added. Other chests remain randomized: open only the listed check
 
 Launchers: `E:/OOTRemake/work/r22-lifts/ingame/01 - chest vanilla control.bat`, then
 `02 - eight chest items candidate.bat`, both **Longshot 3.2.0**. Separate copies of the same natural adult
-post-Forest manual save (`2026-11-09_1347-main-after-forest`, six hearts/Bow, no save edits).
+manual save during the Forest quest (`2026-11-09_1347-main-after-forest`, six hearts/Bow, no save edits).
 Baseline: magic0, wallet148/500, arrows27, bombs10; BottleA Bug and BottleB Empty, C-E unowned;
 all six permanent test items unowned and every target's named chest-open flag false.
 
@@ -72,9 +72,10 @@ Report each row PASS/FAIL and reason; a failure does not admit the actor or bloc
 
 ## Staged packet B: fixed capacities
 
-Private diagnostic seed `922702`; **Longshot 3.2.0**, same natural adult baseline as A, no save edits.
-Launchers `03 - capacity vanilla control.bat`, `04 - capacity chest candidate.bat`,
-`05 - Stick capacity Skulltula candidate.bat` under the same `ingame/` folder. **Estimate: 15 minutes total**
+Private diagnostic seed `922702`; **Longshot 3.2.0**, natural **Forest Complete adult autosave**, seven
+hearts, from the same backup folder as A; no save edits. **Use replacement launchers03b/04b/05b only:**
+`03b - capacity vanilla control natural return.bat`, `04b - capacity chest candidate natural return.bat`,
+`05b - Stick Token candidate natural return.bat` under `ingame/`. **Estimate: 15 minutes total**
 (control4 + chests6 + Token5). Each is an independent profile: the Stick chest cannot mask the Token grant.
 Native capacity10 sticks/20 nuts; medium items absent. Field lone-tree source pair is uncollected.
 
@@ -164,7 +165,7 @@ silently omitting them. Kareem can batch A, B and C independently. No original s
 changes. Only the existing played Token-family hold correction is a product-code candidate now; every
 new chest/hand-over admission remains a separate post-play commit.
 
-Staging choices proposed by **cs22g, 2026-11-24**: natural post-Forest adult rather than reopening chests
+Staging choices proposed by **cs22g, 2026-11-24**: natural adult checkpoints rather than reopening chests
 in a save; independent capacity profiles; both conditional PR40 states before any global hand-over lift.
 These do not change product policy.
 
@@ -192,12 +193,26 @@ These do not change product policy.
   four unchanged dump cases passed in the whole-file run; corrected broad isolated **1 passed in243.23s**,
   `-n 2`, workers1, no lock (Claude's explicit one-file exception). Formatter/lint pass; the last change
   was formatter-required whitespace only. Posted **READY (merge)** for this test-only commit.
+- Explicit-main provenance: rebuilt all three controls using imports from
+  `E:/OOTRemake/Clawshot/src` at main **`5bc5577369d429d426dc2059461918e41b5c5302`** into fresh
+  `work/r22-lifts/main-control-provenance/` folders. All staged RomFS bytes match those explicit-main
+  builds: chest106, capacity4, gallery10 files. No staged arm/profile was rewritten.
+  `main-control-provenance.json` records source path, head and counts.
+- Capacity checkpoint correction: the backup folder's manual save is still ForestStep4030607474, not
+  Complete. This is safe for adult chest packet A but cannot do B's natural child return. Replaced only
+  B's launchers with fresh03b/04b/05b profiles using the natural autosave: ForestStep=`Complete`1275749364,
+  adult, seven hearts, caps10/20, both medium bags absent, both chests closed, lone-tree pair unset.
+  All three replacement cmd dry-runs exit0; original backup hashes unchanged; same immutable mods.
+  `capacity-baseline-v2.json`. Old03/04/05 profiles are superseded; no staged folder/save was rewritten.
+- Rebase onto main **`5bc5577`** after Claude's MAIN MOVED: already up to date (the exact test-only base
+  is this branch's ancestor). Required post-rebase rerun: focused synthetic **174 passed in30.84s**;
+  full `tests/test_event_registration.py -m dump -n 2` **5 passed in319.82s**, workers1. No seed re-pin.
 - No game was started. Boot checks are Claude's. No play pass inferred from writer/readback/dry-run.
 
 ## Work remaining
 
-Capacity sweep and full gate remain under the round order. The early test-only fix is ready for Claude's
-integration gate; rebase onto the resulting local main and rerun focused contracts before FROZEN.
+Capacity sweep and full gate remain under the round order. The early test-only fix fast-forwarded to
+main `5bc5577`; post-rebase focused contracts passed. Request a FROZEN gate turn after existing owners.
 Prepared paired arms:200 broad (`work/r18-fill/settings.txt`),50 Defaults,50 Recommended, plus50
 Chest/Scrub/Token capacity-binding seeds each. Record placement/sphere digest comparison as counts only.
 Final chest/hand-over admissions await Kareem's corresponding play.
