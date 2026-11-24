@@ -81,7 +81,8 @@ class SeedOutput:
 
 OCARINA_GET_MODEL = "ocarina_get_model"
 SONG_GET_EFFECTS = "song_get_effects"
-OPTIONAL_STEPS = (OCARINA_GET_MODEL, SONG_GET_EFFECTS)
+OCARINA_PICKUPS = "ocarina_pickups"
+OPTIONAL_STEPS = (OCARINA_GET_MODEL, SONG_GET_EFFECTS, OCARINA_PICKUPS)
 """The optional cosmetic get-display steps ``make_seed`` runs when the settings could produce what they show."""
 
 
@@ -179,10 +180,32 @@ def make_seed(
     flags = list(custom.flags)
     new_files = dict(custom.new_files)
     token_rows: tuple[tokens.SourceChange, ...] = ()
+    from clawshot.patch import ocarina_pickup, songs
+
+    # Built here, composed at their usual place below: a Skulltula pickup may take one of their actors as its donor.
+    # Both run when the settings could produce what they show (PR #41's rule, the maintainers' option 2); a placement
+    # the rule does not cover is refused rather than shown wrongly (S8).
+    shuffled_placements = {name: out.placements[name] for name in out.shuffled}
+    song_delivery = songs.build(romfs) if songs.songs_can_move(settings.shuffle) else None
+    if song_delivery is None and (moved := songs.moved_songs(out.placements, out.world, table)):
+        raise PatchError(f"{moved} hold a moved song, but the settings do not run the song get effects")
+    ocarina_delivery = None
+    if ocarina_pickup.pickups_possible(settings.shuffle):
+        # The ocarinas' glow reuses the songs' light clone in static: added here only when no song step adds it.
+        ocarina_delivery = ocarina_pickup.build(romfs, ocarina_pickup.PICKUPS, with_static=song_delivery is None)
+    elif ocarinas := ocarina_pickup.needed(shuffled_placements, out.world, table):
+        raise PatchError(f"{ocarinas} sit at world pickups, but the settings do not run the ocarina pickups")
     if token_sources:
+        placed_actors = {
+            token_rewards[out.placements[name]][0] for name in token_sources if out.placements[name] in token_rewards
+        }
+        generated = {}
+        if any(actor.startswith(tokens.GENERATED_PREFIX) for actor in placed_actors):
+            steps = [(d.changes, d.new_files) for d in (song_delivery, ocarina_delivery) if d is not None]
+            generated = tokens.generated_donors(romfs, steps)
         # Token insertion validates the original dump row snapshot; custom rows then insert by name.
         delivery, token_rows = tokens.seed_delivery(
-            romfs, out.placements, token_sources, links.names, census, rewards=token_rewards
+            romfs, out.placements, token_sources, links.names, census, rewards=token_rewards, generated=generated
         )
         changes += (delivery.changes,)
         if overlap := sorted(new_files.keys() & delivery.new_files.keys()):
@@ -267,7 +290,7 @@ def make_seed(
     changes += (mido_schedule.changes(kept=kept_mido),)
     fast_files += tuple(mido_schedule.build(romfs, kept=kept_mido))
     plan = make_plan(out, links, table, chest_events.load(), overrides=custom.actors)
-    from clawshot.patch import getitem, keys, ocarina, progressive, progressive_bonus, scene_handoff, songs
+    from clawshot.patch import getitem, keys, ocarina, progressive, progressive_bonus, scene_handoff
 
     handoff = scene_handoff.build(romfs, skip_saria_farewell=settings.skip_saria_farewell, prior_changes=changes)
     changes += (handoff.changes,)
@@ -280,30 +303,39 @@ def make_seed(
     changes += (key_changes,)
     plan, progressive_changes = progressive.changes(romfs, plan, prior_changes=changes)
     changes += (progressive_changes, bags.changes(romfs))
+    # T1-a: an ocarina from a world pickup is added again by name in Dm_SY_Get, before ocarina.changes binds it.
+    if ocarina_delivery is not None:
+        changes += (ocarina_pickup.receipt_changes(romfs),)
     changes += (ocarina.changes(romfs, prior_changes=changes),)
     # Cosmetic get-display steps run when the settings could produce what they show (PR #41, the maintainers'
     # option 2, 2026-11-23), so the settings string says which build a seed has; the spoiler's ``patch.steps`` names
     # them. A placement the settings rule does not cover is refused rather than shown with the wrong model (S8).
     steps: list[str] = []
-    # The chest-ocarina get model: when Chest and Gift shuffle are both on. Last on ActorInfo and the ocarina packs,
-    # after every row edit.
-    if getitem.chest_ocarinas_possible(settings.shuffle):
+    # The ocarina get model: whenever an ocarina can show its own item actor (in a chest, at a show-item hand-over or
+    # a scrub sale: getitem.shown_ocarinas_possible). Last on ActorInfo and the ocarina packs, after every row edit.
+    if getitem.shown_ocarinas_possible(settings.shuffle):
         changes += (getitem.ocarina_changes(romfs),)
         steps.append(OCARINA_GET_MODEL)
-    elif found := getitem.chest_ocarinas(out.placements, chests, table):
+    elif found := getitem.get_model_ocarinas(shuffled_placements, out.world, table):
         raise PatchError(f"{found} hold an ocarina, but the settings do not run the ocarina get model")
     # Song get effects: when the settings let songs leave their places. Songs show an ocarina with their own effect;
-    # the floor pickups stay unwritten until a feature places them (Kareem, 2026-11-23, rounds/r21-pr41.md
-    # finding 4). Last on ActorInfo and the song packs.
-    if songs.songs_can_move(settings.shuffle):
-        delivery = songs.build(romfs)
+    # their floor pickups serve the floor and Skulltula kinds. Last on ActorInfo and the song packs.
+    if song_delivery is not None:
+        delivery = song_delivery
         changes += (delivery.changes,)
         if overlap := sorted(new_files.keys() & delivery.new_files.keys()):
             raise PatchError(f"another step and the song pickups both create {overlap}")
         new_files.update(delivery.new_files)
         steps.append(SONG_GET_EFFECTS)
-    elif moved := songs.moved_songs(out.placements, out.world, table):
-        raise PatchError(f"{moved} hold a moved song, but the settings do not run the song get effects")
+    # The ocarinas' world actors, glow and pickup receipt: when the settings could put an ocarina on a floor or at a
+    # Skulltula (ocarina_pickup.pickups_possible). Rows inserted by name.
+    if ocarina_delivery is not None:
+        delivery = ocarina_delivery
+        changes += (delivery.changes,)
+        if overlap := sorted(new_files.keys() & delivery.new_files.keys()):
+            raise PatchError(f"another step and the ocarina pickups both create {overlap}")
+        new_files.update(delivery.new_files)
+        steps.append(OCARINA_PICKUPS)
     return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files, token_rows, tuple(steps))
 
 
