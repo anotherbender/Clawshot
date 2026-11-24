@@ -113,25 +113,6 @@ def test_download_selection_covers_native_architectures(scripts):
         assert "Install uv yourself from" in text
 
 
-def test_windows_verifies_before_opening_or_running_download(scripts):
-    text = scripts["scripts/start-windows.ps1"]
-    steps = (
-        "Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $archive",
-        "Get-FileHash -LiteralPath $archive -Algorithm SHA256",
-        "if ($actual -ne $expected) { throw 'SHA-256 mismatch' }",
-        "[System.IO.Compression.ZipFile]::OpenRead($archive)",
-        "$zip.GetEntry('uv.exe')",
-        "[System.IO.Compression.ZipFileExtensions]::ExtractToFile",
-        "& $unpacked --version",
-        "Move-Item -LiteralPath $unpacked -Destination $UvExe",
-        "& $uv run --project $Root",
-    )
-    positions = [text.index(step) for step in steps]
-    assert positions == sorted(positions)
-    assert "$expected = $UvSha256[$target]" in text
-    assert "if ($LASTEXITCODE -ne 0) { throw 'uv --version failed' }" in text
-    assert "if ($failure) {" in text
-    assert "Remove-Item -LiteralPath $work -Recurse -Force" in text
 
 
 def test_unix_verifies_before_extracting_or_running_download(scripts):

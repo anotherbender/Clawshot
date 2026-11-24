@@ -63,7 +63,18 @@ function Install-PinnedUv {
 
         # Nothing from the download is opened before this check.
         $failure = 'the downloaded file is not the expected one (its SHA-256 differs); it was not unpacked or run'
-        $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+        # An inherited PowerShell 7 PSModulePath can hide Get-FileHash in Windows PowerShell 5.1.
+        $sha256 = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $stream = [System.IO.File]::OpenRead($archive)
+            try {
+                $actual = [BitConverter]::ToString($sha256.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
+            } finally {
+                $stream.Dispose()
+            }
+        } finally {
+            $sha256.Dispose()
+        }
         if ($actual -ne $expected) { throw 'SHA-256 mismatch' }
 
         $failure = 'the downloaded file could not be unpacked'
