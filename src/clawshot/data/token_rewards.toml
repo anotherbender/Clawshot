@@ -12,10 +12,10 @@
 #   only to shop shelves in every seed, enforced by the fill (clawshot.generate.fill.SHOP_ONLY_PREFIX); no adapter
 #   to a world pickup this round, so a ``NotPushToPouch`` shop bottle content never becomes a new bottle;
 # - progressive copies and small keys stay chest-only; boss keys, maps and compasses stay in their own dungeon;
-# - songs, the Gerudo captain's card and trade items keep their existing holds; items outside every pool stay out;
-# - Fairy Ocarina remains held: no native world donor, and the Token composer reads its unmodified dump pack,
-#   which has no AnimationRef. PR #40 adds AnimationRef only to generated chest-ocarina outputs, after Token
-#   composition; it does not change the donor input or establish a played Fairy Token grant (rounds/r22-lifts.md);
+# - the Gerudo captain's card and trade items keep their existing holds; items outside every pool stay out;
+# Both ocarinas and the twelve songs drop from the generated world actors Obj_Clawshot_Ocarina_* and
+# Obj_Clawshot_Melody_* (clawshot.patch.tokens.GeneratedDonor), admitted after BBender's runs T1 and TB3
+# (2026-11-24, plans/ocarina-song-drops-everywhere.md); songs go to Skulltulas only with songs = anywhere.
 # - masks and other out-of-pool items remain excluded.
 #
 # [families]: family -> the played evidence that admits it.
@@ -46,7 +46,8 @@ lens = "Kareem, rc.3 packet2 PLAYED PASS: Item_GlassTruth at LLR GS House Window
 agony_stone = "Kareem, rc.3 packet2 PLAYED PASS: Item_AgonyStone (the Echo Gem) at Kak GS Near Gate Guard, owned, and the equipped Gem reacted at the Kakariko watchtower Skulltula, the accepted Gem-effect proof"
 double_defense = "Kareem, rc.3 packet3 PLAYED PASS: Item_FairyBless_DefenseDouble at Kak GS Near Gate Guard, owned with reduced bomb-blast damage on a comparable blast and MaxLife28 unchanged"
 scrub_seed = "Kareem, rc.3 packet3 PLAYED PASS: Obj_ScrubBusinessSeed at Kak GS Watchtower, stock 2 -> 3 of cap30 and usable; using it without buying does not consume it, which is native behaviour, not a bug"
-ocarina = "Kareem, rc.3 packet3 S1 part PLAYED PASS: Obj_Ocarina_Time at LLR GS Tree, Time stock 0 -> 1, Sun's Song played on the newly granted instrument and still owned after Save and Continue (watcher reload 69/69); Fairy Ocarina stays excluded"
+ocarina = "Kareem, rc.3 packet3 S1 part PLAYED PASS: Obj_Ocarina_Time at LLR GS Tree, Time stock 0 -> 1, Sun's Song played on the newly granted instrument and still owned after Save and Continue (watcher reload 69/69). BBender, runs T1 and TB3, 2026-11-24: Fairy Ocarina from Obj_Clawshot_Ocarina_Fairy at Deku Tree GS Basement Gate, owned, spinning drop, played at once (TB3); the Ocarina of Time donor moved to Obj_Clawshot_Ocarina_Time so its drop also creates the instrument at once (finding TB3-a)"
+song = "BBender, runs T1 and TB3, 2026-11-24: Prelude of Light (Deku Tree GS Compass Room) and Zeldas Lullaby (GS Basement Vines) from Obj_Clawshot_Melody_*, the drop spinning with the song's floor effect (TB3), the song learned (IsGet 1) and played; the other ten songs are inferred"
 
 [rewards."Gold Skulltula Token"]
 actor = "Item_Token_Gold"
@@ -244,6 +245,71 @@ family = "scrub_seed"
 source = "PouchActorInfo Obj_ScrubBusinessSeed: Material/Item tab, GetType Small, SpecialDeal None, PouchStockable, FixedMaxNum 30, BundleActorNum 1, IsAutoSaveAfterGet; the scrub's own world actor (chest twin Item_ScrubBusinessSeed); capped stock, not a bundle"
 
 [rewards."Ocarina of Time"]
-actor = "Obj_Ocarina_Time"
+actor = "Obj_Clawshot_Ocarina_Time"
 family = "ocarina"
-source = "PouchActorInfo Obj_Ocarina_Time: KeyItem/KeyItem tab, GetType Large, SpecialDeal Ocarina, BundleActorNum 1, IsAutoSaveAfterGet; the native world pickup that carries its own AnimationRef, which the Item_ ocarinas lack, so only it composes at a Skulltula; Fairy Ocarina has no such donor and stays out"
+source = "PouchActorInfo Item_Ocarina_Time: KeyItem/KeyItem tab, GetType Large, SpecialDeal Ocarina, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Ocarina_Time (clawshot.patch.ocarina_pickup) is the donor. Before 2026-11-24 the native Obj_Ocarina_Time (played rc.3), whose drop left the Fairy as the instrument until a reload (BBender, run TB3)"
+
+[rewards."Fairy Ocarina"]
+actor = "Obj_Clawshot_Ocarina_Fairy"
+family = "ocarina"
+source = "PouchActorInfo Item_Ocarina_Fairy: KeyItem/KeyItem tab, GetType Small, SpecialDeal Ocarina, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Ocarina_Fairy (clawshot.patch.ocarina_pickup) is the donor; played at a Skulltula (BBender, runs T1 and TB3, 2026-11-24)"
+
+[rewards."Bolero of Fire"]
+actor = "Obj_Clawshot_Melody_FireBolero"
+family = "song"
+source = "PouchActorInfo Item_Melody_FireBolero: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_FireBolero (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Eponas Song"]
+actor = "Obj_Clawshot_Melody_EponaSong"
+family = "song"
+source = "PouchActorInfo Item_Melody_EponaSong: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_EponaSong (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Minuet of Forest"]
+actor = "Obj_Clawshot_Melody_ForestMinuet"
+family = "song"
+source = "PouchActorInfo Item_Melody_ForestMinuet: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_ForestMinuet (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Nocturne of Shadow"]
+actor = "Obj_Clawshot_Melody_ShadowNocturne"
+family = "song"
+source = "PouchActorInfo Item_Melody_ShadowNocturne: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_ShadowNocturne (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Prelude of Light"]
+actor = "Obj_Clawshot_Melody_LightPrelude"
+family = "song"
+source = "PouchActorInfo Item_Melody_LightPrelude: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_LightPrelude (clawshot.patch.songs) is the donor; played at a Skulltula (BBender, runs T1 and TB3, 2026-11-24); only with songs = anywhere"
+
+[rewards."Requiem of Spirit"]
+actor = "Obj_Clawshot_Melody_SpiritRequiem"
+family = "song"
+source = "PouchActorInfo Item_Melody_SpiritRequiem: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_SpiritRequiem (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Sarias Song"]
+actor = "Obj_Clawshot_Melody_SariaSong"
+family = "song"
+source = "PouchActorInfo Item_Melody_SariaSong: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_SariaSong (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Serenade of Water"]
+actor = "Obj_Clawshot_Melody_WaterSerenade"
+family = "song"
+source = "PouchActorInfo Item_Melody_WaterSerenade: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_WaterSerenade (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Song of Storms"]
+actor = "Obj_Clawshot_Melody_StormSong"
+family = "song"
+source = "PouchActorInfo Item_Melody_StormSong: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_StormSong (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Song of Time"]
+actor = "Obj_Clawshot_Melody_TimeSong"
+family = "song"
+source = "PouchActorInfo Item_Melody_TimeSong: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_TimeSong (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Suns Song"]
+actor = "Obj_Clawshot_Melody_SunSong"
+family = "song"
+source = "PouchActorInfo Item_Melody_SunSong: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_SunSong (clawshot.patch.songs) is the donor; inferred from Prelude of Light and Zeldas Lullaby (same row shape and generated actor), not played; only with songs = anywhere"
+
+[rewards."Zeldas Lullaby"]
+actor = "Obj_Clawshot_Melody_ZeldaLullaby"
+family = "song"
+source = "PouchActorInfo Item_Melody_ZeldaLullaby: KeyItem/KeyItem tab, GetType Small, SpecialDeal Melody, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Melody_ZeldaLullaby (clawshot.patch.songs) is the donor; played at a Skulltula (BBender, runs T1 and TB3, 2026-11-24); only with songs = anywhere"

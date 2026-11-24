@@ -85,9 +85,9 @@ def gift_step(call):
 
 @pytest.mark.parametrize("item", ["Fairy Ocarina", "Ocarina of Time"])
 @pytest.mark.parametrize("mode", ["song", "anywhere"])
-def test_ocarina_fill_uses_reachable_chests_instead_of_hand_over_gifts(item, mode):
-    # Seed 1 previously put either instrument at Gift. The second chest needs it,
-    # so restricting destinations must also preserve the assumed-fill proof.
+def test_ocarina_fill_may_use_hand_over_gifts_and_keeps_the_assumed_fill_proof(item, mode):
+    # The [hand_over] exclusion was lifted after runs 4.1 and 4.2 (BBender, 2026-11-24): either instrument may be a
+    # show-item hand-over. The second chest needs it, so the fill must still place it reachably first.
     spec = {
         "start": "Root",
         "goal": repr(item),
@@ -111,13 +111,12 @@ def test_ocarina_fill_uses_reachable_chests_instead_of_hand_over_gifts(item, mod
     held = gifts.held_items(world, world.items, items.load(), {"TBox_Rupee_Red", "Item_Boomerang"}, songs=mode)
     settings = Settings(shuffle=("Chest", "NPC"), songs=mode, item_location_types=held)
     seed = generate(spec, 1, settings, attempts=1)
-    assert seed.placements["Early Chest"] == item
-    assert seed.placements["Gift"] != item
+    (where,) = [name for name in ("Early Chest", "Gift") if seed.placements[name] == item]
     sphere_of = {name: index for index, sphere in enumerate(seed.spheres) for name in sphere}
-    assert sphere_of["Early Chest"] < sphere_of["Locked Chest"]
+    assert sphere_of[where] < sphere_of["Locked Chest"]
     for kind in gifts.GIFT_TYPES:
         world.locations["Gift"] = replace(world.locations["Gift"], type=kind)
-        assert not allowed(world, settings, "Gift", item)
+        assert allowed(world, settings, "Gift", item)
 
 
 @pytest.mark.parametrize("item", ["Fairy Ocarina", "Ocarina of Time"])
@@ -146,7 +145,7 @@ def test_gift_only_ocarinas_still_have_direct_story_destinations(item, call):
 
 
 @pytest.mark.parametrize("kind", ["Scrub", "GrottoScrub"])
-def test_ocarina_restriction_covers_scrub_sales_in_a_mixed_pool(kind):
+def test_ocarinas_may_be_scrub_sales_in_a_mixed_pool(kind):
     places = {
         "Chest": {"type": "Chest", "vanilla": "Rupees (20)", "rule": "True"},
         "Sale": {"type": kind, "vanilla": "Fairy Ocarina", "rule": "True"},
@@ -159,8 +158,11 @@ def test_ocarina_restriction_covers_scrub_sales_in_a_mixed_pool(kind):
         "locations": {name: {"type": info["type"]} for name, info in places.items()},
     }
     spec = gifts.restrict_spec(spec, ())
-    seed = generate(spec, 1, Settings(shuffle=("Chest", kind)), attempts=1)
-    assert seed.placements == {"Chest": "Fairy Ocarina", "Sale": "Rupees (20)"}
+    world = build_world(spec)
+    settings = Settings(shuffle=("Chest", kind))
+    assert allowed(world, settings, "Sale", "Fairy Ocarina")  # runs 4.2 H1/H2: both ocarinas at a scrub sale
+    seed = generate(spec, 1, settings, attempts=1)
+    assert sorted(seed.placements.values()) == ["Fairy Ocarina", "Rupees (20)"]
 
 
 @pytest.mark.parametrize("item", ["Bottle", "Bottle with Milk", "Double Defense", "Stone of Agony", "Rupees (200)"])
