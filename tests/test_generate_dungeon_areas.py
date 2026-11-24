@@ -107,8 +107,8 @@ def test_all_anywhere_releases_every_chest_family_and_only_into_chests():
         assert is_restricted(world, ANYWHERE, item) is (kind != "SmallKey")
         assert not is_restricted(world, ALL, item)
         for settings in (OWN, ANYWHERE, ALL):
-            # Its own dungeon takes it at any kind of check, as before; elsewhere never at a non-chest check.
-            assert allowed(world, settings, "Temple Chest", item) and allowed(world, settings, "Temple Floor", item)
+            # Chests only, its own dungeon included (round 21: a floor pickup's generic grant writes no flag).
+            assert allowed(world, settings, "Temple Chest", item) and not allowed(world, settings, "Temple Floor", item)
             assert not any(allowed(world, settings, name, item) for name in outside_others), (kind, settings)
         assert not any(allowed(world, OWN, name, item) for name in outside_chests)
         assert all(allowed(world, ANYWHERE, name, item) is (kind == "SmallKey") for name in outside_chests)

@@ -38,6 +38,15 @@ HIDEOUT_KEY_DESTINATIONS = ("Chest", HIDEOUT_KEY_SOURCE)
 """Where a Fortress key may go: a chest (named Fortress grant) or a jail source (its native key)."""
 SWORD_PEDESTAL_SOURCE = "SwordPedestal"
 """The first-pull source when ``shuffle_master_sword`` is enabled; never a user shuffle kind."""
+CHEST_HELD_DUNGEON_TYPES = frozenset({SMALL_KEY, "BossKey", "GanonBossKey", "Map", "Compass"})
+"""Dungeon item types held to chests in every mode, inside their own dungeon too (Kareem, 2026-11-23, on cs21j's
+``plans/rounds/r21-placement-audit.md`` section 6). Another kind grants the generic item with no
+``DungeonInfo.<target>`` write, unplayed: with Gift and ``songs = "anywhere"`` the Ice Cavern map and compass could go
+to Sheik's lesson; with Freestanding or Scrub shuffled and no palette, to the Well's floor rupees or the dungeon
+scrubs. Silver rupees and key rings keep their own-dungeon rule: they have no chest grant."""
+CHEST_HELD_DESTINATIONS = ("Chest", FLOOR_KEY_SOURCE)
+"""Where those types may go: a chest, or a released floor-key source, whose palette admits only its own native key
+(``clawshot.generate.key_families``)."""
 RELEASED_DUNGEON_ITEM_TYPES: dict[str, frozenset[str]] = {
     "own_dungeon": frozenset(),
     "anywhere": frozenset({SMALL_KEY}),
@@ -421,6 +430,8 @@ def allowed(world: World, settings: Settings, location: str, item: str) -> bool:
         not settings.shuffle_hideout_keys or location_type not in HIDEOUT_KEY_DESTINATIONS
     ):
         return False  # only a named chest grant or a jail source's native key credits the Fortress
+    if world.items[item].type in CHEST_HELD_DUNGEON_TYPES and location_type not in CHEST_HELD_DESTINATIONS:
+        return False  # even in its own dungeon: only a chest's grant is known to credit the dungeon
     dungeon = world.items[item].dungeon
     if dungeon is None or _in_dungeon_area(world, location, dungeon):
         return True
@@ -530,8 +541,8 @@ def _chest_bound(world: World, settings: Settings, locations: list[str], items: 
     """The ``items`` that need a chest, and the empty chests every one of them may take.
 
     An item needs one when no other empty location may take it, or when it is a released dungeon item: outside its
-    dungeon only a chest takes it, and the few other checks inside (the Ice Cavern's one, for its map and compass
-    both) do not make it flexible (round 21: those two, counted as flexible, stranded a map in 14 of 200 seeds).
+    dungeon only a chest takes it, and its own floor-key source does not make it flexible (round 21: maps and compasses
+    counted as flexible because of one other check in their dungeon were stranded in 14 of 200 seeds).
     A chest only some of them may take (``Hyrule Field Chest (Obj_Heart_Piece)`` refuses maps) is not counted."""
     others = [name for name in locations if world.locations[name].type != "Chest"]
     bound = {

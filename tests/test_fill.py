@@ -344,3 +344,46 @@ def test_flexible_progression_leaves_the_last_chest_to_a_released_map():
         assert "Map (Temple)" in chests, (number, seed.placements)
         tools_in_chests += bool(chests & {"Tool A", "Tool B"})
     assert tools_in_chests  # a spare chest still takes progression: only the last one is kept
+
+
+def test_dungeon_items_go_only_to_chests_even_beside_other_kinds_in_their_dungeon():
+    # Round 21 (cs21j's audit, section 6): Gift with songs anywhere put Compass (Ice Cavern) on Sheik's lesson, whose
+    # generic grant gets no DungeonInfo write. A lesson, an NPC and a scrub inside the dungeon take no dungeon item.
+    spec = {
+        "start": "Village",
+        "goal": "Small_Key_Temple and Boss_Key_Temple",
+        "items": {
+            "Small Key (Temple)": {"type": "SmallKey"},
+            "Boss Key (Temple)": {"type": "BossKey"},
+            "Map (Temple)": {"type": "Map", "class": "priority"},
+            "Compass (Temple)": {"type": "Compass", "class": "priority"},
+            "Coin": {"class": "normal"},
+        },
+        "regions": [
+            {"name": "Village", "exits": {"Temple": "True"}},
+            {
+                "name": "Temple",
+                "dungeon": "Temple",
+                "locations": {
+                    **{
+                        f"Chest {n}": {"type": "Chest", "vanilla": item, "rule": "True"}
+                        for n, item in enumerate(
+                            ("Small Key (Temple)", "Boss Key (Temple)", "Map (Temple)", "Compass (Temple)")
+                        )
+                    },
+                    "Lesson": {"type": "Song", "vanilla": "Coin", "rule": "True"},
+                    "Gift": {"type": "NPC", "vanilla": "Coin", "rule": "True"},
+                    "Scrub": {"type": "Scrub", "vanilla": "Coin", "rule": "True"},
+                },
+            },
+        ],
+    }
+    for dungeon_items in ("own_dungeon", "anywhere", "all_anywhere"):
+        settings = Settings(shuffle=("Chest", "NPC", "Song", "Scrub"), songs="anywhere", dungeon_items=dungeon_items)
+        for number in range(10):
+            seed = generate(spec, number, settings, attempts=1)
+            assert [seed.placements[name] for name in ("Lesson", "Gift", "Scrub")] == ["Coin"] * 3, (
+                dungeon_items,
+                number,
+                seed.placements,
+            )
