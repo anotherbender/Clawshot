@@ -312,20 +312,22 @@ label = "Deku Nuts"
 # Silver rupee puzzles (round 22, cs22b). The remake places 85 Obj_RupeeToken_Silver in 17 puzzles of five
 # (plans/03-game-data.md section 5); each puzzle's Banc AiGroup binds its five rupees, an Obj_silverRupeeCounter whose
 # Links name exactly those five, and the room's logic module. The save keeps no rupee count: what it keeps is the
-# room's clear, one Bool per puzzle (`flag`), which counts as the world's whole group (`count`, the group's
-# SilverRupee locations; every rule reads 5). A puzzle not cleared counts none, however many rupees were taken (D4):
+# saved completion: fifteen room-clear Bools and the lava room's unlock-event history (`flag`). Each counts as the
+# world's whole group (`count`, the group's SilverRupee locations; every rule reads 5). An unfinished puzzle counts
+# none, however many rupees were taken (D4):
 # the rupees' own Bool64bitKey actor flags (reset type 24) are not an audited pick-up contract (03-game-data.md
 # section 6). Every flag below is a GameDataList Bool (GameData/GameDataList.Product.110.byml.zs, build e0f3ccfa)
 # with DefaultValue false, ResetTypeValue 8, SaveFileIndex 0: saved to slot_NN/progress.sav and not reset on an
 # area change (ootmenu findings, sloperinaGZ docs/FINDINGS.md section 1 "Saved or not": reset bits 0x08 with save
-# index 0 are progress; bit 0 is the area-change reset). Its writer is the room module's TriggerGameDataSetBoolTrue,
-# driven by the puzzle counter's AllGet output (directly, through the Obj_SilverToken group module's outputs, or
-# through the unlock event the counter requests); the module reads the Bool back to keep the puzzle cleared. No
-# other live writer (one unconnected node, Bottom of the Well's source) and no TriggerGameDataSetBoolFalse names any
-# of them in any AINB graph (round 14's decode cache, 5036 graphs), event flow (915) or Banc file. Rooms are
-# DefaultDungeonRoomIndex. Receipt (read-only dump, facts only):
-# E:/OOTRemake/work/r22-tracker/silver/audit_silver.py and audit.json. Not mapped: the GTG lava room (see
-# [unmapped]), and the six groups no remake puzzle and no world location has.
+# index 0 are progress; bit 0 is the area-change reset). The fifteen named clears are written by the room module's
+# TriggerGameDataSetBoolTrue, driven by its counter's AllGet output (directly, through Obj_SilverToken group outputs,
+# or through the requested unlock event); the module reads the Bool back to keep the puzzle cleared. No other live
+# writer (one unconnected node, Bottom of the Well's source) and no TriggerGameDataSetBoolFalse names those clears
+# in any AINB graph (round 14's decode cache, 5036 graphs), event flow (915) or Banc file. GTG lava instead uses the
+# saved history of its unique AllGet-triggered unlock event, not its encounter/appear event or guessed autogen key.
+# Rooms are DefaultDungeonRoomIndex. Read-only receipts: E:/OOTRemake/work/r22-tracker/silver/audit_silver.py,
+# audit.json, lava-callers.txt and lava-unlock-chain.txt. Only the six groups without a remake puzzle/world location
+# remain unmapped.
 [silver_rupees."Silver Rupee (Bottom of the Well Basement)"]
 flag = "BottomOfTheWell_Level_Room_09_A_SilverRupee_GetAll"
 count = 5
@@ -350,6 +352,11 @@ source = "Banc GerudoTrainingGround room 2, the boulder room (data/world/remake/
 flag = "GerudoTrainingGround_Dungeon_Room09_SilverRupee"
 count = 5
 source = "Banc GerudoTrainingGround room 9, the water room (adult_gerudo_training_ground.toml; AiGroup 16490966705580268555, counter 1360086147602188847, which also binds the Underwater Silver Rupee Chest 3717705376223508790). Logic/GerudoTrainingGround_Level_Room_09_Prefab_8640.logic.module.ainb n0 TriggerGameDataSetBoolTrue <- n3 Obj_SilverToken_Group_Prefab_a475 AllTokenAcquired (its counter's AllGet); n1 reads it back. GameDataList Bool 0x516ed4f9."
+
+[silver_rupees."Silver Rupee (Gerudo Training Ground Lava)"]
+flag = "HavePlayedEvent.GerudoTrainingGround_06_SilverToken_Unlock"
+count = 5
+source = "Banc GerudoTrainingGround room 6 (AiGroup 12402114570269951643, counter 17737439470550412326 links all five rupees). Room_06_Prefab_14f8.logic.module.ainb n12 AllGet -> n2 EventRequestActor_abe3 (Hash5973768131564127645), the sole Banc caller of GerudoTrainingGround_06_SilverToken_Unlock; no EVFL subflow calls it. GerudoTrainingGround_Gimmick.bfevfl unlock entry Event101 -> Event102 -> Event127 (ShadowTemple_Gimmick/Silver_Tolken_Finish) -> Event96 -> Event420 -> Event419 EventTriggerSetEventBool true -> module n18 autogen clear. Its specific saved HavePlayedEvent history therefore proves all five were collected; the appear/encounter event does not. GameDataList Bool Hash2670094484, default false/reset8/save0. Autogen clear key remains unguessed."
 
 [silver_rupees."Silver Rupee (Ganons Castle Forest Trial)"]
 flag = "InsideGanonCastle_Dungeon_Room03_SilverRupee"
@@ -530,8 +537,7 @@ source = "Banc SpiritTemple room 15, the boulder room (three Obj_SpiritTemple_Ro
 "Silver Rupee Pouch (Ganons Castle Spirit Trial)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
 "Silver Rupee (Ganons Castle Water Trial)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
 "Silver Rupee Pouch (Ganons Castle Water Trial)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
-"Silver Rupee (Gerudo Training Ground Lava)" = "no named saved clear: the lava room's module (Banc GerudoTrainingGround room 6, Logic/GerudoTrainingGround_Level_Room_06_Prefab_14f8.logic.module.ainb) keeps its clear only in an autogenerated GameData slot (n18 OperateGameDataAllocAutogenGameData, written from its unlock event), whose save key is not established ([silver_rupees] receipt)"
-"Silver Rupee Pouch (Gerudo Training Ground Lava)" = "no named saved clear for the lava room's puzzle (see Silver Rupee (Gerudo Training Ground Lava))"
+"Silver Rupee Pouch (Gerudo Training Ground Lava)" = "a pouch's rupees count through its group, read from the puzzle's saved completion ([silver_rupees])"
 "Silver Rupee Pouch (Gerudo Training Ground Slopes)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
 "Silver Rupee Pouch (Gerudo Training Ground Water)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
 "Silver Rupee Pouch (Ice Cavern Push Block)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"

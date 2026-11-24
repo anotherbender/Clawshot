@@ -88,11 +88,11 @@ can be marked.
   Other items count only while you hold them.
 - **Small keys** count every key you found in that dungeon, spent ones included. Boss keys, maps and
   compasses count once you have them.
-- **Silver rupees.** Fifteen puzzle groups count as five rupees once the room's own saved clear flag is set,
-  including all four silver-rupee trial puzzles in Ganon's Castle. An unfinished puzzle counts none;
-  missing flags remain unknown. The Gerudo Training Ground lava room remains unmapped because its saved
-  clear key is not established. These are logic counts, not extra item tiles or individual pickup checks
-  ([flag audit](../plans/rounds/r22-tracker.md)).
+- **Silver rupees.** All sixteen live puzzle groups count as five rupees once their saved completion flag is set,
+  including all four silver-rupee trial puzzles in Ganon's Castle. Fifteen use the room's own clear Bool; the Gerudo
+  Training Ground lava room uses its unique all-five unlock event's saved history, not its encounter event.
+  An unfinished puzzle counts none; missing flags remain unknown. These are logic counts, not extra item tiles or
+  individual pickup checks ([flag audit](../plans/rounds/r22-tracker.md)).
 - **Bottles.** Each bottle you own counts as a bottle, except one holding Ruto's Letter, which counts as
   the letter only: as in the seed's logic, the letter is not also an empty bottle.
 - **Hearts** count whole hearts; loose Pieces of Heart are not added.

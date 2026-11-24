@@ -447,9 +447,10 @@ lacks are dropped.
   added. Gold Skulltula tokens use the native stock.
 - Per dungeon, small keys are the found count including spent keys; boss keys, maps and compasses are
   their saved flags.
-- Silver-rupee groups read their native room-clear Bools from `[silver_rupees]`: true grants the group's five,
-  false grants none, absent is unknown. Fifteen live groups are mapped, including all four castle puzzles.
-  Partial puzzles and the unresolved GTG lava-room clear are not counted; pouches are not invented.
+- Silver-rupee groups read native saved completion Bools from `[silver_rupees]`: true grants the group's five,
+  false grants none, absent is unknown. All sixteen live groups are mapped, including all four castle puzzles.
+  GTG lava uses its unique all-five unlock event's history; the other fifteen use room-clear Bools.
+  Partial puzzles are not counted; pouches are not invented.
 - `Field Owl Arrival` reads `HyruleField_ArriveEntrance` and `Met Child Zelda` reads
   `HavePlayedEvent.Dm_HrlField_0020` (Impa's send-off). Other events and the remake story steps without an
   audited save flag are listed in `unmapped` and derived by the search. A test fails when a progression

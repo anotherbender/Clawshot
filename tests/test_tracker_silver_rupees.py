@@ -13,13 +13,14 @@ from clawshot.tracker import logic as tracker_logic
 from clawshot.tracker import seeds
 from clawshot.world import ADULT, Search, load_spec
 
-# The audit: world group -> the room's saved clear Bool (the remake's 17 puzzles; GTG's lava room has none named).
+# World group -> saved completion Bool (17 puzzles; the two slopes sets share one group/clear).
 AUDITED = {
     "Silver Rupee (Bottom of the Well Basement)": "BottomOfTheWell_Level_Room_09_A_SilverRupee_GetAll",
     "Silver Rupee (Ice Cavern Spinning Scythe)": "IceCavern_Room05_Unlocked",
     "Silver Rupee (Ice Cavern Push Block)": "IceCavern_Room06_Unlocked",
     "Silver Rupee (Gerudo Training Ground Slopes)": "GerudoTrainingGround_Dungeon_Room02_SilverRupee",
     "Silver Rupee (Gerudo Training Ground Water)": "GerudoTrainingGround_Dungeon_Room09_SilverRupee",
+    "Silver Rupee (Gerudo Training Ground Lava)": "HavePlayedEvent.GerudoTrainingGround_06_SilverToken_Unlock",
     "Silver Rupee (Ganons Castle Forest Trial)": "InsideGanonCastle_Dungeon_Room03_SilverRupee",
     "Silver Rupee (Ganons Castle Fire Trial)": "InsideGanonCastle_Dungeon_Room10_SilverRupee",
     "Silver Rupee (Ganons Castle Light Trial)": "InsideGanonCastle_Dungeon_Room14_SilverRupee",
@@ -68,9 +69,9 @@ def test_each_count_is_the_world_group(castle, mapping):
     for name, puzzle in mapping.silver_rupees.items():
         assert castle.items[name].type == "SilverRupee"
         assert puzzle.count == groups[name] == 5, name
-    # Every world group is mapped but the lava room's; a group no world location holds is never counted.
+    # Every live world group is mapped; a group no world location holds is never counted.
     silver = {name for name, item in castle.items.items() if item.type == "SilverRupee" and groups[name]}
-    assert silver - set(mapping.silver_rupees) == {"Silver Rupee (Gerudo Training Ground Lava)"}
+    assert silver == set(mapping.silver_rupees)
     assert all(name in mapping.unmapped for name in castle.items if name.startswith("Silver Rupee Pouch"))
 
 
@@ -86,6 +87,12 @@ def test_a_saved_clear_counts_the_whole_group_and_nothing_else_does(castle, name
     # Unread: conservative (D4), and listed.
     unread = inv(castle)
     assert name not in unread.counts and name in unread.unknown
+
+
+def test_lava_encounter_history_does_not_count_as_finishing_the_puzzle(castle):
+    result = inv(castle, {"HavePlayedEvent.GerudoTrainingGround_06_SilverToken_Appear": True})
+    name = "Silver Rupee (Gerudo Training Ground Lava)"
+    assert name not in result.counts and name in result.unknown
 
 
 # The Forest trial's own rules (remake/adult_ganons_castle.toml): its wind room needs Din's Fire with a Hookshot,
