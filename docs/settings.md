@@ -430,6 +430,9 @@ Every new seed also refuses to start Dampé's race without an owned Hookshot or 
 Kareem accepted the no-tool candidate (2026-11-19): no race, fade out/in at the **same spot before Dampé**,
 normal control, and the existing warp back up remains usable. The intended surface return was **not**
 observed; no further behavior change was requested. Both prizes remain shuffled.
+With a Hookshot or Longshot owned, Dampé always runs his second race, so the first-race chest never appears
+(Kareem, 0.2.6, 2026-11-24). From 0.2.7 that chest only holds non-progression items; seeds from 0.2.3 to 0.2.6
+could put a needed item there.
 
 Every new seed enables the D-pad HUD shortcuts from the start, independently of fast-start
 choices (including `--skip` with no selections): **Navi, Ocarina, Boots and Masks**.
