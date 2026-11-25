@@ -15,8 +15,9 @@ through production seeds and reject new risks except that exact played allowance
 import copy
 import functools
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
+from unittest import mock
 
 import pytest
 from dampe_flow import assert_first_race_cycle
@@ -24,8 +25,9 @@ from dampe_flow import assert_first_race_cycle
 from clawshot.census.gifts import FLOW_DIR, FLOW_SUFFIX, FLOW_VERSIONS, flow_files, reachable
 from clawshot.census.scan import read_romfs_byml
 from clawshot.formats import byml, evfl, zsdic
-from clawshot.generate import Settings
-from clawshot.patch import SeedOutput, gifts, make_seed
+from clawshot.generate import Settings, from_placements
+from clawshot.generate.fill import allowed
+from clawshot.patch import SeedOutput, gifts, make_seed, scrubs
 from clawshot.patch.keys import ANALYZED, SETTINGS
 from clawshot.world.load import load_spec
 
@@ -453,9 +455,8 @@ RECIPES: dict[str, tuple[int, Settings, dict]] = {
     # Every shuffle kind and opt-in flow writer: released dungeon items and jail keys, dungeon rewards with the
     # owned-Stones Door, the shuffled Master Sword with free time travel, a reward bridge, every flow-editing fast
     # start, Saria's opt-in farewell handoff, and the runtime module's receive event and "your" get lines.
-    # Seed 46 also puts a shield on a scrub sale (the Mirror Shield at HF Deku Scrub Grotto); re-pinned from 24 in
-    # round 21 when the Hammer logic moved placements (plans/rounds/r21-hammer.md), and from 22 in round 22 when
-    # Dampe's first-race chest stopped taking progression.
+    # Keep the seed for the rest of the recipe; generate() below deterministically swaps a compatible shield
+    # onto a scrub when needed. Writer coverage must not depend on a placement pin surviving logic/fill changes.
     "broad": (
         46,
         Settings(
@@ -540,13 +541,42 @@ def dump_events(romfs: Path) -> tuple[World, dict[str, str]]:
     return World(charts, *tables), files
 
 
-def generate(romfs: Path, seed: int, settings: Settings, options: Mapping) -> SeedOutput:
-    """The generation of ``python -m clawshot`` and the app (``app.jobs.generate_seed``) before the writer."""
+def generate(romfs: Path, seed: int, settings: Settings, options: Mapping, *, scrub_shield: bool = False) -> SeedOutput:
+    """Production seed setup, optionally fixing one allowed placement pair to exercise the scrub-shield writer."""
     spec, steps = None, []
     if gifts.SHUFFLE in settings.shuffle or set(settings.shuffle).intersection(gifts.GIFT_TYPES):
         spec, settings, step = gifts.seed_setup(romfs, load_spec(), settings)
         steps.append(step)
-    return make_seed(romfs, seed, settings, spec, extra_steps=steps, **options)
+    output = make_seed(romfs, seed, settings, spec, extra_steps=steps, **options)
+    if not scrub_shield:
+        return output
+    placements = {name: output.seed.placements[name] for name in output.seed.shuffled}
+    shields = ("Deku Shield", "Hylian Shield", "Mirror Shield")
+    targets = [name for name in scrubs.SALES if name in placements]
+    if any(placements[name] in shields for name in targets):
+        return output
+    world, effective = output.seed.world, output.seed.settings
+    for target in targets:
+        for source, item in placements.items():
+            if (
+                item in shields
+                and allowed(world, effective, target, item)
+                and allowed(world, effective, source, placements[target])
+            ):
+                placements[source], placements[target] = placements[target], item
+                print(f"scrub-shield coverage swap: {source} <-> {target} ({item})")
+
+                # External placements omit hint selection; keep this generated recipe's existing hints so
+                # the same compile still covers the GossipStone flow writer, not only the scrub shield.
+                def placed(*args, **kwargs):
+                    return replace(from_placements(*args, **kwargs), hints=output.seed.hints)
+
+                with mock.patch("clawshot.patch.from_placements", placed):
+                    return make_seed(romfs, seed, settings, spec, extra_steps=steps, placements=placements, **options)
+    pytest.fail(
+        f"no compatible scrub-shield coverage swap: scrubs={[(name, placements[name]) for name in targets]}, "
+        f"shields={[(name, item) for name, item in placements.items() if item in shields]}"
+    )
 
 
 def written_world(romfs: Path, output: SeedOutput) -> tuple[World, list[str]]:
@@ -609,7 +639,7 @@ def test_dump_follows_the_model_but_for_its_named_debt(romfs):
 @pytest.mark.parametrize("recipe", sorted(RECIPES))
 def test_production_seed_declares_every_event_dependency_it_adds(romfs, recipe):
     seed, settings, options = RECIPES[recipe]
-    output = generate(romfs, seed, settings, options)
+    output = generate(romfs, seed, settings, options, scrub_shield=recipe == "broad")
     native, _ = dump_events(romfs)
     patched, written = written_world(romfs, output)
     debt = native.gaps()
