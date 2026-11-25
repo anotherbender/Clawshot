@@ -219,3 +219,59 @@ def test_unplayed_gift_grant_does_not_gain_token_destinations():
     actors = items.loads('[items]\nLetter = { actor = "Item_ZeldaLetter" }\n')
     held = gifts.held_items(world, ["Letter"], actors, set(), token_shuffle=True)
     assert "Token" not in held["Letter"] and "Chest" not in held["Letter"]
+
+
+@pytest.mark.parametrize(
+    "item",
+    [
+        "Light Arrows",
+        "Nayrus Love",
+        "Farores Wind",
+        "Stone of Agony",
+        "Double Defense",
+        "Biggoron Sword",
+        "Bottle",
+        "Rupees (200)",
+    ],
+)
+@pytest.mark.parametrize("token_shuffle", [False, True])
+def test_played_chest_lifts_refuse_unplayed_scrub_destinations(item, token_shuffle):
+    kinds = {"Gift": "NPC", "Chest": "Chest", "Scrub": "Scrub", "Skulltula": "Token"}
+    world = build_world(
+        {
+            "start": "Root",
+            "goal": "True",
+            "items": {item: {"class": "normal"}},
+            "regions": [
+                {"name": "Root", "locations": {name: {"type": kind, "rule": "True"} for name, kind in kinds.items()}}
+            ],
+        }
+    )
+    held = gifts.held_items(world, [item], items.load(), set(), token_shuffle=token_shuffle)
+    shuffle = ("Chest", "NPC", "Scrub") + (("Token",) if token_shuffle else ())
+    settings = Settings(shuffle=shuffle, item_location_types=held)
+    assert allowed(world, settings, "Chest", item)
+    assert not allowed(world, settings, "Scrub", item)
+    assert allowed(world, settings, "Gift", item)
+    assert allowed(world, settings, "Skulltula", item) is token_shuffle
+
+
+def test_unscoped_chest_catalog_records_keep_legacy_item_type_release(monkeypatch):
+    item = "Bottle with Milk"
+    world = build_world(
+        {
+            "start": "Root",
+            "goal": "True",
+            "items": {item: {"class": "normal"}},
+            "regions": [
+                {"name": "Root", "locations": {kind: {"type": kind, "rule": "True"} for kind in ("Chest", "Scrub")}}
+            ],
+        }
+    )
+    monkeypatch.setitem(
+        gifts.CATALOG["chest_verified"], items.load().actor(item), {"source": "synthetic unscoped receipt"}
+    )
+    held = gifts.held_items(world, [item], items.load(), set())
+    settings = Settings(shuffle=("Chest", "Scrub"), item_location_types=held)
+    assert allowed(world, settings, "Chest", item)
+    assert allowed(world, settings, "Scrub", item)

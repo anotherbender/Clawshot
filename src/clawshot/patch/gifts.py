@@ -1270,6 +1270,8 @@ def held_items(
 
     The other eleven songs are inferred from the Song of Storms chest result, not individually verified.
     Non-song gifts still need a vanilla chest actor or a sourced ``chest_verified`` catalog entry for chests.
+    Scoped records add only their named destination kinds to existing Gift/Token eligibility.
+    Unscoped records retain the existing item-type hold release.
     Independently played Token rewards may also use Skulltulas; this does not certify their chest path.
     """
     out = {}
@@ -1277,8 +1279,15 @@ def held_items(
         if world.items[item].type == SONG_TYPE:
             if songs == "song":
                 out[item] = (SONG_TYPE,)
-        elif actors.actor(item) not in chest_actors and actors.actor(item) not in CATALOG["chest_verified"]:
+        else:
+            actor = actors.actor(item)
+            receipt = CATALOG["chest_verified"].get(actor)
+            destinations = receipt.get("destinations") if receipt is not None else None
+            if destinations is None and (actor in chest_actors or receipt is not None):
+                continue
             out[item] = tuple(t for t in GIFT_TYPES if songs == "anywhere" or t != SONG_TYPE)
             if token_shuffle and item in token_policy.REWARDS:
                 out[item] += (token_policy.SHUFFLE,)
+            if destinations is not None:
+                out[item] += tuple(destinations)
     return dict(sorted(out.items()))
