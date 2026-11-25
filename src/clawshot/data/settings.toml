@@ -78,6 +78,9 @@ source = "Kareem via Claude, 2026-11-08, chest-gift-models: Din's Fire from Mido
 [chest_verified.Item_Wallet_Medium]
 source = "Kareem via Claude, 2026-11-08, chest-gift-models: Adult's Wallet from Mido chest held 500 rupees; plans/03-game-data.md section 26"
 
+[chest_verified.Item_Arrow_Light]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: correct model/get text and use PASS; saved ownership and opened chest; plans/rounds/r22-lifts.md"
+
 [songs_anywhere]
 source = "Claude, Round 6 review, 2026-11-08: all twelve Item_Melody_* share the pouch/IsGet grant path. Storms played and Minuet warped from a chest; the other ten are inferred, not individually verified. Opt-in only."
 
