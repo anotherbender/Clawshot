@@ -102,6 +102,9 @@ source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Bottle mod
 [chest_verified.Obj_Rupee_Gold]
 source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: correct 200-rupee model/get text; saved wallet154->354 and chest closed->open; plans/rounds/r22-lifts.md"
 
+[chest_verified.Item_StickBag_Medium]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet04b: Stick chest grants native20 capacity/refill, usable after natural child return and saved Continue; plans/rounds/r22-lifts.md"
+
 [songs_anywhere]
 source = "Claude, Round 6 review, 2026-11-08: all twelve Item_Melody_* share the pouch/IsGet grant path. Storms played and Minuet warped from a chest; the other ten are inferred, not individually verified. Opt-in only."
 
