@@ -14,6 +14,7 @@ from clawshot.world import load_spec
 SPEC = load_spec()
 DEFAULT_LOGIC = {**SPEC.get("settings", {}), **SPEC.get("tricks", {}), **SPEC.get("flags", {})}
 SUPPORTED_BOOLEAN_KEYS = {"free_time_travel", "age_return_guarantee", "keysanity", "skip_mido"}
+SUPPORTED_BOOLEAN_KEYS.add("bombs_without_bracelet")
 UNPAIRED = [
     (name, not value)
     for name, value in sorted(DEFAULT_LOGIC.items())

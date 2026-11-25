@@ -95,6 +95,7 @@ keysanity = [false, true]
 open_forest = ["closed", "closed_deku", "open"]
 skip_mido = [false, true]
 door_of_time = ["closed", "song_only", "open"]
+bombs_without_bracelet = [false, true]
 
 # Effective recipes contain these fields, but prepare() regenerates them from
 # the selected door mode. Stored values are not user-controlled access overrides.

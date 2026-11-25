@@ -107,6 +107,13 @@ group = "World"
 logic_override = "free_time_travel"
 clears = { logic = ["free_time_travel"] }
 help = "Experimental, off by default. After Sheik's first adult scene, return to child before the Forest Temple and change age freely. Seeds may expect those early trips. Prelude still follows Forest completion. Early return, repeated age changes, first adult arrival, Prelude and the repaired child sword return have passed in game. This does not repair an old seed or save."
+[bombs_without_bracelet]
+label = "Bag bombs without the Bracelet (experimental)"
+kind = "boolean"
+group = "World"
+logic_override = "bombs_without_bracelet"
+clears = { logic = ["bombs_without_bracelet"] }
+help = "Off by default. Use bombs from the Bomb Bag without strength upgrades; logic follows. The Bomb Bag is still required. Bomb Flowers still need strength, and Bombchus still need the Bomb Bag. Built, not played on Longshot 3.2.0."
 [starting_items]
 label = "Starting items (experimental)"
 kind = "multi"

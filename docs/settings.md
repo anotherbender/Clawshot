@@ -26,6 +26,13 @@ Conflicting forest/door fields are still refused. Effective return-kit fields
 are regenerated from the selected mode; stored copies cannot override the world.
 Versioned share-prefix checks are unchanged; this adds no cross-version import support.
 
+Bag bombs without the Bracelet is also supported, off by default:
+`--logic bombs_without_bracelet=true` (app: **Bag bombs without the Bracelet (experimental)**).
+It lowers only the ordinary bag bomb's lift requirement and removes strength from the shared `Bombs`
+logic predicate. The Bomb Bag is still necessary, including for Bombchus. Bomb Flowers and strength-gated
+rocks keep their native requirements; this does not open Dodongo's Cavern's child entrance with bag bombs.
+Built, not played on Longshot 3.2.0; [trace and staged check](../plans/rounds/r22-games.md).
+
 OoT-only access overrides such as `open_kakariko=open`, `gerudo_fortress=open`,
 `scarecrow_behavior=free` and `skip_child_zelda=true` are refused: no native patch
 makes them true. The same policy applies to CLI settings strings, app validation
@@ -157,7 +164,7 @@ Choose a concrete upgrade tier, not a number of copies: Longshot includes Hooksh
 include the child Bracelet and Silver Gauntlets, and Quiver/Bullet Bag upgrades include Bow/Slingshot
 and their containers. Lower selections in the same family do not add extra tiers.
 Native bag grants supply their declared ammunition; a Bomb Bag never invents Bombchu ownership.
-Bombs still require age-appropriate strength. Other equipment is owned, not forcibly worn:
+Bombs still require age-appropriate strength unless **Bag bombs without the Bracelet** is on. Other equipment is owned, not forcibly worn:
 equip sword/shield in the pause menu. The selected ocarina is active (Time wins if both are chosen).
 With the adult-return guarantee, starting strength no longer proves the child learned Saria's Song.
 If that song remains at its fixed child source, also start with it, enable Gift/song shuffle, or enable
@@ -254,6 +261,12 @@ prizes (first win, second win, then the usual rupees) and both normal shooting-g
 are confirmed in game (`R10-MINIGAMES-CHILD-JABU`, `R10-MINIGAMES-ADULT`).
 Rental weapons do not become inventory rewards. Both expert galleries remain unshuffled:
 native expert wins pay repeatable wallet rupees, with no separate first-win prize.
+
+In every seed, **LW Ocarina Memory Game** gives its prize on the first completed won round and sets the
+native once-flag: the shuffled reward with `Gift`, or the vanilla Heart Piece without it.
+It then keeps the native post-prize session state and repeat payouts. Failure or declining gives nothing.
+No setting: this matches the other minigames' first-win policy. Its all-five-ocarina-buttons logic
+requirement is unchanged. Built, not played on Longshot 3.2.0; [checklist](../plans/rounds/r22-games.md).
 
 With `Gift` selected, the child Market Potion Shop bottle tutorial and Dampé's graveyard
 digging prize give shuffled rewards. Both passed their in-game checks on 2026-11-10

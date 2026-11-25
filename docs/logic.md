@@ -117,6 +117,14 @@ stays vanilla (the Wasteland Bombchu Salesman in every seed, the 40-token reward
 shuffled). Shuffled packs already went only where the bag is guaranteed (D25). The tracker's in-logic
 view rebuilds the same world, so it follows. [Decision D30](../plans/decisions.md).
 
+**Bag bombs without the Bracelet (experimental, default off):** `bombs_without_bracelet` is paired with
+`patch.bombs`, which lowers only `Item_Bomb`'s required lift grade. `remake/bombs.toml` then requires the
+Bomb Bag but no strength for `Bombs`; `can_use(Bombs)`, explosives and both Octorok bomb shortcuts inherit it.
+Bomb Flowers, child Dodongo's Cavern entrance and other local lift routes retain strength; Bombchus remain
+independent and still need their bag. Built, not played on Longshot 3.2.0.
+[Native trigger chain and checks](../plans/rounds/r22-games.md).
+
+
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
 Boots or Serenade are shuffled. Claude chose the r16 precaution on 2026-11-17; Kareem was informed.

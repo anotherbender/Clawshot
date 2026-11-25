@@ -61,6 +61,9 @@ skip_mido = false
 # D35: paired with patch.door, separate from free_time_travel.
 door_of_time = "closed"
 
+# Round 22 opt-in: patch.bombs lowers only Item_Bomb's required lift grade, not Bomb Flowers.
+bombs_without_bracelet = false
+
 # Round 16, maintainer scope: physical safe anchors, never the abstract Root/save-warp dispatcher.
 # Evidenced traps: played Slingshot Room/Dampé and Kareem's warp-only Colossus policy.
 # Full-graph return debt stays diagnostic; plans/rounds/r18-logic.md records the audit.

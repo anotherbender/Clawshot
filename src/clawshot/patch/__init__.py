@@ -24,11 +24,13 @@ from clawshot.generate import tokens as token_policy
 from clawshot.generate.fill import SWORD_PEDESTAL_SOURCE, shuffled_locations
 from clawshot.patch import (
     bags,
+    bombs,
     custom_items,
     darunia,
     drops,
     freestanding,
     gamedata,
+    gifts,
     scrubs,
     shops,
     text,
@@ -222,7 +224,8 @@ def make_seed(
     # Fast-start initial values compose before gift flag additions; its flow edits run before other flow steps.
     if scrubs.SHUFFLE not in settings.shuffle:
         changes += (scrubs.changes({}),)
-    changes = (gamedata.changes(chosen), *changes)
+    # Pin the native win boundary before kind-specific gift/bag guards rewrite the reward event.
+    changes = (gamedata.changes(chosen), gifts.skull_kid_changes(), *changes)
     if world.settings.get("free_time_travel", False):
         from clawshot.patch.age import changes as age_changes
 
@@ -242,6 +245,7 @@ def make_seed(
     changes += (
         door.changes(out.placements, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
         start_items.changes(settings),
+        bombs.changes(enabled=world.settings.get("bombs_without_bracelet", False)),
         equipment.changes(),
         *([master_sword.changes(out.placements)] if settings.shuffle_master_sword else []),
         dampe_safety.changes(),
