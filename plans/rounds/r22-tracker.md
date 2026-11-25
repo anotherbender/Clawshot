@@ -82,8 +82,8 @@ and the next post explicitly corrected it.
 
 ## Checks and handoff
 
-Rebased onto current local main `5bc5577`; focused and real-dump registration contracts pass (receipts below).
-Final 1280/1920 browser screenshots pass. Ordered paired sweeps and full gate remain.
+**READY (merge).** Frozen product head `9f74421`; authorized test-only correction and gated head `271a48b`.
+Based on `5bc5577`, kept frozen after main moved under Claude's no-ff policy. No play required.
 
 ## Bombchu generator safety and local shortcuts
 
@@ -183,12 +183,63 @@ GTG lava's encounter/appear history must not credit its rupees.
 
 ## Sweep recipe
 
-Prepared `sweep.py`: canonical native `make_seed` setup captured before generation/output; six workers under the
-ordered gate lock. Paired main/head rows retain only placement/sphere digests and counts, not placements.
+Ran `sweep.py`: canonical native `make_seed` setup captured before generation/output; six workers under the
+ordered gate lock. Paired main/head rows retain placement/sphere digests and counts, never placements.
 Broad 200, Defaults 50, Recommended 50; plus 100 EarlyAdultShuffledChus and 50 EarlyAdultVanillaGifts:
 broad with Master Sword shuffle and starting Hover Boots, Longshot, Hammer and Ocarina of Time, no child weapon
 or Bomb Bag starting. The latter removes Gift shuffle, retaining the House's vanilla Bombchus too.
-Both keep free drops on. Recipe admission was validated without generating any seed.
+Both keep free drops on. All cohorts completed; results below.
 
 Implementation commits before rebase: `fe2647bbd9` (world supply rules/D30), `9dc1f313dd` (tracker sources/silver flags).
 No runtime resource is newly read or emitted, so no pack-resource or working-set fixture addition is needed.
+
+## Final locked sweep and gate receipts
+
+Main baseline: `5bc5577369d429d426dc2059461918e41b5c5302`. Candidate product:
+`9f74421284f9912a68b1bc73d1c0556fba8d5777`. All 450 seeds per arm accepted; zero exhausted in every recipe.
+First-try failures below are native fill retries, not rejected seeds. Maximum attempts: two.
+
+| Recipe | Seeds/arm | Main first-try failures | Candidate first-try failures | Placement digest differences | Sphere digest differences |
+|---|---:|---:|---:|---:|---:|
+| Broad | 200 | 0 | 0 | 37 | 69 |
+| Defaults | 50 | 1 | 0 | 36 | 35 |
+| Recommended | 50 | 2 | 1 | 40 | 40 |
+| EarlyAdultShuffledChus | 100 | 0 | 0 | 10 | 38 |
+| EarlyAdultVanillaGifts | 50 | 0 | 0 | 4 | 14 |
+
+The tightening binds: Broad's no-child-weapon replay loses its four immediate child GS in all 200 cases;
+the two early-adult cohorts lose five in all 150 cases. Adding held Bombchus without a bag adds 109 reachable
+locations on main Broad and zero on the candidate (200/200); the extra cohorts change 46 to zero (150/150).
+The shuffled-Chus cohort has four shuffled packs in every seed. These are synthetic search witnesses, not play.
+
+Shared standard main arm published once at `E:/OOTRemake/work/rounds/r22/main-5bc5577-sweep/`:
+`rows.jsonl`, `results.json`, `seeds.json`, input/effective settings strings and README. Verified 300 unique
+recipe/seed pairs, complete metadata and 64-hex placement/sphere digests. Broad seeds 22220000–22220199;
+Defaults/Recommended 22220000–22220049. Main source import provenance points to the immutable `5bc5577` export.
+Standard main elapsed 569.281s; separate extra-main 298.766s; candidate 812.266s.
+
+Gate logs: `E:/OOTRemake/work/r22-tracker/gate-9f74421284/`. Whole-repo format (567 files) and lint passed.
+The initial synthetic run was 4452 passed / 839 skipped / one stale assertion: the Fairy Grave's Bombchu case
+still expected usable explosives with no bag. Claude authorized a test-only correction citing Kareem's
+2026-11-24 report; commit `271a48b54a61acff4f55726982a1b1efe1ac42ba` asserts no Fairy with Bombchus+Bottle,
+then grants the bag. No product code, rebase or sweep change. The changed file's format/lint passed.
+Re-froze that head and reran synthetic only, then ran the first dump stage under the same retained lock:
+
+| Tier | Passed | Skipped | Warnings | Seconds | xdist / generator workers |
+|---|---:|---:|---:|---:|---|
+| Synthetic rerun | 4453 | 839 | 6 | 1610.93 | 2 / 1 (player running) |
+| Dump | 836 | 0 | 24 | 3722.81 | 8 / 3 (player absent) |
+
+Dump used the prescribed read-only ROMFS, NUP and r19 sword-layered fixture. Warnings are existing
+pytest iterable-parametrize deprecations in the door tests. No game launched or game/save folder written.
+
+Harness diagnosis: the first sweep invocation stopped on a printed list-minus-list error in the witness,
+after successful native generation. Fixed it to set difference; moved incomplete artifacts to
+`aborted-main-instrumentation` and made harness errors propagate rather than masquerade as exhausted seeds.
+Only the corrected, completed baseline was published. The final shell EXIT cleanup did not release its lock;
+verified the exact cs22b/branch/head owner, explicitly released only that lock, and posted LOCK RELEASED.
+The shell cleanup anomaly was reported through `report_issue`.
+
+READY is merge-kind: supplied-item logic is tightened to played facts; marker reachability is unchanged;
+all sixteen live silver groups have traced saved completion evidence. In-game optional confirmation is not
+a merge gate. The source-marker presentation remains the maintainer's provisional convention.
