@@ -17,7 +17,8 @@ names a generated pickup actor made of:
 - the reward's identity, from its native actor: canonical ``ActorName``, pouch component (grant identity, category,
   get type, special deal), model and animations, plus the world display of its native world pickup
   (``Obj_Shield_Hylian``) or, for an inventory-only reward (``Item_Boomerang``), of the native generic item pickups
-  (``Item_Obj`` over ``Item_Common``, no effect/sound user, as ``Obj_Ocarina_Time``);
+  (``Item_Obj`` over ``Item_Common``, no effect/sound user, as ``Obj_Ocarina_Time``); either display takes the token's
+  own ASInfo, so the drop spins like a token (:data:`SPIN`);
 - the pickup policy :data:`POLICY`: touch collection, and get events for repeated and full-pouch acquisitions
   (section 10.3; 44 native pouch components set ``IsPlayGetEventPouchMax`` as a top-level Bool). A reward's own pouch
   component that lacks any of it gets a pouch component of its own deriving from the native one, as ``Obj_Bombchu``
@@ -288,9 +289,12 @@ IDENTITY = ("ActorNameRef", "PouchContentRef", "ModelInfoRef", "AnimationRef")
 WORLD_DISPLAY = ("ASInfoRef", "ASRef", "ELinkRef", "SLinkRef", "GameParameterTableRef")
 GENERIC_WORLD_DISPLAY = ("ASInfoRef", "ASRef")
 SPIN = "Rotate_Obj"
-"""The state the token's ASInfo autoplays (its AI never asks for it): the spin, and the song effects' floor trigger."""
-SPIN_DONORS = ("Obj_Ocarina_Time",)
-"""Native donors whose drop spins like a token (see :func:`spins`)."""
+"""The state the token's ASInfo autoplays (its AI never asks for it): the spin, and the song effects' floor trigger.
+Every drop takes it (see :func:`_spin_asinfo`): the native world and generic item pickups use ``Item_Obj``, which
+autoplays nothing (on a floor their ``DropItem`` AI starts :data:`SPIN`), so under the token's AI their drop stood still
+and a song's effect never showed (BBender, run T1, 2026-11-24). Census of the v3.2.0 dump (Claude, 2026-11-25): each
+of the 38 native ``token_rewards.toml`` actors' display ASInfo equals the token's but for the autoplay, and each
+animation set they use (``Item_Common``, ``Item_Rupee_Green``, ``Obj_Heart_Piece``) has a :data:`SPIN` state."""
 # Touch collection, and get events for repeated and full-pouch acquisitions (section 10.3).
 POLICY = {"DefaultAutoGet": True, "PlayGetEventManyTimes": True, "IsPlayGetEventPouchMax": True}
 GRANT_KEY = "PouchActor"  # the inventory actor a pouch component grants (see pouch_grant)
@@ -510,26 +514,18 @@ def _is_world_pickup(sources: actor_packs.Sources, actor: str) -> bool:
     return actor_member(ITEM_BASE) in actor_packs.resolve(sources, actor_member(actor))[1]
 
 
-def spins(item: str) -> bool:
-    """Whether ``item``'s Skulltula drop autoplays the token's spin: the ocarina and song donors (T1-b,
-    ocarina-song-drops-everywhere plan 19). Their world pickups use ``Item_Obj``, which autoplays nothing (their floor
-    AI starts :data:`SPIN`); under the token's AI the drop stood still and the song effect, which waits for
-    :data:`SPIN`, never showed (BBender, run T1, 2026-11-24). The played Boomerang and Hylian Shield drops keep their
-    own display."""
-    return item in SPIN_DONORS or item.startswith(GENERATED_PREFIX)
-
-
-def _spin_asinfo(item, token_pack, donor_pack, token, donor) -> str:
-    """The ASInfo reference ``item``'s drop uses: the token's when the donor's equals it but for an empty autoplay;
-    the donor's own when that already autoplays."""
-    token_ref, donor_ref = token.components["ASInfoRef"], donor.components["ASInfoRef"]
+def _spin_asinfo(item, token_pack, display_pack, token, display) -> str:
+    """The ASInfo reference ``item``'s drop uses (:data:`SPIN`): the token's when the display's (the donor's world
+    pickup, or the generic item display) equals it but for an empty autoplay; the display's own when that already
+    autoplays."""
+    token_ref, display_ref = token.components["ASInfoRef"], display.components["ASInfoRef"]
     token_node = byml.read(token_pack[reference(token_ref)])
-    donor_node = byml.read(donor_pack[reference(donor_ref)])
+    display_node = byml.read(display_pack[reference(display_ref)])
     if token_node.get("AutoPlayASName") != SPIN:
         raise PatchError(f"{TOKEN}: its ASInfo autoplays {token_node.get('AutoPlayASName')!r}, not {SPIN!r}")
-    if donor_node.get("AutoPlayASName"):
-        return donor_ref
-    if {k: v for k, v in donor_node.items() if k != "AutoPlayASName"} != {
+    if display_node.get("AutoPlayASName"):
+        return display_ref
+    if {k: v for k, v in display_node.items() if k != "AutoPlayASName"} != {
         k: v for k, v in token_node.items() if k != "AutoPlayASName"
     }:
         raise PatchError(f"{item}: its ASInfo differs from the token's beyond AutoPlayASName")
@@ -563,11 +559,11 @@ def compose(
                 components[key] = donor.components[key]
             else:
                 components.pop(key, None)
-        if spins(item):
-            components["ASInfoRef"] = _spin_asinfo(item, token_pack, donor_pack, token, donor)
+        components["ASInfoRef"] = _spin_asinfo(item, token_pack, donor_pack, token, donor)
     else:
         for key in GENERIC_WORLD_DISPLAY:
             components[key] = generic.components[key]
+        components["ASInfoRef"] = _spin_asinfo(item, token_pack, generic_pack, token, generic)
         components.pop("ELinkRef", None)
         components.pop("SLinkRef", None)
     new_members: dict[str, bytes] = {}
@@ -656,10 +652,10 @@ def _check_pickup(item, actor, sources, packed, token, donor, generic, world) ->
             raise PatchError(f"{actor}: {key} is not {item}'s")
     if world:
         expected = {key: donor.components.get(key) for key in WORLD_DISPLAY}
-        if spins(item):
-            expected["ASInfoRef"] = _spin_asinfo(item, *(dict(source) for source in sources[1:3]), token, donor)
+        expected["ASInfoRef"] = _spin_asinfo(item, *(dict(source) for source in sources[1:3]), token, donor)
     else:
         expected = {key: generic.components[key] for key in GENERIC_WORLD_DISPLAY}
+        expected["ASInfoRef"] = _spin_asinfo(item, dict(sources[1]), dict(sources[3]), token, generic)
         expected |= {"ELinkRef": None, "SLinkRef": None}
         expected["GameParameterTableRef"] = token.components.get("GameParameterTableRef")
     for key, value in expected.items():

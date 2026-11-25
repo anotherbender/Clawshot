@@ -139,7 +139,7 @@ with `--manifest`, `--baseline`, `--save` and `--phase` to check a staged family
 pickups of their own, generated in every seed that needs them (`Obj_Clawshot_Ocarina_*`,
 `Obj_Clawshot_Melody_*`; the native moat `Obj_Ocarina_Time` is no longer used). An ocarina pickup glows
 warm white on the ground; a song pickup shows its own song effect; both float a little above the spot and
-spin, also as a Skulltula drop. An ocarina from a pickup plays at once and the Ocarina of Time stays
+spin, also as a Skulltula drop (every Skulltula drop spins like a token). An ocarina from a pickup plays at once and the Ocarina of Time stays
 selected once owned. **Known issue:** when the Ocarina of Time comes from a Skulltula while the Fairy Ocarina
 is already owned, it is owned and selected, but Link keeps playing the Fairy Ocarina until Save and Continue. Played by BBender on Longshot v3.1.1, 2026-11-24
 (`plans/ocarina-song-drops-everywhere.md`): both ocarinas, Prelude of Light and Zelda's Lullaby at Deku

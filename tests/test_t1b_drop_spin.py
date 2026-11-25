@@ -1,16 +1,16 @@
-"""T1-b (ocarina-song-drops-everywhere plan 19): a Skulltula drop of an ocarina or song spins like a token.
+"""T1-b (ocarina-song-drops-everywhere plan 19): every Skulltula drop spins like a token.
 
 The native token spins because its ASInfo autoplays ``Rotate_Obj`` (``Obj_Token_Gold``'s ASInfo; its AI never asks
-for it). The ocarina and song world pickups use ``Item_Obj``, which autoplays nothing (their floor AI, ``DropItem``,
-starts ``Rotate_Obj``), so a drop with the token's AI and their ASInfo stood still, and the song effect, triggered by
-``Rotate_Obj``, never showed (BBender, run T1, 2026-11-24). The drop of such a donor takes the token's ASInfo, which
-is ``Item_Obj`` plus that autoplay, over the donor's own ``Item_Common`` animation set. Synthetic packs from
-``test_tokens`` (hard rule 1).
+for it). The native world and generic item pickups use ``Item_Obj``, which autoplays nothing (their floor AI,
+``DropItem``, starts ``Rotate_Obj``), so a drop with the token's AI and their ASInfo stood still, and a song's effect,
+triggered by ``Rotate_Obj``, never showed (BBender, run T1, 2026-11-24). Every drop takes the token's ASInfo, which is
+``Item_Obj`` plus that autoplay, over its own animation set. Synthetic packs from ``test_tokens`` (hard rule 1).
 """
 
 import pytest
 from test_tokens import (
     ALLOWED,
+    BOOMERANG_PICKUP,
     GENERATED,
     GENERATED_REWARDS,
     ITEM_OBJ,
@@ -30,6 +30,8 @@ from clawshot.formats import byml, sarc
 from clawshot.patch import actor_packs, tokens
 from clawshot.patch.plan import PatchError
 
+SHIELD_PICKUP_ITEM = "Obj_Shield_Hylian"
+
 TOKEN_ASINFO = TOKEN_COMPONENTS["ASInfoRef"]
 
 
@@ -37,12 +39,6 @@ def drop_components(delivery, donor):
     pickup = delivery.pickups[donor]
     pack = sarc.read(delivery.new_files[tokens.pack_path(pickup)].data)
     return pack, actor_packs.closure([pack], pickup).components
-
-
-def test_the_spin_rule_covers_the_ocarina_and_generated_donors_only():
-    assert tokens.spins("Obj_Ocarina_Time")
-    assert tokens.spins("Obj_Clawshot_Ocarina_Fairy") and tokens.spins("Obj_Clawshot_Melody_LightPrelude")
-    assert not tokens.spins("Obj_Shield_Hylian") and not tokens.spins("Item_Boomerang")
 
 
 def test_a_generated_donors_drop_autoplays_the_tokens_spin(world):  # noqa: F811 (the imported fixture)
@@ -63,11 +59,17 @@ def test_a_generated_donors_drop_autoplays_the_tokens_spin(world):  # noqa: F811
     assert sarc.read(raw(world, tokens.TOKEN_PACK))[member(TOKEN_ASINFO)] == pack[member(TOKEN_ASINFO)]
 
 
-def test_played_native_drops_keep_their_own_display(world):  # noqa: F811 (the imported fixture)
-    delivery = tokens.build(world, {TOWER: "Obj_Shield_Hylian"}, census(), rewards=ALLOWED)
-    assert delivery.pickups["Obj_Shield_Hylian"] == SHIELD_PICKUP
-    _, components = drop_components(delivery, "Obj_Shield_Hylian")
-    assert components["ASInfoRef"] == ref(ITEM_OBJ)
+@pytest.mark.parametrize(
+    ("item", "pickup", "animation_set"),
+    [(SHIELD_PICKUP_ITEM, SHIELD_PICKUP, "world pickup"), ("Item_Boomerang", BOOMERANG_PICKUP, "generic display")],
+)
+def test_native_drops_take_the_tokens_spin_too(world, item, pickup, animation_set):  # noqa: F811 (the fixture)
+    delivery = tokens.build(world, {TOWER: item}, census(), rewards=ALLOWED)
+    assert delivery.pickups[item] == pickup
+    pack, components = drop_components(delivery, item)
+    assert components["ASInfoRef"] == TOKEN_ASINFO, animation_set
+    assert byml.read(pack[member(TOKEN_ASINFO)])["AutoPlayASName"] == tokens.SPIN
+    assert components["ASRef"] != TOKEN_COMPONENTS["ASRef"]  # the spin plays in the reward's own animation set
 
 
 OWN_ASINFO = "Component/ASInfo/Generated_Obj.engine__component__ASInfo.bgyml"

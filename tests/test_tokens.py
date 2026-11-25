@@ -607,13 +607,14 @@ def test_generated_pickups_take_token_mechanism_and_reward_identity(world):
         assert tokens.canonical(effective) == CANONICAL[item]
         assert (effective["ModelInfoRef"], effective["AnimationRef"]) == (donor["ModelInfoRef"], donor["AnimationRef"])
         if item == "Item_Boomerang":  # no native world pickup: generic item display, no effect/sound user
-            assert (effective["ASInfoRef"], effective["ASRef"]) == (ref(ITEM_OBJ), "?AS/Item_Common.root.asb")
+            spin = token["ASInfoRef"]  # the token's ASInfo (its spin) over the generic animation set
+            assert (effective["ASInfoRef"], effective["ASRef"]) == (spin, "?AS/Item_Common.root.asb")
             assert "ELinkRef" not in effective and "SLinkRef" not in effective
             assert effective["GameParameterTableRef"] == token["GameParameterTableRef"]
         else:
             assert {key: effective.get(key) for key in tokens.WORLD_DISPLAY} == {
                 key: donor.get(key) for key in tokens.WORLD_DISPLAY
-            }
+            } | {"ASInfoRef": token["ASInfoRef"]}
 
 
 def test_pickup_pouch_grants_the_reward_not_a_token(world):

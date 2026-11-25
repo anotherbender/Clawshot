@@ -82,6 +82,7 @@ Read: `plans/chest-ocarina-model.md`, `plans/song-get-effects.md`, `plans/rounds
 | I10 | Admitted at Skulltulas: the Fairy Ocarina and all twelve songs (`song` family), citing runs T1 and TB3; Prelude of Light and Zeldas Lullaby played, the other ten inferred. `[hand_over]` lifted (empty), citing runs 4.1/4.2. | BBender, 2026-11-24 |
 | I11 | T1-b: a Skulltula drop of an `Obj_Ocarina_Time` or `Obj_Clawshot_*` donor takes the token's own ASInfo (autoplay `Rotate_Obj`), so it spins and shows the song's floor effect; Boomerang and Hylian Shield drops unchanged (open for BBender). | T1-b agent |
 | I12 | **Rebased onto PR #41 at `e0156b7`** (BBender, 2026-11-24), whose maintainers' decision (option 2) runs get-display steps by setting, lists them in the spoiler's `patch.steps`, and refuses a placement the rule does not cover (S8). Applied here: the ocarina get model runs whenever a Gift kind is on (`getitem.shown_ocarinas_possible`; wider than #41's Chest+Gift, because hand-overs and scrub sales show the item actor and crashed without it: R11, run 4.1); the ocarina world actors, glow and receipt run when a Gift kind and Token/BossHeart/Freestanding are on (`ocarina_pickup.pickups_possible`, new step `ocarina_pickups` in `patch.steps`); the song step uses #41's `songs.songs_can_move`; each refuses uncovered placements. Docs: Saria's doubled ocarina is the remake's own pre-Gohma farewell glitch (Kareem, #41), no longer listed as a cost of this feature. | maintainers (#41), Claude (applying it) |
+| I13 | Every Skulltula drop spins like a token, not only ocarinas and songs (closes I11's open point): `tokens.compose` gives every non-token drop the token's ASInfo (autoplay `Rotate_Obj`), over the reward's own animation set; `SPIN_DONORS`/`spins()` removed. Dump census (v3.2.0): all 38 native `token_rewards.toml` actors use `Item_Obj` (no autoplay), equal to the token's ASInfo but for the autoplay; their animation sets (`Item_Common`, `Item_Rupee_Green`, `Obj_Heart_Piece`) each have `Rotate_Obj`. Changes the look of every non-token Skulltula drop in Token seeds, including the rc.3-played families; in-game check 21.2 pending. | BBender (scope: this PR), Claude (census, change) |
 
 ## Edits to existing tests (plan 9.4, for BBender's approval)
 
@@ -419,6 +420,11 @@ omfs\...`; no `CRASH:` lines. It looked
   instrument that already exists after a Skulltula grant. **BBender's call: accepted as a known, temporary cosmetic
   state** ("i can live with it"), not investigated further. The donor switch stays (the arrow-based drop also spins
   and glows like the Fairy's).
+
+- **21 All Skulltula drops spin (Claude, 2026-11-25).** Census and change as I13. Tests:
+  `tests/test_t1b_drop_spin.py` (Hylian Shield and Boomerang drops now take the token's ASInfo, own animation set),
+  `tests/test_tokens.py` (generated pickups expect it); token tests 336 passed, `-m dump` token tests 10 passed. In game
+  not yet played (21.2).
 
 ### Other things noticed (no disagreement)
 
