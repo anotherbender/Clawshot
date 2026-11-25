@@ -248,6 +248,10 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
   race with a Hookshot/Longshot owned. New seeds repair this, but do not rewrite an older seed's overlay.
   Seeds from 0.2.3 to 0.2.6 can need that missing item: look up `Graveyard Dampe Race Hookshot Chest` in their
   `spoiler.json`. The 0.2.7 workaround limited it to minor items; that hold is removed for new repaired seeds.
+- **Goron City's sign-puzzle grotto is out of logic.** The remake has no Time Block there, and no other way in
+  has been played yet, so from 0.2.8 the grotto only ever holds minor items; skip it on the tracker. The solution
+  chest also needs a sword, Bombs or the Hookshot to finish the puzzle. Seeds up to 0.2.7 can need an item placed
+  there and may not be finishable: look up `Goron City Chest (TBox_Rupee_Purple) #2` in that seed's `spoiler.json`.
 - **Saves started with older builds:** after an age-unusable item pickup, Save and Continue before using
   other items; changing areas does not clear the old item-bar jam. Newly generated seeds initialize an empty
   nut slot (0/20). Kareem verified child Bow first, then Boomerang use without a reload on 2026-11-12.
