@@ -89,12 +89,20 @@ def run(charts, rows, flow, entry, current, *, stop_native=False, data_only=Fals
                     answer = False
                 elif operation == "EventQueryIsExistInPouch":
                     answer = current["stock"].get(params["Actor"], 0) >= params["Num"]
+                elif operation == "EventQueryIsHeartPiece":
+                    answer = params["ActorName"] == "Obj_Heart_Piece"
+                elif operation == "EventQueryIsMaxLifeUpPouchContent":
+                    answer = params["ActorName"] == "Obj_Heart_Container"
+                elif operation == "EventQueryIsFairy":
+                    answer = params["ActorName"] == "Obj_Fairy"
+                elif operation == "EventQueryIsRecoverHeartOrMpActor":
+                    answer = params["ActorName"] in {"Obj_Heart", "Obj_MagicJar_Small", "Obj_MagicJar_Large"}
                 else:
                     raise AssertionError((operation, params))
                 index = dict(event.cases).get(0 if answer else 1, evfl.NONE)
                 continue
             operation = actor.actions[event.action]
-            if stop_native and actor.name == "Player_Event":
+            if stop_native and actor.name == "Player_Event" and operation != "EventTriggerHealLifeMax":
                 return "native"
             if operation == "EventTransition":
                 name = params["EventName"]
@@ -112,6 +120,14 @@ def run(charts, rows, flow, entry, current, *, stop_native=False, data_only=Fals
                 current["stock"][content] = current["stock"].get(content, 0) + params["Num"]
                 current["IsGet." + content] = True
                 current.setdefault("grants", []).append((content, params["Num"], contexts))
+            elif operation == "EventTriggerRecoverByCureItem":
+                content = params["ActorName"]
+                assert current["stock"].get(content, 0) > 0, "recovery must follow the grant"
+                if content == "Obj_Heart_Piece":
+                    current["stock"][content] += 1  # played coupled-processing regression
+                current["life"] = current["max_life"]
+            elif operation == "EventTriggerHealLifeMax":
+                current["life"] = current["max_life"]
             elif operation == "EventTriggerSetGameDataBool":
                 current[params["GameDataName"]] = params["Value"]
             elif operation == "EventExecuteProgressChallengeStep":
@@ -169,6 +185,21 @@ def fixture(tmp_path, monkeypatch):
         [evfl.ActionEvent("Add", 1, 0, params={"Actor": evfl.Argument("ActorName"), "Num": 1})],
         [evfl.EntryPoint("GetPouchContentByActorName", 0)],
     )
+    healing = evfl.Flowchart(
+        "Dm_SY_Get",
+        [
+            evfl.Actor(
+                "PouchSystemActor",
+                actions=["EventTriggerRecoverByCureItem"],
+                queries=["EventQueryIsHeartPiece"],
+            )
+        ],
+        [
+            evfl.SwitchEvent("Heart", 0, 0, [(0, 1)], {"ActorName": evfl.Argument("ActorName")}),
+            evfl.ActionEvent("Recover", 0, 0, params={"ActorName": evfl.Argument("ActorName")}),
+        ],
+        [evfl.EntryPoint("CheckHeart", 0)],
+    )
     native = evfl.Flowchart(
         "NativeScene",
         [
@@ -194,7 +225,22 @@ def fixture(tmp_path, monkeypatch):
         ],
         [evfl.EntryPoint("Main", 0)],
     )
-    original = {chart.name: evfl.EventFlowFile(chart.name, flowchart=chart) for chart in (pouch, native, caller)}
+    player_donor = evfl.Flowchart(
+        "DoorOfTime",
+        [
+            evfl.Actor(
+                "Player_Event",
+                actions=["EventTriggerHealLifeMax"],
+                params={"BindTargetActorNameComponent": "Player"},
+            )
+        ],
+        [evfl.ActionEvent("NativeFullHeal", 0, 0)],
+        [evfl.EntryPoint("FullHeal", 0)],
+    )
+    original = {
+        chart.name: evfl.EventFlowFile(chart.name, flowchart=chart)
+        for chart in (pouch, native, caller, healing, player_donor)
+    }
     for name, document in original.items():
         path = tmp_path / keys.flow_path(name)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -355,3 +401,21 @@ def test_direct_scene_admission_preserves_original_history_on_native_and_plain_a
     # The native row is requested under a different name. Its automatic history
     # cannot retire the original requester; explicit completion must do that.
     assert current["HavePlayedEvent.NativeScene"] is True
+
+
+def test_skipped_scene_heals_a_heart_reward_after_one_grant_and_never_again(fixture):
+    scene, documents, _ = fixture
+    source = documents["NativeScene"].flowchart
+    source.events[2].params["Actor"] = "Obj_Heart_Piece"
+    plain = evfl.Flowchart(handoff.FLOW)
+    handoff._plain_entry(plain, scene, documents)
+    charts = {name: document.flowchart for name, document in documents.items()} | {handoff.FLOW: plain}
+    current = state()
+    current.update(life=4, max_life=12)
+    run(charts, {}, handoff.FLOW, scene.name, current)
+    assert current["stock"]["Obj_Heart_Piece"] == 1
+    assert current["life"] == 12
+    current["life"] = 4
+    run(charts, {}, handoff.FLOW, scene.name, current)
+    assert current["stock"]["Obj_Heart_Piece"] == 1
+    assert current["life"] == 4

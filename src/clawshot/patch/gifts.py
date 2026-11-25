@@ -60,7 +60,7 @@ RULES_TOML = Path(__file__).with_name("gift_rules.toml")
 SWAP, REWRITE, MORE = "swap", "rewrite", "more"
 CLASSES = (SWAP, REWRITE, MORE)
 FLAG_PREFIX = "Clawshot.Gift."
-FIELDS = {"class", "gate", "given", "flag", "skip", "reason", "writes", "once", "purchase", "track"}
+FIELDS = {"class", "gate", "given", "flag", "skip", "reason", "writes", "once", "purchase", "track", "display"}
 # Tracker-only native once-flags (spec tracker-auto-checks D1, D6): the patch never reads them.
 TRACK_KINDS = ("bool", "played", "quest")
 TRACK_FIELDS = {*TRACK_KINDS, "step", "source", "accepted", "played_by"}
@@ -147,6 +147,7 @@ class Rule:
     once: tuple[str, ...] = ()  # equipped-shield queries replaced by saved check-completion queries
     purchase: bool = False  # specialize a native sale and save completion only after its grant
     track: tuple[TrackEntry, ...] = ()  # tracker only; the patch ignores it (D1)
+    display: tuple[str, ...] = ()  # window-only GetPouchContent:DisplayGetByActorName calls paired with the grant
 
 
 def _nonempty(value: object) -> bool:
@@ -210,6 +211,9 @@ def loads(text: str) -> dict[str, Rule]:
         cls = entry.get("class")
         if cls not in CLASSES:
             raise GiftPatchError(f"{check}: class {cls!r}, expected one of {CLASSES}")
+        displays = entry.get("display", [])
+        if not isinstance(displays, list) or any(not isinstance(ref, str) for ref in displays):
+            raise GiftPatchError(f"{check}: display must be a list of '<flow>/<event>' references")
         rule = Rule(
             check,
             cls,
@@ -222,7 +226,12 @@ def loads(text: str) -> dict[str, Rule]:
             tuple(_ref(check, r) for r in entry.get("once", [])),
             entry.get("purchase", False),
             _track(check, entry["track"]) if "track" in entry else (),
+            tuple(_ref(check, ref) for ref in displays),
         )
+        if len(set(rule.display)) != len(rule.display):
+            raise GiftPatchError(f"{check}: duplicate display reference")
+        if rule.display and cls == MORE:
+            raise GiftPatchError(f"{check}: display belongs to a changeable gift")
         if type(rule.purchase) is not bool:
             raise GiftPatchError(f"{check}: purchase must be a Bool")
         if (rule.given or rule.skip or rule.flag or rule.writes or rule.once or rule.purchase) and cls != REWRITE:
@@ -484,6 +493,22 @@ def _set_item(fc: evfl.Flowchart, step: Gift, item: str) -> None:
             f"{step.id}: {step.param} is {params.get(step.param)!r}, the census said {step.vanilla_item!r}"
         )
     params[step.param] = item
+
+
+def _display_item(fc: evfl.Flowchart, flow: str, ref: str, vanilla: set[str], item: str) -> None:
+    event = fc.events[_index(fc, flow, ref.split("/")[1])]
+    actor = (getattr(event, "params", None) or {}).get("ActorName")
+    if (
+        not isinstance(event, evfl.SubFlowEvent)
+        or (event.flowchart, event.entry_point) != ("GetPouchContent", "DisplayGetByActorName")
+        or not isinstance(actor, str)
+        or isinstance(actor, evfl.Argument)
+        or actor not in vanilla
+    ):
+        raise GiftPatchError(
+            f"{ref}: expected DisplayGetByActorName with literal ActorName in {sorted(vanilla)}, got {event!r}"
+        )
+    event.params["ActorName"] = item
 
 
 def _set_flag_after(fc: evfl.Flowchart, step: Gift, flag: str) -> None:
@@ -835,6 +860,9 @@ def patch_flowchart(fc: evfl.Flowchart, flow: str, changes: Sequence[GiftChange]
                     _set_flag_after(fc, step, "MiniGame_BombchuBowling_ClearThirdTime")
                 if change.check == DAMPE_CHECK:
                     _dampe_reward(fc, step)
+        for ref in change.rule.display:
+            if ref.split("/")[0] == flow:
+                _display_item(fc, flow, ref, vanilla, change.item)
         for ref in change.rule.given:
             if ref.split("/")[0] == flow:
                 _read_flag(fc, flow, ref, vanilla, change.flag)
@@ -859,7 +887,14 @@ def flows_changed(changes: Iterable[GiftChange]) -> list[str]:
     for change in changes:
         out |= {step.flow for step in change.steps}
         out |= {
-            ref.split("/")[0] for ref in (*change.rule.given, *change.rule.skip, *change.rule.writes, *change.rule.once)
+            ref.split("/")[0]
+            for ref in (
+                *change.rule.given,
+                *change.rule.skip,
+                *change.rule.writes,
+                *change.rule.once,
+                *change.rule.display,
+            )
         }
         if change.rule.purchase and change.check in MERCHANT_SHOPS:
             out.add("SimpleShop")

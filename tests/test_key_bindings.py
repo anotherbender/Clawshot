@@ -1,6 +1,7 @@
 """Synthetic event execution: source lifecycle, target attribution, native controls."""
 
 import copy
+from types import SimpleNamespace
 
 import pytest
 from test_mido_schedule import game_data as mido_game_data
@@ -487,6 +488,18 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
     documents[keys.POUCH].flowchart.actors.append(evfl.Actor("UISystemActor"))
     for name in ("Dm_SY_GetInEvent", "Dm_Kokiri_0155", "Dm_MelodyGet_Time"):
         documents[name] = evfl.EventFlowFile(name, flowchart=evfl.Flowchart(name))
+    documents["DoorOfTime"] = _document(
+        "DoorOfTime",
+        [
+            evfl.Actor(
+                "Player_Event",
+                actions=["EventTriggerHealLifeMax"],
+                params={"BindTargetActorNameComponent": "Player"},
+            )
+        ],
+        [evfl.ActionEvent("InventedFullHeal", 0, 0)],
+        [evfl.EntryPoint("FullHeal", 0)],
+    )
     # This world has one invented scene, not the native game's story resources.
     # Compile it for real so the shared pouch sees scene, key and bag additions.
     scene = scene_handoff.Scene(
@@ -596,11 +609,16 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
         [],
     )
     # The placement plan is invented; unrelated Sheik localization does not participate in this grant.
-    monkeypatch.setattr(patch_api.item_actors, "load", lambda: patch_api.item_actors.loads(""))
+    # Keep the shared loader intact: lazy imports must not retain this world's empty table.
+    empty_actors = patch_api.item_actors.loads("")
+    monkeypatch.setattr(patch_api, "item_actors", SimpleNamespace(load=lambda: empty_actors))
     monkeypatch.setattr(patch_api, "make_plan", lambda *args, overrides=None: plan)
     monkeypatch.setattr(text, "sheik_hint_changes", lambda *args: {})
     # The ocarina get model (ActorInfo rows, ocarina packs) is presentation only; test_getitem covers it.
     monkeypatch.setattr(getitem, "ocarina_changes", lambda romfs: {})
+    # The invented HP binding donor is not a native temple/Darunia quest graph.
+    monkeypatch.setattr(patch_api.door, "changes", lambda *args, **kwargs: {})
+    monkeypatch.setattr(patch_api.darunia, "changes", lambda: {})
     # The real receipt compiler sees the same resource set this invented world's
     # writer applies below; unrelated native quest scenes are not part of it.
     compile_receipts = ocarina.changes

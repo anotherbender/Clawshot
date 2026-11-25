@@ -235,6 +235,8 @@ def make_seed(
         master_sword,
         mido_schedule,
         reward_bridge,
+        scene_gifts,
+        talon,
     )
 
     changes += (
@@ -245,6 +247,8 @@ def make_seed(
         dampe_safety.changes(),
         dampe_first_race.changes(),
         text.dampe_refusal_changes(romfs),
+        talon.changes(romfs, out.placements),
+        scene_gifts.changes(out.placements, table),
     )
     changes += (reward_bridge.changes(mode=settings.bridge, count=settings.bridge_count),)
     scrub_previews = {name: out.placements[name] for name in out.shuffled if name in scrubs.SALES}
