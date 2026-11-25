@@ -269,13 +269,13 @@ were added to this repository. This receipt is documentation only above the test
 ## Frozen successor and remaining gates
 
 The earlier merge head8488bdc56c and tested source3299491 remain the historical Token-only receipt.
-**FROZEN source `da1fb78421c578d5329c515ef291324419bd32be`.** All eight chest lifts have
-scoped destination evidence; Stick/Nut chest capacities and PR40-enforced ocarina hand-overs are included.
-No version bump or rebase. Immutable source snapshot: `work/r22-lifts/successor-src-da1fb784/`.
+**FROZEN test-only successor `461f68d67318190265284fd9a6460b406e615e69`** of product source
+`da1fb784`. All eight scoped chest lifts, Stick/Nut chest capacities and PR40-enforced ocarina hand-overs
+are unchanged. No version bump or rebase. Snapshot: `work/r22-lifts/successor-src-461f68d6/`.
 
-Source freeze is not READY: native production-output proof awaits queue13a after Claude12b's explicit
-release. Fresh paired350 and the full gate remain queue14 after shops13. Every seed-capable stage requires
-Kareem's game closed. Fairy-at-Token remains held.
+Queue13a is **PASS**: full synthetic and native production-output proof, below; lock released18:28.
+Not READY until queue14 after shops13: format/lint, fresh paired350 and full dump. Claude approved reusing
+the same-SHA13a full-synthetic receipt. Every seed-capable stage requires game closed. Fairy-at-Token held.
 
 ## Typed played receipts and corrected Farore chronology
 
@@ -357,7 +357,7 @@ Only baseline ownership/stock0 was saved. No unchanged rerun was performed.
 
 Claude's approved shipping variant is **PR40 mandatory for ocarina hand-overs**, not incidental activation
 by an unrelated chest. Production now enforces that boundary; the new native regression covers produced
-hand-over output with no ocarina chest and missing-donor refusal. Its queue13a run is still pending.
+hand-over output with no ocarina chest and missing-donor refusal. Both passed in queue13a.
 Native Fairy10 remains unplayed and outside the shipped path; no native-pack safety is claimed.
 
 ### Destination-scoped catalog decision
@@ -372,17 +372,44 @@ records retain their existing behavior; no other item admission changes.
 
 Requested consumer-level regression: all eight accepted at Chest and refused at Scrub, Token on/off;
 Gift and prior Token eligibility retained, plus an unscoped legacy control — **17 passed in3.04s**,
-n2/W1. These tests call `allowed`, never fill a seed. Source formatter/lint pass. The prepared13a runner
-was syntax-checked and its `--plan` surface observed; no lock or seed has run for this successor.
+n2/W1. These tests call `allowed`, never fill a seed. Source formatter/lint pass. Both requested native
+boundaries and whole event registration subsequently passed on the test-only successor, below.
 
 Prepared runners: `work/r22-lifts/focused-successor13a.sh` and `successor14.sh`; both default to
 non-executing `--plan` and require the assigned predecessor-release marker before one guarded acquisition.
 Success cleanup explicitly checks/removes only the owned lock and posts a phase-specific release rather
-than relying on the earlier broken EXIT trap. Focus is n2/workers1; line14 is synthetic n8/workers4,
-dump n8/workers3 and sweep workers6, with CIM player checks before acquisition and each stage.
+than relying on the earlier broken EXIT trap. The initial focus was n2/workers1; Claude subsequently
+approved full caps: synthetic n8/workers4 and native n8/workers3, with CIM checks at stage starts.
 
 `successor_sweep.py --plan` validated the prepared source module, exact350 main rows and the four expected
 settings strings without preparing native contexts or filling. It reuses the existing fill/oracle/retry
 engine, shared main300 and previously generated immutable5bc binding50, preserving the old receipt files.
 Its whitelist adds only Chest to the eight existing Gift/Token holds and Chest/conditional Token to the
 two capacity holds; other effective fields must match. A fresh candidate350 is still required at line14.
+
+### Queue13a receipt: PASS on the test-only successor
+
+Claude12b released at18:07 after main moved1fc1c54→63fa85e. Frozen product stayed unchanged, no rebase.
+The owned watcher made one guarded acquisition, only after the new explicit release and CIM players0.
+
+Initial synthetic focus:233 passed/5 failed. Printed values showed the fixture's raw `GS Token` kind,
+while the correct derived holds contained canonical `Token`. A direct kind substitution passed admission
+but then correctly failed the generator's raw-source clash guard. Final test-only correction uses public
+`prepare` before admission checks and retains raw `GS Token` for generation; every assertion remains.
+Aimed five cases **passed in3.36s**, formatter/lint clean. Claude approved test-only successor461f68d6
+and required a full synthetic rerun.
+
+- Full synthetic: **4426 passed,845 skipped,24 warnings in477.93s**, n8/workers4; all three OOT variables
+  unset. Native stage started only after its successful exit.
+- Native focus: complete `test_getitem_ocarina_dump.py` plus complete `test_event_registration.py`:
+  **17 passed in464.88s**, n8/workers3, `--dist loadfile`. This proves produced hand-over model output
+  without an ocarina chest and refusal without the model donor, not merely policy wiring.
+- Both stage-start CIM checks found0 players; imports proved the immutable461f68d6 source snapshot.
+  Logs: `work/r22-lifts/focus13a-461f68d67318190265284fd9a6460b406e615e69/`.
+- Explicit own-lock cleanup and **LOCK RELEASED cs22g13a at18:28** completed successfully.
+
+**Claude approved line14 reuse** of this exact-SHA full-synthetic result, recorded in
+`work/r22-lifts/full-synthetic-461f68d6.json`. The14 runner checks the receipt SHA and successful exit
+before acquisition; its observed `--plan` now lists only format/lint, candidate350 versus own-parent
+immutable main350, and full dump. The one-attempt14 watcher waits for a new explicit cs22c13 release;
+no directory disappearance or acquisition retry authorizes a turn.
