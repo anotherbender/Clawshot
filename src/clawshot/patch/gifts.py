@@ -1128,6 +1128,16 @@ def seed_checks(
     return out
 
 
+HAND_OVER_SCRUB_TYPES = ("Scrub", "GrottoScrub")
+
+
+def is_hand_over(source_type: str | None, steps: Iterable[Gift]) -> bool:
+    """Whether the native recipient creates the item actor rather than granting directly to the pouch."""
+    return source_type in HAND_OVER_SCRUB_TYPES or any(
+        step.call not in (DIRECT, "GetPouchContent:GetPouchContentByActorName") for step in steps
+    )
+
+
 def restrict_spec(
     spec: Mapping[str, Any], shuffled: Iterable[str], steps: Mapping[str, tuple[Gift, ...]] | None = None
 ) -> dict[str, Any]:
@@ -1145,12 +1155,9 @@ def restrict_spec(
                 **info,
                 "keep_vanilla": "gift shuffle: not changeable yet (gift_rules.toml, plans/03-game-data.md section 19)",
             }
-        hand_over = info.get("type") in ("Scrub", "GrottoScrub") or (
-            name in keep
-            and any(
-                step.call not in (DIRECT, "GetPouchContent:GetPouchContentByActorName") for step in steps.get(name, ())
-            )
-        )
+        hand_over = (
+            info.get("type") in HAND_OVER_SCRUB_TYPES or name in keep
+        ) and is_hand_over(info.get("type"), steps.get(name, ()))
         if hand_over:
             info = {
                 **info,

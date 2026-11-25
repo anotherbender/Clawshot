@@ -29,6 +29,7 @@ from clawshot.patch import (
     drops,
     freestanding,
     gamedata,
+    gifts,
     scrubs,
     shops,
     text,
@@ -271,9 +272,24 @@ def make_seed(
     plan, progressive_changes = progressive.changes(romfs, plan, prior_changes=changes)
     changes += (progressive_changes, bags.changes(romfs))
     changes += (ocarina.changes(romfs, prior_changes=changes),)
-    # Only seeds that put an ocarina in a chest (Q1 option b, Claude 2026-11-22, pending Kareem): the get model
-    # changes Saria's native farewell cosmetically. Last on ActorInfo and the ocarina packs, after every row edit.
-    if getitem.chest_ocarinas(out.placements, chests, table):
+    ocarinas = getitem.ocarina_locations(out.placements, out.shuffled, table)
+    needs_get_model = any(
+        out.world.locations[name].type == "Chest"
+        or gifts.is_hand_over(out.world.locations[name].type, ())
+        for name in ocarinas
+    )
+    gift_ocarinas = [name for name in ocarinas if out.world.locations[name].type in gifts.GIFT_TYPES]
+    if gift_ocarinas and not needs_get_model:
+        steps = gifts.check_steps(gifts.scan_gifts(romfs), definitions)
+        missing = [name for name in gift_ocarinas if not steps.get(name)]
+        if missing:
+            raise PatchError(f"ocarina gifts lack an audited receipt; native-pack hand-overs are unsafe: {missing}")
+        needs_get_model = any(
+            gifts.is_hand_over(out.world.locations[name].type, steps.get(name, ())) for name in gift_ocarinas
+        )
+    if needs_get_model:
+        # Mandatory for display hand-overs: native ocarina packs crash (r22-lifts, arms07–09).
+        # Last on ActorInfo and both packs; the transform refuses unavailable or incompatible inputs.
         changes += (getitem.ocarina_changes(romfs),)
     return SeedOutput(out, links, plan, changes, fast_files, item_names, new_files, token_rows)
 

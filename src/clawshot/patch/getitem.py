@@ -1,6 +1,6 @@
 """Get-item display: what an item shows in Link's get pose; no inventory or chest-admission policy changes.
 
-The ocarinas' get model (:func:`ocarina_changes`, in seeds that put an ocarina in a chest: :func:`chest_ocarinas`):
+The ocarinas' get model (:func:`ocarina_changes`, required at chests and item-display hand-overs):
 the two ``ActorInfo`` rows lose ``CalcPriority`` and each ocarina pack gets the pouch get-pose performer, the common
 animation set and its own AnimationParam (plans/chest-ocarina-model.md, run O). Equipment components stay native.
 
@@ -165,17 +165,15 @@ def native_inputs() -> tuple[str, ...]:
     )
 
 
-def chest_ocarinas(placements: Mapping[str, str], chests: Iterable[str], actors: ItemActors) -> list[str]:
-    """The chests (in ``chests`` order) whose placed item is an ocarina: a seed gets :func:`ocarina_changes` only
-    when there is one. Elsewhere the change shows nothing and would only alter Saria's native farewell, where her
-    own ocarina is drawn wrong without the instrument's ``CalcPriority`` (plans/chest-ocarina-model.md, runs D, D2)."""
-    return [name for name in chests if actors.actors.get(placements.get(name, "")) in OCARINAS]
+def ocarina_locations(placements: Mapping[str, str], locations: Iterable[str], actors: ItemActors) -> list[str]:
+    """The selected locations, in caller order, whose placed item is either ocarina."""
+    return [name for name in locations if actors.actors.get(placements.get(name, "")) in OCARINAS]
 
 
 def ocarina_changes(romfs: str | Path) -> dict[str, Callable[[bytes], bytes]]:
-    """The chest-ocarina get model: ActorInfo rows and both ocarina packs (``make_seed`` asks :func:`chest_ocarinas`).
+    """Required get model: ActorInfo rows and both ocarina packs, never a native-pack fallback.
 
-    Compose last on these files (after ``ocarina.changes``): it checks only the native fields it changes."""
+    Compose last on these files (after ``ocarina.changes``). Missing inputs or changed native fields fail closed."""
     romfs = Path(romfs)
     donor_path = pack_path(DONOR)
     if not (romfs / donor_path).is_file():

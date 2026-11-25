@@ -112,8 +112,8 @@ source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet04b: Nut chest
 source = "Claude, Round 6 review, 2026-11-08: all twelve Item_Melody_* share the pouch/IsGet grant path. Storms played and Minuet warped from a chest; the other ten are inferred, not individually verified. Opt-in only."
 
 [hand_over]
-excluded_items = ["Fairy Ocarina", "Ocarina of Time"]
-source = "Kareem/Claude, R11 seed10 gallery crash reproduced in German and English, Hookshot 2.0.14; Fairy shares the equipment/show-item mismatch. Direct story grants and chests remain allowed; plans/rounds/r11-ocarina.md"
+excluded_items = []
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 gallery07/08: both ocarinas PASS only with PR40 packs and ActorInfo, now mandatory in patch.make_seed for display hand-overs; native Time09 still crashes and has no output fallback; plans/rounds/r22-lifts.md"
 
 # Claude, r14 Track E, 2026-11-13: public native seeds refuse unpaired
 # access overrides. Unchanged world defaults are always allowed.
