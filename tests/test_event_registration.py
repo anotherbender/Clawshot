@@ -25,7 +25,7 @@ from clawshot.census.gifts import FLOW_DIR, FLOW_SUFFIX, FLOW_VERSIONS, flow_fil
 from clawshot.census.scan import read_romfs_byml
 from clawshot.formats import byml, evfl, zsdic
 from clawshot.generate import Settings, from_placements
-from clawshot.generate.fill import allowed
+from clawshot.generate.fill import FillError, allowed
 from clawshot.patch import SeedOutput, gifts, make_seed, scrubs
 from clawshot.patch.keys import ANALYZED, SETTINGS
 from clawshot.world.load import load_spec
@@ -562,7 +562,8 @@ def generate(romfs: Path, seed: int, settings: Settings, options: Mapping, *, sc
                 and allowed(world, effective, target, item)
                 and allowed(world, effective, source, placements[target])
             ):
-                placements[source], placements[target] = placements[target], item
+                displaced = placements[target]
+                placements[source], placements[target] = displaced, item
                 print(f"scrub-shield coverage swap: {source} <-> {target} ({item})")
 
                 # External placements omit hint selection; keep this generated recipe's existing hints so
@@ -570,8 +571,16 @@ def generate(romfs: Path, seed: int, settings: Settings, options: Mapping, *, sc
                 def placed(*args, **kwargs):
                     return replace(from_placements(*args, **kwargs), hints=output.seed.hints)
 
-                with mock.patch("clawshot.patch.from_placements", placed):
-                    return make_seed(romfs, seed, settings, spec, extra_steps=steps, placements=placements, **options)
+                # ``allowed`` on the seed's world does not carry the placement screens ``from_placements`` checks
+                # (Skulltula ammo containers): a swap the screens refuse is undone and the next pair tried.
+                try:
+                    with mock.patch("clawshot.patch.from_placements", placed):
+                        return make_seed(
+                            romfs, seed, settings, spec, extra_steps=steps, placements=placements, **options
+                        )
+                except FillError as error:
+                    print(f"  refused: {str(error).splitlines()[-1].strip()}")
+                    placements[source], placements[target] = item, displaced
     pytest.fail(
         f"no compatible scrub-shield coverage swap: scrubs={[(name, placements[name]) for name in targets]}, "
         f"shields={[(name, item) for name, item in placements.items() if item in shields]}"
