@@ -8,9 +8,9 @@ section 3 rows 6, 7, 12, 14. Research/staged output only under `E:/OOTRemake/wor
 
 - Each unplayed lift stays held in the merge head. A passed item gets its own final commit citing Kareem's
   Longshot 3.2.0 evidence. Failures retain their hold and recorded reason. No new setting, no version bump.
-- Existing Token fixed-capacity admission cites the actual played representative, `Item_NutBag_Medium`
-  (native30), not a claim that the Stick member was individually played. Its native20 sibling is checked
-  independently by the production structural validator; a separate Stick Token diagnostic will remove doubt.
+- Token fixed-capacity admission now cites both individual plays: Nut native30 on rc.3 and Stick native20
+  on R22 packet05b, including uncollected-drop recovery, one pickup and persistence as child.
+  Each member still passes the production native structural validator.
 - Chest and hand-over packets are private diagnostics, not playable/goal-certified solo seeds.
 - Controls come from main `4f4ff42`. Longshot 3.2.0 only. No agent starts the game or writes to an installed
   game, a played seed or an original save. Source backups remain read-only.
@@ -31,11 +31,13 @@ only that accessor to `int_value` and printed the values. Missing numeric names 
 
 ## Staged packet A: eight gift-only chest actors
 
-**READY (play-held), built/read back/dry-run, NOT played or boot-checked.** Private seed `922701`,
+**PLAYED PASS: Kareem, Longshot 3.2.0.** All eight now have reported model/text/usability passes and
+saved collection/load corroboration. Farore was confirmed separately in the correct Crater grotto after
+resolving a Trail/Crater location mix-up (typed receipts below). Private seed `922701`,
 main control built from `4f4ff42`, both arms use Chest-only `CS1` and the same base placements; only the eight
 target contents differ. `placements=` is a diagnostic, not a solo goal proof. Gift shuffle is deliberately
-off so the production chest allowlist is not changed merely to build this experiment. No `chest_verified`
-entry has been added. Other chests remain randomized: open only the listed checks.
+off in the private packet. Builders did not relax production policy; the successor adds eight sourced
+Chest-only receipts after play. Other chests remain randomized: open only the listed checks.
 
 Launchers: `E:/OOTRemake/work/r22-lifts/ingame/01 - chest vanilla control.bat`, then
 `02 - eight chest items candidate.bat`, both **Longshot 3.2.0**. Separate copies of the same natural adult
@@ -56,14 +58,14 @@ Do not kill the watchtower Skulltula before checking the Echo Gem.
 
 | Item / chest (native model) | Main control content | Model/get window | Immediate ownership and use | After Save and Continue | Result |
 |---|---|---|---|---|---|
-| Light Arrows — left-end Graveyard grave, nearest row leftmost when facing out from Royal Tomb (`A_02`, large) | Piece of Heart | Record rising actor and Light Arrows name/text | Owned, magic appears, select with Bow and fire a light shot; arrow stock falls | Still owned; select/fire another light shot | NOT PLAYED |
-| Nayru's Love — DMT cracked-wall chest between Kakariko and DC (`A_01`, small) | Scrub Business Seed | Record model (native spells can share a model) and Nayru get text | Owned, cast visible protective barrier with magic cost; wait for it to expire before damage comparison | Still owned; cast again | NOT PLAYED |
-| Farore's Wind — DMC upper-rim rock grotto (`A_01`, small) | Scrub Business Seed | Record model and Farore get text | Owned; **walk into Forest Temple**, cast to set a return point, move away and cast Return successfully | Still owned; set/return again inside dungeon (not a promised persisted warp point) | NOT PLAYED |
-| Stone of Agony / Echo Gem — GC top-floor maze, blast middle corridor into Gossip Stone pocket, chest ahead (`A_01`, small) | Rupees (5) | Record Gem model and get text | Owned/equippable; at night approach **uncollected Kakariko watchtower Skulltula** and observe rumble/indicator | Gem still owned/equipped; repeat cue at same uncollected source | NOT PLAYED |
-| Double Defense — same GC pocket, chest right of previous (`A_01`, small) | Rupees (5) | Record model and halved-damage get text | Owned, MaxLife unchanged; before opening record one stationary unshielded bomb blast, then same blast afterwards with Nayru expired; loss should halve | Still owned, MaxLife unchanged; comparable blast still reduced | NOT PLAYED |
-| Biggoron's Sword — ZR uncovered high-ground grotto just upstream of first bridge (`A_01`, small) | Scrub Business Seed | Record sword model and correct get text | Adult sword owned, equip and swing; not Giant's Knife/broken knife | Still equipped/owned and swings | NOT PLAYED |
-| Bottle — HF Storms-cover grotto at foot of Kakariko steps, beat two ReDeads (`A_01_NoBake`, small) | Rupees (50) | Record bottle model and new-bottle get text | **Third bottle** added, original Bug/Empty slots retained; select new slot, catch/release bugs or fill/empty water | Third slot still owned and can fill/empty; original slots retained | NOT PLAYED |
-| Rupees (200) — SFM entrance Storms-cover grotto, beat two Wolfos (`A_01_NoBake`, small) | Rupees (50) | Record gold model and 200-rupee get text | Note wallet immediately before/after, exactly+200 within500; no other pickup during count | Wallet retained (allow only recorded spending); chest open, no second+200 | NOT PLAYED |
+| Light Arrows — left-end Graveyard grave, nearest row leftmost when facing out from Royal Tomb (`A_02`, large) | Piece of Heart | Record rising actor and Light Arrows name/text | Owned, magic appears, select with Bow and fire a light shot; arrow stock falls | Still owned; select/fire another light shot | PASS per Kareem; saved ownership/open chest/load corroborated |
+| Nayru's Love — DMT cracked-wall chest between Kakariko and DC (`A_01`, small) | Scrub Business Seed | Record model (native spells can share a model) and Nayru get text | Owned, cast visible protective barrier with magic cost; wait for it to expire before damage comparison | Still owned; cast again | PASS per Kareem; saved ownership/open chest/load corroborated |
+| Farore's Wind — DMC upper-rim rock grotto (`A_01`, small) | Scrub Business Seed | Record model and Farore get text | Owned; **walk into Forest Temple**, cast to set a return point, move away and cast Return successfully | Still owned; set/return again inside dungeon (not a promised persisted warp point) | PASS on correct Crater play; chest open/IsGet true/stock1 and own override saved |
+| Stone of Agony / Echo Gem — GC top-floor maze, blast middle corridor into Gossip Stone pocket, chest ahead (`A_01`, small) | Rupees (5) | Record Gem model and get text | Owned/equippable; at night approach **uncollected Kakariko watchtower Skulltula** and observe rumble/indicator | Gem still owned/equipped; repeat cue at same uncollected source | PASS per Kareem; saved ownership/open chest/load corroborated |
+| Double Defense — same GC pocket, chest right of previous (`A_01`, small) | Rupees (5) | Record model and halved-damage get text | Owned, MaxLife unchanged; before opening record one stationary unshielded bomb blast, then same blast afterwards with Nayru expired; loss should halve | Still owned, MaxLife unchanged; comparable blast still reduced | PASS per Kareem; saved ownership/open chest/load, MaxLife24 unchanged |
+| Biggoron's Sword — ZR uncovered high-ground grotto just upstream of first bridge (`A_01`, small) | Scrub Business Seed | Record sword model and correct get text | Adult sword owned, equip and swing; not Giant's Knife/broken knife | Still equipped/owned and swings | PASS per Kareem; saved ownership/open chest/load corroborated |
+| Bottle — HF Storms-cover grotto at foot of Kakariko steps, beat two ReDeads (`A_01_NoBake`, small) | Rupees (50) | Record bottle model and new-bottle get text | **Third bottle** added, original Bug/Empty slots retained; select new slot, catch/release bugs or fill/empty water | Third slot still owned and can fill/empty; original slots retained | PASS per Kareem; BottleC added, original A/B retained, chest/load corroborated |
+| Rupees (200) — SFM entrance Storms-cover grotto, beat two Wolfos (`A_01_NoBake`, small) | Rupees (50) | Record gold model and 200-rupee get text | Note wallet immediately before/after, exactly+200 within500; no other pickup during count | Wallet retained (allow only recorded spending); chest open, no second+200 | PASS per Kareem; saved154→354 and chest closed→open |
 
 Required loading evidence: candidate `mods: Banc/<area>/<...> <- <private candidate path>` for each of the
 eight areas/files in `packet-readback.json`, plus its resource table and relevant get flows. Control proves
@@ -81,9 +83,9 @@ Native capacity10 sticks/20 nuts; medium items absent. Field lone-tree source pa
 
 | Check | Control | Candidate / expected checks | Result |
 |---|---|---|---|
-| Graveyard left-end grave large chest, Hash `9622128545943056087` | Piece of Heart; cap10 retained | `Item_StickBag_Medium`: model/window, medium item owned and native20 cap/refill; return to child **naturally at the pedestal**, select/use a Stick. After Save/Continue cap20/item/use persist, chest open | NOT PLAYED |
-| ZR open-grotto small chest, Hash `8838426083116998768` | Scrub Business Seed; cap20 retained | `Item_NutBag_Medium`: model/window, medium item owned and native30 cap/refill; throw a Nut. After Save/Continue cap30/item/use persist, chest open | NOT PLAYED |
-| HF lone tree near forest entrance, source `2177746409373494991` | Roll, kill with sword, native token:18→19; no cap upgrade | Stick native20 instead, token18 unchanged; before pickup leave/re-enter to recover drop, collect, use as natural child, Save/Continue; medium item/cap20 retained and source does not respawn | NOT PLAYED |
+| Graveyard left-end grave large chest, Hash `9622128545943056087` | Piece of Heart; cap10 retained | `Item_StickBag_Medium`: model/window, medium item owned and native20 cap/refill; return to child **naturally at the pedestal**, select/use a Stick. After Save/Continue cap20/item/use persist, chest open | PASS per Kareem; cap20/medium owned, adult and child saved |
+| ZR open-grotto small chest, Hash `8838426083116998768` | Scrub Business Seed; cap20 retained | `Item_NutBag_Medium`: model/window, medium item owned and native30 cap/refill; throw a Nut. After Save/Continue cap30/item/use persist, chest open | PASS report; saved Nut cap30/medium owned, not a Bullet Bag upgrade |
+| HF lone tree near forest entrance, source `2177746409373494991` | Roll, kill with sword, native token:18→19; no cap upgrade | Stick native20 instead, token18 unchanged; before pickup leave/re-enter to recover drop, collect, use as natural child, Save/Continue; medium item/cap20 retained and source does not respawn | PASS: clarified one pickup after uncollected-drop recovery; cap20/token18/collection pair saved |
 
 Loading proof: Graveyard Adult Static, ZoraRiver Adult Dynamic; for Token, HyruleField Adult Static,
 generated Stick-capacity pickup pack, all three RSDB tables and resource table. `packet-resources.json`
@@ -97,18 +99,18 @@ Market child Shooting Gallery. No other hand-over is certified by this packet. N
 `r11-ocarina.md` Reported failure / Native crash-address correlation: Ocarina of Time crashed on
 Hookshot 2.0.14 in German and English; Fairy was excluded by analogy, not by a played failure.
 
-**Important conditional scope:** PR #40 runs only when a seed places an ocarina in a chest
-(`patch/__init__.py:274-277`, `getitem.chest_ocarinas`). A single PR40-active PASS cannot justify admitting
-hand-overs in seeds with native packs. Therefore each instrument has active and native-pack arms, not just
-a cosmetic control. Active arms include an unvisited, already-open Mido far-right chest holding Time,
-so its placement activates the exact production pack/ActorInfo transform without granting anything there.
-Native arms leave that chest vanilla. **Do not visit/open other chests or take Saria's gift.**
+**Original control boundary:** at staging, PR40 ran only for an ocarina placed in a chest. A single
+PR40-active PASS could not justify native-pack hand-overs. Each instrument therefore had active and
+native-pack arms, not merely a cosmetic control. Active arms include an unvisited, already-open Mido
+far-right chest holding Time, activating the exact production pack/ActorInfo transform without granting
+anything there. Native arms leave it vanilla. **Do not visit/open other chests or take Saria's gift.**
+The successor now enforces PR40 independently of an ocarina chest.
 
 The builder clears `hand_over.excluded_items` **in memory only**, proves both instruments fail `allowed`
 at the gallery under main and pass the candidate policy, then uses the production gift planner, all gallery
 tier branches and the production ocarina receipt compiler. No normal get window is appended to the running
 scene. The main control normalizes the gallery to its existing fixed-medium capacity prize. These are
-minimal writer diagnostics, not normal fills or goal-certified seeds; public policy remains unchanged.
+minimal writer diagnostics, not normal fills or goal-certified seeds; public policy was unchanged at staging.
 
 All five profiles copy the natural child save just before Saria's farewell, from
 `2026-11-09_1558-seed8-gatehouse-crash`. It has neither instrument (both IsGet=false, stock0), an empty
@@ -123,10 +125,10 @@ gallery fee; its own fresh copy has78 rupees. Teleport/clock only; never a debug
 | Launcher in `E:/OOTRemake/work/r22-lifts/ingame/` | Expected reward / pack state | Result |
 |---|---|---|
 | `06 - gallery main native reward control.bat` | Main's fixed-medium Bullet Bag40; PR40 active through the remote chest. Gallery returns control normally | NOT PLAYED |
-| `07 - gallery Time PR40 active.bat` | Ocarina of Time; chest-model packs and ActorInfo active | NOT PLAYED |
-| `08 - gallery Fairy PR40 active.bat` | Fairy Ocarina; chest-model packs and ActorInfo active | NOT PLAYED |
-| `09 - gallery Time native packs.bat` | Ocarina of Time; original dump packs/ActorInfo | NOT PLAYED |
-| `10 - gallery Fairy native packs.bat` | Fairy Ocarina; original dump packs/ActorInfo | NOT PLAYED |
+| `07 - gallery Time PR40 active.bat` | Ocarina of Time; chest-model packs and ActorInfo active | PLAYED PASS; saved Time stock1/active Time, correct model/text |
+| `08 - gallery Fairy PR40 active.bat` | Fairy Ocarina; chest-model packs and ActorInfo active | PLAYED PASS; saved Fairy stock1/active Fairy, correct model/text |
+| `09 - gallery Time native packs.bat` | Ocarina of Time; original dump packs/ActorInfo | PLAYED CRASH during hand-over; null read at guest0x270; unchanged rerun forbidden |
+| `10 - gallery Fairy native packs.bat` | Fairy Ocarina; original dump packs/ActorInfo | NOT PLAYED; unnecessary for Claude-approved PR40-enforced path |
 
 For each candidate: win, record hand-over model and get window, no crash/freeze, movement restored; pause
 inventory owns the actual instrument and D-pad plays audible manual notes (this checkpoint has no learned
@@ -141,9 +143,9 @@ production receipt flows/resource table. Active arms additionally load both ocar
 native arms supply neither pack nor ActorInfo. `ocarina-packet.json` lists exact resources.
 An item is not admitted to hand-overs until its necessary arms pass.
 
-**If active passes but native fails:** keep the public hold. A generator change extending the model
-transform to ocarina hand-overs would then need its own reviewed scope and evidence; do not lift globally
-and hope every future seed also has an ocarina chest.
+**Approved by Claude after07/08 PASS and09 crash:** the successor must enforce the PR40 packs and
+ActorInfo for ocarina hand-overs in code, with regression coverage; native-pack hand-over output is
+forbidden. Removing the exclusions without that requirement is not approved. Arm10 is unnecessary.
 
 ## Fairy Ocarina at Skulltulas after PR #40
 
@@ -162,8 +164,8 @@ test `test_fairy_ocarina_is_excluded_for_want_of_its_own_animation` describes th
 Total estimate **63 minutes**, split A28 / B15 / C20 across ten launchers (longest20). These are estimates,
 not timed play. A's target was25; its full usability/reload/control checks are estimated at28 rather than
 silently omitting them. Kareem can batch A, B and C independently. No original save or installed game file
-changes. Only the existing played Token-family hold correction is a product-code candidate now; every
-new chest/hand-over admission remains a separate post-play commit.
+changes. Each new chest/hand-over admission is a separate post-play change; the successor scope and its
+remaining verification are recorded below.
 
 Staging choices proposed by **cs22g, 2026-11-24**: natural adult checkpoints rather than reopening chests
 in a save; independent capacity profiles; both conditional PR40 states before any global hand-over lift.
@@ -264,12 +266,123 @@ Full-gate logs remain under `work/r22-lifts/gate-{format,lint,synthetic,dump}.lo
 were added to this repository. This receipt is documentation only above the tested source head.
 `resume_gate.sh` is retained outside the repository as execution evidence for that tooling report.
 
-## Work remaining
+## Frozen successor and remaining gates
 
-**READY (merge): supported Token capacity admission only.** The early deterministic registration-test
-fix is already on main as5bc5577; the capacity source head3299491 now has the full gate and paired sweep.
+The earlier merge head8488bdc56c and tested source3299491 remain the historical Token-only receipt.
+**FROZEN source `da1fb78421c578d5329c515ef291324419bd32be`.** All eight chest lifts have
+scoped destination evidence; Stick/Nut chest capacities and PR40-enforced ocarina hand-overs are included.
+No version bump or rebase. Immutable source snapshot: `work/r22-lifts/successor-src-da1fb784/`.
 
-**READY (play-held): all staged new chest and hand-over checks.** No capacity chest admission,
-`chest_verified` entry, ocarina hand-over exclusion, or Fairy-at-Token hold was lifted without the
-corresponding play. Keep these limits until Kareem reports each result; every PASS gets its own later
-lift commit and each FAIL retains its reason. Existing packet controls/checklists remain the handoff.
+Source freeze is not READY: native production-output proof awaits queue13a after Claude12b's explicit
+release. Fresh paired350 and the full gate remain queue14 after shops13. Every seed-capable stage requires
+Kareem's game closed. Fairy-at-Token remains held.
+
+## Typed played receipts and corrected Farore chronology
+
+Reporter: **Kareem**, forwarded/clarified by **Claude**, Longshot3.2.0. Read-only evidence copied to
+`work/r22-lifts/played-20261125-133632/`:132 files, every source hash stable across copying.
+`chest-receipts.json`, `capacity-receipts.json` and `ocarina-receipts.json` separate player reports from
+saved/logged facts. No original profile, save or installed-game directory was written.
+
+### A: eight chest items
+
+Seven original collections are supported by open chest flags and saved ownership (BottleC adds the third
+slot, retaining Bug/Empty in A/B). Rupees progress154→354 while that chest changes closed→open; MaxLife
+stays24 with Double Defense owned. Original log override lines: Graveyard3295, Trail11717, GoronCity15305,
+ZoraRiver20047, HyruleField11461, SacredForestMeadow26547. These are mod-load proofs, not substitutes
+for Kareem's model/text/usability observations. A separate post-reload usability sequence for each row
+was not individually described in the forwarded report.
+
+Farore's initial absence was **not a chest-grant defect**. Both preserved earlier sessions visited
+Death Mountain Trail, not Crater. The Trail chest is Nayru's (`9809508929088891725`, already open);
+the intended Farore chest is `1158729434763801603` in both Crater Bancs. Its original false opened flag
+and Farore false/stock0 were valid readings of an uncollected target. The interim FAIL instruction was
+superseded by UNPLAYED pending the correct location, then by this PASS:
+
+- Kareem opened the correct **Crater upper-rim rock-grotto** chest and reported Farore received without issue.
+- New immutable evidence: `work/r22-lifts/farore-pass-20261125-140010/farore-receipt.json`.
+- Latest manual slot01 at13:56:30: Crater chest open, `IsGet.Item_FaroreWind=true`,
+  `PouchData.Item_FaroreWind.StockNum=1`; Nayru remains true/1.
+- `PlayerStatus.MPMax=240`, `PlayerStatus.MP=180`, before and after: lack of magic is not an explanation
+  here. A missing spell in the earlier saved inventory was real, not merely an inferred hidden menu entry.
+- `save/` and `save-work/` have identical SHA256
+  `f5b748f347c58e8e8b3e08c2d7f0e19e6fdcbce2c5ccde7216e35ce3a2e55c91`.
+- Current log2409 loads the candidate's Crater Adult Dynamic Banc; map2519 enters Crater.
+- Talon's independently successful scenes07 uses the **same** `Item_FaroreWind` key, through
+  `GetPouchContent`'s pouch add with Num1. No alias/key workaround or Farore fix was needed.
+
+### B: expected capacities and the once-state per retained slot
+
+**04b confirms Stick20 and Nut30**, not a Bullet Bag reward. DekuSeed capacity stays40; the actual
+Nut medium flag/stock becomes true/1. **05b PASS:** Kareem clarified that he left the first drop
+**uncollected**, reset the area, and collected the second drop **once**. This is recovery, not duplication.
+He reports persistence after reload/as child; the saved child states agree.
+
+H=`2177746409373494991`, H xor2=`2177746409373494989`. **Both are permanent collection records**,
+not separate spawn/death flags. Killing the enemy leaves no saved collection mark (`tokens.py:346-391`);
+pickup writes both (`tokens.py:12-13`, tracker `_source_pair`). All corresponding save/save-work slot
+hashes match in the snapshot. Medium-bag stock is1 where owned.
+
+| Arm / slot | Age | Stick/Nut caps | Medium Stick/Nut owned | Tokens | Collection H/Hxor2 | Stick/Nut chests open |
+| --- | --- | --- | --- | ---: | --- | --- |
+| 04b 00 baseline | adult | 10/20 | false/false | 18 | false/false | false/false |
+| 04b 01 | adult | 20/20 | true/false | 18 | false/false | true/false |
+| 04b 02 | adult | 20/20 | true/false | 18 | false/false | true/false |
+| 04b 03 | adult | 20/30 | true/true | 18 | false/false | true/true |
+| 04b 04 | child | 20/30 | true/true | 18 | false/false | true/true |
+| 04b 05 | child | 20/30 | true/true | 18 | false/false | true/true |
+| 05b 00 baseline | adult | 10/20 | false/false | 18 | false/false | false/false |
+| 05b 01 | adult | 10/20 | false/false | 18 | false/false | false/false |
+| 05b 02 | adult | 20/20 | true/false | 18 | true/true | false/false |
+| 05b 04 | child | 20/20 | true/false | 18 | true/true | false/false |
+| 05b 03 | child | 20/20 | true/false | 18 | true/true | false/false |
+
+Cap20/stock1 alone cannot prove a unique pickup; that comes from Kareem's explicit clarification.
+Rotating saves cannot reconstruct every kill/reset between saves. No duplicate-grant FAIL is inferred.
+
+### C: PR40-active passes, native Time crashes
+
+07 saved Time IsGet/stock true/1 and `PlayerStatus.EquipOcarina` String64=`Item_Ocarina_Time`;
+08 saved Fairy true/1 and active=`Item_Ocarina_Fairy`, Time stock0. Their logs load ActorInfo at73,
+both model packs at1856/2105 (07) and2040/2280 (08), and their gallery override at1537/1755.
+Both completed without a crash. Saved persistence is corroborated; neither log separately proves a
+same-process Continue sequence or learned-song play.
+
+09's preserved `user-r22-lifts-ocarina-time-native/longshot_log.txt:5055-5066` shows:
+`0xc0000005`, read guest`0x270`, host`longshot.exe+0xe3ca5ed`, x0=0, return address`0x829630ac`.
+Gallery override loaded at1258; no PR40 packs/ActorInfo were supplied. This matches the documented
+round11 null-ShowItem getter signature (`r11-ocarina.md:295-310`). **[INFERENCE]** missing native get-model
+actor is the immediate cause; exact EVFL action and in-RAM pouch-grant timing are not certified.
+Only baseline ownership/stock0 was saved. No unchanged rerun was performed.
+
+Claude's approved shipping variant is **PR40 mandatory for ocarina hand-overs**, not incidental activation
+by an unrelated chest. Production now enforces that boundary; the new native regression covers produced
+hand-over output with no ocarina chest and missing-donor refusal. Its queue13a run is still pending.
+Native Fairy10 remains unplayed and outside the shipped path; no native-pack safety is claimed.
+
+### Destination-scoped catalog decision
+
+The existing `gifts.held_items` removed its whole type hold when `chest_verified` gained an actor, which
+would also admit the eight packet02 items at unplayed Scrub checks. **Claude, 2026-11-25: CONSTRAIN.**
+Only Chest joins the existing Gift/Token destinations; no Scrub lift without a separate played packet.
+
+Small generalisation: optional `destinations` on a catalog receipt adds only its listed kinds to the
+existing Gift/Token baseline. The eight packet02 records explicitly list `["Chest"]`. Other unscoped
+records retain their existing behavior; no other item admission changes.
+
+Requested consumer-level regression: all eight accepted at Chest and refused at Scrub, Token on/off;
+Gift and prior Token eligibility retained, plus an unscoped legacy control — **17 passed in3.04s**,
+n2/W1. These tests call `allowed`, never fill a seed. Source formatter/lint pass. The prepared13a runner
+was syntax-checked and its `--plan` surface observed; no lock or seed has run for this successor.
+
+Prepared runners: `work/r22-lifts/focused-successor13a.sh` and `successor14.sh`; both default to
+non-executing `--plan` and require the assigned predecessor-release marker before one guarded acquisition.
+Success cleanup explicitly checks/removes only the owned lock and posts a phase-specific release rather
+than relying on the earlier broken EXIT trap. Focus is n2/workers1; line14 is synthetic n8/workers4,
+dump n8/workers3 and sweep workers6, with CIM player checks before acquisition and each stage.
+
+`successor_sweep.py --plan` validated the prepared source module, exact350 main rows and the four expected
+settings strings without preparing native contexts or filling. It reuses the existing fill/oracle/retry
+engine, shared main300 and previously generated immutable5bc binding50, preserving the old receipt files.
+Its whitelist adds only Chest to the eight existing Gift/Token holds and Chest/conditional Token to the
+two capacity holds; other effective fields must match. A fresh candidate350 is still required at line14.
