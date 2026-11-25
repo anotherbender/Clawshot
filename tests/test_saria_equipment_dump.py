@@ -20,15 +20,18 @@ def test_native_stow_action_and_bridge_prop_order(romfs):
     before = evfl.read(data).flowchart
     after = evfl.read(saria.patch(data)).flowchart
     stow = next(i for i, event in enumerate(after.events) if event.name == saria.EVENT)
+    apply = next(i for i, event in enumerate(after.events) if event.name == saria.APPLY_EVENT)
+    assert after.events[stow].next == apply
+    assert after.events[apply].actor == after.events[stow].actor
     bind = next(i for i, event in enumerate(after.events) if event.name == "Event7")
     assert bind in reachable(after, after.entry_point("ready").main_event)
     seen, pending = set(), [after.entry_point("ready").main_event]
     while pending:
         index = pending.pop()
-        if index not in seen and index not in (evfl.NONE, stow):
+        if index not in seen and index not in (evfl.NONE, apply):
             seen.add(index)
             pending.extend(_successors(after.events[index]))
-    assert bind not in seen, "the native prop must not bind before stowing scheduled equipment"
+    assert bind not in seen, "the native prop must not bind before applying the stowed equipment state"
     assert after.entry_points == before.entry_points
     changed = [old.name for old, new in zip(before.events, after.events, strict=False) if old != new]
     assert changed == ["Event18"]

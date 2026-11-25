@@ -1,8 +1,8 @@
-"""Stow bridge Saria's scheduled ocarina before the farewell binds its own prop.
+"""Apply bridge Saria's stowed equipment state before the farewell prop binds.
 
-Before Gohma the WarpDone schedule holds Npc_Equipment_009 on Weapon_R;
-Dm_Kokiri_0155 also binds Dm_Item_Ocarina_Fairy_Saria there. The native stow
-verb is Dm_DeathMtTrail_0050/Event5 (r21-pr40 research). No inventory changes.
+Before Gohma the WarpDone schedule holds Npc_Equipment_009 on Weapon_R.
+Changing the schedule variable alone does not update event-driven equipment.
+Apply that state through her native event-AI command; leave the authored prop.
 """
 
 from clawshot.census.gifts import _successors
@@ -16,6 +16,8 @@ ACTOR = "Npc_Kokiri_Saria_Child"
 INSTANCE = "KokiriForest_ArriveLostWood"
 ACTION = "EventTriggerChangeAIScheduleEquipState"
 EVENT = "ClawshotSariaStowEquipment"
+APPLY = "EventAIScheduleSetEquipmentState"
+APPLY_EVENT = "ClawshotSariaApplyEquipment"
 
 
 def patch(data: bytes) -> bytes:
@@ -24,7 +26,7 @@ def patch(data: bytes) -> bytes:
     if fc is None or fc.name != FLOW:
         raise PatchError(f"Saria equipment: expected {FLOW} flowchart")
     events = {event.name: i for i, event in enumerate(fc.events)}
-    if EVENT in events:
+    if EVENT in events or APPLY_EVENT in events:
         raise PatchError("Saria equipment: already patched")
     if not {"Event18", "Event3", "Event7"} <= events.keys():
         raise PatchError("Saria equipment: missing native prop setup")
@@ -50,10 +52,16 @@ def patch(data: bytes) -> bytes:
         or any(entry.main_event in (events["Event3"], events["Event7"]) for entry in fc.entry_points)
     ):
         raise PatchError(f"Saria equipment: changed native setup: {saria!r}, {look!r}, {bind!r}, {inbound!r}")
-    if ACTION not in saria.actions:
-        saria.actions.append(ACTION)
+    for action in (ACTION, APPLY):
+        if action not in saria.actions:
+            saria.actions.append(action)
     stow = len(fc.events)
-    fc.events.append(evfl.ActionEvent(EVENT, look.actor, saria.actions.index(ACTION), look.next, {"EquipState": 0}))
+    fc.events.extend(
+        [
+            evfl.ActionEvent(EVENT, look.actor, saria.actions.index(ACTION), stow + 1, {"EquipState": 0}),
+            evfl.ActionEvent(APPLY_EVENT, look.actor, saria.actions.index(APPLY), look.next),
+        ]
+    )
     look.next = stow
     result = evfl.write(file)
     if evfl.read(result) != file:

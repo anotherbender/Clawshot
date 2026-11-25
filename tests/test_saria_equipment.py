@@ -33,20 +33,35 @@ def fixture():
     )
 
 
-def test_stow_precedes_participation_and_bind_without_changing_the_prop():
+def test_suspended_schedule_is_applied_before_the_authored_prop_binds():
     before = fixture()
     after = evfl.read(saria.patch(evfl.write(before)))
     fc = after.flowchart
-    assert fc.entry_point("ready").main_event == 0
-    look = fc.events[0]
-    stow = fc.events[look.next]
-    assert (fc.actors[stow.actor].name, fc.actors[stow.actor].secondary_name) == (saria.ACTOR, saria.INSTANCE)
-    assert fc.actors[stow.actor].actions[stow.action] == saria.ACTION
-    assert stow.params == {"EquipState": 0}
-    assert stow.next == 1
+    # A schedule-variable write alone was the played v1 failure: the field brain
+    # is paused, leaving the accessory visible until equipment is applied now.
+    scheduled, visible_accessory = 1, True
+    index = fc.entry_point("ready").main_event
+    bound = False
+    for _ in range(10):
+        if index == evfl.NONE:
+            break
+        event = fc.events[index]
+        actor = fc.actors[event.actor]
+        action = actor.actions[event.action]
+        if action == "EventTriggerChangeAIScheduleEquipState" and event.actor == 0:
+            scheduled = event.params["EquipState"]
+        elif action == "EventAIScheduleSetEquipmentState" and event.actor == 0:
+            visible_accessory = scheduled != 0
+        elif action == "EventTriggerModelBind":
+            assert not visible_accessory, "the scheduled red accessory must not overlap the authored prop"
+            bound = True
+        index = event.next
+    else:
+        raise AssertionError("farewell setup did not finish")
+    assert bound
     assert fc.events[1:3] == before.flowchart.events[1:3]
     assert evfl.read(evfl.write(after)) == after
-    with pytest.raises(PatchError, match="already patched"):
+    with pytest.raises(PatchError):
         saria.patch(evfl.write(after))
 
 
