@@ -657,7 +657,8 @@ it is not relabeled a separate played native-gift acquisition.
 4. **Adult Bow/Lizalfos capability.** Report2026-11-24: explicitly killed the **upper Lizalfos with arrows**;
    the later Bombchu use is not used as bagless evidence. Adds usable adult weapons/Bow to
    Lower Right Side→Torch Room, Upper Lizalfos→Bomb Bag Ledge, and Room5/Room16 reward chests.
-   Lower-pair Bow is a same-actor damage/death-counter extrapolation, **not a separate lower-pair play report**.
+   **Update2026-11-25, Kareem via Claude: he also killed the lower Lizalfos pair with the Bow. Lower-pair Bow
+   is now played evidence, not merely the original same-actor damage/death-counter extrapolation.**
    Adult weapon class has Kareem's2026-11-22 Hammer-as-weapon report (`r21-hammer.md:15-18,62`); eye timing/weapon
    gates remain. The canonical swordless inventory corroborates capability state, not the killer.
 5. **Active Mirror Shield reflection kills Beamos.** Report2026-11-24: adult, before bombs/Hammer, redirected
@@ -665,11 +666,13 @@ it is not relabeled a separate played native-gift acquisition.
    Added usable Mirror Shield to Spirit Anubis Room→Beyond Anubis, GTG Beamos Chest, GTG Lobby→Lava Room Front,
    and the two Beamos helpers (currently no consumers). GTG's other fight/heat gates remain. No wall, switch,
    unidentified target, or high-Beamos reach alternative is inferred; the native reflection collision is not
-   claimed fully reverse-engineered. This widening rests on his played kill.
+   claimed fully reverse-engineered. The kill is played; Kareem explicitly approved the named Spirit/GTG
+   extrapolations on2026-11-25 (exact words below), not a claim of separate play at every target.
 6. **Hammer at DC Lobby→Lower Right Side.** This is the ordinary identified WallCrack, **not** a growing-flower
    chain. Class play: Kareem2026-11-22 on0.2.5, Hammer broke bomb boulders and the DMT chest/Skulltula walls
    (`tracker-ui-notes.md`, recorded in `r21-hammer.md:15-18,49,66-70`). The new target inherits the same
-   damage→death→collision-removal chain. No claim that Kareem separately played this exact DC wall.
+   damage→death→collision-removal chain. Kareem explicitly approved this extrapolation on2026-11-25
+   (exact words below); do not relabel his assumption as a separately played DC wall break.
 
 ### Held: do not merge an admission loosening from the staged packets
 
@@ -689,7 +692,60 @@ it is not relabeled a separate played native-gift acquisition.
   targets remain unchanged/deferred. GC grotto approach is now **False**, not certified by Hookshot/Hover speculation.
 
 The Ice pair and three DC pairs are built/dry-run/read-back verified, **not played or booted by cs22d**.
+Claude already boot-checked all eight arms on Longshot3.2.0 after their15:30–16:10 builds:
+`bootcheck-batch2/3`,16:33/16:44; each crash0, fatal0, save1, one mod. They are in the shared
+`work/rounds/r22/PLAY.md`. Earlier “READY for Claude boot” wording is superseded; **no boot rerun needed**.
+Candidates need play; controls are optional at Claude's call. Boot checks do not lift the held physics/admission rules.
 Exact launcher/save/loading-log/checklist boundaries are in their sections above. Do not ask Kareem to repeat the
 already-attributed played methods merely to merge those backed changes; only the held alternatives need new play.
 ZR downstream mirroring, GC grotto closure and the GC sign attack rule are **tightenings**, not new loosenings.
 Sign attacks accept only played swords/Bombs/Hookshot family; Hammer/Bombchus/other ranged remain unproved.
+
+## Kareem's acceptance ruling — 2026-11-25, via Claude
+
+Kareem **ACCEPTS the by-analogy cases** in the already-gated logic track:
+
+- DC's **lower Lizalfos pair with the Bow is played**: Claude explicitly relayed that Kareem did kill this pair
+  with the Bow. This supersedes the earlier lower-pair-only-by-analogy classification, including the corresponding
+  lower fight/reward admission; the upper pair and plain-arrow candle reports remain as recorded.
+- Exact wall words: **“Hammer I assume would have broken that wall yeah”**. Accepted for the identified
+  DC Lobby→Lower Right Side wall. This is approval of the native/class inference, **not a fresh played wall break**.
+- Exact reflection words: **“Mirror Shield can extrapolate, yeah”**. Accepted for Spirit Anubis Room→Beyond Anubis,
+  GTG Beamos Chest and GTG Lobby→Lava Room Front, retaining their other fight/heat gates.
+
+The conditional literal-only draft was discarded using scoped edits; all ten affected files returned to gated
+bfbb00e35d and its external conditional patch was deleted. Nothing from that draft was committed. This receipt
+changes documentation only; product remains gated84582cc, with bfbb00e35d's prior test/receipt-only child.
+Ice lesson admission, ledge/arch transport, carried-flower candle ignition and Hammer staircase startup remain
+play-held; this acceptance does not silently admit those distinct alternatives.
+
+Claude's ordering remains: **logic merges as gated only after0.2.8 is published** (the broader round becomes0.2.9).
+No logic merge, rebase, refreeze, runtime launch or candidate edit was performed by cs22d.
+
+## 0.2.8 hotfix release-candidate gate — PASS
+
+Separate detached candidate `1d3f1ff6da6feaf73978799d497d037b5aaac017`,
+`E:/OOTRemake/work/r28-release/cand`: v0.2.7 plus the no-ff hotfix merge, deterministic scrub-shield test port,
+and Release0.2.8 version/docs bump. **No candidate product edits or reruns.** Claude's fix-branch prerequisite
+finished55 passed/exit0 before acquisition. Owned gate lock09:24–10:36, explicit fail-closed mkdir acquisition,
+player0 at acquisition and every stage start, then exact-owner removal and **LOCK RELEASED10:36**.
+
+1. Candidate impact standard300: **0 broken,0 exhausted**,604.563s, six workers. Actual entry remains False;
+   independent goal/return/softlock oracle accepts every seed with all grotto placements withheld and identical
+   spheres; neither grotto region/check contributes. The old main-only Hookshot-branch auditor was not misused.
+2. Paired200 Broad/50 Defaults/50 Recommended against immutable5bc5577: exact inputs/effective settings/seed keys;
+   reuse those audited candidate digests, no duplicate generation and no baseline regeneration. All300 placement
+   and sphere digests differ. All17 prior-risk cases have new accepted placements: Broad13, Defaults1, Recommended3.
+   Candidate first-try failures0/1/1 versus main0/1/2; zero exhaustion both arms. “17 rerolled” describes changed
+   placements, not17 failed fill attempts (candidate302 total attempts).
+3. Full format/lint passed:561 files already formatted.
+4. Whole synthetic, **every OOT_* unset**, `uv run --locked --extra ui --with pytest-xdist pytest -n 8`,
+   `CLAWSHOT_WORKERS=4`: **4425 passed,838 skipped**,24 existing parametrization warnings,474.09s.
+5. Full dump with configured read-only romfs/NUP/r19 sword-layered dump, `--extra ui`, `-n 8`,
+   `CLAWSHOT_WORKERS=3`: **836 passed**,24 existing warnings,3207.18s. Command wall for the complete chain4329.21s.
+
+All pytest output, stage game counts and audit/pair JSON are retained outside the repository:
+`work/r22-logic/release-0.2.8-1d3f1ff/{synthetic.log,dump.log,load-stages.log,impact.json,impact-rows.jsonl,paired.json}`.
+Candidate is ready for Claude's publication decision; this is generator/model and dump evidence, not new in-game
+proof of a grotto approach. GC model/platform/location scope and lack of native scrub/beehive destinations remain
+as recorded above and were sent separately for the release notes' spoiler review.
