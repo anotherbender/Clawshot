@@ -96,6 +96,9 @@ source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Double Def
 [chest_verified.Item_Sword_Biggoron]
 source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Biggoron Sword model/get text and use PASS; saved Weapon_Sword_Biggoron ownership and opened Zora River chest; plans/rounds/r22-lifts.md"
 
+[chest_verified.Item_Bottle]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Bottle model/get text and use PASS; BottleC added while original Bug/Empty BottleA/B remain; plans/rounds/r22-lifts.md"
+
 [songs_anywhere]
 source = "Claude, Round 6 review, 2026-11-08: all twelve Item_Melody_* share the pouch/IsGet grant path. Storms played and Minuet warped from a chest; the other ten are inferred, not individually verified. Opt-in only."
 
