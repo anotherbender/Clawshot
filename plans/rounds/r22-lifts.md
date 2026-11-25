@@ -209,10 +209,67 @@ These do not change product policy.
   full `tests/test_event_registration.py -m dump -n 2` **5 passed in319.82s**, workers1. No seed re-pin.
 - No game was started. Boot checks are Claude's. No play pass inferred from writer/readback/dry-run.
 
+## Ordered gate and sweep: PASS
+
+Tested source head **`32994910938709151649c9c95fdfa65edf2256ca`**, unchanged throughout the gate.
+Per Claude, later MAIN MOVED notices did not trigger a rebase/refreeze; the comparison remains against
+**`5bc5577369d429d426dc2059461918e41b5c5302`**. No product changes followed the focused run.
+
+- `uv run ruff format --check` and `uv run ruff check`: PASS.
+- Synthetic, with `OOT_ROMFS`, `OOT_NUP`, `OOT_DUMP` unset: `CLAWSHOT_WORKERS=4 uv run --with
+  pytest-xdist pytest -n 8` — **4403 passed, 839 skipped, 24 warnings in504.64s**.
+- Dump: `CLAWSHOT_WORKERS=3 uv run --with pytest-xdist pytest -m dump -n 8` — **836 passed,
+  24 warnings in3405.24s**. Standard `OOT_ROMFS`/`OOT_NUP`; read-only
+  `OOT_DUMP=E:/OOTRemake/work/rounds/r19/sword-layered-dump`. No new working-set file required.
+- Game checked at every heavy-stage start; both completed suites used eight workers. Sweeps used six
+  workers. cs22g ran no overlapping heavy job, started no game, and wrote no source save or game directory.
+
+**Paired350/arm: all accepted, zero exhausted.** Reused cs22b's published standard300 main arm from
+`work/rounds/r22/main-5bc5577-sweep/` after reading its README and validating revision, exact seed
+pairs and input settings. Only the additional50 main seeds ran locally, importing a pinned source
+export of5bc5577. Broad seeds22220000–22220199; all other cohorts22220000–22220049.
+Binding recipe: `Settings(shuffle=('Chest','Scrub','Token'))`.
+
+| Cohort | Seeds per arm | Placement digests identical | Sphere digests identical | First-try failures candidate/main | Candidate capacity placements at Token |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Broad | 200 | 0 | 0 | 0/0 | 389 |
+| Defaults | 50 | 50 | 50 | 1/1 | 0 |
+| Recommended | 50 | 50 | 50 | 2/2 | 0 |
+| Capacity-binding | 50 | 0 | 0 | 2/3 | 95 |
+
+Binding main has **0 Token /100 Scrub** capacity placements; candidate has **95 Token /5 Scrub**.
+These are modeled placements, not new in-game grant evidence. All first-try failures recovered through
+the existing generator retry path. Full per-seed placement/sphere hashes and counts, without placements
+or spoiler contents: `work/r22-lifts/sweep-{candidate,main-binding}.json`,
+`sweep-{candidate,main-binding}-summary.json`, and `sweep-comparison.json`.
+
+cs22g's harness-only corrections, with printed causes retained outside the repository:
+
+- The first effective-CS1 assertion failed before filling (`attempts=0`): the intended admission itself
+  derives `item_location_types` entries changing only Stick/Nut `('Scrub',)` to `('Scrub','Token')`.
+  The next parent preflight showed Recommended has Token off and must retain Scrub-only. The final
+  predicate permits exactly those two derived changes only with Token enabled; all other effective
+  fields and every input setting/seed pair remain equal. Both recorded payloads passed before resuming.
+  Preparation now happens before the worker pool, so a setup error cannot masquerade as exhausted seeds.
+  `sweep-candidate-setup-failure.log` and `sweep-recommended-setup-failure.log` preserve both causes.
+- Synthetic environment isolation follows cs21i's reported OOT-variable contamination; the passed
+  synthetic stage was not repeated. Failed-mkdir fault injection also caught `set -e`'s `&&` exception:
+  splitting acquisition into sequential commands proved immediate exit73 instead of fall-through92,
+  without touching a real lock or starting tests/seeds.
+- The successful resume did not execute its EXIT cleanup. After observing the completed dump result,
+  cs22g checked the exact own owner record, removed only that lock, and posted **LOCK RELEASED at00:37**.
+  Submitted `report_issue` for the missing successful EXIT trap. No verification rerun was needed.
+
+Full-gate logs remain under `work/r22-lifts/gate-{format,lint,synthetic,dump}.log`; no game data or logs
+were added to this repository. This receipt is documentation only above the tested source head.
+`resume_gate.sh` is retained outside the repository as execution evidence for that tooling report.
+
 ## Work remaining
 
-Capacity sweep and full gate remain under the round order. The early test-only fix fast-forwarded to
-main `5bc5577`; post-rebase focused contracts passed. Request a FROZEN gate turn after existing owners.
-Prepared paired arms:200 broad (`work/r18-fill/settings.txt`),50 Defaults,50 Recommended, plus50
-Chest/Scrub/Token capacity-binding seeds each. Record placement/sphere digest comparison as counts only.
-Final chest/hand-over admissions await Kareem's corresponding play.
+**READY (merge): supported Token capacity admission only.** The early deterministic registration-test
+fix is already on main as5bc5577; the capacity source head3299491 now has the full gate and paired sweep.
+
+**READY (play-held): all staged new chest and hand-over checks.** No capacity chest admission,
+`chest_verified` entry, ocarina hand-over exclusion, or Fairy-at-Token hold was lifted without the
+corresponding play. Keep these limits until Kareem reports each result; every PASS gets its own later
+lift commit and each FAIL retains its reason. Existing packet controls/checklists remain the handoff.
