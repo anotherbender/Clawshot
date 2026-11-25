@@ -3,7 +3,7 @@ from dataclasses import replace
 import pytest
 
 from clawshot.census.gifts import DIRECT, Gift
-from clawshot.generate import Settings, generate
+from clawshot.generate import Settings, generate, prepare
 from clawshot.generate.fill import allowed
 from clawshot.patch import gifts, items
 from clawshot.world.load import build_world
@@ -198,14 +198,14 @@ def test_token_grants_keep_unplayed_chest_variants_held(item, chest_safe):
         },
         "regions": [{"name": "Root", "locations": places}],
     }
-    world = build_world(spec)
+    settings, world = prepare(spec, Settings(shuffle=("Chest", "NPC", "Token")))
     actors = items.load()
     held = gifts.held_items(world, [item], actors, set(), token_shuffle=True)
     legacy = gifts.held_items(world, [item], actors, set())
     if not chest_safe:
         assert "Token" not in legacy[item] and "Chest" not in held[item]
         assert set(held[item]) == {*legacy[item], "Token"}
-    settings = Settings(shuffle=("Chest", "NPC", "Token"), item_location_types=held)
+    settings = replace(settings, item_location_types=held)
     assert allowed(world, settings, "Skulltula", item)
     assert allowed(world, settings, "Chest", item) is chest_safe
     seed = generate(spec, 7, settings, attempts=1)
