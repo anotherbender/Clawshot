@@ -186,9 +186,12 @@ def make_seed(
     # Both run when the settings could produce what they show (PR #41's rule, the maintainers' option 2); a placement
     # the rule does not cover is refused rather than shown wrongly (S8).
     shuffled_placements = {name: out.placements[name] for name in out.shuffled}
-    song_delivery = songs.build(romfs) if songs.songs_can_move(settings.shuffle) else None
+    song_pickups = songs.pickups_possible(settings.shuffle, settings.songs)
+    song_delivery = songs.build(romfs, pickups=song_pickups) if songs.songs_can_move(settings.shuffle) else None
     if song_delivery is None and (moved := songs.moved_songs(out.placements, out.world, table)):
         raise PatchError(f"{moved} hold a moved song, but the settings do not run the song get effects")
+    if not song_pickups and (placed := songs.placed_pickups(shuffled_placements, out.world, table)):
+        raise PatchError(f"{placed} hold a song as a world pickup, but the settings do not build the song pickups")
     ocarina_delivery = None
     if ocarina_pickup.pickups_possible(settings.shuffle):
         # The ocarinas' glow reuses the songs' light clone in static: added here only when no song step adds it.
@@ -319,7 +322,8 @@ def make_seed(
     elif found := getitem.get_model_ocarinas(shuffled_placements, out.world, table):
         raise PatchError(f"{found} hold an ocarina, but the settings do not run the ocarina get model")
     # Song get effects: when the settings let songs leave their places. Songs show an ocarina with their own effect;
-    # their floor pickups serve the floor and Skulltula kinds. Last on ActorInfo and the song packs.
+    # their floor pickups, for the floor and Skulltula kinds, only when the settings could place a song there
+    # (songs.pickups_possible; Kareem's rule, rounds/r21-pr41.md finding 4). Last on ActorInfo and the song packs.
     if song_delivery is not None:
         delivery = song_delivery
         changes += (delivery.changes,)

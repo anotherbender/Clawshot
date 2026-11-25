@@ -513,6 +513,32 @@ def songs_can_move(shuffle: Iterable[str]) -> bool:
     return bool(getitem.gift_kinds(shuffle))
 
 
+PICKUP_KINDS = ("Token", "BossHeart", "Freestanding")
+"""The location kinds where a song stands as its floor pickup (ocarina-song-drops-everywhere): a Skulltula drop
+(``patch.tokens``) or a floor (``patch.drops``)."""
+
+
+def pickups_possible(shuffle: Iterable[str], songs_setting: str) -> bool:
+    """Whether the settings could put a song at a kind of :data:`PICKUP_KINDS`: the song step runs
+    (:func:`songs_can_move`), ``songs = anywhere`` (only then do songs join the Skulltula and floor pools) and Token,
+    BossHeart or Freestanding is shuffled. A seed gets :func:`build` with ``pickups`` exactly then: Kareem's rule that
+    the pickups are written only once a feature places them (2026-11-23, rounds/r21-pr41.md finding 4), as a settings
+    rule like the other get-display steps (PR #41, the maintainers' option 2). A seed whose placements need a pickup
+    without it is refused (:func:`placed_pickups`, S8)."""
+    shuffle = set(shuffle)
+    return songs_can_move(shuffle) and songs_setting == "anywhere" and bool(shuffle & set(PICKUP_KINDS))
+
+
+def placed_pickups(placements: Mapping[str, str], world, actors) -> list[str]:
+    """The locations (sorted) of a kind of :data:`PICKUP_KINDS` holding a song: each needs the song's floor pickup."""
+    out = []
+    for name, item in placements.items():
+        location = world.locations.get(name)
+        if actors.actors.get(item) in getitem.SONG_MODELS and location is not None and location.type in PICKUP_KINDS:
+            out.append(name)
+    return sorted(out)
+
+
 def moved_songs(placements: Mapping[str, str], world, actors) -> list[str]:
     """The locations (sorted) holding a song that is not their vanilla item. ``make_seed`` refuses a seed that has
     one when :func:`songs_can_move` says the settings cannot: the song would show the green rupee. ``actors`` maps

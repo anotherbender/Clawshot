@@ -42,7 +42,10 @@ def written(romfs, tmp_path_factory):
     pieces = sorted(
         (loc for loc in census if loc.kind == FREESTANDING and freestanding._saved_heart(loc)), key=lambda loc: loc.id
     )
-    fairy, song = ocarina_pickup.build(romfs, ocarina_pickup.PICKUPS, with_static=False), songs.build(romfs)
+    fairy, song = (
+        ocarina_pickup.build(romfs, ocarina_pickup.PICKUPS, with_static=False),
+        songs.build(romfs, pickups=True),
+    )
     generated = tokens.generated_donors(romfs, [(song.changes, song.new_files), (fairy.changes, fairy.new_files)])
     sources = dict(zip(skulltulas, GROUPS.values(), strict=False))
     delivery = tokens.build(romfs, sources, census, rewards=FAMILIES, generated=generated)
