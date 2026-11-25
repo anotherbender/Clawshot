@@ -22,5 +22,5 @@ new = true
 region = "GC Grotto"
 type = "Chest"
 vanilla = "Rupees (50)"
-rule = "True"
-source = "Sign-puzzle solution chest (GoronCity_SecretHole_AppearTreasureBox2). Kareem in game, 2026-11-09: reading the signs in the correct order spawns this right chest; a wrong sign gives the left green-rupee chest and locks the puzzle until Link leaves Goron City and returns, then it can be retried. The puzzle needs no item; reaching the grotto is the region's rule."
+rule = "can_use(Kokiri_Sword) or adult_sword or (is_adult and Giants_Knife) or Bombs or can_use(Hookshot)"
+source = "Sign-puzzle solution chest (GoronCity_SecretHole_AppearTreasureBox2). Kareem in game, 2026-11-09: correct order spawns the right purple-rupee chest; a wrong sign gives the left green-rupee chest and locks the puzzle until Link leaves Goron City and returns. Kareem, played report 2026-11-24: completion also needs an attack; swords, Bombs and Hookshot worked. Count age-usable swords (including Giant's Knife for this strike), usable ordinary bombs and Hookshot/Longshot only; no Hammer, Bombchus or other ranged alternative is proven. Reaching the grotto remains the region's rule. plans/rounds/r22-logic.md."

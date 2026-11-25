@@ -2,3 +2,13 @@
 rule = "can_use(Hookshot)"
 was = "is_adult"
 source = "https://www.nintendolife.com/guides/zelda-ocarina-of-time-gold-skulltula-locations-rewards-switch-2#gold-skulltula-46: token is on the ceiling near the north side of the entrance, reached with Hookshot, not simply by being adult. Census Hash 18139423190738716302 is adult-only."
+
+[exits."Goron City"."GC Grotto Platform"]
+rule = "False"
+was = "is_adult and ((can_play(Song_of_Time) and ((damage_multiplier != 'ohko' and damage_multiplier != 'quadruple') or Goron_Tunic or Longshot or can_use(Nayrus_Love))) or (Hookshot and ((damage_multiplier != 'ohko' and Goron_Tunic) or can_use(Nayrus_Love) or (damage_multiplier != 'ohko' and damage_multiplier != 'quadruple' and logic_goron_grotto))))"
+source = "Kareem, played report 2026-11-24: no Time Block anywhere in Goron City. All four GC Banc files (both ages) agree; real Hookshot targets have Wall_StickHookshot, but target-center gaps and Range 10/20 do not prove the standable approach/landing chain. Nov09/10 copied main saves record a grotto visit with Hookshot1, Longshot0, HoverBoot0, not which method was used. No end-to-end access method is verified: use the strictest fill-tolerated rule until one is played (Claude's 2026-11-24 instruction). This excludes progression at the solution chest, not its played attack methods. plans/rounds/r22-logic.md."
+
+[exits."GC Grotto Platform"."Goron City"]
+rule = "(damage_multiplier != 'ohko' and (damage_multiplier != 'quadruple' or can_use(Goron_Tunic))) or can_use(Nayrus_Love)"
+was = "(damage_multiplier != 'ohko' and (damage_multiplier != 'quadruple' or can_use(Goron_Tunic))) or can_use(Nayrus_Love) or (can_play(Song_of_Time) and can_use(Longshot))"
+source = "Kareem, played report 2026-11-24: no Time Block anywhere in Goron City; native placement/event trace corroborates absence. Remove the inherited return's Song of Time + Longshot block route too; remaining damage/defense alternatives are unchanged. plans/rounds/r22-logic.md."
