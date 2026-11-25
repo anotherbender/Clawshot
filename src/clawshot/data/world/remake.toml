@@ -60,11 +60,9 @@ source = "plans/03-game-data.md section 47 (Round 14 native census, build e0f3cc
 
 [locations."Graveyard Dampe Race Hookshot Chest"]
 vanilla_fixed = "Hookshot"
-# Round 22: retain 0.2.7's progression hold until Kareem plays the chest-open-based race repair.
-# The first race has no sub-minute prize condition; the whole descent still needs a usable Hookshot.
-# Native talk/start/finish/result/spawn/open chain: plans/rounds/r22-dampe.md.
-nonprogression_only = true
-source = "D16; census holds Item_Hookshot; native first-race rule and play-held repair: plans/rounds/r22-dampe.md"
+# Round 22: Kareem played the chest-open-based repair, unopened retry and old-save recovery on 2026-11-24.
+# First race has no sub-minute prize condition; descent/admission still needs a usable Hookshot/Longshot.
+source = "D16; census holds Item_Hookshot; played first-race progression admission: plans/rounds/r22-dampe.md"
 
 [locations."Water Temple Longshot Chest"]
 vanilla_fixed = "Longshot"

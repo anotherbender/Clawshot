@@ -1,16 +1,16 @@
-"""The first race stays progression-held until its chest-open-based flow repair passes play."""
+"""Played first-race recovery admits progression; native tool admission and other holds remain."""
 
 import pytest
 from dampe_flow import FOREST, STEPS, assert_first_race_cycle, play
 
 from clawshot.formats import byml, evfl
 from clawshot.formats.zsdic import Dictionaries
-from clawshot.generate import FillError, Settings, from_placements, generate, prepare
-from clawshot.generate.fill import _swap, allowed
+from clawshot.generate import Settings, prepare
+from clawshot.generate.fill import allowed
 from clawshot.patch import dampe_first_race, dampe_safety
 from clawshot.patch.gamedata import GAME_DATA_LIST
 from clawshot.save import key
-from clawshot.world import build_world, load_spec
+from clawshot.world import load_spec
 
 FIRST_RACE = "Graveyard Dampe Race Hookshot Chest"
 SECOND_RACE = "Graveyard Dampe Race Freestanding PoH"
@@ -18,14 +18,11 @@ SHUFFLES = [("Chest",), ("Chest", "Freestanding", "NPC", "Token", "Song")]
 
 
 @pytest.mark.parametrize("shuffle", SHUFFLES)
-def test_no_production_progression_item_may_go_to_the_first_race_chest(shuffle):
+@pytest.mark.parametrize("item", ["Progressive Hookshot", "Progressive Quiver", "Progressive Magic"])
+def test_played_first_race_accepts_progression_in_production(shuffle, item):
     settings, world = prepare(load_spec(), Settings(shuffle=shuffle))
-    assert world.items["Progressive Hookshot"].progression
-    assert "Progressive Hookshot" in world.locations[FIRST_RACE].excluded_items
-    unsafe = [
-        item for item, info in world.items.items() if info.progression and allowed(world, settings, FIRST_RACE, item)
-    ]
-    assert not unsafe, unsafe
+    assert world.items[item].progression
+    assert allowed(world, settings, FIRST_RACE, item)
     assert allowed(world, settings, FIRST_RACE, "Rupees (5)")
 
 
@@ -33,44 +30,6 @@ def test_no_production_progression_item_may_go_to_the_first_race_chest(shuffle):
 def test_the_second_race_chest_is_not_restricted(shuffle):
     _settings, world = prepare(load_spec(), Settings(shuffle=shuffle))
     assert "Progressive Hookshot" not in world.locations[SECOND_RACE].excluded_items
-
-
-def race_spec():
-    return {
-        "start": "Root",
-        "goal": "Boomerang and Hylian_Shield",
-        "items": {"Boomerang": {}, "Hylian Shield": {}, "Rupees (5)": {"class": "normal"}},
-        "regions": [
-            {
-                "name": "Root",
-                "locations": {
-                    "Chest A": {"rule": "True", "type": "Chest", "vanilla": "Boomerang"},
-                    "Chest B": {"rule": "True", "type": "Chest", "vanilla": "Hylian Shield"},
-                    FIRST_RACE: {"rule": "True", "type": "Chest", "vanilla": "Rupees (5)", "nonprogression_only": True},
-                },
-            }
-        ],
-    }
-
-
-def test_a_seed_puts_only_junk_in_the_first_race_chest():
-    for seed_number in range(1, 9):
-        seed = generate(race_spec(), seed_number, Settings(shuffle=("Chest",)))
-        assert seed.placements[FIRST_RACE] == "Rupees (5)"
-
-
-def test_external_assignments_cannot_put_progression_in_the_first_race_chest():
-    supplied = {FIRST_RACE: "Boomerang", "Chest A": "Rupees (5)", "Chest B": "Hylian Shield"}
-    with pytest.raises(FillError, match=FIRST_RACE):
-        from_placements(race_spec(), 7, Settings(shuffle=("Chest",)), supplied)
-
-
-def test_a_swap_cannot_move_progression_into_the_first_race_chest():
-    world = build_world(race_spec())
-    placements = {FIRST_RACE: "Rupees (5)", "Chest A": "Boomerang"}
-    before = dict(placements)
-    assert _swap(world, Settings(shuffle=("Chest",)), placements, [FIRST_RACE], "Hylian Shield", [], {}) is None
-    assert placements == before
 
 
 @pytest.mark.dump

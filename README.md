@@ -235,15 +235,18 @@ Kareem reported these played checks:
 - **Ganon's trials:** count 1 end to end and count 2's first trial (see At a glance).
 - **Very strong hints:** all ten Gossip Stone texts checked in a new game were correct.
 - **Tracker:** ten gift checks read as collected from the game's own records ([Tracker guide](docs/tracker.md)).
+- **Dampé:** the no-tool refusal and safe surface return, first race with the Hookshot owned, unopened-chest
+  retry, first-to-second race transition, and first-prize recovery on an old save passed on Longshot 3.2.0
+  (2026-11-24). New seeds allow progression in the first chest; the escape-tool requirement remains.
 
 Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
 
 ### Known issues
 
-- **Dampé's first-race prize can't be collected.** With a Hookshot or Longshot in hand (which the race needs),
-  Dampé always runs his second race, so the first-race chest never appears. From 0.2.7 it only ever holds a minor
-  item; skip it on the tracker. Seeds from 0.2.3 to 0.2.6 can need the item placed there and may not be
-  finishable: look up `Graveyard Dampe Race Hookshot Chest` in that seed's `spoiler.json`.
+- **Older seed outputs can skip Dampé's first prize.** The former item-based selector always chose the second
+  race with a Hookshot/Longshot owned. New seeds repair this, but do not rewrite an older seed's overlay.
+  Seeds from 0.2.3 to 0.2.6 can need that missing item: look up `Graveyard Dampe Race Hookshot Chest` in their
+  `spoiler.json`. The 0.2.7 workaround limited it to minor items; that hold is removed for new repaired seeds.
 - **Saves started with older builds:** after an age-unusable item pickup, Save and Continue before using
   other items; changing areas does not clear the old item-bar jam. Newly generated seeds initialize an empty
   nut slot (0/20). Kareem verified child Bow first, then Boomerang use without a reload on 2026-11-12.

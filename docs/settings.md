@@ -426,13 +426,13 @@ stop/fly-away, with banner/map/Malon preserved. The Field owls near Kakariko and
 also passed: no speech, a short look-and-fly-away. The summit and Lake travel owls kept a short offer and working flights.
 These results do not cover every owl scene; later Woods/Zora owl additions remain unplayed.
 
-Every new seed also refuses to start Dampé's race without an owned Hookshot or Longshot.
-Kareem accepted the no-tool candidate (2026-11-19): no race, fade out/in at the **same spot before Dampé**,
-normal control, and the existing warp back up remains usable. The intended surface return was **not**
-observed; no further behavior change was requested. Both prizes remain shuffled.
-With a Hookshot or Longshot owned, Dampé always runs his second race, so the first-race chest never appears
-(Kareem, 0.2.6, 2026-11-24). From 0.2.7 that chest only holds non-progression items; seeds from 0.2.3 to 0.2.6
-could put a needed item there.
+Every new seed refuses Dampé's race without an owned Hookshot or Longshot: he explains the requirement
+before race setup, then fades out and returns Link to the surface. With either tool, the first race and its
+chest remain available until that chest is opened; an unopened retry and old second-race saves are supported.
+The first race has no one-minute prize condition. After collection, the native second race/timed prize resumes.
+Kareem played refusal, retry, both prizes and old-save recovery on Longshot 3.2.0 (2026-11-24); the first chest
+now accepts progression under the usual item restrictions. This replaces 0.2.7's non-progression workaround.
+New generation does not rewrite old seed outputs, which may retain the item-based second-race-only bug.
 
 Every new seed enables the D-pad HUD shortcuts from the start, independently of fast-start
 choices (including `--skip` with no selections): **Navi, Ocarina, Boots and Masks**.
