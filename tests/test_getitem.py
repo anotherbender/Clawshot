@@ -25,71 +25,21 @@ def actor_pack(actor):
     return sarc.write(pack), model
 
 
-@pytest.mark.parametrize("actor", getitem.SONG_MODELS)
-def test_model_correction_preserves_every_nonpresentation_member(actor):
-    before, model = actor_pack(actor)
-    original = sarc.read(before)
-    after = sarc.read(getitem.patch_pack(before, actor=actor))
-    assert byml.read(after[model]) == {
-        "FmdbName": getitem.SONG_MODELS[actor],
-        "ModelProjectName": getitem.SONG_MODELS[actor],
-    }
-    after[model] = original[model]
-    assert after == original
-
-
-def test_actor_info_keeps_grant_identity_and_unrelated_rows_and_uses_unmodified_donors():
-    def row(name, heap, model):
-        return {
-            "__RowId": name,
-            "ActorName": name,
-            "FmdbName": model,
-            "ModelProjectName": model,
-            "ModelAabbMin": {"X": byml.F32(-heap)},
-            "ModelAabbMax": {"X": byml.F32(heap)},
-            "InstanceHeapSize": byml.U32(heap),
-            "PreActorRenderInfoHeapSize": byml.U32(heap),
-            "Unrelated": "keep",
-        }
-
-    song = "Item_Melody_StormSong"
-    rows = [
-        row(getitem.FAIRY, 100, getitem.FAIRY),
-        row(getitem.TIME, 200, getitem.TIME),
-        row("Item_Boomerang", 300, "Item_Boomerang"),
-        row(song, 50, "Obj_Rupee"),
-        row("Other", 9, "Other"),
-    ]
-    data = byml.write(rows, byte_order="big")
-    result = getitem.patch_actor_info(data, actors=(song,))
-    assert byml.byte_order(result) == "big"
-    after = byml.read(result)
-    assert after[3]["InstanceHeapSize"] == 150
-    assert after[3]["PreActorRenderInfoHeapSize"] == 100
-    for field in getitem.MODEL_FIELDS:
-        assert byml.same(after[3][field], rows[0][field])
-        after[3][field] = rows[3][field]
-    after[3]["InstanceHeapSize"] = rows[3]["InstanceHeapSize"]
-    after[3]["PreActorRenderInfoHeapSize"] = rows[3]["PreActorRenderInfoHeapSize"]
-    assert byml.same(after, rows)
-
-
-def test_stale_model_is_refused_and_does_not_mutate_input():
-    actor = "Item_Melody_StormSong"
-    data, model = actor_pack(actor)
+def swap_model(data, *, actor):
+    """The song's ModelInfo pointed at its ocarina and nothing else: the substitution ``member_growth`` sizes (the
+    song step, ``patch.songs``, makes it among its other edits)."""
     pack = sarc.read(data)
-    pack[model] = byml.write({"FmdbName": "Changed", "ModelProjectName": "Changed"})
-    with pytest.raises(PatchError):
-        getitem.patch_pack(sarc.write(pack), actor=actor)
-    with pytest.raises(PatchError):
-        getitem.patch_pack(data, actor="Other")
-    assert sarc.read(data) != pack
+    model = member_path(byml.read(pack[member_path(actor_path(actor))])["Components"]["ModelInfoRef"])
+    tree = byml.load(pack[model])
+    tree.root["FmdbName"] = tree.root["ModelProjectName"] = getitem.SONG_MODELS[actor]
+    pack[model] = byml.dump(tree)
+    return sarc.write(pack)
 
 
 def test_structural_growth_cannot_borrow_a_string_substitution_allocation():
     actor = "Item_Melody_StormSong"
     before, model = actor_pack(actor)
-    pack = sarc.read(getitem.patch_pack(before, actor=actor))
+    pack = sarc.read(swap_model(before, actor=actor))
     tree = byml.read(pack[model])
     tree["NewArray"] = [byml.I32(1)]
     pack[model] = byml.write(tree)
@@ -104,7 +54,7 @@ def test_common_writer_reserves_nested_model_growth_without_lowering_other_entri
     pack = sarc.read(before)
     pack[model] = byml.write(byml.read(pack[model]) | {"Padding": ""})
     before = sarc.write(pack)
-    transform = partial(getitem.patch_pack, actor=actor)
+    transform = partial(swap_model, actor=actor)
     after = sarc.read(transform(before))
     old = sarc.read(before)
     delta = ((len(after[model]) + 31) // 32 - (len(old[model]) + 31) // 32) * 32
@@ -306,12 +256,11 @@ def test_ocarina_changes_refuse_a_dump_without_the_donor_pack(tmp_path, zsdic_pa
         getitem.ocarina_changes(tmp_path)
 
 
-@pytest.mark.parametrize("actor", getitem.OCARINAS)
-def test_song_model_changes_refuse_ocarinas_and_stage_no_chest_props(tmp_path, actor):
+def test_no_chest_props_are_staged_and_the_unwired_song_swap_is_gone():
     # The round-8 prop staging is gone: no seed changes Dm_SY_TreasureboxSmall or Dm_SY_Treasurebox for ocarinas.
-    with pytest.raises(PatchError, match="no get-display correction"):
-        getitem.changes(tmp_path, (actor,))
     assert not hasattr(getitem, "patch_chest_flow") and not hasattr(getitem, "CHEST_FLOWS")
+    # The song mesh swap is replaced by the song get effects (patch.songs, spec song-get-effects S11).
+    assert not any(hasattr(getitem, name) for name in ("changes", "patch_pack", "patch_actor_info"))
 
 
 def test_native_inputs_name_every_dump_file_the_ocarina_step_reads():
@@ -340,6 +289,22 @@ def test_the_app_working_set_holds_the_ocarina_inputs():
 
     wanted = working_files(SimpleNamespace(files=[]), resource_spec())
     assert set(getitem.native_inputs()) <= wanted, sorted(set(getitem.native_inputs()) - wanted)
+
+
+@pytest.mark.parametrize(
+    ("shuffle", "runs"),
+    [
+        (("Chest", "Gift"), True),
+        (("Chest", "Gift", "Token"), True),
+        (("Chest", "NPC", "Song", "Cutscene", "Boss"), True),  # Gift as the types it expands to
+        (("Chest",), False),  # the defaults: no ocarina can reach a chest
+        (("Chest", "Token"), False),
+        (("Gift",), False),  # gifts move, chests stay: no ocarina can reach a chest
+        ((), False),
+    ],
+)
+def test_the_ocarina_get_model_runs_when_chest_and_gift_shuffle_are_both_on(shuffle, runs):
+    assert getitem.chest_ocarinas_possible(shuffle) is runs
 
 
 def test_only_a_chest_holding_an_ocarina_asks_for_the_get_model():

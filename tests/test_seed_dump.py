@@ -14,7 +14,7 @@ from clawshot.census.scan import CHEST, scan
 from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.generate import Settings, prepare
 from clawshot.patch import events as chest_events
-from clawshot.patch import getitem, make_seed, write_seed
+from clawshot.patch import getitem, make_seed, songs, write_seed
 from clawshot.patch import items as item_actors
 from clawshot.patch.plan import DROP_KEY, EVENT_KEY, Plan
 from clawshot.world.load import load_spec
@@ -154,8 +154,10 @@ def test_same_seed_same_folder_in_two_processes(romfs, tmp_path):
         folders.append({p.relative_to(out).as_posix(): p.read_bytes() for p in sorted(out.rglob("*")) if p.is_file()})
     assert folders[0] == folders[1]
     assert "spoiler.json" in folders[0] and len(folders[0]) > 1
-    # A Chest-only seed can put no ocarina in a chest, so it carries no ocarina get model (Q1 option b).
-    for path in map(getitem.pack_path, getitem.OCARINAS):
+    # Chest-only settings can put no ocarina in a chest and move no song, so the seed carries neither the ocarina
+    # get model nor the song get effects (by setting: PR #41, the maintainers' option 2).
+    song_files = (songs.ELINK, songs.STATIC, *map(getitem.pack_path, getitem.SONG_MODELS))
+    for path in (*map(getitem.pack_path, getitem.OCARINAS), *song_files):
         assert f"romfs/{path}" not in folders[0], path
 
 

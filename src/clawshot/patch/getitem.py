@@ -1,13 +1,14 @@
 """Get-item display: what an item shows in Link's get pose; no inventory or chest-admission policy changes.
 
-The ocarinas' get model (:func:`ocarina_changes`, in seeds that put an ocarina in a chest: :func:`chest_ocarinas`):
-the two ``ActorInfo`` rows lose ``CalcPriority`` and each ocarina pack gets the pouch get-pose performer, the common
-animation set and its own AnimationParam (plans/chest-ocarina-model.md, run O). Equipment components stay native.
+The ocarinas' get model (:func:`ocarina_changes`, when the settings could put an ocarina in a chest:
+:func:`chest_ocarinas_possible`): the two ``ActorInfo`` rows lose ``CalcPriority`` and each ocarina pack gets the
+pouch get-pose performer, the common animation set and its own AnimationParam (plans/chest-ocarina-model.md, run O).
+Equipment components stay native.
 
-Songs borrow native ocarina meshes (:func:`changes`, an unwired experiment pending visual review).
+Songs show these ocarinas (:data:`SONG_MODELS`) with an effect of their own: ``clawshot.patch.songs``. The writer
+sizes their changed ModelInfo with :func:`member_growth`.
 """
 
-import copy
 from collections.abc import Callable, Iterable, Mapping
 from functools import partial
 from pathlib import Path
@@ -61,27 +62,6 @@ def _dump(document: byml.Document) -> bytes:
     result = byml.dump(document)
     if difference := byml.difference(document.root, byml.read(result)):
         raise PatchError(f"get-display BYML failed read-back: {difference}")
-    return result
-
-
-def patch_pack(data: bytes, *, actor: str) -> bytes:
-    """Change a song's mesh without changing its grant identity."""
-    if actor not in SONG_MODELS:
-        raise PatchError(f"no song get-display correction for {actor}")
-    pack = sarc.read(data)
-    components = resolve_member(pack, actor_path(actor))["Components"]
-    model_member = member_path(components["ModelInfoRef"])
-    model = byml.load(pack[model_member])
-    if (model.root.get("FmdbName"), model.root.get("ModelProjectName")) != ("Obj_Rupee", "Obj_Rupee"):
-        raise PatchError(f"{actor}: stale native model: {model.root}")
-    if components.get("EventPerformerRef") != "?" + PERFORMER:
-        raise PatchError(f"{actor}: song no longer uses the pouch performer")
-    for field in ("FmdbName", "ModelProjectName"):
-        model.root[field] = SONG_MODELS[actor]
-    pack[model_member] = _dump(model)
-    result = sarc.write(pack)
-    if sarc.read(result) != pack:
-        raise PatchError(f"{actor}: get-display pack failed read-back")
     return result
 
 
@@ -165,15 +145,30 @@ def native_inputs() -> tuple[str, ...]:
     )
 
 
+def gift_kinds(shuffle: Iterable[str]) -> set[str]:
+    """The gift kinds among ``shuffle`` (``Gift`` or one of the types it expands to, ``patch.gifts.GIFT_TYPES``)."""
+    from clawshot.patch.gifts import GIFT_TYPES, SHUFFLE
+
+    return set(shuffle) & {SHUFFLE, *GIFT_TYPES}
+
+
+def chest_ocarinas_possible(shuffle: Iterable[str]) -> bool:
+    """Whether the settings could put an ocarina in a chest (Chest and Gift shuffle both on): a seed gets
+    :func:`ocarina_changes` exactly then, so the settings string says which build a seed has (PR #41, the
+    maintainers' option 2, 2026-11-23). Other seeds keep these files byte-identical to the dump."""
+    shuffle = tuple(shuffle)
+    return "Chest" in shuffle and bool(gift_kinds(shuffle))
+
+
 def chest_ocarinas(placements: Mapping[str, str], chests: Iterable[str], actors: ItemActors) -> list[str]:
-    """The chests (in ``chests`` order) whose placed item is an ocarina: a seed gets :func:`ocarina_changes` only
-    when there is one. Elsewhere the change shows nothing and would only alter Saria's native farewell, where her
-    own ocarina is drawn wrong without the instrument's ``CalcPriority`` (plans/chest-ocarina-model.md, runs D, D2)."""
+    """The chests (in ``chests`` order) whose placed item is an ocarina. ``make_seed`` refuses a seed that has one
+    when :func:`chest_ocarinas_possible` says the settings cannot: the chest would show the wrong model."""
     return [name for name in chests if actors.actors.get(placements.get(name, "")) in OCARINAS]
 
 
 def ocarina_changes(romfs: str | Path) -> dict[str, Callable[[bytes], bytes]]:
-    """The chest-ocarina get model: ActorInfo rows and both ocarina packs (``make_seed`` asks :func:`chest_ocarinas`).
+    """The chest-ocarina get model: ActorInfo rows and both ocarina packs (``make_seed`` asks
+    :func:`chest_ocarinas_possible`).
 
     Compose last on these files (after ``ocarina.changes``): it checks only the native fields it changes."""
     romfs = Path(romfs)
@@ -188,62 +183,9 @@ def ocarina_changes(romfs: str | Path) -> dict[str, Callable[[bytes], bytes]]:
     return out
 
 
-def patch_actor_info(data: bytes, *, actors: tuple[str, ...]) -> bytes:
-    """Keep cached models consistent and reserve conservative native display heap budgets.
-
-    Native instance budgets include more than model bytes. Adding the entire donor
-    budget avoids assuming an unverified exact component/mesh heap delta. This is
-    an experimental upper reservation, not a measured minimal runtime allocation.
-    """
-    document = byml.load(data)
-    rows = {row["__RowId"]: row for row in document.root}
-    for actor in actors:
-        if actor not in SONG_MODELS:
-            raise PatchError(f"no song get-display correction for {actor}")
-        row = rows[actor]
-        if (row.get("FmdbName"), row.get("ModelProjectName")) != ("Obj_Rupee", "Obj_Rupee"):
-            raise PatchError(f"{actor}: stale ActorInfo model: {row}")
-    # Donors remain native; never alter the playable ocarina rows.
-    donors = {name: copy.deepcopy(rows[name]) for name in OCARINAS}
-    for actor in actors:
-        row = rows[actor]
-        donor = donors[SONG_MODELS[actor]]
-        if (donor.get("FmdbName"), donor.get("ModelProjectName")) != (SONG_MODELS[actor],) * 2:
-            raise PatchError(f"{actor}: native model donor changed: {donor}")
-        for field in MODEL_FIELDS:
-            row[field] = copy.deepcopy(donor[field])
-        field = "PreActorRenderInfoHeapSize"
-        row[field] = type(row[field])(max(row[field], donor[field]))
-        field = "InstanceHeapSize"
-        row[field] = type(row[field])(int(row[field]) + int(donor[field]))
-    return _dump(document)
-
-
-def changes(romfs: str | Path, actors: Iterable[str]) -> dict:
-    """Song get-model FileChanges for explicit song actors, suitable for the common overlay writer (unwired).
-
-    Call only for intended chest actors. This does not certify a grant or release
-    a gift-only actor from the sourced allowlist.
-    """
-    actors = tuple(sorted(set(actors)))
-    if not actors:
-        return {}
-    unknown = set(actors) - SONG_MODELS.keys()
-    if unknown:
-        raise PatchError(f"no get-display correction for {sorted(unknown)}")
-    romfs = Path(romfs)
-    for model in {SONG_MODELS.get(actor, actor) for actor in actors}:
-        if not (romfs / f"Model/{model}.{model}.bfres.zs").is_file():
-            raise PatchError(f"missing native model {model}")
-    songs = tuple(actor for actor in actors if actor in SONG_MODELS)
-    out = {pack_path(actor): partial(patch_pack, actor=actor) for actor in songs}
-    if songs:
-        out[ACTOR_INFO] = partial(patch_actor_info, actors=songs)
-    return out
-
-
 def member_growth(before: bytes, after: bytes) -> dict[str, int]:
-    """Retain original parsed overhead for same-shape song model substitutions."""
+    """Retain original parsed overhead for same-shape song model substitutions (``patch.songs``): a song's ModelInfo
+    keeps its native entry plus its rounded growth."""
     original, changed = sarc.read(before), sarc.read(after)
     growth = {}
     for actor in SONG_MODELS:

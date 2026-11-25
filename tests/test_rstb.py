@@ -64,6 +64,14 @@ def test_set_updates_a_name_entry_or_adds_a_hash_entry():
         ("Component/PouchContentParam/X.game__component__PouchContentParam.bgyml", 212, 224 + 5216),
         ("RSDB/GameActorInfo.Product.111.rstbl.byml.zs", 574_824, 575_112),
         ("RSDB/PouchActorInfo.Product.111.rstbl.byml.zs", 49_380, 49_672),
+        # Song effects (plans/03-game-data.md, section 51): ELinkParam members, effect files, static, ELink tables.
+        ("Component/ELink/X.engine__component__ELinkParam.bgyml", 37, 64 + 5064),
+        ("Effect/Obj_X.Nin_Ounce_NVN2.vsetb.byml.zs", 289_116, 289_120 + 264),
+        ("Effect/static.Nin_Ounce_NVN2.vsetb.byml.zs", 52_401_096, 52_401_120 + 4136),
+        ("Effect/static.Nin_Ounce_NVN2.vsetb.byml", 52_746_792, 52_746_816 + 4136),
+        ("ELink2/elink2.Product.110.belnk.zs", 2_418_776, 2_418_776 + 272),  # both formulas agree
+        ("ELink2/elink2.Product.110.belnk.zs", 2_442_368, 2_442_368 + 272),  # size + 272 is the larger
+        ("ELink2/elink2.Product.110.belnk.zs", 2_442_376, 2_442_400 + 264),  # rounded + 264 is the larger
     ],
 )
 def test_required_size(path, size, entry):

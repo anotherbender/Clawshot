@@ -1,14 +1,15 @@
 """The chest ocarinas' get model in a real generated seed, against the dump (plans/chest-ocarina-model.md, run O).
 
 A Chest + Gift + Token seed with both ocarinas in chests, so ActorInfo also carries another step's rows; every
-difference from the dump is named. A seed with no ocarina in a chest carries none of it (Q1 option b)."""
+difference from the dump is named. Settings without Gift shuffle carry none of it
+(by setting: PR #41, the maintainers' option 2)."""
 
 import pytest
 
 from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.generate import Settings
 from clawshot.generate.fill import allowed
-from clawshot.patch import getitem, gifts, make_seed, ocarina, write_seed
+from clawshot.patch import getitem, gifts, make_seed, ocarina, songs, write_seed
 from clawshot.patch.shops import actor_path, member_path
 from clawshot.world.load import load_spec
 
@@ -68,8 +69,9 @@ def seed(romfs, tmp_path_factory):
 
 
 @pytest.mark.dump
-def test_a_seed_without_a_chest_ocarina_keeps_the_native_rows_and_packs(romfs, tmp_path):
+def test_settings_without_gift_shuffle_keep_the_native_rows_and_packs(romfs, tmp_path):
     output = make_seed(romfs, 7, Settings(shuffle=("Chest", "Token")))  # Chest-only kinds: no ocarina in the pool
+    assert output.steps == ()
     written = {info.path for info in write_seed(output, romfs, tmp_path / "seed")}
     assert not written & set(map(getitem.pack_path, getitem.OCARINAS)), sorted(written)
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)
@@ -86,28 +88,41 @@ def step_module(transform):
     return function.__module__
 
 
+def ocarina_step(output) -> int:
+    """The index of the ocarina get model's step. Only the song get effects may follow it (Gift shuffle lets songs
+    move, so the seed gets them; song-get-effects): last on ActorInfo and the song packs."""
+    steps = [{step_module(t) for t in step.values()} for step in output.extra_changes]
+    index = max(i for i, modules in enumerate(steps) if getitem.__name__ in modules)
+    assert steps[index] == {getitem.__name__}, steps[index]
+    assert all(modules == {songs.__name__} for modules in steps[index + 1 :]), steps[index + 1 :]
+    return index
+
+
 @pytest.mark.dump
 def test_a_chest_ocarina_seed_runs_the_ocarina_step_last_on_its_files(seed):
     output, written, _, _ = seed
     paths = (getitem.ACTOR_INFO, *map(getitem.pack_path, getitem.OCARINAS))
     for path in paths:
         assert path in written, f"{path} is not in the output"
-        touching = [i for i, step in enumerate(output.extra_changes) if path in step]
+        touching = [i for i, step in enumerate(output.extra_changes[: ocarina_step(output) + 1]) if path in step]
         last = output.extra_changes[touching[-1]][path]
         assert step_module(last) == getitem.__name__, (
             path,
             [step_module(output.extra_changes[i][path]) for i in touching],
         )
-    # It comes after ocarina.changes (the Time-stays-equipped receipts) in the recipe.
+    # It comes after ocarina.changes (the Time-stays-equipped receipts) in the recipe; only the song step follows.
     steps = [{step_module(t) for t in step.values()} for step in output.extra_changes]
-    assert max(i for i, m in enumerate(steps) if ocarina.__name__ in m) < len(steps) - 1
-    assert steps[-1] == {getitem.__name__}
+    assert max(i for i, m in enumerate(steps) if ocarina.__name__ in m) < ocarina_step(output)
+    for step in output.extra_changes[ocarina_step(output) + 1 :]:
+        assert not set(map(getitem.pack_path, getitem.OCARINAS)) & set(step), "the song step leaves the ocarinas"
 
 
 @pytest.mark.dump
 def test_actor_info_differs_from_the_dump_only_by_the_calc_priorities_and_named_steps_rows(seed):
     output, _, native, written = seed
-    other = [step[getitem.ACTOR_INFO] for step in output.extra_changes[:-1] if getitem.ACTOR_INFO in step]
+    index = ocarina_step(output)
+    other = [step[getitem.ACTOR_INFO] for step in output.extra_changes[:index] if getitem.ACTOR_INFO in step]
+    later = [step[getitem.ACTOR_INFO] for step in output.extra_changes[index + 1 :] if getitem.ACTOR_INFO in step]
     names = sorted({step_module(transform) for transform in other})
     print(f"ActorInfo row steps before the ocarina step: {names}")
     assert set(names) <= ROW_STEPS, names
@@ -123,6 +138,11 @@ def test_actor_info_differs_from_the_dump_only_by_the_calc_priorities_and_named_
         if row["__RowId"] == getitem.SARIA_PROP:
             assert "CalcPriority" not in row, row
             row["CalcPriority"] = "After"
+    # The song step after it (its own tests check its rows): applied to the expected table as the seed applies it.
+    expected_data = byml.dump(byml.Document(expected_rows))
+    for transform in later:
+        expected_data = transform(expected_data)
+    expected_rows = byml.read(expected_data)
     after = byml.read(written(getitem.ACTOR_INFO))
     difference = byml.difference(after, expected_rows)
     assert difference is None, difference
