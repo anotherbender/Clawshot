@@ -15,6 +15,7 @@ def story(check, item="Obj_Heart_Piece"):
         evfl.SubFlowEvent(display, scenes.POUCH, "DisplayGetByActorName", params={"ActorName": item}),
         evfl.ActionEvent("Event242", 1, 0),
     ]
+    events[0].next = 1 if check == scenes.MOAT else evfl.NONE
     events[1].next = 2 if check == scenes.MOAT else 0
     return evfl.EventFlowFile(
         flow,
@@ -23,9 +24,10 @@ def story(check, item="Obj_Heart_Piece"):
             [
                 evfl.Actor("PouchSystemActor", actions=["EventTriggerAddOrRemovePouchContent"]),
                 evfl.Actor("EventSystemActor", actions=["EventWait"]),
+                evfl.Actor("Player_Event"),
             ],
             events,
-            [evfl.EntryPoint("Cut", 1, [1])],
+            [evfl.EntryPoint("Cut", 0 if check == scenes.MOAT else 1, [1])],
         ),
     )
 
@@ -35,30 +37,50 @@ def patch_story(file, check):
     return scenes._scene(evfl.write(file), flow=flow, grant=grant, display=display, anchor=anchor)
 
 
+def play_story(chart):
+    """Model the observed heart-processing replay; display itself never grants."""
+    state = {"pieces": 0, "life": 4, "max_life": 24}
+    order = []
+    index = chart.entry_point("Cut").main_event
+    for _ in range(20):
+        if index == evfl.NONE:
+            return state, order
+        event = chart.events[index]
+        if isinstance(event, evfl.ActionEvent):
+            actor = chart.actors[event.actor]
+            operation = actor.actions[event.action]
+            if (actor.name, operation) == ("PouchSystemActor", "EventTriggerAddOrRemovePouchContent"):
+                state["pieces"] += event.params["Num"]
+                order.append("grant")
+            elif (actor.name, operation) == ("Player_Event", "EventTriggerHealLifeMax"):
+                state["life"] = state["max_life"]
+                order.append("heal")
+        elif event.flowchart == "GetPouchContent":
+            order.append("window")
+        elif (event.flowchart, event.entry_point) == ("Dm_SY_Get", "CheckHeart"):
+            # The played already-added piece took this coupled path and became two.
+            state["pieces"] += 1
+            state["life"] = state["max_life"]
+            order.append("heal")
+        else:
+            raise AssertionError(event)
+        index = event.next
+    raise AssertionError("story did not finish")
+
+
 @pytest.mark.parametrize("check", [scenes.MOAT, scenes.SARIA])
-def test_healing_follows_the_given_item_once_and_keeps_the_native_continuation(check):
+def test_already_added_piece_is_one_piece_and_heals_fully_without_replaying_heart_processing(check):
     before = story(check)
-    fc = evfl.read(patch_story(before, check)).flowchart
-    _, _, _, _, anchor = scenes.SOURCES[check]
-    old = next(event for event in before.flowchart.events if event.name == anchor)
-    source = next(event for event in fc.events if event.name == anchor)
-    heal = fc.events[source.next]
-    assert (heal.flowchart, heal.entry_point, heal.params) == (
-        "Dm_SY_Get",
-        "CheckHeart",
-        {"ActorName": "Obj_Heart_Piece"},
-    )
-    assert heal.next == old.next
-    assert source.next in fc.entry_point("Cut").sub_flow_events
-    assert fc.events[0].params == before.flowchart.events[0].params
-    assert sum(isinstance(event, evfl.ActionEvent) and event.actor == 0 for event in fc.events) == 1
-    window = fc.events[1]
-    assert window.entry_point == (scenes.DISPLAY if check == scenes.MOAT else "DisplayGetByActorName")
+    after = evfl.read(patch_story(before, check))
+    state, order = play_story(after.flowchart)
+    assert state == {"pieces": 1, "life": 24, "max_life": 24}
+    assert order == (["grant", "window", "heal"] if check == scenes.MOAT else ["window", "grant", "heal"])
+    assert after.flowchart.events[0].params == before.flowchart.events[0].params
     with pytest.raises(PatchError, match="already patched"):
-        patch_story(evfl.EventFlowFile(fc.name, flowchart=fc), check)
+        patch_story(after, check)
 
 
-@pytest.mark.parametrize("fault", ["item", "normal_get", "continuation", "display"])
+@pytest.mark.parametrize("fault", ["item", "normal_get", "continuation", "display", "player", "player_instance"])
 def test_changed_scene_source_is_refused(fault):
     file = story(scenes.MOAT)
     if fault == "item":
@@ -67,9 +89,13 @@ def test_changed_scene_source_is_refused(fault):
         file.flowchart.events[0].params["IsGetEvent"] = True
     elif fault == "continuation":
         file.flowchart.events[1].next = evfl.NONE
+    elif fault == "player":
+        file.flowchart.actors[2].name = "Other"
+    elif fault == "player_instance":
+        file.flowchart.actors[2].secondary_name = "Other"
     else:
         file.flowchart.events[1].entry_point = "GetPouchContentByActorName"
-    with pytest.raises(PatchError, match="changed"):
+    with pytest.raises(PatchError):
         patch_story(file, scenes.MOAT)
 
 

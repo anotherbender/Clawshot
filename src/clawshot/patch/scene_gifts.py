@@ -1,9 +1,9 @@
 """Native healing for the two split story grants; post-add moat heart-piece text.
 
-CheckHeart is the game's post-NPC-grant path, without a get window, model or
-save. The moat adds before its window, unlike ordinary gets: its heart-piece
-caption uses a private clone with post-add cases, never the shared native entry.
-Evidence: r22-scenes, native Dm_SY_GetInEvent and GetPouchContent.
+Heart upgrades have already been added by the scene. Replaying CheckHeart's
+SpecialDeal-coupled cure duplicated the played moat piece; use the native
+HP-only full heal instead (DoorOfTime/Event70). Other cure actors retain their
+native CheckHeart path. The moat's post-add caption is a private native clone.
 """
 
 from collections.abc import Mapping
@@ -22,7 +22,9 @@ SARIA = "LW Gift from Saria"
 POUCH = "GetPouchContent"
 ANALYZED = "RSDB/GameAnalyzedEventInfo.Product.111.rstbl.byml.zs"
 DISPLAY = "ClawshotDisplayHeartPieceAfterGrant"
-HEAL = "ClawshotStoryGiftCheckHeart"
+HEAL = "ClawshotStoryGiftHeal"
+FULL_HEAL = "EventTriggerHealLifeMax"
+HEART_ACTORS = ("Obj_Heart_Piece", "Obj_Heart_Container")
 # check -> (flow, vanilla logic item, grant, display, heal anchor)
 SOURCES = {
     MOAT: ("Dm_MelodyGet_Time", "Ocarina of Time", "Event70", "Event229", "Event229"),
@@ -74,13 +76,23 @@ def _scene(data: bytes, *, flow: str, grant: str, display: str, anchor: str) -> 
     if flow == SOURCES[MOAT][0] and item == "Obj_Heart_Piece":
         window.entry_point = DISPLAY
     added = len(fc.events)
-    fc.events.append(evfl.SubFlowEvent(HEAL, "Dm_SY_Get", "CheckHeart", source.next, {"ActorName": item}))
+    if item in HEART_ACTORS:
+        players = [i for i, actor in enumerate(fc.actors) if (actor.name, actor.secondary_name) == ("Player_Event", "")]
+        if len(players) != 1:
+            raise PatchError(f"story gift {flow}: expected one native Player_Event for healing")
+        player = fc.actors[players[0]]
+        if FULL_HEAL not in player.actions:
+            player.actions.append(FULL_HEAL)
+        fc.events.append(evfl.ActionEvent(HEAL, players[0], player.actions.index(FULL_HEAL), source.next))
+    else:
+        fc.events.append(evfl.SubFlowEvent(HEAL, "Dm_SY_Get", "CheckHeart", source.next, {"ActorName": item}))
     source.next = added
     owners = [entry for entry in fc.entry_points if added in reachable(fc, entry.main_event)]
     if not owners:
         raise PatchError(f"story gift {flow}: healing anchor is unreachable")
-    for entry in owners:
-        entry.sub_flow_events.append(added)
+    if isinstance(fc.events[added], evfl.SubFlowEvent):
+        for entry in owners:
+            entry.sub_flow_events.append(added)
     return _encode(file)
 
 
@@ -151,7 +163,8 @@ def changes(placements: Mapping[str, str], actors: ItemActors) -> FileChanges:
             continue
         actor = actors.actor(item)
         out[path(flow)] = partial(_scene, flow=flow, grant=grant, display=display, anchor=anchor)
-        flows.append(flow)
+        if actor not in HEART_ACTORS:
+            flows.append(flow)
         if check == MOAT and actor == "Obj_Heart_Piece":
             out[path(POUCH)] = _post_add_piece_display
     if flows:

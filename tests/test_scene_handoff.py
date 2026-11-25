@@ -102,7 +102,7 @@ def run(charts, rows, flow, entry, current, *, stop_native=False, data_only=Fals
                 index = dict(event.cases).get(0 if answer else 1, evfl.NONE)
                 continue
             operation = actor.actions[event.action]
-            if stop_native and actor.name == "Player_Event":
+            if stop_native and actor.name == "Player_Event" and operation != "EventTriggerHealLifeMax":
                 return "native"
             if operation == "EventTransition":
                 name = params["EventName"]
@@ -121,8 +121,12 @@ def run(charts, rows, flow, entry, current, *, stop_native=False, data_only=Fals
                 current["IsGet." + content] = True
                 current.setdefault("grants", []).append((content, params["Num"], contexts))
             elif operation == "EventTriggerRecoverByCureItem":
-                assert current["stock"].get(params["ActorName"], 0) > 0, "recovery must follow the grant"
-                current.setdefault("heals", []).append(params["ActorName"])
+                content = params["ActorName"]
+                assert current["stock"].get(content, 0) > 0, "recovery must follow the grant"
+                if content == "Obj_Heart_Piece":
+                    current["stock"][content] += 1  # played coupled-processing regression
+                current["life"] = current["max_life"]
+            elif operation == "EventTriggerHealLifeMax":
                 current["life"] = current["max_life"]
             elif operation == "EventTriggerSetGameDataBool":
                 current[params["GameDataName"]] = params["Value"]
@@ -221,8 +225,21 @@ def fixture(tmp_path, monkeypatch):
         ],
         [evfl.EntryPoint("Main", 0)],
     )
+    player_donor = evfl.Flowchart(
+        "DoorOfTime",
+        [
+            evfl.Actor(
+                "Player_Event",
+                actions=["EventTriggerHealLifeMax"],
+                params={"BindTargetActorNameComponent": "Player"},
+            )
+        ],
+        [evfl.ActionEvent("NativeFullHeal", 0, 0)],
+        [evfl.EntryPoint("FullHeal", 0)],
+    )
     original = {
-        chart.name: evfl.EventFlowFile(chart.name, flowchart=chart) for chart in (pouch, native, caller, healing)
+        chart.name: evfl.EventFlowFile(chart.name, flowchart=chart)
+        for chart in (pouch, native, caller, healing, player_donor)
     }
     for name, document in original.items():
         path = tmp_path / keys.flow_path(name)
@@ -398,7 +415,7 @@ def test_skipped_scene_heals_a_heart_reward_after_one_grant_and_never_again(fixt
     run(charts, {}, handoff.FLOW, scene.name, current)
     assert current["stock"]["Obj_Heart_Piece"] == 1
     assert current["life"] == 12
-    assert current["heals"] == ["Obj_Heart_Piece"]
+    current["life"] = 4
     run(charts, {}, handoff.FLOW, scene.name, current)
     assert current["stock"]["Obj_Heart_Piece"] == 1
-    assert current["heals"] == ["Obj_Heart_Piece"]
+    assert current["life"] == 4

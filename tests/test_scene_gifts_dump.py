@@ -42,13 +42,21 @@ def test_native_heart_grants_declare_their_recovery_and_preserve_shared_caption_
         chart = charts[flow]
         events = {event.name: event for event in chart.events}
         heal = events[scenes.HEAL]
-        assert (heal.flowchart, heal.entry_point, heal.params) == (
-            "Dm_SY_Get",
-            "CheckHeart",
-            {"ActorName": "Obj_Heart_Piece"},
+        assert isinstance(heal, evfl.ActionEvent)
+        assert (chart.actors[heal.actor].name, chart.actors[heal.actor].actions[heal.action], heal.params) == (
+            "Player_Event",
+            "EventTriggerHealLifeMax",
+            None,
         )
         assert chart.events[events[anchor].next] == heal
         assert events[grant].params["Actor"] == events[display].params["ActorName"] == "Obj_Heart_Piece"
+        # Native full-heal interface, not the SpecialDeal-coupled CheckHeart path.
+        donor = native.charts["DoorOfTime"]
+        native_heal = next(event for event in donor.events if event.name == "Event70")
+        assert (
+            donor.actors[native_heal.actor].actions[native_heal.action] == chart.actors[heal.actor].actions[heal.action]
+        )
+        assert native_heal.params == heal.params
     before, after = native.charts[scenes.POUCH], charts[scenes.POUCH]
     assert after.events[: len(before.events)] == before.events
     assert after.entry_points[: len(before.entry_points)] == before.entry_points
@@ -67,31 +75,3 @@ def test_native_heart_grants_declare_their_recovery_and_preserve_shared_caption_
             )
         else:
             assert any(message.endswith("Obj_Heart_Piece_" + expected[count]) for message in messages)
-
-
-def test_native_checkheart_has_recovery_but_no_grant_window_model_or_autosave(romfs):
-    native, _ = dump_events(romfs)
-    chart = native.charts["Dm_SY_Get"]
-    events = [chart.events[i] for i in reachable(chart, chart.entry_point("CheckHeart").main_event)]
-    actions = {
-        chart.actors[event.actor].actions[event.action] for event in events if isinstance(event, evfl.ActionEvent)
-    }
-    assert actions == {
-        "EventTriggerReserveRecoverOrAddHeartGauge",
-        "EventTriggerSetDisplayHeartGauge",
-        "EventWait",
-        "EventTriggerRecoverByCureItem",
-        "EventStartRecoverOrAddHeartGauge",
-    }
-    assert not any(isinstance(event, evfl.SubFlowEvent) for event in events)
-    recover = [
-        event
-        for event in events
-        if isinstance(event, evfl.ActionEvent)
-        and chart.actors[event.actor].actions[event.action] == "EventTriggerRecoverByCureItem"
-    ]
-    assert [event.params for event in recover] == [{"ActorName": evfl.Argument("ActorName")}]
-    assert chart.events[chart.entry_point("CheckHeart").main_event].name == "Event145"
-    names = {event.name: event for event in chart.events}
-    assert [chart.events[target].name for _, target in names["Event145"].cases] == ["Event156", "Event149"]
-    assert chart.events[dict(names["Event149"].cases)[0]].name == "Event156"
