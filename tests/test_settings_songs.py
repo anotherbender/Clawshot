@@ -173,7 +173,13 @@ def test_ocarina_scrub_sales_are_model_requiring_destinations(kind):
 
 @pytest.mark.parametrize(
     "item,chest_safe",
-    [("Bottle", True), ("Bottle with Milk", False), ("Double Defense", True), ("Stone of Agony", True), ("Rupees (200)", True)],
+    [
+        ("Bottle", True),
+        ("Bottle with Milk", False),
+        ("Double Defense", True),
+        ("Stone of Agony", True),
+        ("Rupees (200)", True),
+    ],
 )
 def test_token_grants_keep_unplayed_chest_variants_held(item, chest_safe):
     token = "Gold Skulltula Token"

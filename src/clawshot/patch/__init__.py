@@ -274,8 +274,7 @@ def make_seed(
     changes += (ocarina.changes(romfs, prior_changes=changes),)
     ocarinas = getitem.ocarina_locations(out.placements, out.shuffled, table)
     needs_get_model = any(
-        out.world.locations[name].type == "Chest"
-        or gifts.is_hand_over(out.world.locations[name].type, ())
+        out.world.locations[name].type == "Chest" or gifts.is_hand_over(out.world.locations[name].type, ())
         for name in ocarinas
     )
     gift_ocarinas = [name for name in ocarinas if out.world.locations[name].type in gifts.GIFT_TYPES]

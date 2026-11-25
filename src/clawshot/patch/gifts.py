@@ -1155,9 +1155,9 @@ def restrict_spec(
                 **info,
                 "keep_vanilla": "gift shuffle: not changeable yet (gift_rules.toml, plans/03-game-data.md section 19)",
             }
-        hand_over = (
-            info.get("type") in HAND_OVER_SCRUB_TYPES or name in keep
-        ) and is_hand_over(info.get("type"), steps.get(name, ()))
+        hand_over = (info.get("type") in HAND_OVER_SCRUB_TYPES or name in keep) and is_hand_over(
+            info.get("type"), steps.get(name, ())
+        )
         if hand_over:
             info = {
                 **info,
