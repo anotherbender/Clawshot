@@ -1,7 +1,7 @@
 # Round 22 shops — cs22c
 
 Branch `r22/shops`, base `2091387`; model `openai-codex/gpt-6.1-sol`.
-Status: implementation, paired staging and post-rebase focused contracts complete; serialized sweep/full gate pending. All behavior changes are **built, not played** until Kareem's Longshot 3.2.0 checks.
+Status: implementation, paired staging, focused contracts, full gate and candidate sweep complete. **READY (play-held)**: all behavior changes remain **built, not played** until Kareem's Longshot 3.2.0 checks.
 Research/output root: `E:/OOTRemake/work/r22-shops/` (outside this repository).
 
 ## Scope and order
@@ -67,4 +67,37 @@ Runtime-load lines and observed outcomes are still for Kareem to supply. No agen
 
 ## Verification and played limits
 
-All staged behavior is **built, not played**. Serialized 200/50/50 paired sweep and full gate pending Claude's order and the preceding owner's explicit release. Comparison source snapshot: local main `5bc5577`; staged gameplay control: release main `2091387` (the intervening main changes are documentation/test-only). No new setting or product-scope decision proposed.
+Gated frozen head **b5e6eb02edf9850fb115e882246ecd6067045273**, on base `5bc5577`; kept frozen through subsequent MAIN MOVED notices as Claude instructed. The final receipt commit changes this round file only. Staged gameplay control remains release main `2091387`. No new setting or product-scope decision proposed.
+
+### Full gate
+
+Owned lock acquired after Claude's line7 authorization and cs22d's full-gate release. Explicit existing-lock guard exits73 before writing owner.txt; isolated occupied/fresh-lock smoke passed without touching the real lock. Every stage-start player check was off (bootchecks excluded).
+
+| Check | Result |
+|---|---|
+| `uv run ruff format --check` | PASS |
+| `uv run ruff check` | PASS |
+| Synthetic, `-n8`, `CLAWSHOT_WORKERS=4`, all `OOT_*` unset | 4,408 passed; 861 skipped; 24 warnings; 463.79s |
+| Dump, `-n8`, `CLAWSHOT_WORKERS=3` | 858 passed; 24 warnings; 3,196.61s |
+
+Dump environment: `OOT_ROMFS=E:/Games/Hookshot/romfs`, `OOT_NUP=E:/Games/Hookshot/The Legend of Zelda Ocarina of Time [0400486024DEC000][v131072].nup`, `OOT_DUMP=E:/OOTRemake/work/rounds/r19/sword-layered-dump`. Existing resource patterns cover all changed files; no fixture extension needed. Warnings are pytest's existing iterator-parametrization deprecation.
+
+### Sweep and immutable main comparison
+
+Candidate only, six workers, same exact recipe/seed pairs and effective CS1 strings as the published shared main **5bc5577369d429d426dc2059461918e41b5c5302** baseline at `work/rounds/r22/main-5bc5577-sweep/`. No duplicate main sweep. Production native setup captured before generation; each generated candidate passed the goal oracle and normalized-pool multiset assertion. Placement digests use the producer's sorted item-pair list encoding; comparisons below are counts only.
+
+| Recipe | Seeds per arm | Exhausted main/candidate | First-try failures main/candidate | Max attempts main/candidate | Identical placements / spheres | Tunic gifts replaced / shuffled |
+|---|---:|---:|---:|---:|---:|---:|
+| Broad | 200 | 0 / 0 | 0 / 0 | 1 / 1 | 0 / 0 | 399 / 400 |
+| Defaults | 50 | 0 / 0 | 1 / 1 | 2 / 2 | 50 / 50 | 0 / 0 |
+| Recommended | 50 | 0 / 0 | 2 / 2 | 2 / 2 | 0 / 0 | 99 / 100 |
+
+Defaults does not select Gift and is the identical control. Broad and Recommended are binding cohorts for the new gift sources. Potion shelves held native equipment in254 Broad and69 Recommended assignments; this count excludes non-bottle ammo/refills whose names begin `Buy`.
+
+### Receipt recovery and handoff
+
+All measured stages exited0. The wrapper then failed only while looking for `<head>-summary.json`: the external sweep CLI had used the literal `sweep` argument as its output label and correctly written `sweep-summary.json` / `sweep-rows.jsonl`. Printed the cause and complete sweep payload, corrected the external argument dispatch, and finalized only the existing results; **no test or seed was rerun**.
+
+Original rows created03:06:08; rows and summary last modified03:14:43 on2026-11-25, matching this run. Finalization checked all300 recipe/seed pairs, successful final fill attempts, effective-settings equality and binding-source totals; preserved original receipts and copied them to the head-qualified paths. `gate-b5e6eb02edf9/result.json` records the post-processing recovery. Owned lock removed and **LOCK RELEASED** posted03:16.
+
+Receipts under `E:/OOTRemake/work/r22-shops/`: `gate-b5e6eb02edf9/` (format/lint/synthetic/dump/capture/sweep logs and final result), `gate-b5e6eb02-runner.log`, `b5e6eb02edf9-{summary.json,rows.jsonl}`. The packet/checklist above remains play-held; no runtime-load or gameplay pass is claimed. Maintainer merge waits for Kareem's checks.
