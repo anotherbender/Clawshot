@@ -123,10 +123,12 @@ item = "Farores Wind"
 [cells.nayrus_love]
 item = "Nayrus Love"
 
-# found_bombchus reads any Bombchus item: once found, used chus still count (proposed by Claude, see the PR).
+# Found Bombchus remain known after use, but supply no capability without their Bomb Bag
+# (Kareem, Longshot 3.2.0, 2026-11-24; plans/rounds/r22-tracker.md).
 [cells.bombchus]
 item = "Bombchus"
 acquired = true
+requires = "bomb_bag"
 
 # can_plant_bean asks for (Magic_Bean, 10): the beans held now (planted ones are gone; D4: conservative).
 [cells.magic_beans]
@@ -307,6 +309,105 @@ label = "Deku Sticks"
 item = "Buy Deku Nut (5)"
 label = "Deku Nuts"
 
+# Silver rupee puzzles (round 22, cs22b). The remake places 85 Obj_RupeeToken_Silver in 17 puzzles of five
+# (plans/03-game-data.md section 5); each puzzle's Banc AiGroup binds its five rupees, an Obj_silverRupeeCounter whose
+# Links name exactly those five, and the room's logic module. The save keeps no rupee count: what it keeps is the
+# saved completion: fifteen room-clear Bools and the lava room's unlock-event history (`flag`). Each counts as the
+# world's whole group (`count`, the group's SilverRupee locations; every rule reads 5). An unfinished puzzle counts
+# none, however many rupees were taken (D4):
+# the rupees' own Bool64bitKey actor flags (reset type 24) are not an audited pick-up contract (03-game-data.md
+# section 6). Every flag below is a GameDataList Bool (GameData/GameDataList.Product.110.byml.zs, build e0f3ccfa)
+# with DefaultValue false, ResetTypeValue 8, SaveFileIndex 0: saved to slot_NN/progress.sav and not reset on an
+# area change (ootmenu findings, sloperinaGZ docs/FINDINGS.md section 1 "Saved or not": reset bits 0x08 with save
+# index 0 are progress; bit 0 is the area-change reset). The fifteen named clears are written by the room module's
+# TriggerGameDataSetBoolTrue, driven by its counter's AllGet output (directly, through Obj_SilverToken group outputs,
+# or through the requested unlock event); the module reads the Bool back to keep the puzzle cleared. No other live
+# writer (one unconnected node, Bottom of the Well's source) and no TriggerGameDataSetBoolFalse names those clears
+# in any AINB graph (round 14's decode cache, 5036 graphs), event flow (915) or Banc file. GTG lava instead uses the
+# saved history of its unique AllGet-triggered unlock event, not its encounter/appear event or guessed autogen key.
+# Rooms are DefaultDungeonRoomIndex. Read-only receipts: E:/OOTRemake/work/r22-tracker/silver/audit_silver.py,
+# audit.json, lava-callers.txt and lava-unlock-chain.txt. Only the six groups without a remake puzzle/world location
+# remain unmapped.
+[silver_rupees."Silver Rupee (Bottom of the Well Basement)"]
+flag = "BottomOfTheWell_Level_Room_09_A_SilverRupee_GetAll"
+count = 5
+source = "Banc BottomOfTheWell room 9, the dungeon's only puzzle (AiGroup 2607688059532569446, counter 16625183292448018016). Logic/BottomOfTheWell_Level_Room_10_Prefab_e580.logic.module.ainb n18 TriggerGameDataSetBoolTrue <- n2 EventRequestActor (BottomOfTheWell_SilverToken_Unlock) EventFinish, requested by n10 ActorLogicRupeeCounter AllGet; n19 reads it back (counter Vanish, event actor Logic_Delete). Room_10_Prefab_cb30 n4 also names it, with IsDrive unconnected (default false): it never fires. GameDataList Bool 0x74b2b996."
+
+[silver_rupees."Silver Rupee (Ice Cavern Spinning Scythe)"]
+flag = "IceCavern_Room05_Unlocked"
+count = 5
+source = "Banc IceCavern room 3 (AiGroup 1731122661316148223, counter 12613027945768783129); the dungeon's other puzzle is in room 8, the push-block room (data/world/remake/child_ice_cavern.toml). Logic/IceCavern_Level_Room_05_Prefab_b7b3.logic.module.ainb n1 TriggerGameDataSetBoolTrue <- n0 EventRequestActor (IceCavern_Room05_SilverToken_Unlock) EventFinish, requested by n18 ActorLogicRupeeCounter AllGet; n2 reads it back. GameDataList Bool 0xafe50c4b."
+
+[silver_rupees."Silver Rupee (Ice Cavern Push Block)"]
+flag = "IceCavern_Room06_Unlocked"
+count = 5
+source = "Banc IceCavern room 8, the push-block room (data/world/remake/child_ice_cavern.toml; AiGroup 17154235701062031984, counter 9589276576518015200). Logic/IceCavern_Level_Room_06_Prefab_ef28.logic.module.ainb n1 TriggerGameDataSetBoolTrue <- n0 EventRequestActor (IceCavern_Room06_SilverToken_Unlock) EventFinish, requested by n30 ActorLogicRupeeCounter AllGet; n2 reads it back (n5 also sets IceCavern_Room06_SilverRupeeGet straight from AllGet, same metadata). GameDataList Bool 0x35e5c635."
+
+[silver_rupees."Silver Rupee (Gerudo Training Ground Slopes)"]
+flag = "GerudoTrainingGround_Dungeon_Room02_SilverRupee"
+count = 5
+source = "Banc GerudoTrainingGround room 2, the boulder room (data/world/remake/adult_gerudo_training_ground.toml: boulders 2, lava 6, water 9; AiGroup 5376408650136387192). The room has two five-rupee sets, one per entrance side (events GerudoTrainingGround_02_SilverToken_* and _02From03_*, counters 12823581757598790153 and 6357240931969779658), one clear: Logic/GerudoTrainingGround_Level_Room_02_Prefab_e14a.logic.module.ainb n1 TriggerGameDataSetBoolTrue <- n10 OR of n9 (Obj_SilverToken_Group_Prefab_a475) and n15 (Obj_SilverToken_FirstDemoGroup_Prefab_2b57) GimmickClear, each its unlock event's EventFinish requested by its counter's AllGet; n0 reads it back and deletes both sets (PrefabAllDelete), so the world's five count once. GameDataList Bool 0x49278189."
+
+[silver_rupees."Silver Rupee (Gerudo Training Ground Water)"]
+flag = "GerudoTrainingGround_Dungeon_Room09_SilverRupee"
+count = 5
+source = "Banc GerudoTrainingGround room 9, the water room (adult_gerudo_training_ground.toml; AiGroup 16490966705580268555, counter 1360086147602188847, which also binds the Underwater Silver Rupee Chest 3717705376223508790). Logic/GerudoTrainingGround_Level_Room_09_Prefab_8640.logic.module.ainb n0 TriggerGameDataSetBoolTrue <- n3 Obj_SilverToken_Group_Prefab_a475 AllTokenAcquired (its counter's AllGet); n1 reads it back. GameDataList Bool 0x516ed4f9."
+
+[silver_rupees."Silver Rupee (Gerudo Training Ground Lava)"]
+flag = "HavePlayedEvent.GerudoTrainingGround_06_SilverToken_Unlock"
+count = 5
+source = "Banc GerudoTrainingGround room 6 (AiGroup 12402114570269951643, counter 17737439470550412326 links all five rupees). Room_06_Prefab_14f8.logic.module.ainb n12 AllGet -> n2 EventRequestActor_abe3 (Hash5973768131564127645), the sole Banc caller of GerudoTrainingGround_06_SilverToken_Unlock; no EVFL subflow calls it. GerudoTrainingGround_Gimmick.bfevfl unlock entry Event101 -> Event102 -> Event127 (ShadowTemple_Gimmick/Silver_Tolken_Finish) -> Event96 -> Event420 -> Event419 EventTriggerSetEventBool true -> module n18 autogen clear. Its specific saved HavePlayedEvent history therefore proves all five were collected; the appear/encounter event does not. GameDataList Bool Hash2670094484, default false/reset8/save0. Autogen clear key remains unguessed."
+
+[silver_rupees."Silver Rupee (Ganons Castle Forest Trial)"]
+flag = "InsideGanonCastle_Dungeon_Room03_SilverRupee"
+count = 5
+source = "Banc InsideGanonCastle room 3, the Forest trial's fan room (plans/rounds/r21-checks.md, castle research; AiGroup 7835226965490510248, counter 16682450164085901568). Logic/InsideGanonCastle_Level_Room_03_Prefab_71a7.logic.module.ainb n0 TriggerGameDataSetBoolTrue <- n5 Obj_SilverToken_Group_Prefab_a475 AllTokenAcquired (its counter's AllGet); n1 reads it back (DeleteAppearArea); Room_03_Prefab_233d reads it too. GameDataList Bool 0x04e5dca5."
+
+[silver_rupees."Silver Rupee (Ganons Castle Fire Trial)"]
+flag = "InsideGanonCastle_Dungeon_Room10_SilverRupee"
+count = 5
+source = "Banc InsideGanonCastle room 10, the Fire trial (r21-checks.md, with the Inside Pillar rupee's golden rock; AiGroup 3783797390688110477, counter 2325832285843758386). Logic/InsideGanonCastle_Level_Room_10_Prefab_1206.logic.module.ainb n0 TriggerGameDataSetBoolTrue <- n5 Obj_SilverToken_Group_Prefab_a475 AllTokenAcquired (its counter's AllGet); n1 reads it back; Room_10_Prefab_50db reads it too. GameDataList Bool 0x7a447d5e."
+
+[silver_rupees."Silver Rupee (Ganons Castle Light Trial)"]
+flag = "InsideGanonCastle_Dungeon_Room14_SilverRupee"
+count = 5
+source = "Banc InsideGanonCastle room 14, the Light trial (r21-checks.md: rooms 12-14, core 15; AiGroup 7575653807927074785, counter 17875820752556747042). Logic/InsideGanonCastle_Level_Room_14_Prefab_9b00.logic.module.ainb n0 TriggerGameDataSetBoolTrue <- n6 Obj_SilverToken_Group_Prefab_a475 AllTokenAcquired (its counter's AllGet); n2 reads it back; the core room's Room_15_Prefab_954c reads it too. GameDataList Bool 0x1af5aa9e."
+
+[silver_rupees."Silver Rupee (Ganons Castle Spirit Trial)"]
+flag = "InsideGanonCastle_Dungeon_Room16_SilverRupee"
+count = 5
+source = "Banc InsideGanonCastle room 16, the Spirit trial (r21-checks.md: rooms 16-17, core 18; AiGroup 10266515494931912273, counter 1049310672076278794). Logic/InsideGanonCastle_Level_Room_16_Prefab_2f19.logic.module.ainb n0 TriggerGameDataSetBoolTrue <- n5 Obj_SilverToken_Group_Prefab_a475 AllTokenAcquired (its counter's AllGet); n1 reads it back. GameDataList Bool 0xcf4f16d6."
+
+[silver_rupees."Silver Rupee (Shadow Temple Scythe Shortcut)"]
+flag = "ShadowTemple_RoomB2FC_Cleared"
+count = 5
+source = "Banc ShadowTemple room 6, the scythe room (data/world/remake/adult_shadow_temple.toml; Obj_ShadowTemple_RotateBlade_A_01; AiGroup 11137976598341326132, counter 2699463646692811448). Logic/ShadowTemple_Level_Room_B2F_C_Prefab_1484.logic.module.ainb n1 TriggerGameDataSetBoolTrue <- n2 Obj_SilverToken_GroupShadowTemple_Prefab_ce27 OpenPath (the delayed EventBool of the unlock event its counter's AllGet requests); n0 reads it back. GameDataList Bool 0x39e71c85."
+
+[silver_rupees."Silver Rupee (Shadow Temple Huge Pit)"]
+flag = "ShadowTemple_Level_Room_09_Clear_B"
+count = 5
+source = "Banc ShadowTemple room 9, the guillotine room over the pit (three Obj_ShadowTemple_Guillotine_A_01), the dungeon's third puzzle beside rooms 6 and 12 (AiGroup 3916742373444069978, counter 2682914567583010156). Logic/ShadowTemple_Level_Room_B3FB4F_B_Prefab_e5f7.logic.module.ainb n1 TriggerGameDataSetBoolTrue <- n9 OR of n2 Obj_SilverToken_GroupShadowTemple_Prefab_ce27 OpenPath and AllTokenAcquired (its counter's AllGet); n0 reads it back. GameDataList Bool 0x0882bcd0."
+
+[silver_rupees."Silver Rupee (Shadow Temple Invisible Spikes)"]
+flag = "ShadowTemple_RoomB3FB4FE_Cleared_01"
+count = 5
+source = "Banc ShadowTemple room 12, the invisible-spikes room (adult_shadow_temple.toml: its five Invisible Spikes silver rupees; AiGroup 7373900934889976300, counter 8473538806559085468). Logic/ShadowTemple_Level_Room_B3FB4F_E_Prefab_c88b.logic.module.ainb n1 TriggerGameDataSetBoolTrue <- n28 OR of n16 Obj_SilverToken_Group_Prefab_a475 AllTokenAcquired (its counter's AllGet) and OpenPath; n0 and n21 read it back. GameDataList Bool 0xf2b38f41."
+
+[silver_rupees."Silver Rupee (Spirit Temple Child Early Torches)"]
+flag = "SpiritTemple_Room05_BoardNet_On"
+count = 5
+source = "Banc SpiritTemple room 4, the torch room (four Obj_CandleStick, the fall net and its key chest; AiGroup 2095160585687803462, counter 5291099432473101177). Logic/SpiritTemple_Level_Room_05_Prefab_1952.logic.module.ainb n0 TriggerGameDataSetBoolTrue <- n21 OR of the delayed AND of all five rupees' Dead and the delayed EventBool of the unlock event (SpiritTemple_Level_Room_05_SilverToken_Unlock) its counter's AllGet requests; n4 reads it back; event flow SageOfSpirit_FocusOnGimmick only reads it (Event14). GameDataList Bool 0xbd225a42."
+
+[silver_rupees."Silver Rupee (Spirit Temple Sun Block)"]
+flag = "SpiritTemple_Room10_Candle_On"
+count = 5
+source = "Banc SpiritTemple room 9, the sun-block room (five Obj_SpiritTemple_MovableBox_A_01, two Obj_SolarSwitch_A_01; data/world/remake/adult_spirit_temple.toml: its five silver rupees open the onward door; AiGroup 14959906778474730288, counter 17521946004381847443). Logic/SpiritTemple_Level_Room_10_01_Prefab_b242.logic.module.ainb n0 TriggerGameDataSetBoolTrue <- n18 OR of n5 Obj_SilverToken_GroupLargeDoor_Prefab_b21f CounterGimmickClear (the EventBool of the unlock event its counter's AllGet requests) and AllTokenAcquired; n1 reads it back. GameDataList Bool 0x168522b6."
+
+[silver_rupees."Silver Rupee (Spirit Temple Adult Boulders)"]
+flag = "SpiritTemple_Room16_Unlocked"
+count = 5
+source = "Banc SpiritTemple room 15, the boulder room (three Obj_SpiritTemple_RollingRock_A_01, two Song of Time blocks; AiGroup 6375850356728659511, counter 10267692997410785041). Logic/SpiritTemple_Level_Room_16_Prefab_b7fb.logic.module.ainb n1 TriggerGameDataSetBoolTrue <- n11 OR of n4 Obj_SilverToken_GroupLargeDoor_Prefab_b21f CounterGimmickClear and AllTokenAcquired (its counter's AllGet); n0 reads it back. GameDataList Bool 0xdc943ffa."
+
 # Logic names the tracker does not take from the save, with why. The search derives events itself when their
 # region and rule are reached in logic; nothing here is ever counted as held.
 [unmapped]
@@ -424,48 +525,32 @@ label = "Deku Nuts"
 "Small Key Ring (Spirit Temple)" = "a ring's keys count through the dungeon's found small-key count (D3)"
 "Small Key Ring (Thieves Hideout)" = "a ring's keys count through the dungeon's found small-key count (D3)"
 "Small Key Ring (Water Temple)" = "a ring's keys count through the dungeon's found small-key count (D3)"
-# Silver rupees: no audited save field.
-"Silver Rupee (Bottom of the Well Basement)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Bottom of the Well Basement)" = "no audited save field for silver rupees"
-"Silver Rupee (Dodongos Cavern Staircase)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Dodongos Cavern Staircase)" = "no audited save field for silver rupees"
-"Silver Rupee (Ganons Castle Fire Trial)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Ganons Castle Fire Trial)" = "no audited save field for silver rupees"
-"Silver Rupee (Ganons Castle Forest Trial)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Ganons Castle Forest Trial)" = "no audited save field for silver rupees"
-"Silver Rupee (Ganons Castle Light Trial)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Ganons Castle Light Trial)" = "no audited save field for silver rupees"
-"Silver Rupee (Ganons Castle Shadow Trial)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Ganons Castle Shadow Trial)" = "no audited save field for silver rupees"
-"Silver Rupee (Ganons Castle Spirit Trial)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Ganons Castle Spirit Trial)" = "no audited save field for silver rupees"
-"Silver Rupee (Ganons Castle Water Trial)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Ganons Castle Water Trial)" = "no audited save field for silver rupees"
-"Silver Rupee (Gerudo Training Ground Lava)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Gerudo Training Ground Lava)" = "no audited save field for silver rupees"
-"Silver Rupee (Gerudo Training Ground Slopes)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Gerudo Training Ground Slopes)" = "no audited save field for silver rupees"
-"Silver Rupee (Gerudo Training Ground Water)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Gerudo Training Ground Water)" = "no audited save field for silver rupees"
-"Silver Rupee (Ice Cavern Push Block)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Ice Cavern Push Block)" = "no audited save field for silver rupees"
-"Silver Rupee (Ice Cavern Spinning Scythe)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Ice Cavern Spinning Scythe)" = "no audited save field for silver rupees"
-"Silver Rupee (Shadow Temple Huge Pit)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Shadow Temple Huge Pit)" = "no audited save field for silver rupees"
-"Silver Rupee (Shadow Temple Invisible Blades)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Shadow Temple Invisible Blades)" = "no audited save field for silver rupees"
-"Silver Rupee (Shadow Temple Invisible Spikes)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Shadow Temple Invisible Spikes)" = "no audited save field for silver rupees"
-"Silver Rupee (Shadow Temple Scythe Shortcut)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Shadow Temple Scythe Shortcut)" = "no audited save field for silver rupees"
-"Silver Rupee (Spirit Temple Adult Boulders)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Spirit Temple Adult Boulders)" = "no audited save field for silver rupees"
-"Silver Rupee (Spirit Temple Adult Climb)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Spirit Temple Adult Climb)" = "no audited save field for silver rupees"
-"Silver Rupee (Spirit Temple Child Early Torches)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Spirit Temple Child Early Torches)" = "no audited save field for silver rupees"
-"Silver Rupee (Spirit Temple Lobby and Lower Adult)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Spirit Temple Lobby and Lower Adult)" = "no audited save field for silver rupees"
-"Silver Rupee (Spirit Temple Sun Block)" = "no audited save field for silver rupees"
-"Silver Rupee Pouch (Spirit Temple Sun Block)" = "no audited save field for silver rupees"
+# Silver rupees: each mapped group ([silver_rupees]) counts through its own name; a pouch is that group's ten.
+"Silver Rupee Pouch (Bottom of the Well Basement)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee (Dodongos Cavern Staircase)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Dodongos Cavern Staircase)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Ganons Castle Fire Trial)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee Pouch (Ganons Castle Forest Trial)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee Pouch (Ganons Castle Light Trial)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee (Ganons Castle Shadow Trial)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Ganons Castle Shadow Trial)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Ganons Castle Spirit Trial)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee (Ganons Castle Water Trial)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Ganons Castle Water Trial)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Gerudo Training Ground Lava)" = "a pouch's rupees count through its group, read from the puzzle's saved completion ([silver_rupees])"
+"Silver Rupee Pouch (Gerudo Training Ground Slopes)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee Pouch (Gerudo Training Ground Water)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee Pouch (Ice Cavern Push Block)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee Pouch (Ice Cavern Spinning Scythe)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee Pouch (Shadow Temple Huge Pit)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee (Shadow Temple Invisible Blades)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Shadow Temple Invisible Blades)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Shadow Temple Invisible Spikes)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee Pouch (Shadow Temple Scythe Shortcut)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee Pouch (Spirit Temple Adult Boulders)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee (Spirit Temple Adult Climb)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Spirit Temple Adult Climb)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Spirit Temple Child Early Torches)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"
+"Silver Rupee (Spirit Temple Lobby and Lower Adult)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Spirit Temple Lobby and Lower Adult)" = "no remake puzzle and no world location: none of the remake's 17 silver rupee puzzles is this group ([silver_rupees] receipt)"
+"Silver Rupee Pouch (Spirit Temple Sun Block)" = "a pouch's rupees count through its group, read from the puzzle's saved clear ([silver_rupees])"

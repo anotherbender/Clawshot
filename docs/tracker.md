@@ -65,6 +65,14 @@ when the seed's own logic says you can reach it with what
 your save holds, or **out of logic** otherwise. Each area heading counts its finished checks and "N in
 logic".
 
+An amber diamond, **Needs a source**, means the check is in logic only after obtaining a resource
+the logic derives from a reachable source, rather than stock your save holds. Point at the check:
+the side panel names the event (for example `Deku Stick Drop`), its reachable region(s), the age
+that supplies it and its rule. It shows one sufficient route; alternatives may exist.
+This annotation does not change reachability, assume a shop purchase, collect an unchecked reward or
+reveal a shuffled item. It follows the age selector and disappears when saved stock already suffices.
+The source-marker design is provisional (Claude, round 22); Kareem may change it.
+
 **Show** chooses the rows: **All checks** (the default), **Open checks** (collected, marked and skipped checks
 leave the list) or **Open and in logic**. Areas with nothing left to show fold away, and **Hide finished
 areas** also hides an area whose every check is done. Both choices are remembered in this browser.
@@ -76,9 +84,15 @@ can be marked.
   The spoiler's placements are never used, so in-logic gives nothing away.
 - **Used-up items.** A trade item, Ruto's Letter or a shield counts once the save shows you got it,
   even after you traded it on, delivered it, or lost the shield. Bombchus count once found, even when
-  used. Other items count only while you hold them.
+  used, but only with a held Bomb Bag. Bought Bombchus without the bag are not explosives.
+  Other items count only while you hold them.
 - **Small keys** count every key you found in that dungeon, spent ones included. Boss keys, maps and
   compasses count once you have them.
+- **Silver rupees.** All sixteen live puzzle groups count as five rupees once their saved completion flag is set,
+  including all four silver-rupee trial puzzles in Ganon's Castle. Fifteen use the room's own clear Bool; the Gerudo
+  Training Ground lava room uses its unique all-five unlock event's saved history, not its encounter event.
+  An unfinished puzzle counts none; missing flags remain unknown. These are logic counts, not extra item tiles or
+  individual pickup checks ([flag audit](../plans/rounds/r22-tracker.md)).
 - **Bottles.** Each bottle you own counts as a bottle, except one holding Ruto's Letter, which counts as
   the letter only: as in the seed's logic, the letter is not also an empty bottle.
 - **Hearts** count whole hearts; loose Pieces of Heart are not added.

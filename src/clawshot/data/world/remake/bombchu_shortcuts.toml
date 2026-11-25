@@ -1,0 +1,93 @@
+# Round 22 D30: local Bombchu packs do not bypass the Bomb Bag.
+# Keep every non-Bombchu route, including three-key and projectile alternatives.
+
+[locations."Spirit Temple Child Climb North Chest"]
+rule = "(is_child and has_projectile(child) and (Small_Key_Spirit_Temple, 5)) or (is_adult and has_projectile(adult) and ((Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag))) or has_projectile(both)"
+was = "(is_child and has_projectile(child) and (Small_Key_Spirit_Temple, 5)) or (is_adult and has_projectile(adult) and ((Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops))) or has_projectile(both)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Map Chest"]
+rule = "(is_child and Sticks and (Small_Key_Spirit_Temple, 5)) or (is_adult and (has_fire_source or (logic_spirit_map_chest and Bow)) and ((Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts)) or ((can_use(Dins_Fire) or (((Magic_Meter and Fire_Arrows) or logic_spirit_map_chest) and Bow and Sticks)) and (has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)))"
+was = "(is_child and Sticks and (Small_Key_Spirit_Temple, 5)) or (is_adult and (has_fire_source or (logic_spirit_map_chest and Bow)) and ((Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts)) or ((can_use(Dins_Fire) or (((Magic_Meter and Fire_Arrows) or logic_spirit_map_chest) and Bow and Sticks)) and (has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)))"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Central Chamber Pot 1"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Central Chamber Pot 2"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Central Chamber Pot 3"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Central Chamber Pot 4"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Central Chamber Pot 5"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Central Chamber Pot 6"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Central Chamber Flying Pot 1"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Central Chamber Flying Pot 2"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Hall After Sun Block Room Pot 1"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Hall After Sun Block Room Pot 2"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Sun Block Room Silver Rupee Left"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Sun Block Room Silver Rupee Center Front"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Sun Block Room Silver Rupee Center Back"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Sun Block Room Silver Rupee Right Front"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple Sun Block Room Silver Rupee Right Back"]
+rule = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)"
+was = "(Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts or has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+
+[locations."Spirit Temple GS Hall After Sun Block Room"]
+rule = "(is_child and Boomerang and (Small_Key_Spirit_Temple, 5)) or (is_adult and Hookshot and ((Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts)) or (Boomerang and Hookshot and (has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops and Bomb_Bag)))"
+was = "(is_child and Boomerang and (Small_Key_Spirit_Temple, 5)) or (is_adult and Hookshot and ((Small_Key_Spirit_Temple, 3) or spirit_temple_shortcuts)) or (Boomerang and Hookshot and (has_explosives or ((Small_Key_Spirit_Temple, 2) and free_bombchu_drops)))"
+source = "Round 22 cs22b, D30 corrected: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, bought Bombchus were zero/unusable until the Bomb Bag, also with Bracelet. The translated Spirit Temple two-key free-drop branch assumes the local Bombchu pack; require its bag without changing other routes. plans/rounds/r22-tracker.md; spirit_temple.toml cites the original rule. Tightening only."
+

@@ -141,6 +141,11 @@ def test_fairy_only_grave_needs_explosives_and_a_bottle_not_a_redead_weapon(expl
     if explosives == "Bomb Bag":
         assert not search.holds("Fairy")
         search.collect("Goron Bracelet")
+    else:
+        # Kareem, 2026-11-24 (Longshot 3.2.0 / Clawshot 0.2.6):
+        # Bought Bombchus were unusable without the Bomb Bag, even with Goron's Bracelet.
+        assert not search.holds("Fairy")
+        search.collect("Bomb Bag")
     assert search.holds("Fairy")
 
 
