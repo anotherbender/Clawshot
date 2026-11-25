@@ -566,6 +566,10 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
                 msbt.Msbt({keys.TARGETS["Forest Temple"].location_label: ["Invented Grove"]}, buckets=2)
             ),
             text.POUCH_TEXT: msbt.write(msbt.Msbt({key_text.KEY_NOUN: ["Invented Key"]}, buckets=2)),
+            # The refusal writer runs for every seed, including this invented world.
+            "EventFlowMsg/Npc_Hylia_Dampe_002.msbt": msbt.write(
+                msbt.Msbt({"Talk_37": ["Invented gravedigger line."]}, buckets=2)
+            ),
         }
     )
     dictionaries = zsdic.Dictionaries.from_pack(zsdic_pack)
