@@ -224,7 +224,6 @@ def make_seed(
         master_sword,
         mido_schedule,
         reward_bridge,
-        saria_equipment,
         scene_gifts,
         talon,
     )
@@ -235,7 +234,6 @@ def make_seed(
         equipment.changes(),
         *([master_sword.changes(out.placements)] if settings.shuffle_master_sword else []),
         dampe_safety.changes(),
-        saria_equipment.changes(),
         talon.changes(romfs, out.placements),
         scene_gifts.changes(out.placements, table),
     )

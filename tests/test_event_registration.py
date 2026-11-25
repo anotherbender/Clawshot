@@ -495,7 +495,6 @@ _EVERY_RECIPE = _modules(
     "keys",
     "ocarina",
     "progressive_bonus",
-    "saria_equipment",
     "scene_handoff",
     "scrubs",
 )

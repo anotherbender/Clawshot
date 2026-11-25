@@ -1,6 +1,7 @@
 """Synthetic event execution: source lifecycle, target attribution, native controls."""
 
 import copy
+from types import SimpleNamespace
 
 import pytest
 from test_mido_schedule import game_data as mido_game_data
@@ -10,7 +11,7 @@ from clawshot import patch as patch_api
 from clawshot.census.gifts import FLOW_VERSIONS
 from clawshot.formats import byml, evfl, msbt, rstb, sarc, zsdic
 from clawshot.generate import Settings
-from clawshot.patch import getitem, key_text, keys, ocarina, saria_equipment, scene_handoff, text
+from clawshot.patch import getitem, key_text, keys, ocarina, scene_handoff, text
 from clawshot.patch.key_targets import DungeonGrant
 from clawshot.patch.key_text import labels
 from clawshot.patch.plan import ChestChange, Plan
@@ -604,7 +605,9 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
         [],
     )
     # The placement plan is invented; unrelated Sheik localization does not participate in this grant.
-    monkeypatch.setattr(patch_api.item_actors, "load", lambda: patch_api.item_actors.loads(""))
+    # Keep the shared loader intact: lazy imports must not retain this world's empty table.
+    empty_actors = patch_api.item_actors.loads("")
+    monkeypatch.setattr(patch_api, "item_actors", SimpleNamespace(load=lambda: empty_actors))
     monkeypatch.setattr(patch_api, "make_plan", lambda *args, overrides=None: plan)
     monkeypatch.setattr(text, "sheik_hint_changes", lambda *args: {})
     # The ocarina get model (ActorInfo rows, ocarina packs) is presentation only; test_getitem covers it.
@@ -612,8 +615,6 @@ def test_public_seed_preserves_named_key_credit_and_first_weapon_bag(tmp_path, z
     # The invented HP binding donor is not a native temple/Darunia quest graph.
     monkeypatch.setattr(patch_api.door, "changes", lambda *args, **kwargs: {})
     monkeypatch.setattr(patch_api.darunia, "changes", lambda: {})
-    # The empty farewell flow has no cinematic equipment setup; its writer is covered separately.
-    monkeypatch.setattr(saria_equipment, "changes", lambda: {})
     # The real receipt compiler sees the same resource set this invented world's
     # writer applies below; unrelated native quest scenes are not part of it.
     compile_receipts = ocarina.changes

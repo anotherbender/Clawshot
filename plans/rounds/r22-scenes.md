@@ -5,18 +5,18 @@ Rebased onto main `5bc5577` before FROZEN, retaining its deterministic scrub-shi
 
 ## Scope and status
 
-Built, not played until Kareem checks each staged arm on **Longshot 3.2.0**:
+**2026-11-25, Longshot 3.2.0:** moat/Saria heart recovery and Talon's presentation/reward checks **PLAYED PASS**. The pre-Gohma ocarina double persists; both ineffective equipment interventions are withdrawn. Targets **0.2.9**, without rebasing to later main. New full gate required after removal; no sweep.
 
 1. Bind the moat and Saria window-only display steps to their shuffled grants.
 2. Trace Talon's milk table prop and prize advertisements; native model substitution if supported, otherwise remove the prop and write neutral Clawshot strings.
-3. Stow bridge Saria's AI-schedule equipment before the native farewell prop binds; production writer coverage and pre-Gohma main/no-mod controls.
+3. Document native pre-Gohma Saria's doubled ocarina; withdraw the ineffective stow/apply writer rather than ship inert code.
 4. Resolve native healing for silent grants and match native verbs where possible; otherwise explicitly record the remaining issue.
 
 No edits to `patch/getitem.py` or song-get flows owned by PR #41. Changes to shared `patch/gifts.py`/`gift_rules.toml` are display-only. Cross-track integration requests posted on `cs-r22` before shared-file changes.
 
 ## Evidence and decisions
 
-Prior evidence: `r21-pr40.md`, proposed round-22 display and Saria fixes; `r21-pr39.md`, presentation findings. Kareem already reproduced doubled pre-Gohma Saria with both main and no mod (arms 10/11); do not repeat as an agent-side reproduction.
+Prior evidence: `r21-pr40.md`, proposed round-22 display and Saria fixes; `r21-pr39.md`, presentation findings. Kareem reproduced doubled pre-Gohma Saria with no mod and main in arms 10/11 on **Longshot 3.0.0**, 2026-11-23 (`r21-pr40.md:353-365`). This is not a no-mod 3.2.0 claim; do not repeat as an agent-side reproduction.
 
 Research scripts and decoded facts stay outside the repository at `E:/OOTRemake/work/r22-scenes/`. GameData layout reference: sloperinaGZ `docs/FINDINGS.md`, section 1, read from `work/refs/sloperina-FINDINGS.md` (GPL, facts only; no source reused).
 
@@ -24,7 +24,7 @@ Native display event shape cannot be verified by the dump-free `gifts.loads(text
 
 Implemented display bindings: `HF Ocarina of Time Item` → `Dm_MelodyGet_Time/Event229`; `LW Gift from Saria` → `Dm_Kokiri_0155/Event77`. Gift transforms rewrite only each existing native window's `ActorName`, using the same actor as the silent grant; native ocarina props stay untouched. Literal mismatches, other subflows and argument-valued actors are refused.
 
-Implemented `patch/saria_equipment.py`: native `Event18` look-at now leads through `ClawshotSariaStowEquipment` on **bridge** `Npc_Kokiri_Saria_Child [KokiriForest_ArriveLostWood]`, `EventTriggerChangeAIScheduleEquipState {EquipState: 0}`, then the original Event3 participation/Event7 prop bind. Donor confirmed on the dump: `Dm_DeathMtTrail_0050/Event5`. No inventory or story writes. Always registered before scene handoff compilation; `_EVERY_RECIPE` includes its writer.
+**Withdrawn after failed v1/v2 play:** `patch/saria_equipment.py` stowed bridge `Npc_Kokiri_Saria_Child [KokiriForest_ArriveLostWood]` via `EventTriggerChangeAIScheduleEquipState {EquipState: 0}` before Event3/7, with immediate application added in `963d113`. Both attempts had no visible effect. The entire writer, registration and exclusive tests are removed; this historical description is not a shipped fix.
 
 Working-set coverage: `pack/resources.toml` already includes `Event/EventFlow/*.bfevfl.zs`; both display flows, Saria's now-always-written flow and the native action donor are in that existing list. No new native input outside the working set yet.
 
@@ -40,7 +40,7 @@ Decision proposed by cs22e: remove the prop for the whole seed, including after 
 
 The separate Talon transform composes after gifts and before source-bound compilers; it does not overwrite gifts' flow or Skulltula hint transforms. Native inputs are already in the Banc/Event/Mals working-set patterns. Its event writer is covered by the broad production recipe.
 
-### Native recovery and the moat count correction
+### Original native recovery investigation (superseded by the played count correction below)
 
 Native `Dm_SY_Get:CheckHeart` is the appropriate verb: twelve `Dm_SY_GetInEvent` callers invoke it immediately after their grant (e.g. Event29→Event342, Event90→Event386). It contains no grant, get window, model or autosave. Its heart path reserves the gauge, shows it, waits 30 frames, invokes `PouchSystemActor.EventTriggerRecoverByCureItem {ActorName}`, waits 3 frames, then starts recovery alongside a 120-frame wait. No forced unconditional `HealLifeMax` is used.
 
@@ -141,3 +141,38 @@ The first full gate on `11ddd531bbb76f761ab8f437f152b0bc9ab5f195` passed format/
 Claude authorized a **test-only successor freeze** above `11ddd53`, retaining the owned lock, with a fresh **whole synthetic** run plus format/lint and dump on the new head; the failed head's receipts remain immutable. This supersedes the preceding real-player fixed-cap note: every stage probes exact game images; game absent means synthetic `-n 8` / workers 4 and dump `-n 8` / workers 3, while any game image drops to `-n 2` / workers 1. All three dump variables are removed before synthetic and restored only for dump. Merge still waits for Kareem's v2 play.
 
 Fixture repair proposed by cs22e; printed-cause isolated public-seed rerun: **2 passed in 0.57 s**, changed-file format and lint clean. These isolated results are not substituted for the authorized new whole synthetic run.
+
+## V2 played acceptance and withdrawn equipment intervention
+
+Kareem's report relayed by Claude, **2026-11-25, Longshot 3.2.0**:
+
+- **05b moat PASS:** one Piece of Heart in inventory and full health.
+- **09b Saria heart PASS:** Piece-of-Heart window, immediate full heal, one piece in inventory.
+- **07 Talon PASS:** no milk prop or milk/bottle prize wording; declining or failing gives nothing. Winning gives **Farore's Wind**, present in inventory, with **two bottles still owned**. Later dialogue warns that subsequent wins have no prize or offers the real **30-rupee milk sale**; bought milk fills a bottle and drinks normally.
+- **02b/09b Saria prop FAIL, unchanged from v1:** the red-gem ocarina is pinned to her right hand from the start while she holds the green-gem Fairy Ocarina in both hands. Close-ups were reported by Kareem; this agent does not claim an independent visual observation. `963d113` had no visible effect.
+
+The Known-issue claim is sourced to the **played** pre-Gohma no-mod/main pair in `plans/rounds/r21-pr40.md:353-365`, not merely Kareem's earlier vanilla memory. Its original arm10 launcher selects **Longshot 3.0.0**, clears overlay and uses `mods/none-empty`; its archived log line12 says `mods: none in .../none-empty` (SHA-256 `71151d53d079b9fca2d00908ad6ab0c86e4adad25b2fcdde486bac53b04eae9d`). The source's actor/schedule trace (`:309-350`) explains a carried accessory alongside the cinematic prop, but the precise engine cause remains an inference. There is no separate no-mod 3.2.0 observation.
+
+**Decision proposed by cs22e under Claude's “no inert code” instruction:** remove the entire unsuccessful equipment writer, not only `963d113`'s apply step and leave the failed v1 stow. Delete both exclusive test files and registration/coverage/mock references. The suspended-schedule model assumed the native command's visible effect; v2 disproves that model, so it is deleted rather than re-pinned. Keep native props/schedule, the played heart/caption corrections, Talon changes and all key/bag/handoff/receipt behavior. The README Known issue now distinguishes native 3.0.0 evidence from persistence in the 3.2.0 candidate.
+
+**No additional play requested:** archived no-mod control already establishes this pre-Gohma issue's native origin. Optional03 could provide a runtime-specific 3.2.0 comparison, but is not necessary to remove the failed intervention; do not interrupt shops. No played profile, save, log, mod or packet is rewritten, and no game is started by the agent. The 3-to-fourth-piece/container edge remains unplayed.
+
+Prior gate **567b58ee67c92b53e2eaef98c55ea0e7e1a40a32** passed: format/lint, **4450 synthetic passed / 848 skipped**, **845 dump passed**; lock released at04:31. Its test-only fixture repair remains. Those immutable receipts are not a gate claim for the subsequent equipment-writer removal; the replacement freeze requires the full serialized gate, without a placement sweep.
+
+Removal focus: **129 passed, 1 failed** in180.51s. Printed broad-registration failure: `master_sword` received an empty `ItemActors` table for `Scrub Business Seed`. The public-key fixture patched the shared loader while `master_sword` was lazily imported; its `from ...items import load as item_actors` retained the fake loader after teardown. Repair scoped the invented empty table to `make_seed`'s local module alias instead, leaving the shared loader untouched. This is test isolation, not a seed re-pin or production actor fallback. A deterministic same-process run of the two public-key cases followed by broad native registration exercises that order.
+
+Ordered fixture-isolation proof: **3 passed / 132.25 s**, one process/workers1, with native dump enabled (public-key cases first, then broad production registration). Changed Python format/lint: **3 files formatted, all checks passed**. `work/r22-scenes/withdraw-stow-focused.txt` preserves the initial printed failure; `withdraw-stow-isolation-proof.txt` preserves its cause-directed correction. No unchanged retry or seed re-pin.
+
+### Read-only durable v2 receipts
+
+`work/r22-scenes/played-v2-20261125.json` records actual typed values, full SHA-256s/mtimes and exact runtime load lines for **all 14 save slots and their 14 save-work counterparts**, plus the two source backups. Every save/work pair is byte-identical; each log ends with window-close and completed file-write shutdown. All three logs identify **Longshot v3.2.0, source1f0bf123**, and exactly one private candidate mod (154 RomFS files). No played file was written.
+
+| Arm | Before/source and early slots | Completed slots | Durable result |
+|---|---|---|---|
+| 05b moat | source/00/05: pieces0, moat false | 01/02: pieces1, moat true | **0→1**, MaxLife24 unchanged; Fairy stock1/active, Time stock0/IsGet false |
+| 09b Saria | source/00/01: pieces0, farewell false | 02/03: pieces1, farewell true | **0→1**, MaxLife12 unchanged; both ocarina stocks0, active empty, Gohma scene false |
+| 07 Talon | source/00/01/05: Farore stock0/IsGet false, clear false | 02/03/04: Farore stock1/IsGet true, clear true | **0→1 Farore's Wind**, bottles **2→2**; BottleB Empty in02, Half Milk in03/04; BottleA Bug throughout |
+
+These snapshots support durable grants/counts, not exact refusal/failure timing or visual/heal observations; those are Kareem's report above. In particular, unchanged MaxLife is not evidence of current full health.
+
+Load proof (line numbers in each private profile's `longshot_log.txt`, arrows point into its corresponding candidate's `romfs`): **05b** mod12 (`candidate-v2`), analyzed75, GetPouchContent551, Clawshot_SceneGet7337, Dm_MelodyGet_Time7338; **09b** mod14 (`candidate-heart-v2`), analyzed74, GetPouchContent540, Dm_Kokiri_0155 at3460; **07** mod13 (`candidate-v1`, Talon unchanged across v2), Mals/USen77, Minigame_FindOutCucco1255, HyruleField_Child_Static2089. Complete paths and log hashes are in the JSON receipt.

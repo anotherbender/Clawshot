@@ -48,8 +48,9 @@ Hookshot's GitHub repository has been offline since 2026-11-13. Get Longshot's l
 the game on your PC from your own dump. Kareem verified app Play on **Longshot v3.0.0-rc.2**
 on 2026-11-13: the seed loaded with isolated saves, game options carried over, shuffled rewards matched,
 Xbox prompts displayed correctly, and progress survived reload. His later in-game checks ran on **Longshot 3.0.0**.
-On **Longshot 3.2.0**, two seeds started without a crash, loaded a save and loaded their mod (a start-up check on
-2026-11-24); nothing has been played on 3.2.0 yet. Not every runtime/item combination is played.
+On **Longshot 3.2.0**, focused story-scene checks passed on 2026-11-25: the moat and Saria gave one Heart Piece
+and healed, and Talon's shuffled first prize worked without the milk prop or bottle wording. Not every runtime/item
+combination is played.
 
 Keep the terminal open. **My seeds** finds your earlier seeds after a restart. Copy the number,
 settings and short hash to share a seed recipe, never the generated game files. **On Discord, use
@@ -257,9 +258,12 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
   This follows the [static game-data trace](plans/rounds/r13-gerudo-card.md), not a played D39 acceptance test.
 - A song found in a chest shows a green rupee with the song's own text; the song works normally. Only some
   songs have been individually played from chests. Chest ocarinas show their own model.
-- Saria's own ocarina looks doubled or mirrored in her farewell at the Lost Woods bridge when the farewell plays
-  before Gohma, which only an open forest (`forest = closed_deku` or `open`) allows. The unmodified game does
-  the same; Defaults (`forest = closed`) never reach it. Cosmetic; `skip_saria_farewell` skips the movie.
+- **Saria can hold two ocarinas before Gohma.** Her carried ocarina overlaps the farewell's props; a red ocarina
+  can be pinned to her right hand while she presents the Fairy Ocarina. The same pre-Gohma save showed the double
+  with no Clawshot mod on **Longshot 3.0.0**; it persists in the **3.2.0** candidate. The attempted stow fix had no
+  visible effect and is withdrawn, not shipped as a fix. Defaults (`forest = closed`) keep Gohma first;
+  `closed_deku`/`open` can reach this cosmetic issue. `skip_saria_farewell` skips the movie.
+  [Played no-mod control and limits](plans/rounds/r21-pr40.md#research-why-a-fresh-new-game-shows-the-doubled-ocarina-and-the-natural-save-doesnt).
 - Previously generated seeds can lose boss keys, maps and compasses placed in small chests,
   despite showing their pickup text. Repaired map/compass saves and menus, boss-key credit,
   pickup indicator and normal boss-door opening passed in-game. Rebuilding cannot re-award opened chests.
