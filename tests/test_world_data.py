@@ -43,7 +43,8 @@ def vanilla_placements(world) -> dict[str, str]:
 
 def test_all_other_vanilla_checks_with_keys_and_an_escape_tool(world):
     """Worst-order keys and no-save-warp escape guards need upfront tools;
-    neither vanilla Slingshot nor Dampé's Hookshot can supply its own entry tool."""
+    neither vanilla Slingshot nor Dampé's Hookshot can supply its own entry tool.
+    Goron City's grotto remains held until an approach is proved in the remake."""
     placements = vanilla_placements(world)
     keys = [item for item in placements.values() if world.items[item].type == "SmallKey"]
     search = Search(world, [*keys, "Slingshot", "Hookshot"])
@@ -62,14 +63,11 @@ def test_all_other_vanilla_checks_with_keys_and_an_escape_tool(world):
         "Kakariko Village Chest (TBox_Rupee_Purple) [Adult]",
         "Kokiri Forest Chest (TBox_Rupee_Purple)",
     }
-    assert (
-        sorted(
-            n
-            for n in placements
-            if n not in search.collected and n not in excluded and world.locations[n].type == "Chest"
-        )
-        == []
-    )
+    # Kareem 2026-11-24: no GC Time Block; Hookshot/Hover approach unproved (r22-logic).
+    # The held grotto chest is the only additional exception, not a general unreachable-chest exemption.
+    assert sorted(
+        n for n in placements if n not in search.collected and n not in excluded and world.locations[n].type == "Chest"
+    ) == ["Goron City Chest (TBox_Rupee_Purple) #2"]
 
 
 def test_forest_start(world):

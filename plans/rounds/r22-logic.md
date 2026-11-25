@@ -1,13 +1,13 @@
 # Round 22, track logic (cs22d)
 
-Branch `r22/logic`, base `2091387` (0.2.7 plus round records). Work/research and staged packets:
+Branch `r22/logic`, gated base `5bc5577` (initial base `2091387`). Work/research and staged packets:
 `E:/OOTRemake/work/r22-logic/`. No game or boot check run by this agent. Runtime for every new checklist:
 **Longshot 3.2.0**, stable `builds/stable/v3.2.0/bin/longshot.exe`.
 
 Product commits before final rebase/gate: `5b6041f` downstream wall; `fb3b676` explicit Ice gift credit (admission
 held); `55a6568` reflected Beamos kills; `0440ac8` two Goron flower uses; `387df4c` adult DC flower/arrows.
 Ice and three paired DC physics checks are staged, dry-run/read-back verified, **built, not played**.
-No sweep/full-gate acceptance is claimed yet.
+Gate complete on frozen product `84582cc`; test-contract/receipt-only child follows. See final READY below.
 
 ## Scope and acceptance
 
@@ -18,7 +18,7 @@ No sweep/full-gate acceptance is claimed yet.
 3. Stage an Ice Cavern compass from Sheik's lesson, with Gift and songs anywhere. Keep the round-21 chest hold until
    Kareem plays it; any loosening is a separate final commit after the pass.
 4. Before READY: rule-2 sweep (200 broad, 50 Defaults, 50 Recommended; paired placement/sphere digests, plus binding
-   cohort if standard placements are unchanged), then ordered exact-head gate. Results pending.
+   cohort if standard placements are unchanged), then ordered exact-head gate. Completed; see final READY.
 
 ## Played facts, not new certifications
 
@@ -427,7 +427,7 @@ the unresolved physics alternatives remain held regardless of generator/gate res
   aliases Bow1. Fixtures now supply that raw copy, not change product logic. A child Bow-only matrix case could
   not reach the torch room at all; supply child Bracelet/Slingshot to isolate the intended candle refusal.
 - Cause-directed DC/ranged/Hammer/Master-Sword rerun: **104 passed in24.25s**. No game running.
-- Targeted ruff format/check passed before the last fixture-layout change; final rebase/gate checks pending.
+- Targeted ruff format/check passed before the last fixture-layout change; subsequent post-rebase/gate results below.
 - No new setting, version bump, saved field or game-resource filename. The explicit Ice gift credit is a runtime
   repair; its admission loosening remains a separate final commit after the paired play. All other loosenings cite
   native trigger/Low-lift chains or Kareem's attributed play; the staircase Hammer and ledge/flower ignition stay held.
@@ -445,7 +445,7 @@ Queued sweep plan, not results: paired current-main/head,200 Broad +50 Defaults 
 `BroadAdultFlowers` per arm. The added cohort opens forest/door, shuffles the Master Sword, enables free travel,
 and starts with Time Ocarina/Lullaby/Saria's Song/Bow. Compare opaque placement/sphere digests and bagless adult
 Bracelet+Bow DC chest-access counts; no placement lists published. Generator exhaustions must be zero.
-Full format/lint, synthetic then dump gate follows under the assigned lock. No gate or sweep has run yet.
+This plan completed on2026-11-25 under the assigned lock; exact results and the test-only correction follow.
 
 ## Urgent GC grotto and sign puzzle correction (Claude/Kareem, 2026-11-24)
 
@@ -549,3 +549,147 @@ required grotto items lost under the isolated tightening; goal failures/joint de
 placements or its only logical route inside the grotto; mere delays separately. Errors/incomplete rows are never
 zero-risk results. Publish counts only and release immediately. This is model-based hotfix evidence, **not**
 an assertion that a particular seed was proved unwinnable in game. Full gate remains line6 after cs22g.
+
+### Audit3b result — main5bc, standard300
+
+Ran only after cs21i's explicit22:48 `LOCK RELEASED`, Claude's authorization and stage-start player0.
+Owned audit lock22:50–23:02; released immediately after measurement. **300/300 complete**, no errors/exhaustions;
+every placement/sphere digest and effective settings match the immutable shared baseline. No baseline goal or
+sphere-replay mismatches. Generation/audit646.609s (command wall683.24s). Frozen product head84582cc is unchanged.
+
+| Recipe | Seeds | Required item lost with SoT removed / goal fails | Additional early-return refusal | Hookshot-family item in grotto | That item lost | Hookshot or its only logical route through grotto |
+|---|---:|---:|---:|---:|---:|---:|
+| Broad | 200 | 13 | 0 | 1 | 1 | 13 |
+| Defaults | 50 | 0 | 1 | 1 | 0 | 0 |
+| Recommended | 50 | 2 | 1 | 9 | 2 | 2 |
+| Total | 300 | 15 | 2 | 11 | 3 | 15 |
+
+“Required” is a leave-one-out goal proof, not merely `Item.progression`. Each of the15 goal-breaking seeds
+loses a required grotto item under the isolated no-SoT rule; zero joint-only goal failures. A Hookshot-family
+placement inside is **not automatically a lock**: another copy/path can open the retained Hookshot branch.
+Required-but-still-obtainable items were merely delayed in17 Broad,27 Defaults and12 Recommended location cases.
+These delay counts are item/location cases, not additional broken seeds.
+
+The additional Defaults/Recommended case each still satisfies the bare goal but `check_beatable` rejects at
+`fill.py:1282`. Its `Search.won()` additionally requires `return_safe`: these are earliest-pull return-guarantee
+failures, not a `softlock` observer exception or an audit error. The redacted payload says6 placed items never
+reachable; no placement names were published. Thus the proper acceptance oracle rejects17/300 counterfactual
+seeds, of which15 lose the goal itself. This quantifies a released-model risk; the real game's unproved approach
+could differ, so it does not label17 actual played seeds unwinnable.
+
+Immutable evidence: `work/r22-logic/grotto-audit-main-5bc5577/{rows.jsonl,results.json}` and the sibling `.log`.
+Source revision5bc5577369d429d426dc2059461918e41b5c5302, standard lists22220000..22220199 Broad and
+22220000..22220049 each Defaults/Recommended. Audit changed no product files, output mod, source baseline or
+player data. **Hotfix release decision remains Claude/Kareem's**;15 goal-critical dependencies are sufficient
+reason not to dismiss the inherited Time Block assumption as harmless.
+
+Lock-acquisition safety: full runner now calls an explicit `if ! mkdir; then exit73; fi` helper before owner write.
+Actual helper passed held/free temporary-directory cases; the held sentinel owner was unchanged. No real lock
+was tested outside an authorized turn. Audit acquisition itself used exclusive Python `Path.mkdir`.
+This is a round-receipt edit only; keep frozen84582cc for the later sweep/full gate, no rebase/refreeze.
+
+### Line6 full gate — frozen product84582cc (2026-11-25, cs22d)
+
+Started00:38 after cs22g's00:37 explicit release and Claude's go. Exclusive fail-closed acquisition; player0
+before acquisition, each sweep, synthetic and dump. No rebase/refreeze or product-source edit.
+
+| Recipe | Seeds/arm | Main first-try failures | Head first-try failures | Exhausted main/head | Changed placement/sphere digests |
+|---|---:|---:|---:|---:|---:|
+| Broad | 200 | 0 | 0 | 0/0 | 200/200 |
+| Defaults | 50 | 1 | 0 | 0/0 | 50/50 |
+| Recommended | 50 | 2 | 2 | 0/0 | 50/50 |
+| BroadAdultFlowers | 50 | 0 | 0 | 0/0 | 50/50 |
+
+**350 accepted/arm, zero exhausted**. Reused immutable standard300 main; executed only extra50 main
+(117.984s) and350 candidate (665.156s), six workers. Standard seed/settings/serialization equality checks
+passed. Every adult Bracelet+Bow/no-Bag probe changes reachable DC chests0→7 (all50 extra-cohort cases).
+Placement/sphere churn is for the combined branch, not attribution solely to the grotto change; audit3b is
+the separate isolated no-SoT counterfactual.
+
+Full format/lint passed (567 formatted files). Synthetic at `-n 8`, `CLAWSHOT_WORKERS=4`: **4454 passed,
+841 skipped, one failure** in506.09s. Printed failure was exactly the held GC grotto Purple#2 chest, not a
+generator failure: the older vanilla-all-chests contract still expected it reachable despite the intentional
+unproved-entry hold. cs22d updated only that test's explicit expected missing chest and its explanation.
+The goal, boss-room, all other chest reachability and exact keep-vanilla exclusions remain enforced.
+This is a test-contract correction, no product delta or broadened blanket exemption.
+
+The changed test initially required Ruff's printed assertion layout; applied that exact formatting via patch.
+Changed-file format/lint then passed; isolated affected test **1 passed in2.38s**, player0, one worker.
+No passed synthetic case or sweep was repeated. Dump started01:04 after fresh player0,
+`-n 8`, `CLAWSHOT_WORKERS=3`, with the existing read-only r19 sword-layered dump and configured romfs/NUP.
+Dump **838 passed**,24 existing parametrization warnings,3483.27s (58m03s); command wall3489.40s.
+Verified exact owner and removed only our lock, then posted **LOCK RELEASED at02:02**. No product changes,
+unchanged reruns, game launches or writes into player/dump folders. Receipts are under
+`work/r22-logic/gate-84582ccd329379d4b35611d0a3b75898a973ca8a/`.
+
+## READY — merge-backed versus play-held boundary (cs22d, 2026-11-25)
+
+**Gate complete on product84582cc, baseline5bc5577.** Paired350/arm zero exhausted; full format/lint passed;
+synthetic4454 passed/841 skipped plus the sole corrected contract passed in isolation; dump838 passed.
+The final child changes only `tests/test_world_data.py` and this receipt, not product behavior/settings.
+The historical failed synthetic run is retained, not relabeled a green full rerun. Lock released02:02.
+
+### Merge-head loosenings: attributed play and exact scope
+
+Reports below are **Kareem via Claude**, not new checks run by cs22d. New2026-11-24 reports were on
+**Longshot3.2.0, Clawshot0.2.6**; their method/runtime/context is recorded in this round's sections above.
+Do not treat unplayed class members as separately played targets.
+The played-save audit corroborates Bracelet/Low, **not native Darunia-source provenance**. The added fixed-source
+adult case rests on the identical native actor's age-independent Low pickup check plus that played capability;
+it is not relabeled a separate played native-gift acquisition.
+
+1. **Adult Low/Bracelet Bomb Flower use in DC.** Report2026-11-24: adult carried the cavern's flowers before
+   finding the Bomb Bag, with Goron's Bracelet and no adult gauntlets. `dc_bomb_flower` adds the fixed native
+   Bracelet adult case, backed by the age-independent Low pickup and identified native carry/blocker chains.
+   Exact changed consumers: Beginning→Lobby; Lobby Fairy; Lobby Gossip Stone; Map Chest; Room1 Blue-Rupee Chest;
+   Lobby→Lower Right Side; Torch Room scrub; Compass Chest; Staircase→Climb; Climb→Before Upper Lizalfos;
+   King Dodongo's existing flower fight alternative. It does **not** add flowers to a remote floor, socket or ledge.
+   The report is a pre-bag progression report, not a claim he separately certified every listed check; the per-target
+   native chains are in the DC audit table. Global R14 strength/copy policy and child policy are unchanged.
+2. **Two adult GC flower uses.** Report2026-11-24: before the bag, adult carried flowers with the Bracelet to
+   open the **Lost Woods shortcut** and **stop Rolling Goron**. Added fixed-Bracelet case only to
+   `GC Woods Warp Open` and `Stop GC Rolling Goron as Adult`; local adult flower placements corroborate transport.
+   This is not a general GC/Medigoron flower widening, and gift delivery is not changed here.
+3. **Plain Bow through DC's lit candle.** Report2026-11-24: ordinary arrows through the already-lit candle
+   lit the three timed candles. `Lobby→Staircase Room` now accepts usable Bow via `at(Torch Room, ...)`, retaining
+   child Sticks and Din alternatives. Native candle→room8/9 door→room9 switch→staircase shutter chain is identified.
+   This does not certify the separate bare-climb ledge or a flower blast lighting candles.
+4. **Adult Bow/Lizalfos capability.** Report2026-11-24: explicitly killed the **upper Lizalfos with arrows**;
+   the later Bombchu use is not used as bagless evidence. Adds usable adult weapons/Bow to
+   Lower Right Side→Torch Room, Upper Lizalfos→Bomb Bag Ledge, and Room5/Room16 reward chests.
+   Lower-pair Bow is a same-actor damage/death-counter extrapolation, **not a separate lower-pair play report**.
+   Adult weapon class has Kareem's2026-11-22 Hammer-as-weapon report (`r21-hammer.md:15-18,62`); eye timing/weapon
+   gates remain. The canonical swordless inventory corroborates capability state, not the killer.
+5. **Active Mirror Shield reflection kills Beamos.** Report2026-11-24: adult, before bombs/Hammer, redirected
+   the beam **back onto its Beamos and killed it**; a passive block is not the claimed method.
+   Added usable Mirror Shield to Spirit Anubis Room→Beyond Anubis, GTG Beamos Chest, GTG Lobby→Lava Room Front,
+   and the two Beamos helpers (currently no consumers). GTG's other fight/heat gates remain. No wall, switch,
+   unidentified target, or high-Beamos reach alternative is inferred; the native reflection collision is not
+   claimed fully reverse-engineered. This widening rests on his played kill.
+6. **Hammer at DC Lobby→Lower Right Side.** This is the ordinary identified WallCrack, **not** a growing-flower
+   chain. Class play: Kareem2026-11-22 on0.2.5, Hammer broke bomb boulders and the DMT chest/Skulltula walls
+   (`tracker-ui-notes.md`, recorded in `r21-hammer.md:15-18,49,66-70`). The new target inherits the same
+   damage→death→collision-removal chain. No claim that Kareem separately played this exact DC wall.
+
+### Held: do not merge an admission loosening from the staged packets
+
+- **Ice lesson Map/Compass gift admission:** remains chest-only in normal fill. The merge head contains the
+  explicit same-dungeon flag-credit writer repair, but that code is **not an in-game pass** and does not lift
+  admission. Candidate/control `r22-ice-{candidate,control}-next.bat` must show the Ice compass pause indicator
+  and `DungeonInfo.IceCavern.IsGetCompass` surviving exit/reload, with native loading-log proof. Any admission
+  change is a separate commit only after Kareem's pass. Keys/boss keys remain held.
+- **DC ledge / optional Hookshot arch:** `r22-ledge-{candidate,control}-next.bat`; bare jump/grab and arch transport
+  remain unproved. The old adult ledge clause is unchanged, **not newly certified** by this merge or the sweep.
+- **DC carried-flower blast ignites the timed candles:** `r22-dc-{candidate,control}-next.bat`; must show ignition,
+  all three timed, then the door and room9 switch/shutter result. Plain-arrow play does not prove this.
+- **Hammer starts the staircase flower-bed manager:** `r22-hammer-{candidate,control}-next.bat`; must chain and
+  lower the stairs with persistence. Kareem's2026-11-23 Longshot3.0.0 hit exploding one growing flower proves only
+  that first explosion. No Hammer startup alternative is in the merge head.
+- Other remote-flower routes, upper floor/skull-eye substitutions, Medigoron candidates and unidentified Beamos
+  targets remain unchanged/deferred. GC grotto approach is now **False**, not certified by Hookshot/Hover speculation.
+
+The Ice pair and three DC pairs are built/dry-run/read-back verified, **not played or booted by cs22d**.
+Exact launcher/save/loading-log/checklist boundaries are in their sections above. Do not ask Kareem to repeat the
+already-attributed played methods merely to merge those backed changes; only the held alternatives need new play.
+ZR downstream mirroring, GC grotto closure and the GC sign attack rule are **tightenings**, not new loosenings.
+Sign attacks accept only played swords/Bombs/Hookshot family; Hammer/Bombchus/other ranged remain unproved.
