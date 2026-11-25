@@ -90,6 +90,9 @@ source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02 correct Cra
 [chest_verified.Item_AgonyStone]
 source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Echo Gem model/get text and use PASS; saved ownership and opened Goron City chest; plans/rounds/r22-lifts.md"
 
+[chest_verified.Item_FairyBless_DefenseDouble]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Double Defense model/get text and use PASS; owned in save with MaxLife24 unchanged; plans/rounds/r22-lifts.md"
+
 [songs_anywhere]
 source = "Claude, Round 6 review, 2026-11-08: all twelve Item_Melody_* share the pouch/IsGet grant path. Storms played and Minuet warped from a chest; the other ten are inferred, not individually verified. Opt-in only."
 
