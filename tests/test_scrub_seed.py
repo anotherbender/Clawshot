@@ -22,11 +22,9 @@ def test_only_four_once_families_join_pool_and_repeat_vendors_stay_vanilla():
     for name, info in prepared["locations"].items():
         if info.get("type") in ("Scrub", "GrottoScrub") and name not in scrubs.SALES:
             assert info.get("keep_vanilla")
-    assert settings.item_location_types["Deku Stick Capacity"] == ("Scrub",)
-    assert settings.item_location_types["Deku Nut Capacity"] == ("Scrub",)
 
 
-def test_fixed_capacity_pool_cannot_leak_to_chests_or_repeat_vendors():
+def test_fixed_capacity_pool_keeps_repeat_vendors_vanilla_and_admits_played_chests():
     vanilla = dict(zip(scrubs.SALES, ["Piece of Heart", "Piece of Heart", *scrubs.CAPACITIES], strict=True))
     vanilla.update({"Chest": "Boomerang", "Repeat": "Rupees (5)"})
     locations = {name: {"type": "GrottoScrub", "vanilla": item} for name, item in vanilla.items()}
@@ -48,22 +46,29 @@ def test_fixed_capacity_pool_cannot_leak_to_chests_or_repeat_vendors():
         assert Counter(seed.placements[name] for name in seed.shuffled) == expected
         for name, item in seed.placements.items():
             if item in scrubs.CAPACITIES:
-                assert name in scrubs.SALES
-        assert seed.placements["Chest"] not in scrubs.CAPACITIES
+                assert name in (*scrubs.SALES, "Chest")
 
 
 @pytest.mark.parametrize("item", scrubs.CAPACITIES)
 @pytest.mark.parametrize("prior", [None, ("Token",), ("Chest", "Scrub")])
-def test_capacity_token_hold_preserves_chest_barrier_and_prior_restrictions(item, prior):
+@pytest.mark.parametrize("verified", [False, True])
+def test_capacity_destinations_follow_played_actor_and_preserve_prior_restrictions(item, prior, verified, monkeypatch):
     from clawshot.generate import prepare
     from clawshot.generate.fill import allowed
+    from clawshot.patch.items import load
 
+    actor = load().actor(item)
+    if verified:
+        monkeypatch.setitem(scrubs.CATALOG["chest_verified"], actor, {"source": "synthetic chest-pass fixture"})
+    else:
+        monkeypatch.delitem(scrubs.CATALOG["chest_verified"], actor, raising=False)
     holds = {} if prior is None else {item: prior}
     spec, settings, _ = scrubs.seed_setup(
         load_spec(), Settings(shuffle=("Chest", "Scrub", "Token"), item_location_types=holds)
     )
     _, world = prepare(spec, settings)
-    expected = ("Scrub", "Token") if prior is None else tuple(t for t in prior if t in ("Scrub", "Token"))
+    destinations = ("Chest", "Scrub", "Token") if verified else ("Scrub", "Token")
+    expected = destinations if prior is None else tuple(t for t in prior if t in destinations)
     assert settings.item_location_types[item] == expected
     for name in ("LW Deku Scrub Near Bridge", "HF GS Lone Tree", "KF Midos Top Left Chest", "Kak Anju as Child"):
         assert allowed(world, settings, name, item) is (world.locations[name].type in expected)
