@@ -87,6 +87,9 @@ source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: correct mo
 [chest_verified.Item_FaroreWind]
 source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02 correct Crater grotto: model/get and grant PASS; chest open, IsGet true and stock1 saved; plans/rounds/r22-lifts.md"
 
+[chest_verified.Item_AgonyStone]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Echo Gem model/get text and use PASS; saved ownership and opened Goron City chest; plans/rounds/r22-lifts.md"
+
 [songs_anywhere]
 source = "Claude, Round 6 review, 2026-11-08: all twelve Item_Melody_* share the pouch/IsGet grant path. Storms played and Minuet warped from a chest; the other ten are inferred, not individually verified. Opt-in only."
 
