@@ -1,30 +1,30 @@
 # Round 22 shops — cs22c
 
 Branch `r22/shops`, base `2091387`; model `openai-codex/gpt-6.1-sol`.
-Status: implementation, paired staging, focused contracts, full gate and candidate sweep complete. **READY (play-held)**: all behavior changes remain **built, not played** until Kareem's Longshot 3.2.0 checks.
+Status: **gifts-only split approved by Claude, 2026-11-25**. Both tunic gifts passed Kareem's candidate play and typed receipts. The unproven potion-label fill and its exclusive tests are removed from the tip; the complete original implementation is retained on `r22/shops-potion-held` at `1cfbb7c4dad924aec8b91ce730a23f120f2e7ee9`. Gifts-only replacement full gate is assigned line13 after cs22e's explicit release. Claude waived line12's boot: unchanged played mods, save-only fixture; no boot was performed or lock taken.
 Research/output root: `E:/OOTRemake/work/r22-shops/` (outside this repository).
 
 ## Scope and order
 
-1. Repair native potion-shop sale dispatch for the full existing shop palette, including Kakariko's vanilla Half Milk shelf (Item 3), every other potion shelf, and Market.
-2. Only after that repair, enable GC Rolling Goron as Adult and ZD King Zora Thawed as shuffled gifts. Preserve native scene-safe grants and cite their complete native trigger chains.
-3. Stage private-seed candidate/control launchers on Longshot 3.2.0; control from main. Focused tests, production event-registration coverage, the 200 broad / 50 Defaults / 50 Recommended sweep, and serialized full gate on the frozen merge head.
+1. Merge the two played tunic gifts independently: GC Rolling Goron as Adult and ZD King Zora Thawed. Their production code and native grant contracts are unchanged from gated `b5e6eb0`.
+2. Hold the potion-label hypothesis on `r22/shops-potion-held`, with no dormant helper, registration or exclusive tests in the gifts-only tree. Investigate and reproduce the seller-specific shield refusal before choosing a fix.
+3. Keep seed 922301's existing staged mods and every played profile immutable. Use a fresh, identically edited candidate/control save pair for the never-owned Deku Shield with Mirror equipped. No rebase, new settings decision or repeated sweep.
 
-No game started; no personal seed, game folder or original save is modified. Natural backup saves are read-only. Research facts from GPL documentation are cited, not copied code: sloperinaGZ `docs/FINDINGS.md` (local `work/refs/sloperina-FINDINGS.md`), sections 1 (typed GameData, saved flags, quest enums, save layout) and 2 (flow/actor investigation).
+No interactive game or headless boot started by cs22c; no personal seed, game folder or original save is modified. Claude waived the new fixture's boot because it reuses the played v1 mods. Natural backups are read-only. Research facts from GPL documentation are cited, not copied code: sloperinaGZ `docs/FINDINGS.md` (local `work/refs/sloperina-FINDINGS.md`), sections 1 (typed GameData, saved flags, quest enums, save layout) and 2 (flow/actor investigation).
 
 ## Initial evidence
 
-- Kareem, Longshot 3.2.0, Clawshot 0.2.6, adult: Kakariko Potion Shop Item 3 (vanilla Half Milk) could not sell its shuffled Deku Shield with no shield owned; no refusal text. Goron Shop's shield sold afterwards. User report is the repro; no game rerun by the agent.
+- Kareem, Longshot 3.2.0, Clawshot 0.2.6, adult: Kakariko Potion Shop Item3 (vanilla Half Milk) could not sell its shuffled Deku Shield; no prompt. His corrected history below establishes no **Deku** Shield ever owned, with Hylian and Mirror owned and Mirror equipped. Goron City then sold the Deku Shield. User report is the repro.
 - `patch/gifts.seed_checks` requires every native grant actor to match the mapped logic actor after existing aliases. `SageOfFire/Event18` gives `Obj_Armor_Goron`, `SageOfWater/Event242` gives `Obj_Armor_Zora`, while `item_actors.toml` maps tunics to `Shop_Armor_*`; unsupported gifts are dynamically kept vanilla by `restrict_spec`. The static `remake/gifts.toml` currently has no tunic rows. This explains the silent gift exclusion, not yet a complete native-trigger audit.
 - `patch/gift_rules.toml` already classifies both checks as swap; King Zora has a provisional native completion-flag read. Existing source ledger: `plans/03-game-data.md` section 19.
 
-## Potion shops: traced failure and repair
+## Potion shops: original hypothesis (withdrawn 2026-11-25)
 
 - Both potion sellers call `DisplayShop:Root_Buy`: Market `Npc_Hylia_020_Shop_Child/Event19`, Kakariko `Npc_Hylia_020_Shop_Adult/Event1`. Their shelf instances have only `ShopItemIndex`; the seller's `ShopRef` retains the original stock/release fields. All three Kakariko/Market placement copies are covered by stable shelf Hash.
 - `DisplayShop/Event318` checks the selected item's native purchase requirements; its bottle-content arm alone reaches `Event325` (empty bottle). Equipment uses the ordinary capacity/purchase checks. No bottle requirement is removed.
-- A concrete non-bottle dialogue gap: the adult Deku Shield offer `DisplayShop/Event554` requests `Shop_01_Shield_Adult` with `ChangeMstxtForActor=true`. The potion sellers' `ActorNameRef` names `Npc_Hylia_020_Shop_Child`; its message file lacks that label in every language. Other missing consumer paths include `Event78` (`Shop_04`, partial-capacity confirmation), `Event98` (`Shop_06`, partial-heart confirmation), `Event45` (`Shop_16`, magic confirmation), full-capacity and ownership refusals. **Inference:** the missing remapped offer accounts for the silent no-purchase report; the repaired runtime path still needs the paired play check. The Goron sale is user-confirmed, not an agent replay or proof of every shared-message branch.
-- `patch/shops.py` fills those missing potion labels from the player's native same-language message tables, preserving every existing potion line byte-for-byte. The equipment repeat refusal uses an item-neutral native line, not a false claim about a specific tunic. The common no-quiver label uses the native first no-bow refusal. No added get window, scene, payment, stock or bottle logic.
-- Applied whenever a selected potion shelf has a non-bottle sale, regardless of shelf index or normal/Alternative copy. No fill restriction or palette change; native child-tunic and Blue Fire holds remain.
+- A concrete non-bottle dialogue gap exists: adult Deku Shield offer `DisplayShop/Event554` requests `Shop_01_Shield_Adult` with `ChangeMstxtForActor=true`; the potion seller's own table lacks it. **Withdrawn inference:** that absence explains the silent no-sale. The control successfully sold the shield and both tunics, so the missing labels do not establish the cause. The original Kokiri table contains the requested offer in both staged archives; actual fallback/rendered wording is not logged. The held fill also omits `Shop_33`, used on the first adult Deku-capacity refusal.
+- The original held `patch/shops.py` implementation filled missing potion labels from native same-language tables, preserving existing potion lines. It added no get window, payment, stock or bottle logic. The equipment repeat refusal was item-neutral; the no-quiver line came from the native no-bow refusal.
+- That held implementation applied to non-bottle sales at every selected potion index/copy. It is now removed from the gifts-only tip, not left disabled. Native child-tunic and Blue Fire holds are unchanged.
 - Inputs/output are already covered by `pack/resources.toml`'s existing `Mals/*.Product.110.sarc.zs` pattern. No new native input or event writer. No new working-set fixture needed.
 - Focused command: `CLAWSHOT_WORKERS=1 OOT_ROMFS=E:/Games/Hookshot/romfs uv run --with pytest-xdist pytest -n 2 -q tests/test_potion_shops.py tests/test_potion_shops_dump.py tests/test_shops.py tests/test_shop_settings.py`: **62 passed**, 17.52 s pytest time; no game process at stage start. Receipt `work/r22-shops/potion-focused.log`.
 
@@ -101,3 +101,82 @@ All measured stages exited0. The wrapper then failed only while looking for `<he
 Original rows created03:06:08; rows and summary last modified03:14:43 on2026-11-25, matching this run. Finalization checked all300 recipe/seed pairs, successful final fill attempts, effective-settings equality and binding-source totals; preserved original receipts and copied them to the head-qualified paths. `gate-b5e6eb02edf9/result.json` records the post-processing recovery. Owned lock removed and **LOCK RELEASED** posted03:16.
 
 Receipts under `E:/OOTRemake/work/r22-shops/`: `gate-b5e6eb02edf9/` (format/lint/synthetic/dump/capture/sweep logs and final result), `gate-b5e6eb02-runner.log`, `b5e6eb02edf9-{summary.json,rows.jsonl}`. The packet/checklist above remains play-held; no runtime-load or gameplay pass is claimed. Maintainer merge waits for Kareem's checks.
+
+## Played receipts and approved split — 2026-11-25
+
+Claude accepted these receipts and approved a gifts-only head. Human no-repeat/door observations remain
+distinct from typed saved inventory. All 11 gift-profile saves equal their `save-work` counterparts;
+no live profile, mod, natural backup or personal seed was modified.
+
+| Candidate | Typed saved result | Native continuation/once state | Own-arm load proof |
+|---|---|---|---|
+| 4c / 03 Goron | Ice Arrows stock 0->1 and IsGet false->true in slots03/04; Goron Tunic remains 0 | FirstTalked false->true is pre-grant, not independently completion. Step_SageOfFire advances Ready -> StopDaruniaJr -> MoveStatue. Kareem: doors open, no repeated grant. | log5481, `Event/EventFlow/SageOfFire.bfevfl.zs`, candidate-v1 |
+| 4d / 04 Zora | Mirror Shield stock 0->1 and IsGet false->true in slots04/05; Zora Tunic remains 0 | `SageOfWater_KingZora_adult_Talk_Event198` and `HavePlayedEvent.SageOfWater_KingZora_IsMelted_Ice` false->true. Kareem: no repeated grant. | log9946, `Event/EventFlow/SageOfWater.bfevfl.zs`, candidate-v1 |
+
+Both logs identify Longshot 3.2.0 source `1f0bf123` and end normally. Typed receipt:
+`work/r22-shops/played-tunics-20261125.json`. Controls 03/04 were not played.
+01 candidate did launch and load its own USen archive (log79), but its only progress save remains the
+Nov24 fixture: 148 rupees, all three tested gear stocks 0, Deku IsGet true. No saved purchase is evidenced.
+4b candidate passed the reported partial sale/refusal: its tutorial bottle check correctly gave the seed's
+Rupees (20), with its native present flag set; nuts then filled 15->20 for 10 rupees.
+
+The split removes only potion-specific constants/helper/message registration and their two exclusive test
+files. Gift code, gift definitions/rules, fill, pool and settings are untouched. Thus the binding 200/50/50
+sweep and comparison against 5bc5577 remain applicable to the gift placement change; no new sweep is proposed.
+The earlier combined full gate is historical, not a substitute for the gifts-only replacement gate.
+
+## Potion trigger hunt and final reproduction fixture
+
+Kareem's corrected 0.2.6 history: natural adult play, Hylian and Mirror shields owned, **Mirror equipped**,
+Deku never acquired; he left a shuffled Deku pickup at Zora's River. Daytime after the shop opened,
+English, affordable price10 and sufficient rupees. Selecting the Kakariko shelf produced **no prompt**;
+the Goron City shop then sold the same Deku Shield. This argues against a purely global inventory-capacity
+refusal, but does not expose the context-sensitive engine query's inputs.
+
+| Candidate difference | Dump evidence and limit |
+|---|---|
+| Never-owned versus removed shield | Old fixture retained Deku IsGet and HavePlayedGetEvent true with StockNum0. Native defaults are false/false/0. Its PouchData Struct has only StockNum; no extra saved counter. DisplayShop has no explicit Deku IsGet query. CheckBuyResult, CanAddToPorch and CheckIsSoldOut are opaque engine queries, so history-sensitive behavior is plausible, not established. HavePlayedGetEventAtShop is reset at each Root_Buy and must not be assumed to mean lifetime ownership. |
+| Stronger shield ownership/equip | Old fixture had Hylian stock1/equipped, Mirror stock0. No explicit Mirror/rank/equipped-shield comparison appears in the purchase flow or PouchActorInfo. Shield category/subtype and era usability exist, not a visible rank predicate. The new fixture matches Mirror ownership and equip; Goron success limits any global-only explanation. |
+| Alternative/night | Alternative is the post-burning story scene, not night. Normal and Alternative sellers share the same ShopRef; both Item3 copies are patched. Time checks restrict the door, not the purchase. No Alternative/night branch in the buy path. |
+| Price/rupees | Affordable is10 in the test, matching Kareem. Original destination Half Milk price is20; cheap-shield applies only at Kokiri. CheckBuyResult has an insufficient-rupees path with an existing potion refusal line, not the reported silent selection. |
+| Language | Kareem and staged play use English/USen. No language predicate occurs in the event flow; language selects the message archive externally. The held fill covered all16 archives, not proof that labels caused the failure. |
+| Child/adult seller | Kakariko adult and child Market are separate actors/packs; adult inherits the child actor's message/ShopRef identity. Both call DisplayShop. PlayerIsChild selects shield dialogue; no child Kakariko seller placement exists. Both original and fixture are adult. |
+| Shelf index/links | Item3 is native index2, not index3. Both copies link to the correct seller. Native Half Milk GoodsList[2] has StockNum -1 and **no Release**; replacement preserves that and adds only price offset. No vanilla empty-bottle release remains there; only DisplayShop's selected bottle category checks empty bottles. |
+| Shuffle setting | No Shop shuffle keeps Half Milk native, so cannot yield this shuffled shelf shield. Settings change placement/price, not DisplayShop. Bender's separately reported no-shuffle logic gap is not established as this runtime failure. |
+
+Specific silent paths: `DisplayShop/NormalFlow/Event216` handles sold-out query results1/2, but has no
+case0, a plausible silent path if that result is returned. A capacity refusal through Event560 first requests `Shop_33`,
+missing from **both** staged potion tables. The held candidate adds later `Shop_32`, not that first line.
+Neither query's actual return value or the engine's unhandled-case behavior is exposed by the dump.
+
+After a no-sale attempt, explicitly Save: `KokiriForest_Shop_SelectActor_Shield_Deku` starts false.
+Event141 sets it after the first capacity refusal; Event558 also sets it on an adult purchase.
+A true flag **with no sale** therefore distinguishes that refusal path from the unhandled Event216 result.
+Do not replay the same failed select merely to get a different line.
+
+Claude requested reproduction before flag isolation. Final paired launchers:
+`05-kak-never-owned-{control,candidate}-v4.bat` under `work/r22-shops/ingame`; older v2/v3 drafts are unused.
+Both use the existing seed922301 mods and fresh, byte-identical users. From the natural adult copy:
+Deku StockNum1->0, IsGet true->false, HavePlayedGetEvent true->false; Mirror StockNum0->1 and both
+history flags false->true; clear stale stored Deku String64 `0x2342b619`; equip Hylian->Mirror.
+Eight fields, 30 changed bytes. Hylian ownership, age, quest, bottle and rupees unchanged.
+All native per-item Struct namespaces were checked; the one additional per-item Bool is unsaved
+and absent from the source save, so no invented field is written.
+
+Both launcher dry-runs exit0 and copied saves match SHA256
+`1a761c3dea89e7485bb58c84dc679fa6481b4047d890f0cd07752ec1614a5c7b`.
+Manifest `work/r22-shops/repro-pair-v4.json` records every edit. PLAY.md 4e is a five-minute,
+control-first diagnostic; candidate only if control fails. Claude waived the line12 boot: the existing mods
+already booted and played; a startup check does not load the fixture. Queued boot worker cancelled before
+acquisition; no new boot or boot-lock claim. The gifts-only full gate is line13, after cs22e's explicit release.
+
+## Gifts-only replacement freeze
+
+Focused proof after removing the potion implementation: **60 passed in 268.83s**, `-n2`,
+`CLAWSHOT_WORKERS=1`, `OOT_ROMFS=E:/Games/Hookshot/romfs`; receipt `work/r22-shops/gifts-only-focused.log`.
+Command: `uv run --with pytest-xdist pytest -n2 -q tests/test_tunic_gifts.py tests/test_tunic_gifts_dump.py tests/test_shops.py tests/test_shop_settings.py tests/test_event_registration.py`.
+This includes real-dump event registration and both native tunic contracts. Gift production/placement
+code is unchanged from b5e6eb0; retain its binding sweep. The gifts-only withdrawal commit is the new
+code freeze, with full format/lint/synthetic/dump gate assigned line13, after cs22e's explicit release.
+
+
