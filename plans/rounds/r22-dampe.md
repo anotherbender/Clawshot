@@ -297,3 +297,46 @@ the published immutable `5bc5577` baseline, not the moved main.
   remain confined to the dump command. Player detection excludes Claude's bootchecks; no sweep starts
   with a real player, and game-on test stages cap at `-n 2`/one worker. Failure retains the owned lock for
   diagnosis; successful full completion releases it immediately. No lock or sweep has started yet.
+
+## Line-10 lift gate PASS — 2026-11-25
+
+Claude relayed cs22f's 05:49 PASS/release and authorized line 10. Acquired at 05:50 with explicit Git Bash;
+shared lock released at **07:08** after the successful full gate. No rebase or moving-main sweep baseline.
+
+The completed paired sweep used product freeze `70569ae98c289064b32988cce5996d6349028164`, six workers,
+and the cached `5bc5577369d429d426dc2059461918e41b5c5302` baseline. **300/300 accepted**, zero exhausted
+on either side, in 492.188 seconds. Exact recipe inputs/effective settings matched.
+
+| Recipe | Seeds | Baseline first-attempt failures | Lift first-attempt failures | First-chest progression witnesses |
+| --- | ---: | ---: | ---: | ---: |
+| Broad | 200 | 0 | 1 | 176 |
+| Defaults | 50 | 1 | 2 | 23 |
+| Recommended | 50 | 2 | 2 | 31 |
+
+All five candidate first-attempt failures recovered on attempt 2; original FillError payloads remain in
+the receipts. Placement and sphere digests changed for all 300 pairs. There were **230 progression
+witnesses** at the first chest. No additional generation or unchanged sweep rerun.
+
+Initial whole synthetic gate: 4410 passed, 855 skipped, two failures in the two chest-size variants of
+`test_public_seed_preserves_named_key_credit_and_first_weapon_bag`. Their invented archive lacked
+`EventFlowMsg/Npc_Hylia_Dampe_002.msbt`, which the real refusal writer requires. Read-only inspection
+confirmed that file and its `Talk_37` donor in **all 16 real language archives**; no native text was copied.
+Claude authorized adding an entirely invented donor to this fixture only, retaining writer/assertions
+and the owned lock, then repeating whole synthetic/format/lint and running dump without repeating sweep.
+
+Test-only successor **`0b4d868297a18d4aef8273009f2381f1b11abda8`** adds four fixture lines; production
+files are unchanged from `70569ae98c`. Kept minimal for integration with cs22e's `567b58e` fixture work.
+Its full gate passed:
+
+- `uv run ruff format --check`: 566 files already formatted.
+- `uv run ruff check`: all checks passed.
+- Whole synthetic: **4412 passed, 855 skipped**, 24 warnings, 447.29 seconds; all `OOT_*` unset.
+- Whole dump: **853 passed**, 24 warnings, 2999.09 seconds, with the three authorized dump variables.
+- Every stage-start player check returned 0. Synthetic: `-n 8`, four workers; dump: `-n 8`, three workers.
+- Lock owner checked before release; `LOCK RELEASED` and `GATE PASS` emitted at 07:08.
+
+Receipts (outside repository):
+`E:/OOTRemake/work/r22-dampe/gate-70569ae98c289064b32988cce5996d6349028164/sweep/results.json`
+and `E:/OOTRemake/work/r22-dampe/gate-0b4d868297a18d4aef8273009f2381f1b11abda8/`
+(`format.log`, `lint.log`, `synthetic.log`, `dump.log`, `stages.txt`, `sweep-carried-forward.txt`).
+The tested code freeze remains `0b4d868297`; this evidence update is documentation only, not a new code freeze.
