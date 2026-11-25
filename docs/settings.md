@@ -84,7 +84,9 @@ rooftop man's gift. These source-logic corrections do not expand the floor palet
 every surface ([ranged pickup audit](../plans/rounds/r20-audit.md)).
 
 With Gift and Token selected, played bottles, Double Defense, the Echo Gem and gold rupees may also reach
-Skulltulas; this does not allow their unverified chest grants. Fixed Nut/Stick upgrades remain Scrub-only.
+Skulltulas; this does not allow their unverified chest grants. Fixed Nut/Stick upgrades may reach Scrub and Token
+checks: the played family representative was Nut native30; Stick native20 is a structurally checked sibling, not
+an individually played result ([round 22 evidence](../plans/rounds/r22-lifts.md)). Both stay out of chests.
 Token placement retains the existing seeded random ordering; there is no target percentage or weighting.
 Reachability, container requirements, pool composition and earlier fill stages still limit the result.
 

@@ -15,6 +15,7 @@ from typing import Any
 
 from clawshot.formats import evfl
 from clawshot.generate import Settings, prepare
+from clawshot.generate import tokens as token_policy
 from clawshot.patch import items as item_actors
 from clawshot.patch import scrub_shields
 from clawshot.patch.plan import PatchError
@@ -317,14 +318,17 @@ def seed_setup(spec: Mapping[str, Any], settings: Settings):
     """Four reviewed once-sale families; one pool reward per shared saved flag.
 
     Public Scrub covers the two translated scrub types without exposing an internal
-    alias in the settings string. Capacities use fixed Medium actors (D16), held to
-    these destinations until their grants have been tested in chests.
+    alias in the settings string. Capacities use fixed Medium actors (D16).
+    The played fixed_capacity Token family admits the Nut native30 representative
+    and structurally checked Stick native20 sibling; chests remain held pending play
+    (token_rewards.toml, plans/rounds/r22-lifts.md).
     """
     spec = logic_spec(spec, settings)
     prices = sale_prices(settings)
     held = dict(settings.item_location_types)
+    destinations = (SHUFFLE, token_policy.SHUFFLE) if token_policy.SHUFFLE in settings.shuffle else (SHUFFLE,)
     for item in CAPACITIES:
-        held[item] = (SHUFFLE,) if item not in held else tuple(t for t in held[item] if t == SHUFFLE)
+        held[item] = destinations if item not in held else tuple(t for t in held[item] if t in destinations)
     settings = replace(settings, item_location_types=held)
     _, world = prepare(spec, settings)
     checks = tuple(

@@ -119,7 +119,8 @@ that proves the model, not that every route has been verified in the game.
 | Master Sword shuffle | Experimental, default off; requires Chest shuffle and free time travel. The sword goes to a chest; the pedestal still changes age. [Settings and v4 played evidence](docs/settings.md#master-sword-shuffle). |
 
 With Token added to the shipped presets, played bottle, Double Defense, Echo Gem and gold-rupee rewards
-may also reach Skulltulas without becoming chest-safe; fixed Nut/Stick upgrades remain Scrub-only.
+may also reach Skulltulas without becoming chest-safe; fixed Nut/Stick upgrades may reach Scrubs and Skulltulas
+(played Nut native30 family, structurally checked Stick native20 sibling), but not chests.
 
 **Confirmed with Gift shuffle:** the first two Bombchu Bowling wins and both normal
 shooting-gallery prizes give the seed's rewards (`R10-MINIGAMES-CHILD-JABU`,
