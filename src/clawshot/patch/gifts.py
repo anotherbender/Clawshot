@@ -50,6 +50,7 @@ from clawshot.patch import bags
 from clawshot.patch import items as item_actors
 from clawshot.patch.gamedata import GAME_DATA_LIST
 from clawshot.patch.items import ItemActors
+from clawshot.patch.key_targets import DUNGEON_TARGETS, DungeonGrant
 from clawshot.patch.plan import PatchError
 from clawshot.save import TYPES, murmur3_32
 from clawshot.settings import CATALOG, DEFAULTS
@@ -257,6 +258,7 @@ class GiftChange:
     rule: Rule
     steps: tuple[Gift, ...]
     item: str  # the actor name the check gives now
+    dungeon_grant: DungeonGrant | None = None
 
     @property
     def check(self) -> str:
@@ -822,6 +824,8 @@ def patch_flowchart(fc: evfl.Flowchart, flow: str, changes: Sequence[GiftChange]
         for step in change.steps:
             if step.flow == flow:
                 _set_item(fc, step, change.item)
+                if change.dungeon_grant is not None:
+                    _set_flag_after(fc, step, change.dungeon_grant.field)
                 if (change.new_flag or change.rule.once) and not change.rule.purchase and not change.expert:
                     _set_flag_after(fc, step, change.flag)
                 if change.check == MARKET_BOTTLE_CHECK:
@@ -1170,6 +1174,8 @@ def seed_step(
     actors: ItemActors,
     vanilla: Mapping[str, str],
     files: Mapping[str, str],
+    *,
+    dungeon_grants: Mapping[tuple[str, str], DungeonGrant] | None = None,
 ) -> Callable[[Mapping[str, str]], dict[str, Callable[[bytes], bytes]]]:
     """The seed's patch step for gifts: placements (location -> logic item) in, the flow and GameDataList
     transforms out, for moved gifts and once-gate normalization (``vanilla``: check -> its logic item)."""
@@ -1186,7 +1192,13 @@ def seed_step(
             or name in BOWLING_CHECKS
             or any(s.call in VARIABLE_RUPEE_CALLS for s in steps[name])
         }
-        return file_changes(plan(moved, gifts, definitions, rules), files)
+        changes = plan(moved, gifts, definitions, rules)
+        if dungeon_grants:
+            changes = [
+                replace(change, dungeon_grant=dungeon_grants.get((change.check, placements[change.check])))
+                for change in changes
+            ]
+        return file_changes(changes, files)
 
     return step
 
@@ -1239,7 +1251,17 @@ def seed_setup(
     dicts = zsdic.Dictionaries.from_romfs(Path(romfs))
     versions = {str(k): str(v) for k, v in read_romfs_byml(Path(romfs), dicts, FLOW_VERSIONS)["Versions"].items()}
     files = flow_files(Path(romfs), versions)
-    gift_step = seed_step(shuffled, census, definitions, rules, actors, vanilla, files)
+    # Generic pouch grants do not credit dungeon maps/compasses. Reuse the chest grant's target/field contract.
+    # Same-dungeon gifts only; admission remains chest-held until the staged lesson check passes.
+    dungeon_grants = {
+        (name, item): DungeonGrant(DUNGEON_TARGETS[info.dungeon].id, info.type)
+        for name in shuffled
+        for item, info in world.items.items()
+        if info.type in {"Map", "Compass"}
+        and info.dungeon in DUNGEON_TARGETS
+        and info.dungeon == world.regions[world.locations[name].region].dungeon
+    }
+    gift_step = seed_step(shuffled, census, definitions, rules, actors, vanilla, files, dungeon_grants=dungeon_grants)
 
     def step(placements: Mapping[str, str]) -> dict[str, Callable[[bytes], bytes]]:
         hints = skulltula_hint_changes(

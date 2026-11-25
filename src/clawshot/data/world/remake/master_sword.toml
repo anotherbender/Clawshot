@@ -353,9 +353,9 @@ source = "Gerudo Training Ground.json:8. Round 19 Master Sword shuffle (cs19c; p
 [locations."Gerudo Training Ground Beamos Chest"]
 # adult_weapon for the fight; the Beamos (Enemy_Beamos 2867582777575272608, 0.0 from the chest) takes the Hammer too:
 # Kareem, Longshot 3.0.0, 2026-11-23, one Hammer hit destroyed an Enemy_Beamos (r21-hammer.md, Beamos G1).
-rule = "can_blast_or_smash and (adult_weapon or (is_child and Kokiri_Sword))"
+rule = "(can_blast_or_smash or can_use(Mirror_Shield)) and (adult_weapon or (is_child and Kokiri_Sword))"
 was = "has_explosives and (is_adult or Kokiri_Sword)"
-source = "Gerudo Training Ground.json:9. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the room's fight after the Beamos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+source = "Gerudo Training Ground.json:9; r19 Master Sword shuffle guards the room's other fight with adult_weapon or child Kokiri Sword. Enemy_Beamos 2867582777575272608 shares the played Hammer kill (r21-hammer.md). Round 22 cs22d: Kareem, Longshot 3.2.0, 0.2.6, adult before bombs/Hammer, redirected a Beamos beam with the Mirror Shield back at it and killed it outright; add adult-only shield use, not passive blocking. Keep the other fight requirement; plans/rounds/r22-logic.md."
 
 [exits."Gerudo Training Ground Lobby"."Gerudo Training Ground Boulder Room"]
 # adult_weapon: Enemy_Stalfos Hammer 1.0.

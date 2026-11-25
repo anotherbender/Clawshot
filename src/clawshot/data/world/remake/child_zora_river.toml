@@ -21,7 +21,12 @@ source = "03-game-data.md section 48 (cs14e, e0f3ccfa): the free river-to-Domain
 [exits."ZR Front"."Zora River"]
 rule = "can_blast_or_smash or 'Zora River Domain Arrival'"
 was = "is_adult or has_explosives"
-source = "Kareem via Claude, 2026-11-13, paired Longshot check: adult Water=Ready/rock-broken=false is blocked; Step03/false is open, both after reload. Native ZoraRiver_Common_08f0 wall nodes 1/3/4/10/11/12/13 all create iff NOT(Zorariver_BrokenRock_Broken OR Water==Step03 OR Water>Step03). Either entrance rock's death sets that Bool. Obj_BrokenRock_A_01 inherits WallCrack; CrackStoneObject accepts Hammer damage, so retain the existing age-aware blast-or-smash helper. Lost Woods and reverse Domain routes are unchanged."
+source = "Kareem via Claude, 2026-11-13, paired Longshot check: adult Water=Ready/rock-broken=false is blocked; Step03/false is open, both after reload. Native ZoraRiver_Common_08f0 wall nodes 1/3/4/10/11/12/13 all create iff NOT(Zorariver_BrokenRock_Broken OR Water==Step03 OR Water>Step03). Either entrance rock's death sets that Bool. Obj_BrokenRock_A_01 inherits WallCrack; CrackStoneObject accepts Hammer damage, so retain the existing age-aware blast-or-smash helper. Lost Woods and reverse Domain routes are unchanged; the Field-side wall gates both directions."
+
+[exits."Zora River"."ZR Front"]
+rule = "can_blast_or_smash or 'Zora River Domain Arrival'"
+was = "True"
+source = "Kareem, Longshot 3.2.0, 0.2.6, 2026-11-24: entering from the Lost Woods/Domain leaves the downstream route to Hyrule Field blocked by the invisible wall and bomb rocks. The same seven ZoraRiver_Common_08f0 walls and rock-death Bool gate upstream and downstream (03-game-data.md section 48; upstream source above). Tightening only: mirror the upstream condition; no new play needed."
 
 [locations."ZR GS Tree"]
 region = "Zora River"

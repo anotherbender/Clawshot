@@ -196,6 +196,10 @@ destinations = ["Chest"]
 rule = "(progressive_copies_only and is_child and 'Goron Bracelet') or ((not progressive_copies_only or not is_child) and ('Progressive Strength Upgrade', 1))"
 source = "Claude, 2026-11-13, Round 14 deliberate child-capability exception: native Darunia's Lullaby/Saria/door route supplies child lift but no copy tier; all three copies supply adult tiers. E native audit work/r14-steps/ainb/FINDINGS.md:70-73 confirms DC has no quest-step precondition. See plans/rounds/r14-progressive.md."
 
+[helpers.dc_bomb_flower]
+rule = "Progressive_Strength_Upgrade or (is_adult and 'Goron Bracelet')"
+source = "Round 22 cs22d: only audited Dodongo's Cavern local flower routes. Fruit Obj_BombFlower_A_01 requires Low, and its pick prompt reads IsGet.Armor_Child_Gauntlet_Goron without an age check. Kareem, Longshot 3.2.0, 0.2.6, carried these flowers as adult before the Bomb Bag; copied saves show Bracelet stock1, PlayerStatus.LiftGrade Low, no adult gauntlets. The same canonical Low-lift capability admits the fixed Bracelet here without adding a progressive copy. R14's global strength policy and non-flower rocks stay unchanged; plans/rounds/r22-logic.md."
+
 [helpers.adult_sword]
 # OoT Randomizer's adult always holds the Master Sword, so its rules read is_adult for an armed adult.
 rule = "is_adult and (not shuffle_master_sword or Master_Sword or Biggoron_Sword)"

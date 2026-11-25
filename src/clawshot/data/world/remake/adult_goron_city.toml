@@ -3,6 +3,17 @@ rule = "can_use(Hookshot)"
 was = "is_adult"
 source = "https://www.nintendolife.com/guides/zelda-ocarina-of-time-gold-skulltula-locations-rewards-switch-2#gold-skulltula-46: token is on the ceiling near the north side of the entrance, reached with Hookshot, not simply by being adult. Census Hash 18139423190738716302 is adult-only."
 
+# Round 22 cs22d: only these two additional adult Bomb Flower uses are played, not every Goron City wall.
+[events."Goron City"."GC Woods Warp Open"]
+rule = "can_blast_or_smash or can_use(Dins_Fire) or can_use(Bow) or Progressive_Strength_Upgrade or (is_adult and 'Goron Bracelet') or 'Goron City Child Fire'"
+was = "can_blast_or_smash or can_use(Dins_Fire) or can_use(Bow) or Progressive_Strength_Upgrade or 'Goron City Child Fire'"
+source = "Kareem, Longshot 3.2.0, 0.2.6, adult with a strength-copy Bracelet before the Bomb Bag: carried Bomb Flowers to open the Goron City -> Lost Woods shortcut. Native Obj_Goron_BrokenRock_A_01 8668774813841012997 (16.1,104.9,-1.6); adult Obj_BombFlower_A_03 9706505068154001370 (15.5,106.4,0.9) and 7238665186396676143 (14.2,106.6,-3.8) beside it. Exact flower used was not reported. Fruit requires Low; copied played saves show Armor_Child_Gauntlet_Goron stock1, LiftGrade Low, no Silver/Gold. Add only the fixed-Bracelet adult lift case; raw strength copies already counted. plans/rounds/r22-logic.md."
+
+[events."Goron City"."Stop GC Rolling Goron as Adult"]
+rule = "is_adult and (Progressive_Strength_Upgrade or 'Goron Bracelet' or has_explosives or Bow or (logic_link_goron_dins and can_use(Dins_Fire)))"
+was = "is_adult and (Progressive_Strength_Upgrade or has_explosives or Bow or (logic_link_goron_dins and can_use(Dins_Fire)))"
+source = "Kareem, Longshot 3.2.0, 0.2.6, adult with a strength-copy Bracelet before the Bomb Bag: used Bomb Flowers to stop the Rolling Goron. GoronCity_Adult_Dynamic places Obj_BombFlower_A_03 along the middle ring: 7043415660827355832 (-18.8,105.0,-9.1), 2438703331718758676 (-3.1,104.8,13.9), 9316970488062789031 (-7.8,104.8,10.9), and the eastern pair cited above. Exact flower was not reported. Played Low-lift capability, not a new Hammer/arrow or passive-flower claim; the adult gate and all existing alternatives stay. plans/rounds/r22-logic.md."
+
 [exits."Goron City"."GC Grotto Platform"]
 rule = "False"
 was = "is_adult and ((can_play(Song_of_Time) and ((damage_multiplier != 'ohko' and damage_multiplier != 'quadruple') or Goron_Tunic or Longshot or can_use(Nayrus_Love))) or (Hookshot and ((damage_multiplier != 'ohko' and Goron_Tunic) or can_use(Nayrus_Love) or (damage_multiplier != 'ohko' and damage_multiplier != 'quadruple' and logic_goron_grotto))))"

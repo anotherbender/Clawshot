@@ -73,9 +73,9 @@ BEFORE = {
     ("locations", None, "HF GS Lone Tree"): "can_bonk and (is_adult or can_child_attack)",
     ("locations", None, "Spirit Temple Mirror Shield Chest"): "True",
 }
-# Round 21 (plans/rounds/r21-hammer.md, Beamos G1/G2): the Hammer destroys the ground Beamos, so these rules' explosives
-# widened after the sword rewrite; the rule before them reads can_blast_or_smash for the comparison.
-HAMMER_WIDENED = frozenset(
+# The played Beamos alternatives widened after the sword rewrite (Hammer r21, reflected Mirror beam r22).
+# Compare the sword guard against that current kill contract, not the older explosives-only predicate.
+BEAMOS_WIDENED = frozenset(
     {
         "Gerudo Training Ground Beamos Chest",
         "Gerudo Training Ground Lobby -> Gerudo Training Ground Lava Room Front",
@@ -136,10 +136,17 @@ def _entries(spec):
         rule = current(kind, region, name)
         assert any(word in rule for word in ("adult_sword", "adult_weapon", "can_kill_")), (region, name, rule)
         out.append((name if region is None else f"{region} -> {name}", rule, before, name in ADULT_ONLY))
-    widened = {label for label, *_ in out} & HAMMER_WIDENED
-    assert widened == HAMMER_WIDENED, widened
+    widened = {label for label, *_ in out} & BEAMOS_WIDENED
+    assert widened == BEAMOS_WIDENED, widened
     return [
-        (label, new, old.replace("has_explosives", "can_blast_or_smash") if label in widened else old, adult_only)
+        (
+            label,
+            new,
+            old.replace("has_explosives", "(can_blast_or_smash or can_use(Mirror_Shield))")
+            if label in widened
+            else old,
+            adult_only,
+        )
         for label, new, old, adult_only in out
     ]
 
