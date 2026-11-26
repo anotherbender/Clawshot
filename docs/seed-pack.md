@@ -32,8 +32,9 @@ player-facing summary (steps, known issues, the Discord link); this file has the
    `HOS_MODS=<pack>` (only `seed` is a mod) and `--user <pack>\user`.
    Hookshot needs a build that can load mods (tested on 2.0.13). Longshot v3.0.0-rc.2 passed
    Kareem's Windows app Play check on 2026-11-13: isolated saves/options, shuffled reward and reload.
-   Later checks were played on Longshot 3.0.0. Seeds also start on Longshot 3.2.0 (start-up checked
-   2026-11-24); nothing has been played on it yet.
+   Later gameplay checks passed on Longshot 3.0.0 and **3.2.0**, including story-scene rewards on
+   2026-11-25 ([played results](../plans/rounds/r22-scenes.md#v2-played-acceptance-and-withdrawn-equipment-intervention)).
+   Not every item or route has been played.
    Packs share that checked starter. If Play says your game cannot load mods, update it and try again.
    Detection checks the game's binary for `HOS_MODS`, not version labels or log wording.
    No seed copy or link is made.
@@ -91,8 +92,9 @@ your normal saves and has not been played with Clawshot. Facts below are from th
 *Design decisions*).
 
 1. Make succeeds; quit Longshot.
-2. **Back up your saves.** Windows: the `user` folder in the game folder (the launcher keeps one per
-   build). Linux: `~/.local/share/longshot`, shared by every build.
+2. **Back up your saves:** use the user folder your normal Longshot start uses, not necessarily one
+   inside the build folder. The launcher can use a shared user folder; a directly started game uses
+   its own normal location. See [save-folder locations](ui.md#using-it).
 3. Copy `seed\romfs` to `<game folder>\mods\Clawshot-seed-<number>\romfs` (real folders, not links).
    Use the game folder of the build you will start: the launcher's main **Play** starts its default build,
    and each build's **Open folder** shows its folder, the one holding `bin`. The final folder must contain
@@ -223,9 +225,9 @@ absolute paths. Save/log files are outside the seed folder. Replay requires the 
 and frozen dependency versions; `0.1.0` alone is not a unique source revision. A changed catalogue or
 patch must be shipped in a newly built pack with a newly computed digest.
 
-Acceptance still needs an invited tester/Kareem to play: Make succeeds, Play opens the isolated new game,
-the log reports `mods: <file> <- <path>`, and the displayed seed placements agree.
-Agent verification uses `python -m clawshot.pack.runtime play --root <pack> --dry-run` only:
+Before sharing a new pack, play it: Make must succeed, Play must open a new game with separate saves,
+and the rewards must match the seed. Confirm the log reports `mods: <file> <- <path>` for that pack.
+Dry-run verification uses `python -m clawshot.pack.runtime play --root <pack> --dry-run`:
 the same checks print the command, environment, mod and log paths without starting anything or creating
 the user/log. `CLAWSHOT_DRY_RUN=1` also enables this through the normal Play entry point.
 
@@ -239,7 +241,7 @@ reads another native resource adds its path there, not another extraction branch
 CLAWSHOT_WORKERS=1 OOT_ROMFS=<romfs> OOT_NUP=<game.nup> uv run pytest tests/test_pack_nup_dump.py -m dump
 ```
 
-Run under the round's gate lock, serially. The dump matrix generates and writes complete seeds
+Run under the project's gate lock, serially. The dump matrix generates and writes complete seeds
 from the cache directory **alone**, then compares every output path and byte digest with a separate
 full-RomFS generation. It covers each enabled shuffle kind, all forest modes/fast-start skips,
 free travel, both hint modes, songs/prices/partial shops and (once present) all Door of Time modes.

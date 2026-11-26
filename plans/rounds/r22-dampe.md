@@ -340,3 +340,38 @@ Receipts (outside repository):
 and `E:/OOTRemake/work/r22-dampe/gate-0b4d868297a18d4aef8273009f2381f1b11abda8/`
 (`format.log`, `lint.log`, `synthetic.log`, `dump.log`, `stages.txt`, `sweep-carried-forward.txt`).
 The tested code freeze remains `0b4d868297`; this evidence update is documentation only, not a new code freeze.
+
+## Jabu Compass chest: Ruto hypothesis refuted in play — 2026-11-26
+
+Overnight extension authorized by Claude: new **TEST** seed `2026112512`, public Defaults (`CS1`),
+exact main `874f30a24040bbed4ae7223fbfb751fb60174c4d` (Clawshot 0.2.8), Longshot **3.2.0**
+(`1f0bf123`). No product edits. Natural child save copied into isolated A/B profiles, **zero save edits**;
+Boomerang already owned, room-12 Compass chest unopened. This seed places **Rupees (50)** there,
+not a Compass; starting wallet 48/200. Its room-12 opening entry and EventSetting binding remain native.
+
+Kareem's played observations, relayed by Claude, are the presence/reward evidence:
+
+| Arm | Ruto during attempt, reported by Kareem | Played result | Latest committed save | Rupees, baseline → saved |
+| --- | --- | --- | --- | --- |
+| A | Left outside room 12, in the entryway | Chest opened; purple rupee | `slot_02`, 01:17:58 | 48 → 98 |
+| B | Carried into room 12 and set down | Chest opened; purple rupee | `slot_02`, 01:21:37 | 48 → 100 |
+
+Both `checker-last.txt` receipts show `IsTreasureBoxOpen.3510516276638146208=true`,
+`InsideJabuJabuBelly_Room12_TBoxDemo=true`, `InsideJabuJabuBelly_Room12_TBoxNearRuto=false`,
+room 12 cleared/treasure true, and `IsGet.Obj_Rupee_Purple` false → true.
+B's total balance increase is 52, not 50; the extra 2 are not attributed to this chest.
+Ruto's saved spawn/liftability is not used as a presence oracle.
+
+Receipts are under `E:/OOTRemake/work/r22-jabu-chest/morning-874f30a/ingame/`,
+in `user-jabu-ruto-test-2026112512-A/` and `-B/`. Actual `longshot_log.txt` loaded-file proof:
+A/B `InsideJabuJabuBelly_Static.bcett.byml.zs` at lines **555/573**, FocusGimmick **1430/1423**,
+big-chest flow **1435/1415**, GetPouchContent **539/561**, NaviChat **5919/4798**.
+Both logs line 1 identify Longshot 3.2.0 and line 16 loads exactly this one test mod.
+A/B latest save SHA256: `aa6d067083269149023c2cf28ecc9a14210371667f082d5d6fee6d7b41cc8369` /
+`34896985c9e11625a40ff9078fae56e93682e385faff0cf263607182318f3b39`.
+
+**Conclusion (Kareem/Claude, corroborated by saved state and runtime loads): Ruto's presence does NOT
+gate this chest on exact `874f30a` / Longshot 3.2.0. The “needs Ruto” hypothesis is refuted.**
+This is a played purple-rupee case, not certification of every reward, older generator/runtime or save state.
+`Event235` participation and `Event243`'s near-Ruto branch alone were not evidence of an opening refusal.
+Follow-on failed-VOD investigation is read-only: no lock, seeds, game starts or save/output edits.

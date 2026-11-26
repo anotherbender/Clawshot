@@ -41,9 +41,9 @@ The same specification defines `n64_only` (not a remake check), `keep_vanilla` (
 shuffled), `vanilla_fixed` (a concrete tier), and `new = true` (a remake addition). Preserve those
 meanings in a port. Do not turn a held check into a randomized check just because it has a rule.
 The current acceptance boundary is in [settings](settings.md), with observations in
-`plans/playtest/answers.md` and the [roadmap index](../plans/00-roadmap.md) plus its linked round files.
+`plans/playtest/answers.md` and the [roadmap index](../plans/00-roadmap.md) plus its linked play records.
 Cow work remains research only; no cow shuffle option or production check shipped
-([round 19 cows](../plans/rounds/r19-cows.md)).
+([cow research](../plans/rounds/r19-cows.md)).
 
 **Ranged pickup audit:** the windmill platform pickup requires the existing adult
 Dampé approach; child Boomerang retrieval failed in BBender's report and the native Heart Piece
@@ -91,7 +91,10 @@ fights read the world helper `adult_weapon`
 (`Enemy_Beamos`, Spirit Temple's Beamos hall and Gerudo Training Ground's Beamos room) also takes the
 Hammer: Kareem destroyed one with a single Hammer hit (Longshot 3.0.0, 2026-11-23). The adult's
 Mirror Shield also kills it by **redirecting its beam back onto it**, not merely blocking (Kareem,
-Longshot 3.2.0, 0.2.6); only Beamos-kill predicates gain that alternative, not cracked walls.
+Longshot 3.2.0, 0.2.6); only Beamos-kill predicates gain that alternative, not cracked walls. Kareem accepted
+extending that kill to Spirit Anubis Room → Beyond Anubis, GTG Beamos Chest and GTG Lobby → Lava Room Front
+(2026-11-25); their other fight and heat requirements stay, and no high Beamos or unidentified target gains it
+([Mirror Shield evidence](../plans/rounds/r22-logic.md)).
 King Dodongo (bombs, or Bomb Flowers with the Bracelet), the Shadow Temple skull pots and webs
 (Hammer rate 0), eye switches, in-place Bomb Flower chains, high-Beamos Hammer reach and boss
 fights keep their prior requirements. [Hammer evidence](../plans/rounds/r21-hammer.md).
@@ -104,7 +107,7 @@ so Bracelet + Bow reaches the Bomb Bag without bag explosives or a durable sword
 carried to each cited wall; a Hammer hitting a growing fruit does not imply transport or a working
 staircase chain. No global strength/rock policy changes. [Per-rule audit](../plans/rounds/r22-logic.md).
 
-**Bombchus need the Bomb Bag (0.2.8).** Kareem (Longshot 3.2.0, a 0.2.6 seed, 2026-11-24): Bombchus
+**Bombchus need the Bomb Bag (0.2.9).** Kareem (Longshot 3.2.0, a 0.2.6 seed, 2026-11-24): Bombchus
 bought before the Bomb Bag showed a count of 0 and could not be used, also with the Goron's Bracelet,
 and no strength refusal played; the bought amount appeared once he had the bag. Every Bombchus helper
 requires `Bomb_Bag` whatever `free_bombchu_drops` says (`has_bombchus` and `found_bombchus` in
@@ -121,13 +124,14 @@ view rebuilds the same world, so it follows. [Decision D30](../plans/decisions.m
 `patch.bombs`, which lowers only `Item_Bomb`'s required lift grade. `remake/bombs.toml` then requires the
 Bomb Bag but no strength for `Bombs`; `can_use(Bombs)`, explosives and both Octorok bomb shortcuts inherit it.
 Bomb Flowers, child Dodongo's Cavern entrance and other local lift routes retain strength; Bombchus remain
-independent and still need their bag. Built, not played on Longshot 3.2.0.
-[Native trigger chain and checks](../plans/rounds/r22-games.md).
+independent and still need their bag. Kareem played it on Longshot 3.2.0 (2026-11-25): with the Bomb Bag and
+no Bracelet, bag bombs worked, also after a reload, while Goron City's Bomb Flowers still could not be lifted.
+[Native trigger chain and play record](../plans/rounds/r22-games.md).
 
 
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
-Boots or Serenade are shuffled. Claude chose the r16 precaution on 2026-11-17; Kareem was informed.
+Boots or Serenade are shuffled. This precaution dates from 2026-11-17.
 Kareem tested rc.7 unmodded, Debug-made adult with Hookshot and Iron Boots at adult Lake Hylia.
 With the quest at `Ready` and `SageOfWater_GetWaterSerenade=false`, the Hookshot did not latch.
 On the same save, setting the Ice end-chest wrapper's writes, `SageOfWater_GetWaterSerenade=true`
@@ -141,6 +145,11 @@ played save-edit control, not a normal-progression or modded Clawshot certificat
 does not bypass the downstream wall. Kareem met it going downstream on Longshot 3.2.0 (0.2.6);
 this mirrors the already verified upstream predicate, a tightening only.
 [Evidence](../plans/rounds/r22-logic.md).
+
+**Jabu Jabu's Compass chest needs no Ruto.** It stays `True` inside `Jabu Jabus Belly Depths`, which already
+requires the Boomerang. On Longshot 3.2.0 (2026-11-26), on a test seed, the room-12 chest opened both with Ruto
+left in the entryway and with her carried into the room. That is one played purple-rupee reward, not every
+reward or save state.
 
 ## Rule language
 
@@ -183,13 +192,13 @@ tier N. The native reward is a bonus outside that count, so no order between it 
 is assumed; it never downgrades, and a copy that finds no tier left is a harmless leftover. The
 fixed-tier placement rule applies only to items that stay fixed.
 
-**Deliberate child-strength exception (Claude, 2026-11-13):** child capability requires Darunia's
+**Deliberate child-strength exception (2026-11-13):** child capability requires Darunia's
 native source via his door, Lullaby and Saria's Song, never a copy Bracelet. The gift adds no
 copy tier; all three copies remain, adult strength stays copy-only, and Darunia stays native even
 with free time travel. An early copy Bracelet
 can physically work out of logic. The first adult copy is not assumed in the return-kit lower
-bound; the kit must place it. See the [round dependency](../plans/rounds/r14-progressive.md)
-for E's unplayed post-boulder Darunia source-lock finding.
+bound; the kit must place it. See the [progressive-chest record](../plans/rounds/r14-progressive.md)
+for an unplayed post-boulder Darunia source-lock finding.
 Progressive Quiver and Slingshot establish the weapon before any capacity; a fixed bag upgrade is not the weapon.
 A spell, the Lens or magic arrows open the native meter; at run time that makes the first magic copy give the
 double meter, never an extra copy. A port must model these as counted chain items, not as their
@@ -223,7 +232,7 @@ Hashes at matching positions. Sources: `plans/04-world-format.md`, Overrides;
 For a tracker, preserve world keys for placements/rules and use `location_names.toml` for display.
 Do not allocate Archipelago network IDs from mutable array order; an eventual port needs an explicit
 stable mapping from these identities. That network-ID mapping is a port requirement, not an existing
-Clawshot feature (architecture: `plans/01-architecture.md`; current scope: the roadmap index plus your round's file).
+Clawshot feature (architecture: `plans/01-architecture.md`; current scope: [roadmap](../plans/00-roadmap.md)).
 
 ## Search and seed acceptance
 
@@ -243,10 +252,10 @@ Sources: `plans/04-world-format.md`, Ages; `src/clawshot/world/search.py`;
 R10-FIRST-PULL-FIXED. Open-mode early return and preserved escape/moat rewards passed on rc.7.
 Kareem reports the Hyrule Field day/night clock working as expected in his seeds (2026-11-21); the
 first-arrival lighting repair has no separate staged v5 check. The earlier broader clock-pass claim was
-retracted in the [round 18 evidence review](../plans/rounds/r18-docs.md#review-corrections-after-3e31f160cb).
+retracted in the [evidence review](../plans/rounds/r18-docs.md#review-corrections-after-3e31f160cb).
 See [settings](settings.md).
 
-**No save warp (Round 16).** The remake autosaves room changes; an older manual save is not a logic escape.
+**No save warp.** The remake autosaves room changes; an older manual save is not a logic escape.
 The Slingshot Room's entry now requires its existing usable Slingshot/Boomerang/Bow exit condition as well
 as the scrub's shield condition. Neither room chest can supply its own first escape tool. A Slingshot copy
 may still be there when another usable exit tool is already available.
@@ -260,13 +269,13 @@ Unscoped `audit(world, placements)` reports unresolved graph returns for triage;
 edge is not physical-trap proof. Held warp songs count as returns indoors too (Kareem, played 2026-11-17),
 through the same age/instrument rules as normal travel. Farore's Wind ownership proves no saved escape point.
 
-**One-way arrivals (Round 18).** Dampé's whole grave descent requires usable Hookshot before entry;
+**One-way arrivals.** Dampé's whole grave descent requires usable Hookshot before entry;
 neither race reward can supply it. There is no reverse race return, and the windmill climb uses Hookshot,
 not the N64 Song of Time. Ordinary windmill access from Kakariko is unchanged. Kareem's no-Hookshot
 check on Longshot rc.7 (2026-11-19) refused the race and faded back in front of Dampé, with normal
-movement and the existing warp back up usable. It did not return Link to the surface.
+movement and the existing warp back up usable. It did not return Link to the surface; newer seeds do (below).
 
-**Dampé's first race (Round 22, played).** The first prize has no one-minute condition: finish the course
+**Dampé's first race (0.2.9, played).** The first prize has no one-minute condition: finish the course
 and open its chest. Descent/admission still requires a usable Hookshot (either tier). The race stays available
 until `IsTreasureBoxOpen.16041366920820397198` is true, including old second-race saves and an unopened retry.
 After collection the native second race and its timed prize resume. Kareem played these paths on Longshot
@@ -288,9 +297,9 @@ on 2026-11-19; this is not a claim that every equipment/age combination has been
 
 Experimental, default-off Master Sword shuffle requires Chest shuffle and free time travel.
 Sword-dependent adult rules then require an owned Master Sword or durable Biggoron Sword, and the finale
-requires the owned Master Sword. V4's two unowned pulls, chest acquisition/equip/use and owned age round
+requires the owned Master Sword. Two unowned pulls, chest acquisition/equip/use and the owned age round
 trip passed on Longshot 3.0.0 stable, 2026-11-20 at 16:21; that does not certify every combat gate or
-finale refusal ([round 19 sword](../plans/rounds/r19-sword.md#final-acceptance--candidate-v4-played-pass--ready)).
+finale refusal ([Master Sword play record](../plans/rounds/r19-sword.md#final-acceptance--candidate-v4-played-pass--ready)).
 
 Imported Gerudo Fortress rules treat `Gerudo_Membership_Card` as friendly access. In the remake the guards,
 desert gate, Training Ground entrance and horseback archery check Spirit quest progress, which the
@@ -308,8 +317,8 @@ four keys from four chests, all four rescues, the card once and Training Ground 
 also passed with that option ([Fortress play record](../plans/rounds/r20-cows.md)); no new pre-rescue access
 is inferred.
 The Well floor replacement passed recovery and once-only leave/return/Continue checks.
-Round 19 changes no key behavior: Shadow's floor key stays in its usual place under every setting
-([round 19 keys](../plans/rounds/r19-keys.md)). See [key placement limits](settings.md#door-of-time-and-returning-to-child).
+Shadow's floor key always stays in its usual place, under every setting
+([floor-key record](../plans/rounds/r19-keys.md)). See [key placement limits](settings.md#door-of-time-and-returning-to-child).
 
 With dungeon rewards shuffled, the closed Door uses the three owned Stones rather than child boss
 completion, retaining the instrument/song/send-off prerequisites. Kareem opened it before Dodongo and
@@ -321,7 +330,7 @@ complete reward-shuffled playthrough. Other completion gates stay native; see [r
 The Light Arrows scene (LACS) and vanilla bridge follow completion of the Shadow and Spirit awakenings,
 not owned medallions, including with default settings. This is a logic correction based on **static
 event-data evidence only, not played**; the six trials and finale still require usable Light Arrows
-([round 19 LACS](../plans/rounds/r19-lacs.md)).
+([Light Arrows scene research](../plans/rounds/r19-lacs.md)).
 
 The persistent `Met Child Zelda` event models the **whole courtyard/Impa lesson and accepted
 send-off through DoorOfTime Step02**, not first courtyard contact. Both moat rewards, Saria's
@@ -348,8 +357,8 @@ woken adult Talon stays until Epona is freed from Ingo. Sources: `remake/child_m
 **Song lessons and no-instrument safety.** Logic conservatively requires an Ocarina for all twelve
 `Dm_MelodyGet_*` checks: either instrument at either age. Kareem reproduced the old no-ocarina Minuet
 softlock and passed its Ocarina control on
-2026-11-18. On 2026-11-20 his [round-19](../plans/rounds/r19-scenes.md) Minuet control (adult, Fairy Ocarina
-only, main build) played the native lesson and granted its Boomerang; round 18's issue #34 adult-Fairy control
+2026-11-18. On 2026-11-20 his [Minuet control](../plans/rounds/r19-scenes.md) (adult, Fairy Ocarina
+only, main build) played the native lesson and granted its Boomerang; the earlier issue #34 adult-Fairy control
 had already played Sun's Song
 ([check13](../plans/rounds/r18-equipment.md#check13-acceptance-and-combined-integration)). Lessons therefore no
 longer ask an adult for the Ocarina of Time. Generic song playing (`remake/age_ocarina.toml`) keeps its
@@ -360,20 +369,20 @@ and Iron Boots chest rewards are given before their lessons, so those reward rul
 The physical guard now replaces the lesson with a normal get only when **both instruments have zero
 pouch stock**, independently of age, selection or historical ownership. That fixes the former
 no-ocarina lesson-freeze known issue without relaxing the model's conservative instrument requirement.
-On Longshot 3.0.0 stable, 2026-11-20, the morning Minuet/Impa candidates skipped lessons and gave
+On Longshot 3.0.0 stable, 2026-11-20, the morning Minuet/Impa checks skipped lessons and gave
 Boomerang; Impa retained normal Hyrule Field dialogue. The separate `skip_saria_farewell` option gave
 correct item text and continued straight to Hyrule Field without the farewell movie; Saria's brief
-pop-in is cosmetic. Minuet stock v2 passed at 14:16 with adult Fairy retaining the native lesson,
+pop-in is cosmetic. The Minuet stock check passed at 14:16 with adult Fairy retaining the native lesson,
 then Boomerang, and zero stock of both instruments going straight to a normal get.
-Continue/re-entry was not reported; the round file distinguishes the accepted native-arm inference
-from its missing load lines ([round 19 scenes](../plans/rounds/r19-scenes.md)).
+Continue/re-entry was not reported; the play record distinguishes the accepted native-arm inference
+from its missing load lines ([scene checks](../plans/rounds/r19-scenes.md)).
 
 The fixed `Ocarina` alias MAX-combines Fairy tier1 and Time tier2; it is not a count of two progressive
 copies. Issue #34 showed that a later Fairy receipt can overwrite the native selected instrument while
 logic retains tier2. New outputs preserve Time selection after the genuine Fairy grant when Time is
 owned; stock, `IsGet` and source flags remain native. Kareem passed the child and adult checks on
 Longshot rc.7 on 2026-11-19: adult Sun's Song worked and Time remained selected after Continue.
-Adult Sun's Song also worked with Fairy in the control; adult-Fairy Minuet has the separate round-19
+Adult Sun's Song also worked with Fairy in the control; adult-Fairy Minuet has the separate
 lesson acceptance above. Neither proves every adult melody; ordinary adult song-playing logic keeps Time.
 Older outputs can still select Fairy after Time; ownership history alone does not prove the active instrument.
 
@@ -391,13 +400,13 @@ held/excluded checks remain fixed sources for logic where applicable. Sources:
 The default non-progression restriction at the first 100-token House reward is lifted only by the
 separate `shuffle_100_token_reward` opt-in, which requires Gift shuffle. Hammer at the first 100-token
 reward followed by the native repeating gold rupee passed on Longshot 3.0.0 stable, 2026-11-20
-([round 19 tokens](../plans/rounds/r19-tokens.md)). This does not certify every replacement.
+([100-token reward checks](../plans/rounds/r19-tokens.md)). This does not certify every replacement.
 
 Determinism requires the same source/world data, seed and effective settings. Tests include changed
 Python hash seeds; unordered placement iteration and timestamps are forbidden. A passing search is
 proof of **this model**, not of unplayed remake routes. The earlier Slingshot-room softlock exposed an
 N64/remake mismatch; player answers remain essential. Sources: `AGENTS.md` rule 4;
-`plans/04-world-format.md`, Generating a seed; [Round 3](../plans/rounds/r3-overview.md), recorded mini-seed result;
+`plans/04-world-format.md`, Generating a seed; [early mini-seed result](../plans/rounds/r3-overview.md);
 `plans/playtest/answers.md`, DT01/DT02.
 
 ## Spoiler contract

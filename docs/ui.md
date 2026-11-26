@@ -147,7 +147,7 @@ Before starting a game, both UI and pack Play check the PC-wide process list. An
 This happens before creating the save folder, opening the log or starting another process.
 
 The pack's Make path was verified on Linux (WSL) with both a romfs folder and a `.nup`, producing
-the same digest as Windows (maintainer verification, round 11). The UI shares that generator path,
+the same digest as Windows (maintainer verification). The UI shares that generator path,
 so generation is expected to work on Linux and macOS; macOS itself is untested. **Play starts
 `bin/hookshot.exe` or `bin/longshot.exe` on Windows and `bin/hookshot` or `bin/longshot` on Linux**, the
 layout of a Hookshot Builder or Longshot game folder (Longshot README, *Running the game from the command
@@ -158,8 +158,9 @@ is refused before anything is written. Neither Hookshot nor Longshot has a macOS
 the maintainers in game**; Linux Make verification does not certify the Linux UI.
 Windows app Play on **Longshot v3.0.0-rc.2** passed Kareem's 2026-11-13 seed-101 check:
 isolated saves, game options including Ocarina controls, shuffled rewards, Xbox prompts and reload.
-His later in-game checks ran on **Longshot 3.0.0**. On **Longshot 3.2.0** two seeds started without a crash,
-loaded a save and loaded their mod (start-up check, 2026-11-24); nothing has been played on 3.2.0 yet.
+Later gameplay checks passed on **Longshot 3.0.0** and **3.2.0**, including story-scene rewards on
+2026-11-25 ([played results](../plans/rounds/r22-scenes.md#v2-played-acceptance-and-withdrawn-equipment-intervention)).
+Not every item or route has been played.
 
 ## Keyboard and layout
 
@@ -238,7 +239,7 @@ worlds/resources. The HTTP suite exercises real generation/writing, worker respo
 cancellation, original fill errors, publication races, security and spoiler consent. Play tests
 compare read-only plans, digest refusal, one-mod discovery, private saves, and input/output links;
 they never launch a game. Detection tests use synthetic Hookshot, Longshot and Longshot Launcher
-folders; Longshot Play has not been played. Dialog adapter smoke uses a synthetic picker, not an OS dialog.
+folders; Windows app Play has the separate played result above. Dialog adapter smoke uses a synthetic picker, not an OS dialog.
 The adapter prefers [pywebview FileDialog enums](https://pywebview.flowrl.com/api/) with the requested
 legacy-constant fallback. Headless screenshots use `--no-open` and a fresh browser profile; no
 OS dialog/window may be triggered. Keep screenshots outside the repository.
@@ -314,8 +315,9 @@ Use a current Hookshot or Longshot with mod loading. Clawshot checks the program
 (its `HOS_MODS` marker), not just its version number. On Hookshot, **2.0.14** has been played and seeds
 also start on **2.1.0**. Longshot **v3.0.0-rc.2** passed Kareem's Windows app Play check on
 2026-11-13, including isolated saves/options, a shuffled chest and reload persistence. His later checks
-were played on Longshot **3.0.0**. Seeds also start on Longshot **3.2.0** (start-up checked 2026-11-24),
-but nothing has been played on it yet.
+were played on Longshot **3.0.0** and **3.2.0**, including story-scene rewards on 2026-11-25
+([played results](../plans/rounds/r22-scenes.md#v2-played-acceptance-and-withdrawn-equipment-intervention)).
+Not every item or route has been played.
 
 - **Hookshot:** on Game, choose the Hookshot Builder game folder containing `bin/hookshot.exe` on Windows
   or `bin/hookshot` on Linux, then press **Detect**. Update or repair Hookshot if refused. A Linux
@@ -369,8 +371,9 @@ See [manual emulator steps](seed-pack.md#emulator--console-loading).
 
 ### Can I load a seed in Longshot without Play?
 
-Yes, but it uses your normal Longshot saves. Quit Longshot and back up its saves: the `user` folder in
-the game folder on Windows, `~/.local/share/longshot` on Linux (Longshot README, *Where the files go*).
+Yes, but it uses your normal Longshot saves. Quit Longshot and back up the user folder your normal
+start uses ([save-folder locations](#using-it)); with the launcher, this can be a shared folder rather
+than one inside a particular build.
 Copy this seed's `seed/romfs` folder to `<game folder>/mods/Clawshot-seed-<number>/romfs` (Longshot
 README, *Mods*; with the launcher, its **Open folder** for that build shows the game folder). Start a
 **New Game in an empty slot**. While the mod is in `mods` it applies to every save slot, so remove the
@@ -427,8 +430,9 @@ give the version, OS and whole UI error text (terminal error if it never opens).
   own dungeon; pickup text or an icon is not saved ownership. Repaired map/compass saves
   and menus, boss-key credit, pickup indicator and normal boss-door opening passed in-game.
   Rebuilding cannot re-award opened chests.
-- Of dungeon items outside their own dungeon, only the opt-in **Small keys anywhere** choice
-  exists: small keys in any shuffled chest, named to their own dungeon, with the game's key
-  counters still showing only the dungeon you are in. Moving boss keys, maps or compasses
-  outside their dungeon, and wider keysanity, are not available.
+- Dungeon items stay in their own dungeon by default. **Small keys anywhere** moves dungeon chest keys
+  and the Well floor key to supported shuffled chests. Experimental **All dungeon items anywhere** also
+  moves maps, compasses and boss keys, including Ganon's Castle's boss key. Pickup messages name the
+  item's dungeon; the game's key counters still show only the dungeon you are in.
+  [Dungeon-item settings](settings.md).
 - Both `play-note.md` and `spoiler.json` reveal item locations. Do not open them if you want surprises.
