@@ -555,7 +555,7 @@ function parseDungeonNames(fragment) {
   const checksShown = () => panel && panel.screen && !panel.screen.hidden && panel.title && panel.details;
   const KIND_WORDS = {
     chest: "Chest", token: "Gold Skulltula", boss_heart: "Boss heart", freestanding: "Freestanding item",
-    scrub: "Deku Scrub", gift: "Gift or song", shop: "Shop item", other: "Other",
+    scrub: "Deku Scrub", gift: "Gift", shop: "Shop item", other: "Other",
   };
   function howWords(check) {
     if (check.empty) return "Darunia's vanilla bonus gives nothing while you own the child's Bracelet. Inferred from current stock; not a permanent mark.";
@@ -597,7 +597,8 @@ function parseDungeonNames(fragment) {
         const region = source.region === "KF Outside Deku Tree" ? "Kokiri Forest, outside the Deku Tree" : source.region;
         const where = source.purchase ? "buy at " + source.purchase.shop + " · " + source.purchase.price + " rupees (" + source.purchase.budget + ")" :
           entry.item === "Deku Stick Drop" || entry.item === "Deku Nut Drop" ? "Deku Babas in " + region : region;
-        return where + ", as " + source.ages.join(" / ") + " (" + source.rule.replaceAll("_", " ") + ")";
+        const rule = source.rule === "True" ? "" : " (" + source.rule.replaceAll("_", " ") + ")";
+        return where + ", as " + source.ages.join(" / ") + rule;
       }).join("; ");
     }).join("\n");
   }

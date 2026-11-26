@@ -276,6 +276,7 @@ def test_an_owned_bracelet_shows_the_unshuffled_darunia_bonus_empty_and_reverses
     for count in (1, 0, 1):  # one session: the empty state follows the save, nothing sticks
         row = darunia(logic, stock(BRACELET, count), unplayed)
         assert row["item"] == "Goron Bracelet"
+        assert row["kind"] == "gift"
         if count:
             assert (row["collected"], row.get("empty"), row["basis"]) == (True, True, "empty_bonus")
             assert "in_logic" not in row

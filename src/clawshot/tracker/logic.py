@@ -375,6 +375,7 @@ class VanillaRow:
     item: str
     item_label: str
     shared: bool
+    kind: str
 
 
 def logic_reads(world: World) -> frozenset[str] | None:
@@ -466,6 +467,7 @@ def vanilla_rows(seed: Seed, world: World, scope: str | None = None) -> tuple[Va
                 item=loc.vanilla,
                 item_label=shown.get(loc.vanilla, loc.vanilla),
                 shared=any(_can_give(world, given, item.name) for given in pool),
+                kind=seeds._classify(name, place, described.ids if described else (), {}, {}, {})[0],
             )
         )
     return tuple(rows)
@@ -794,7 +796,7 @@ class SeedLogic:
                 "id": row.location,
                 "label": row.label,
                 "where": row.where,
-                "kind": "vanilla",
+                "kind": row.kind,
                 "dungeon": row.dungeon,
                 "collected": collected,
                 "basis": "inventory" if collected is not None else None,

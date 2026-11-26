@@ -114,3 +114,29 @@ The throwaway runner was deleted after proof. These are renderer observations, n
   Per Claude's task, QA was focused; whole-repository synthetic/dump gates were not run for this tracker-only change.
 - Claude explicitly retained the R14 child-strength exception; no open product decision or new play hold remains.
 
+
+## Screenshot-review follow-up
+
+Claude approved the first screenshots and requested two presentation corrections before freezing:
+
+- Omit an unconditional source rule's raw `(True)` suffix; retain the source's age and any nontrivial rule.
+  Purchase details now read `buy at Kokiri Shop · 40 rupees (saved rupees), as child`.
+- Check the actual seed world, not the five-check renderer fixture: `GC Darunias Joy` has world type `NPC`
+  and its catalog place also has type `NPC`. The previous screenshot fixture incorrectly called it a chest;
+  the real vanilla-row projection previously discarded the physical kind and emitted `kind = vanilla`.
+  Vanilla rows now cache the existing seed-check classifier's kind, independently of `vanilla = true`.
+  Darunia therefore emits `kind = gift`, rendered **Kind: Gift**, including its inferred empty state.
+  No location-specific kind override or copied classification convention was added.
+- Focused rerun: fresh CIM player count **0**, `-n 8`, **344 passed, 1 skipped in 32.46 s**.
+  Format: **612 files already formatted**; lint: **All checks passed**.
+  Logs: `E:/OOTRemake/work/r22-tracker-2/followup-{format,lint,focused}.log`.
+  Regression coverage includes unconditional/conditional purchase wording, the real world's Darunia
+  payload kind, and the displayed empty bonus's Gift kind.
+
+- Chromium rerun at 1280×860 and 1920×1080 passed with no page errors or non-local requests.
+  `shots/followup-metrics.json` records the exact purchase text without `(True)` and **Kind: Gift**.
+  The Darunia screenshot uses the real `logic_world(Settings())` projection: **195 native-world chests
+  and 47 vanilla rows**, synthetic save/check metadata only, no generated seed or player save.
+  Inspected `followup-purchase-1280.png` and `followup-real-darunia-1920.png` under
+  `E:/OOTRemake/work/r22-tracker-2/shots/`; both widths captured. Throwaway runner deleted.
+

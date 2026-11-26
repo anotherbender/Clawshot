@@ -521,7 +521,7 @@ def area_with(name, *checks, **extra):
 
 def pickup(check_id, collected, in_logic=None, **extra):
     """A vanilla row as tracker.logic sends it: read from the inventory and tagged with its usual item."""
-    return check(check_id, collected, in_logic) | {"kind": "vanilla", "vanilla": True, "item": "Heart", **extra}
+    return check(check_id, collected, in_logic) | {"kind": "other", "vanilla": True, "item": "Heart", **extra}
 
 
 def listing(areas, vanilla=(), **options):
@@ -715,7 +715,7 @@ def test_without_a_save_or_logic_no_area_says_ready_or_after(tmp_path):
 def goron_city(*, empty=True):
     """Goron City with Darunia's vanilla bonus: empty while the save owns the child's Bracelet (as tracker.logic sends
     it), else an open vanilla row in logic for the child."""
-    bonus = {"item": "Goron Bracelet", "item_label": "Goron's Bracelet"}
+    bonus = {"item": "Goron Bracelet", "item_label": "Goron's Bracelet", "kind": "gift"}
     if empty:
         darunia = pickup("GC Darunias Joy", True, basis="empty_bonus", empty=True, **bonus)
     else:
@@ -736,6 +736,7 @@ def test_darunias_empty_vanilla_bonus_is_its_own_inferred_state_not_a_collected_
     assert details["rows"]["State"] == "Empty vanilla bonus" and "Click" not in details["rows"]
     assert "Collected" not in details["body"]
     assert "Inferred" in details["rows"]["Save"] and "not a permanent mark" in details["rows"]["Save"]
+    assert details["rows"]["Kind"] == "Gift"
     assert "Empty bonus" in rendered["legend"][0]["text"]
     # Finished: after the open rows, off the remaining count, hidden by Open checks.
     assert [entry["id"] for entry in rendered["checks"]] == ["GC Pot", "GC Maze", "GC Rock Pickup", "GC Darunias Joy"]
@@ -759,10 +760,11 @@ def test_darunias_empty_vanilla_bonus_is_its_own_inferred_state_not_a_collected_
 
 
 @pytest.mark.parametrize("budget", ["saved rupees", "wallet capacity"])
-def test_a_purchase_source_names_the_shop_price_and_budget_and_no_reward(tmp_path, budget):
+@pytest.mark.parametrize("rule", ["True", "is_child"])
+def test_a_purchase_source_names_the_shop_price_and_budget_and_no_reward(tmp_path, budget, rule):
     snap = snapshot()
-    purchase = {"location": "KF Shop Item 1", "shop": "KF Shop", "price": 40, "budget": budget}
-    source = {"region": "KF Kokiri Shop", "ages": ["child"], "rule": "is_child", "purchase": purchase}
+    purchase = {"location": "KF Shop Item 7", "shop": "KF Shop", "price": 40, "budget": budget}
+    source = {"region": "KF Kokiri Shop", "ages": ["child"], "rule": rule, "purchase": purchase}
     needs = [{"item": "Buy Deku Shield", "sources": [source]}]
     snap["state"]["areas"][0]["checks"][0]["assumed_sources"] = {"child": needs, "adult": [], "either": needs}
     rendered = tab(
@@ -773,4 +775,5 @@ def test_a_purchase_source_names_the_shop_price_and_budget_and_no_reward(tmp_pat
     rows = rendered["details"]["rows"]
     words = rows["Needs a source"]
     assert "KF Shop" in words and "40 rupees" in words and budget in words and "Deku Babas" not in words
+    assert ", as child" in words and "(True)" not in words
     assert not {"Item", "Usual item"} & set(rows)  # the check's own reward stays hidden
