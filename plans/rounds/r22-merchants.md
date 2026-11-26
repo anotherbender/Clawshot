@@ -346,3 +346,34 @@ genuine result. The old seed startup PASS does not certify the new fixtures.
 
 Production holds/wallet predicates remain. Admission still requires actual PLAY and a full
 paired sweep; merge current main into this branch when admission resumes, never rebase.
+
+## Native controls played — 2026-11-26
+
+Claude relayed Kareem's A-Granny: "Offers purchase for 100, Blue Potion filled empty bottle,
+persists after reload." A-Knife: "Declining works, buying works, equip/swing okay."
+While Kareem was moving to B-Medigoron's first visit, only read-only physical snapshots and
+small receipt checks ran. No profile/save edits, seeds, boots, gates or heavy work.
+
+| Row | Result | Saved proof against frozen start |
+|---|---|---|
+| A-Granny | PASS: native sale/reload gate | Slots00/01: rupees100->0; BottleB Empty->Blue Potion; BottleA Bug unchanged; valid bottles2->2. Default wallet capacity200, Medium/Large unowned. Step06 567736888 retained; Odd Potion stock0/unowned. |
+| A-Knife | PASS: native default-wallet Knife control | Slots01/02: rupees200->0; Weapon_Sword_Giant stock0->1, IsGet/HavePlayedGetEvent true; Broken Knife absent. Default wallet capacity200, Medium/Large unowned. Bottles and Ready trade step unchanged. |
+
+Copied snapshots are `packet-v2/receipts/A-Granny/1795717225344007700-read-only-inspection/`
+and `A-Knife/1795717225651724500-read-only-inspection/`. Both copied logs identify Longshot
+3.2.0, their own row profiles and `mods: none` in `native-empty-mods`.
+Full slot facts, hashes, checks and tester quotations are in
+`packet-v2/receipts/A-Granny-PLAY-20261126.json` and `A-Knife-PLAY-20261126.json`;
+the top of PLAY links these receipts.
+
+A-Knife slot00 is an older pre-purchase200/no-Knife save, not a failed purchase. Bomb ammo is
+6 initially,7 in slot01 and6 in slot02; these values do not independently prove pickup/use or
+wall-opening method. Granny decline was not explicitly reported and is not certified.
+Equip/swing and reload execution remain explicitly attributed to Kareem, not inferred from
+static saved stock. Native rows have no Clawshot merchant fields; missing fields remain null.
+
+The Step06-only trade edit now has a played vanilla-sale control, validating B/C-Granny's
+starting trade state. This is not a B/C transaction/repeat PASS or an admission approval.
+Claude reports B-Medigoron ROW_PREPARED from A's real Knife snapshot, with rupees0->200 as its
+only fixture change; its first-visit result is still pending. Holds and the full paired-sweep
+requirement remain.
