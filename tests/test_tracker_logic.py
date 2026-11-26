@@ -170,6 +170,55 @@ def test_world_is_built_once_per_loaded_seed(tmp_path, world, monkeypatch):
     assert calls == [1, 1]
 
 
+def test_rutos_letter_autotracks_a_new_saved_pickup_not_an_unchanged_reload(tmp_path, world, monkeypatch):
+    field = SPEC["regions"][1]
+    letter = "LH Underwater Item"
+    spec = {
+        **SPEC,
+        "items": {**SPEC["items"], "Rutos Letter": {"class": "progression"}},
+        "regions": [
+            SPEC["regions"][0],
+            {
+                **field,
+                "exits": {**field["exits"], "Child Ledge": "age == 'child' and (Boomerang or Rutos_Letter)"},
+                "locations": {
+                    **field["locations"],
+                    letter: {"rule": "True", "type": "Collectable", "vanilla": "Rutos Letter"},
+                },
+            },
+            *SPEC["regions"][2:],
+        ],
+    }
+    monkeypatch.setattr(tracker_logic, "world_spec", lambda: spec)
+    monkeypatch.setattr(seeds, "location_index", lambda: PLACES | {letter: Place("Lake Hylia", None, "Collectable")})
+    root = write_seed(tmp_path)
+    slot = root / "user" / "save" / "1" / "slot_00"
+    slot.mkdir(parents=True)
+    progress = slot / "progress.sav"
+    flags = {valid: False for _, valid, _ in tracker_logic.state.BOTTLE_SLOTS}
+    flags["IsGet.Item_Bottle_Letter"] = False
+    progress.write_bytes(build_save(flags))
+    session = TrackerSession()
+    session.configure(root)
+
+    def collected(current):
+        state = current.snapshot()["state"]
+        assert state["logic"]["available"], state["logic"]
+        return next(c["collected"] for a in state["vanilla_areas"] for c in a["checks"] if c["id"] == letter)
+
+    assert collected(session) is False
+    reloaded = TrackerSession()
+    reloaded.configure(root)
+    assert collected(reloaded) is False
+    # A natural after-Jabu save also confirms this native acquisition flag survives changed bottle contents.
+    progress.write_bytes(build_save(flags | {"IsGet.Item_Bottle_Letter": True}))
+    stat = progress.stat()
+    os.utime(progress, ns=(stat.st_atime_ns, stat.st_mtime_ns + 10**9))
+    assert collected(session) is True
+    reloaded.configure(root)
+    assert collected(reloaded) is True
+
+
 # 3.4
 def tree(path):
     return {

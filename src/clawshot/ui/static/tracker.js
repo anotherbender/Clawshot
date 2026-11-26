@@ -467,7 +467,7 @@ function parseDungeonNames(fragment) {
   // A check's state in the Checks tab: ``markable`` offers Mark done (D9), ``skippable`` offers Skip.
   const markable = (check) => check.markable === true;
   function checkState(check, key, noSave) {
-    const done = check.collected === true ? "collected" : check.skipped ? "skipped" : check.marked ? "marked" : null;
+    const done = check.empty ? "empty" : check.collected === true ? "collected" : check.skipped ? "skipped" : check.marked ? "marked" : null;
     const open = !done;
     const inLogic = key && open && check.in_logic ? check.in_logic[key] ?? null : null;
     const manual = open && markable(check);
@@ -481,7 +481,7 @@ function parseDungeonNames(fragment) {
     const sources = inLogic === true ? check.assumed_sources?.[key] || [] : [];
     return {done, open, inLogic, manual, action, sources};
   }
-  const STATE_WORDS = {collected: "Collected (your save)", marked: "Marked done by you", skipped: "Skipped by you"};
+  const STATE_WORDS = {collected: "Collected (your save)", marked: "Marked done by you", skipped: "Skipped by you", empty: "Empty vanilla bonus"};
   function stateWords(state, noSave) {
     if (state.done) return STATE_WORDS[state.done];
     if (noSave) return "Not read yet: no save";
@@ -497,6 +497,7 @@ function parseDungeonNames(fragment) {
   // Marker shapes for the legend and the rows (CSS only, no fonts or art).
   const LEGEND = [
     ["collected", "Collected", "Your save shows it collected"],
+    ["empty", "Empty bonus", "The owned child Bracelet leaves Darunia's vanilla bonus empty; inferred, not permanently marked"],
     ["marked", "Marked", "Marked done by you"],
     ["skipped", "Skipped", "Skipped by you"],
     ["in-logic", "In logic", "Open, and in logic with what your save holds"],
@@ -510,11 +511,12 @@ function parseDungeonNames(fragment) {
     return el;
   }
   // One line: a marker and a word each (the longer meaning on hover). Without a save it steps aside.
-  function drawLegend(skippable, noSave) {
+  function drawLegend(skippable, noSave, empty) {
     legend.replaceChildren();
     legend.hidden = noSave;
     for (const [kind, text, meaning] of LEGEND) {
       if (kind === "skipped" && !skippable) continue;
+      if (kind === "empty" && !empty) continue;
       const item = node("span", "tracker-legend-item");
       item.title = meaning;
       item.append(marker(kind), document.createTextNode(text));
@@ -556,6 +558,7 @@ function parseDungeonNames(fragment) {
     scrub: "Deku Scrub", gift: "Gift or song", shop: "Shop item", other: "Other",
   };
   function howWords(check) {
+    if (check.empty) return "Darunia's vanilla bonus gives nothing while you own the child's Bracelet. Inferred from current stock; not a permanent mark.";
     if (check.vanilla) return "Not shuffled in this seed: it keeps its usual item. Read from your inventory, as the logic counts it.";
     if (markable(check) && check.collected == null) return "Your save can't show this check" + (check.reason ? " (" + check.reason + ")" : "") + ". Click it when you have it.";
     if (markable(check)) return "Your save reads it through a flag not yet confirmed in play; if it is wrong, click it when you have it.";
@@ -572,6 +575,7 @@ function parseDungeonNames(fragment) {
     if (noSaveNow) return "Shown after your first save.";
     if (logicReason) return "Unavailable: " + logicReason;
     if (state.done === "collected") return "Collected; no longer counted.";
+    if (state.done === "empty") return "Empty bonus; no remaining check while the child's Bracelet is owned.";
     if (state.done) return "Done by you; no longer counted.";
     const ages = check.in_logic;
     if (!ages) return "No logic data for this check.";
@@ -591,7 +595,8 @@ function parseDungeonNames(fragment) {
       const item = label ? label + " (" + entry.item + ")" : entry.item;
       return item + ": " + entry.sources.map((source) => {
         const region = source.region === "KF Outside Deku Tree" ? "Kokiri Forest, outside the Deku Tree" : source.region;
-        const where = entry.item === "Deku Stick Drop" || entry.item === "Deku Nut Drop" ? "Deku Babas in " + region : region;
+        const where = source.purchase ? "buy at " + source.purchase.shop + " · " + source.purchase.price + " rupees (" + source.purchase.budget + ")" :
+          entry.item === "Deku Stick Drop" || entry.item === "Deku Nut Drop" ? "Deku Babas in " + region : region;
         return where + ", as " + source.ages.join(" / ") + " (" + source.rule.replaceAll("_", " ") + ")";
       }).join("; ");
     }).join("\n");
@@ -696,15 +701,20 @@ function parseDungeonNames(fragment) {
     const vanillaShown = view.key !== null && vanillaToggle.checked;
     const vanilla = new Map(vanillaShown ? (state.vanilla_areas || []).map((area) => [area.name, area]) : []);
     const listed = [...(state.areas || []), ...[...vanilla.keys()].filter((name) => !(state.areas || []).some((area) => area.name === name)).map((name) => ({name, checks: []}))];
-    let skippable = false;
+    let skippable = false, empty = false;
     lastAreas = listed.map((area) => area.name);
     checksList.replaceChildren();
     for (const area of listed) {
       const checks = [...(area.checks || []), ...(vanilla.get(area.name)?.checks || [])];
       const lines = checks.map((check) => checkLine(check, area.name, filter));
+      // Stable within each priority: reachable open checks, other open checks, then finished checks.
+      const priority = ({state}) => state.open ? state.inLogic === true ? 0 : 1 : 2;
+      if (!noSave) lines.sort((a, b) => priority(a) - priority(b));
       skippable ||= checks.some((check) => check.skippable || check.skipped);
+      empty ||= checks.some((check) => check.empty);
       const finished = lines.filter(({state}) => !state.open).length;
       const inLogic = lines.filter(({state}) => state.inLogic === true).length;
+      const clearable = view.key !== null && inLogic > 0 && inLogic === lines.length - finished;
       const folded = collapsed.has(area.name);
       const item = node("section", "tracker-area" + (folded ? " tracker-area-collapsed" : ""));
       const head = node("button", "tracker-area-head");
@@ -713,6 +723,13 @@ function parseDungeonNames(fragment) {
       head.dataset.keyAction = folded ? "Expand" : "Collapse";
       const counts = noSave ? lines.length + " checks" : finished + " / " + lines.length + " done" + (view.key ? " · " + inLogic + " in logic" : "");
       head.append(node("span", "tracker-area-fold"), node("strong", "", area.name), node("span", "tracker-area-counts", counts));
+      if (clearable) {
+        const ready = node("span", "tracker-area-ready", "All in logic");
+        ready.title = "Every remaining listed check is in logic for the selected age view; not a promise they can all be collected in one trip.";
+        head.append(ready);
+      }
+      const after = [...new Set([...(area.after_events?.[view.key] || []), ...(vanilla.get(area.name)?.after_events?.[view.key] || [])])];
+      if (view.key && !inLogic && after.length) head.append(node("span", "tracker-area-after", "After: " + after.join(" / ")));
       head.title = (folded ? "Expand " : "Collapse ") + area.name;
       head.addEventListener("click", () => {
         folded ? collapsed.delete(area.name) : collapsed.add(area.name);
@@ -728,7 +745,7 @@ function parseDungeonNames(fragment) {
       checksList.append(item);
     }
     skipOffered = skippable;
-    drawLegend(skippable, noSave);
+    drawLegend(skippable, noSave, empty);
     if (selected && !rows.has(selected)) selected = null;
     showDetails();
     if (focused) [...checksList.querySelectorAll("[data-check]")].find((row) => row.dataset.check === focused)?.focus();

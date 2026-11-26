@@ -455,3 +455,28 @@ Tests run with `uv run --with pytest-xdist pytest -n auto`; dump tests skip with
     16.10 [x] 8.8 Synthetic tests (`tests/test_tracker_vanilla_rows.py`): custom world with a non-shuffled gate item (letter-like) and a gated check: row open and in logic, gated check out; save holding the item: row collected, gated check in logic. A vanilla item that a shuffled location's own item also gives yields `collected: null` (the items the spoiler placed are never read). Shuffled-check state equal with and without vanilla rows. Deterministic JSON (P14.a). Maintainer review (2026-11-21): an item no rule reads gets no row (synthetic, and the six fixed native tiers on the real Chest-only world); fixed tiers on the real Ocarina chain.
     16.11 [x] 8.9 `docs/tracker.md` "In logic" section: vanilla rows, the toggle, and the Ruto's Letter / Jabu-Jabu example.
     16.12 [ ] 7.3 Format, lint and the full suite pass; the PR description lists D19, Q3, Q4 and a maintainer in-game step: on a Chest-only seed as child with Silver Scale reachable, the tracker shows "LH Underwater Item" open and in logic before the letter is taken and collected after, and Jabu-Jabu's checks turn in logic once the letter is held. Full suite 2026-11-21: 4155 passed, 2 failed, 799 skipped; the two failures (`test_unavailable_logic_leaves_every_existing_field_unchanged`, an empty `vanilla_areas` key added while logic was unavailable) were fixed by leaving the key out, and the tracker tests then passed (128). Format and lint pass. The full suite was not rerun after that fix, nor after the maintainer review's fixes (format, lint and the focused tracker tests pass); the maintainer's full gate runs at merge.
+
+## Overnight round 22 tracker policy update (2026-11-25)
+
+Claude approved these tracker-only changes after Bender's reports; generator reachability is unchanged.
+This supersedes D17's projected events only for the readable saved Gohma and Kakariko guard completions,
+and extends D19 only for obtainable unshuffled vanilla Shop stock.
+
+- Saved Gohma outro (`HavePlayedEvent.Dm_Deku_BossOut`) gates the closed forest; saved guard letter-show
+  (`Npc_Hylia_Soldier_003_GateOpen`) gates Keaton availability. Missing flags stay conservative. An area
+  closed solely by one undone event may show an age-specific **After:** hint.
+- With Shop shuffle off, reachable native shelves can supply their vanilla items, priced through the shared
+  `shop_price` function and maximum native-copy base price. Use saved rupees when read, otherwise wallet
+  capacity. Annotate the purchase/source and price; do not mark shelves collected or expose placed rewards.
+  Other fixed progression stays held-only. This catches up to the generator: `generate/fill.py:1164-1170`
+  adds unshuffled vanilla stock to placements; `:497-498` and `:1278-1279` use `collect_spheres`,
+  whose `world/search.py:435-441` collects reachable placed stock. Claude accepted existing shop play
+  (Kareem's vanilla Deku Shield in 06-kak, shield/tunics in 4a) rather than holding this for new play.
+- Per cs22d's native Darunia audit and Claude's explicit decision, an owned child Bracelet makes the anchored
+  vanilla bonus empty/done in presentation only. The inference is reversible, uses exact child stock rather
+  than adult strength, and never grants the Darunia event, permanently marks a check, or applies to shuffled
+  rewards.
+- Checks sort stably within each area: reachable open, other open, then finished. **All in logic** means
+  at least one remaining listed check, and all remaining listed checks (including shown vanilla rows)
+  reachable in the selected age view, before filtering. No one-trip or already-finished-area promise.
+
