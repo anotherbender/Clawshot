@@ -4,9 +4,11 @@
 # physically work out of logic, but seed logic never relies on it. Direct legacy worlds retain their old
 # progressive-items behavior; adult seed strength counts only copies. See section 47 / r14-progressive.md.
 [helpers.Bombs]
-rule = "Bomb_Bag and ((is_child and ('Goron Bracelet' or (not progressive_copies_only and (Progressive_Strength or (progressive_items and Progressive_Strength_Upgrade))))) or (is_adult and Progressive_Strength_Upgrade))"
+rule = "Bomb_Bag and (bombs_without_bracelet or (is_child and ('Goron Bracelet' or (not progressive_copies_only and (Progressive_Strength or (progressive_items and Progressive_Strength_Upgrade))))) or (is_adult and Progressive_Strength_Upgrade))"
 was = "Bomb_Bag"
 source = "D30; 03-game-data.md sections 30-31, build e0f3ccfa: Item_Bomb LiftableParam requires Low; Bracelet works as child, any strength tier as adult; bag grants capacity only. Claude 2026-11-13 approved native Darunia child-capability exception to Round 14 copies-only logic: no copy tier from the gift, no child capability from copies. E FINDINGS.md:70-73 confirms the DC flower route has no quest-step precondition; early-copy use stays out of logic."
+# With bombs_without_bracelet, patch.bombs gives only Item_Bomb a private Low -> None lift component.
+# The native bag/spawn -> pre-lift -> required<=available chain is cited in plans/rounds/r22-games.md.
 
 # N64's two direct Bomb_Bag combat shortcuts must use the same usable-bomb capability.
 [helpers.can_kill_octorok_with_bombs]

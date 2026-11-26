@@ -21,6 +21,7 @@ from clawshot.patch import scrub_shields
 from clawshot.patch.plan import PatchError
 from clawshot.patch.shops import SHOPS_TOML
 from clawshot.patch.write import FileChanges
+from clawshot.settings import CATALOG
 
 FLOW = "Enemy_Scrub_Business_Common"
 PATH = f"Event/EventFlow/{FLOW}.bfevfl.zs"
@@ -319,15 +320,18 @@ def seed_setup(spec: Mapping[str, Any], settings: Settings):
 
     Public Scrub covers the two translated scrub types without exposing an internal
     alias in the settings string. Capacities use fixed Medium actors (D16).
-    The played fixed_capacity Token family admits the Nut native30 representative
-    and structurally checked Stick native20 sibling; chests remain held pending play
+    Played Medium actors may also use chests, through the actor-specific chest
+    verification catalog. Fixed-capacity Token members retain native capacities
     (token_rewards.toml, plans/rounds/r22-lifts.md).
     """
     spec = logic_spec(spec, settings)
     prices = sale_prices(settings)
+    actors = item_actors.load()
     held = dict(settings.item_location_types)
-    destinations = (SHUFFLE, token_policy.SHUFFLE) if token_policy.SHUFFLE in settings.shuffle else (SHUFFLE,)
     for item in CAPACITIES:
+        destinations = ("Chest", SHUFFLE) if actors.actor(item) in CATALOG["chest_verified"] else (SHUFFLE,)
+        if token_policy.SHUFFLE in settings.shuffle:
+            destinations += (token_policy.SHUFFLE,)
         held[item] = destinations if item not in held else tuple(t for t in held[item] if t in destinations)
     settings = replace(settings, item_location_types=held)
     _, world = prepare(spec, settings)
@@ -336,7 +340,6 @@ def seed_setup(spec: Mapping[str, Any], settings: Settings):
         for name, loc in world.locations.items()
         if name in SALES and loc.vanilla is not None and not loc.n64_only and not loc.keep_vanilla
     )
-    actors = item_actors.load()
 
     def step(placements: Mapping[str, str]) -> FileChanges:
         # Even an unchanged capacity placement must normalize both native tier

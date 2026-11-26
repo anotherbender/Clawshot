@@ -63,7 +63,9 @@ def test_whole_seed_assigns_one_item_to_every_tier_and_copy_without_changing_pri
     before, after = evfl.read(data), evfl.read(written)
     index = {e.name: e for e in after.flowchart.events}
     native = {e.name: e for e in before.flowchart.events}
-    assert set(output.seed.shuffled) & scrubs.SALES.keys() == scrubs.SALES.keys()
+    assert {
+        name for name in output.seed.shuffled if output.seed.world.locations[name].type == scrubs.SHUFFLE
+    } == scrubs.SALES.keys()
     for check, sale in scrubs.SALES.items():
         item = actors.actor(output.seed.placements[check])
         for name, old in sale.grants:
@@ -79,7 +81,7 @@ def test_whole_seed_assigns_one_item_to_every_tier_and_copy_without_changing_pri
     assert after == before
     for name in output.seed.shuffled:
         if output.seed.placements[name] in scrubs.CAPACITIES:
-            assert name in scrubs.SALES
+            assert output.seed.world.locations[name].type in ("Chest", scrubs.SHUFFLE)
 
 
 @pytest.mark.dump

@@ -24,11 +24,13 @@ from clawshot.generate import tokens as token_policy
 from clawshot.generate.fill import SWORD_PEDESTAL_SOURCE, shuffled_locations
 from clawshot.patch import (
     bags,
+    bombs,
     custom_items,
     darunia,
     drops,
     freestanding,
     gamedata,
+    gifts,
     scrubs,
     shops,
     text,
@@ -248,26 +250,35 @@ def make_seed(
     # Fast-start initial values compose before gift flag additions; its flow edits run before other flow steps.
     if scrubs.SHUFFLE not in settings.shuffle:
         changes += (scrubs.changes({}),)
-    changes = (gamedata.changes(chosen), *changes)
+    # Pin the native win boundary before kind-specific gift/bag guards rewrite the reward event.
+    changes = (gamedata.changes(chosen), gifts.skull_kid_changes(), *changes)
     if world.settings.get("free_time_travel", False):
         from clawshot.patch.age import changes as age_changes
 
         changes += (age_changes(out.placements, free_time_travel=True),)
     from clawshot.patch import (
+        dampe_first_race,
         dampe_safety,
         door,
         equipment,
         master_sword,
         mido_schedule,
         reward_bridge,
+        scene_gifts,
+        talon,
     )
 
     changes += (
         door.changes(out.placements, mode=settings.door_of_time, dungeon_rewards=settings.dungeon_rewards),
         start_items.changes(settings),
+        bombs.changes(enabled=world.settings.get("bombs_without_bracelet", False)),
         equipment.changes(),
         *([master_sword.changes(out.placements)] if settings.shuffle_master_sword else []),
         dampe_safety.changes(),
+        dampe_first_race.changes(),
+        text.dampe_refusal_changes(romfs),
+        talon.changes(romfs, out.placements),
+        scene_gifts.changes(out.placements, table),
     )
     changes += (reward_bridge.changes(mode=settings.bridge, count=settings.bridge_count),)
     scrub_previews = {name: out.placements[name] for name in out.shuffled if name in scrubs.SALES}
@@ -310,17 +321,22 @@ def make_seed(
     if ocarina_delivery is not None:
         changes += (ocarina_pickup.receipt_changes(romfs),)
     changes += (ocarina.changes(romfs, prior_changes=changes),)
-    # Cosmetic get-display steps run when the settings could produce what they show (PR #41, the maintainers'
-    # option 2, 2026-11-23), so the settings string says which build a seed has; the spoiler's ``patch.steps`` names
-    # them. A placement the settings rule does not cover is refused rather than shown with the wrong model (S8).
+    # Cosmetic get-display steps follow settings, not actual placements (PR #41 option 2).
+    # Gift-only settings also need the ocarina model: display hand-overs crash with native packs (r22 arms07–09).
     steps: list[str] = []
-    # The ocarina get model: whenever an ocarina can show its own item actor (in a chest, at a show-item hand-over or
-    # a scrub sale: getitem.shown_ocarinas_possible). Last on ActorInfo and the ocarina packs, after every row edit.
-    if getitem.shown_ocarinas_possible(settings.shuffle):
+    ocarinas = getitem.ocarina_locations(out.placements, out.shuffled, table)
+    gift_ocarinas = [name for name in ocarinas if out.world.locations[name].type in gifts.GIFT_TYPES]
+    if gift_ocarinas:
+        receipts = gifts.check_steps(gifts.scan_gifts(romfs), definitions)
+        missing = [name for name in gift_ocarinas if not receipts.get(name)]
+        if missing:
+            raise PatchError(f"ocarina gifts lack an audited receipt; native-pack hand-overs are unsafe: {missing}")
+    # Last on the ocarina packs and after prior ActorInfo row edits. Missing model inputs fail closed.
+    if getitem.ocarina_get_model_possible(settings.shuffle):
         changes += (getitem.ocarina_changes(romfs),)
         steps.append(OCARINA_GET_MODEL)
-    elif found := getitem.get_model_ocarinas(shuffled_placements, out.world, table):
-        raise PatchError(f"{found} hold an ocarina, but the settings do not run the ocarina get model")
+    elif ocarinas:
+        raise PatchError(f"{ocarinas} hold an ocarina, but the settings do not run the ocarina get model")
     # Song get effects: when the settings let songs leave their places. Songs show an ocarina with their own effect;
     # their floor pickups, for the floor and Skulltula kinds, only when the settings could place a song there
     # (songs.pickups_possible; Kareem's rule, rounds/r21-pr41.md finding 4). Last on ActorInfo and the song packs.

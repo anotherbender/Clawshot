@@ -25,9 +25,9 @@ source = "Banc room 0: one Bow eye-switch chest (east, 2436665354602612279) and 
 # Sword the child's; it folds to the rule before while shuffle_master_sword is false. Round 21 cs21e: adult_weapon for
 # the fight, and the Beamos room's Enemy_Beamos 2867582777575272608 takes the Hammer (Kareem, Longshot 3.0.0,
 # 2026-11-23: one Hammer hit destroyed an Enemy_Beamos; r21-hammer.md, Beamos G2).
-rule = "here(can_blast_or_smash and (adult_weapon or (is_child and Kokiri_Sword))) and can_use(Goron_Tunic)"
+rule = "here((can_blast_or_smash or can_use(Mirror_Shield)) and (adult_weapon or (is_child and Kokiri_Sword))) and can_use(Goron_Tunic)"
 was = "here(has_explosives and (is_adult or Kokiri_Sword))"
-source = "EG section 2: after the Beamos room the lava room needs the Goron Tunic for heat resistance; ZC: wear the Goron Tunic in the lava rooms or the heat drains hearts. The remake's heat damage: https://www.ign.com/wikis/ocarina-of-time-remake/Biggest_Changes_and_Differences (Link Reacts to Temperature)."
+source = "EG section 2: after the Beamos room the lava room needs the Goron Tunic for heat resistance; ZC: wear the Goron Tunic in the lava rooms or heat drains hearts. Remake heat damage: https://www.ign.com/wikis/ocarina-of-time-remake/Biggest_Changes_and_Differences. Round 22 cs22d: Kareem, Longshot 3.2.0, 0.2.6, adult before bombs/Hammer, redirected a Beamos beam back with the Mirror Shield to kill it. Keep the other fight and heat requirements; plans/rounds/r22-logic.md."
 
 [exits."Gerudo Training Ground Central Maze Right"."Gerudo Training Ground Lava Room Front"]
 rule = "can_use(Goron_Tunic)"

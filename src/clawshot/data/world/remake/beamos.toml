@@ -1,0 +1,14 @@
+# Round 22 cs22d; plans/rounds/r22-logic.md, Beamos audit. The translated helpers currently have no world
+# consumers; keep their Beamos-kill contract consistent with the three direct rules, without editing generated data.
+# Kareem, Longshot 3.2.0, Clawshot 0.2.6: adult, before bombs or Hammer, redirected a Beamos beam back at it with
+# the Mirror Shield and killed it outright. Merely blocking the beam is not the kill.
+
+[helpers.can_kill_beamos]
+rule = "has_soul(Beamos) and (has_explosives or can_use(Mirror_Shield))"
+was = "has_soul(Beamos) and has_explosives"
+source = "LogicHelpers.json:131; Kareem's played reflected-beam kill, Longshot 3.2.0, 0.2.6, 2026-11-24. Adult-only can_use(Mirror_Shield); preserve explosives and soul gate. Native Beam damage rate 1, MaxLife 2, BeamosBeam power 2; reflection corroborated by Enemy_Beamos/QueryBeamosGetMirrorShieldInfo and Weapon_Shield_Mirror/ExecuteMirrorShieldReflect (r22-logic.md)."
+
+[helpers.can_kill_beamos_with_bomb_flower]
+rule = "has_soul(Beamos) and (has_explosives or Progressive_Strength_Upgrade or can_use(Mirror_Shield))"
+was = "has_soul(Beamos) and (has_explosives or Progressive_Strength_Upgrade)"
+source = "LogicHelpers.json:132; same played reflected-beam kill as can_kill_beamos. Preserve the existing local Bomb Flower alternative; no new flower placement or carry route implied. plans/rounds/r22-logic.md."

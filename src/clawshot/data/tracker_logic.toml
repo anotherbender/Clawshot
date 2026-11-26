@@ -286,6 +286,20 @@ source = "data/world/remake/child_hyrule_castle.toml, event Time Flows: 'Field O
 flag = "HavePlayedEvent.Dm_HrlField_0020"
 source = "data/world/remake/child_hyrule_castle.toml, event Time Flows: 'Met Child Zelda' is HavePlayedEvent.Dm_HrlField_0020, Impa's send-off (round16 clock predicate); patch/door.py SENDOFF."
 
+# Readable completed actions are tracker gates, not predictions that the player could perform them now.
+# The generator retains its normal event derivation; these two are filtered only in tracker.SeedLogic.
+[story."Defeat Queen Gohma"]
+flag = "HavePlayedEvent.Dm_Deku_BossOut"
+saved_only = true
+after = "Defeat Queen Gohma"
+source = "Overnight r22 tracker-2, Claude/Bender 2026-11-25: require actual saved Gohma completion for the closed forest. Native Get_StoneOfForest.bfevfl Event78/80 transition to Dm_Deku_BossOut after the Gohma win/outro path. GameDataList Product110 Bool Hash1484945036, default false/reset8/save0. Owned Emerald or enough combat gear is not this flag."
+
+[story."Kakariko Village Gate Open"]
+flag = "Npc_Hylia_Soldier_003_GateOpen"
+saved_only = true
+after = "Show Zelda's Letter to the Kakariko guard"
+source = "Overnight r22 tracker-2, Claude/Bender 2026-11-25: possession of Zelda's Letter is not showing it. Dm_Kakariko_0010.bfevfl Event18 and Npc_Hylia_Soldier_003.bfevfl Event3 write true; native Npc_Hylia_018_Shop_Child Event5/76/97 and DisplayShop Event468 read this Bool to gate masks. GameDataList Product110 Bool Hash428444948, default false/reset8/save0. Filter both Root and village projected copies in the tracker only."
+
 # A gift the save records only as its cutscene's saved Bool: the flag counts as the item. `vanilla_at`: only while that
 # location keeps its vanilla item; shuffled, the flag would mean the check was done, not that the item is held.
 # Seed child logic reads 'Goron Bracelet' from Darunia's gift only, never from a strength copy (world.toml

@@ -33,7 +33,7 @@ def _intended(fc: evfl.Flowchart, flow: str, changes) -> set[int]:
         out |= {index[s.event] for s in change.steps if s.flow == flow}
         out |= {
             index[r.split("/")[1]]
-            for r in (*change.rule.given, *change.rule.writes, *change.rule.once)
+            for r in (*change.rule.given, *change.rule.writes, *change.rule.once, *change.rule.display)
             if r.split("/")[0] == flow
         }
         if (
@@ -215,6 +215,7 @@ def test_dump_game_data_list_differs_only_in_the_added_flags(romfs, context):
 @pytest.mark.dump
 def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
     from clawshot.generate import Settings, prepare
+    from clawshot.generate.fill import allowed
     from clawshot.patch import items as item_actors
     from clawshot.patch import make_seed, write_seed
     from clawshot.world.load import load_spec
@@ -237,16 +238,16 @@ def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
         for s in steps[name]:
             data = dicts.decompress(s.file, (tmp_path / "seed" / "romfs" / s.file).read_bytes())
             event = next(e for e in evfl.read(data).flowchart.events if e.name == s.event)
-            assert event.params[s.param] == actors.actor(seed.placements[name]), s.id
+            actor = actors.actor(seed.placements[name])
+            assert event.params[s.param] == gifts.TUNIC_GIFT_ACTORS.get(actor, actor), s.id
     rules = gifts.load()
     for name in seed.shuffled:
         if name in rules:
             assert rules[name].cls != gifts.MORE, name
     print(f"moved gifts: {[(n, seed.placements[n]) for n in moved]}")
 
-    # The forest slice has no held items after adult trades stay vanilla. A real
-    # unrestricted gift setup still holds Bottle outside chests; exercise its
-    # native hand-over writer with a controlled NPC-to-NPC swap.
+    # Bottle now has a scoped Chest lift, not a Scrub lift. Retain its native
+    # hand-over coverage with a controlled NPC-to-NPC swap.
     held_spec, held_settings, held_step = gifts.seed_setup(
         romfs, load_spec(), Settings(shuffle=("Chest", gifts.SHUFFLE), songs="song")
     )
@@ -259,7 +260,8 @@ def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
     )
     held = held_settings.item_location_types
     assert held_placements[destination] == "Bottle"
-    assert "Chest" not in held["Bottle"]
+    assert allowed(held_world, held_settings, "KF Midos Top Left Chest", "Bottle")
+    assert not allowed(held_world, held_settings, "LW Deku Scrub Near Bridge", "Bottle")
     transforms = held_step(held_placements)
     for name in (source, destination):
         item = held_placements[name]
@@ -268,7 +270,8 @@ def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
         for s in steps[name]:
             original = dicts.decompress(s.file, (romfs / s.file).read_bytes())
             event = next(e for e in evfl.read(transforms[s.file](original)).flowchart.events if e.name == s.event)
-            assert event.params[s.param] == actors.actor(item), s.id
+            actor = actors.actor(item)
+            assert event.params[s.param] == gifts.TUNIC_GIFT_ACTORS.get(actor, actor), s.id
 
 
 @pytest.mark.dump

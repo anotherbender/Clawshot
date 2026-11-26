@@ -60,6 +60,11 @@ ANIMATION_PARAM_PER_RESOURCE = 88
 # (1,463,176) is its size (1,462,888, a multiple of 8) + 288, which rounding to 32 would overshoot.
 OWN_FORMULA: dict[str, tuple[int, int]] = {
     "GameData/GameDataList.Product.110.byml": (8, 288),
+    # Round 22: bag-bomb lift component, native 992 -> 7168 (6176 parsed overhead). The private clone changes
+    # only its U32 LiftGrade; no generic LiftableParam rule (36 native members have shape-dependent overhead).
+    # Same-shape native/private paths only; audit and provenance in plans/rounds/r22-games.md.
+    "Component/LiftableParam/Item_Bomb.game__component__LiftableParam.bgyml": (32, 6176),
+    "Component/LiftableParam/Clawshot_BagBomb.game__component__LiftableParam.bgyml": (32, 6176),
     # ActorInfo: 1,934,492 raw -> 1,937,560; Round 7 same-shape model/heap field substitutions, and Round 15's
     # inserted generated-pickup rows (structural growth with the same native formula; unplayed).
     "RSDB/ActorInfo.Product.111.rstbl.byml": (32, 3064),

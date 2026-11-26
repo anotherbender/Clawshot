@@ -5,7 +5,7 @@ local). Branch `feature/ocarina-song-drops-everywhere`, made off `feature/song-g
 `plans/chest-ocarina-model.md` (PR #40, D6 left this open) and `plans/song-get-effects.md` (PR #41, S3 built the song
 floor actors but placed none).
 
-## Before and after
+## Before and after (implementation chronology)
 
 | Location kind | Fairy Ocarina | Ocarina of Time | Songs (`--songs anywhere`) | State on this branch |
 |---|---|---|---|---|
@@ -19,6 +19,14 @@ floor actors but placed none).
 | Shop | out of scope | out of scope | out of scope | unchanged (pinned by a test) |
 
 Songs reach the new kinds only with `songs = anywhere`. With `songs = song` nothing changes (pinned by a test).
+
+Current maintainer integration status supersedes the historical pending labels in this table and
+the placement-selected helper described in I1/I12. See
+[round22 integration](rounds/r22-pr42-integration.md): one settings-selected mandatory get model,
+audited gift receipts and fail-closed model coverage; generated pickup actors remain separate.
+The ten song analogies and TB4 cosmetic exception are accepted. The five specific remaining play
+rows are not yet played; no full integration or in-game pass is inferred from this older record.
+
 
 ## Representatives (O5)
 

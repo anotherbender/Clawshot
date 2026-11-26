@@ -12,6 +12,12 @@ source = "Kareem's chest test lost the held Egg when Letter arrived; Claude appr
 keep_vanilla = "D39: the captain's native hand-over advances Spirit Step02; a moved card does not clear the guards"
 source = "Kareem, 2026-11-12 17:20; plans/decisions.md D39 and plans/rounds/r13-gerudo-card.md. SageOfSpirit:Meet_FourCarpenter_ClearEvent grants Item_Token_Gerudo via Dm_Gerudo_0025/Event294, then Event146 advances Step02. Keep the check and item out of every shuffle; logic remains unchanged."
 
+[locations."GC Rolling Goron as Adult"]
+source = "cs22c, native build e0f3ccfa, plans/rounds/r22-shops.md: adult GoronCity Prefab118a NPC/quest dispatch -> SageOfFire StopDaruniaJr/TalkDaruniaJr participant schedules in Pack/AIScheduleParam -> Step02_Npc_Goron_DaruniaJr_Adult_Talk -> Event320 first-talk/choice chain -> Event38 hand-over fork -> Event18 GetInEvent_NotTurn(Obj_Armor_Goron). Post-grant local DoorOpen/AfterTalk calls reach Event13 MoveStatue. FirstTalked is not completion; tunic ownership is only a Navi heat hint. Existing Stop GC Rolling Goron as Adult rule retained; its stopping methods remain separately sourced."
+
+[locations."ZD King Zora Thawed"]
+source = "cs22c, native build e0f3ccfa, plans/rounds/r22-shops.md: adult ZoraDomain Static EventRequestActor Hash11896564388441894476; Common1b33 nodes0/7/8/9 require red ice isHitBlueFire and not HavePlayedEvent.SageOfWater_KingZora_IsMelted_Ice -> SageOfWater_KingZora_IsMelted_Ice EventSetting -> KingZora_IsMelted_Ice -> Event156 hand-over fork -> Event242 GetInEvent_NotTurn_PosCamera(Obj_Armor_Zora) -> Event69 saved completion. Tunic ownership changes hints/BGM and separate trade dialogue, not this grant. Existing is_adult and Blue_Fire thaw rule retained."
+
 # R13 (proposed by cs13b from native data, kept vanilla at the user's request, 2026-11-12): every adult trade
 # hand-in is a ShowItemReplaceEvent of its own item (SubEvent_GetSwordBigGoron Step03..Step11), and the shared
 # trade cell Pa_ItemIcon_23 shows only one owned variant, chosen in PouchTable order (native 0xa6ef20): an adult
@@ -92,8 +98,10 @@ vanilla = "Rupees (20)"
 source = "cs8d MiniGame_FrogTenors Event223 -> TeachNewMusic, TimeSong saved Bool. Native melody4; child playable-song rule remains Overworld.json:2525."
 
 [locations."GC Medigoron"]
+rule = "is_adult and Progressive_Wallet and can_blast_or_smash"
+was = "is_adult and Progressive_Wallet and (can_blast_or_smash or Progressive_Strength_Upgrade)"
 keep_vanilla = "Round 8: success-only saved merchant check awaits Kareem's result"
-source = "cs8d, build e0f3ccfa: Npc_Goron_Medigoron_Adult/Event11 -> SimpleShopRoot_Npc_Goron_Medigoron_Adult, price200. New saved Bool after the private grant; native ownership checks are not check-completion flags. Existing adult/wallet/open-room rule remains Overworld.json:2209."
+source = "cs22d: supported dump room barriers are WallCrack (Bomb/Hammer damage rates100, life6); retain blast/Hammer access, not an untraced strength-only flower route (r22-logic, r22-merchants). Retain the imported wallet predicate until default-wallet200 play passes. cs8d: Npc_Goron_Medigoron_Adult/Event11 -> private SimpleShop success grant, price200, independent saved Bool."
 
 [locations."Wasteland Bombchu Salesman"]
 keep_vanilla = "Round 8: private once-only 90-rupee sale awaits Kareem's result"

@@ -49,9 +49,7 @@ class Location:
     is the remake's Banc folder the check lies in (its region's, unless the remake moved it).
     ``n64_only`` is the reason, with its evidence, when the check does not exist in the remake; ``keep_vanilla`` the
     reason a check of a shuffled type keeps its vanilla item; ``override`` the source of the remake overrides
-    applied to it (``remake.toml``). ``excluded_items`` forbids unsafe delivery combinations during fill.
-    ``hand_over`` marks a check whose grant creates the item actor to show it (a show-item gift hand-over or a scrub
-    sale; set by ``clawshot.patch.gifts.restrict_spec``)."""
+    applied to it (``remake.toml``). ``excluded_items`` forbids unsafe delivery combinations during fill."""
 
     name: str
     region: str
@@ -64,7 +62,6 @@ class Location:
     keep_vanilla: str | None = None
     override: str | None = None
     excluded_items: tuple[str, ...] = ()
-    hand_over: bool = False
 
 
 @dataclass(frozen=True)

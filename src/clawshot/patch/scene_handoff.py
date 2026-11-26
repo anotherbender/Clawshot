@@ -14,7 +14,7 @@ from pathlib import Path
 
 from clawshot.census.gifts import reachable
 from clawshot.formats import byml, evfl, zsdic
-from clawshot.patch import keys, ocarina
+from clawshot.patch import keys, ocarina, scene_gifts
 from clawshot.patch.plan import PatchError
 from clawshot.patch.write import FileChanges, NewFile
 
@@ -443,6 +443,18 @@ def _plain_entry(chart: evfl.Flowchart, scene: Scene, documents: dict[str, evfl.
             raise PatchError(f"scene handoff: unsupported source grant {ref}: {event}")
         if not isinstance(content, str) or isinstance(content, evfl.Argument) or not content:
             raise PatchError(f"scene handoff: {ref}: reward is not a literal actor: {content!r}")
+        # Heart upgrades are already added here; replaying CheckHeart's coupled
+        # heart processing doubled the played moat piece. Copy the HP-only native
+        # player binding without importing a cinematic model into this helper.
+        if content in scene_gifts.HEART_ACTORS:
+            donor = documents["DoorOfTime"].flowchart
+            player = next(i for i, actor in enumerate(donor.actors) if actor.name == "Player_Event")
+            actor, operation = _operation(chart, donor, player, scene_gifts.FULL_HEAL)
+            onward = append(evfl.ActionEvent(f"Heal{number}", actor, operation, onward))
+        else:
+            onward = append(
+                evfl.SubFlowEvent(f"Heal{number}", "Dm_SY_Get", "CheckHeart", onward, {"ActorName": content})
+            )
         onward = append(
             evfl.SubFlowEvent(
                 f"Grant{number}",
@@ -494,7 +506,7 @@ def build(
                 data = changes[path](data)
         return data
 
-    names = {keys.POUCH, *(scene.flow for scene in scenes)}
+    names = {keys.POUCH, "DoorOfTime", *(scene.flow for scene in scenes)}
     names.update(ref.split("/")[0] for scene in scenes for ref in (*scene.grants, *scene.before, *scene.after))
     originals = {name: evfl.read(read(keys.flow_path(name))) for name in sorted(names)}
     if any(

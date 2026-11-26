@@ -78,12 +78,50 @@ source = "Kareem via Claude, 2026-11-08, chest-gift-models: Din's Fire from Mido
 [chest_verified.Item_Wallet_Medium]
 source = "Kareem via Claude, 2026-11-08, chest-gift-models: Adult's Wallet from Mido chest held 500 rupees; plans/03-game-data.md section 26"
 
+[chest_verified.Item_Arrow_Light]
+destinations = ["Chest"]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: correct model/get text and use PASS; saved ownership and opened chest; plans/rounds/r22-lifts.md"
+
+[chest_verified.Item_NayruLove]
+destinations = ["Chest"]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: correct model/get text and use PASS; saved ownership and opened Trail chest; plans/rounds/r22-lifts.md"
+
+[chest_verified.Item_FaroreWind]
+destinations = ["Chest"]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02 correct Crater grotto: model/get and grant PASS; chest open, IsGet true and stock1 saved; plans/rounds/r22-lifts.md"
+
+[chest_verified.Item_AgonyStone]
+destinations = ["Chest"]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Echo Gem model/get text and use PASS; saved ownership and opened Goron City chest; plans/rounds/r22-lifts.md"
+
+[chest_verified.Item_FairyBless_DefenseDouble]
+destinations = ["Chest"]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Double Defense model/get text and use PASS; owned in save with MaxLife24 unchanged; plans/rounds/r22-lifts.md"
+
+[chest_verified.Item_Sword_Biggoron]
+destinations = ["Chest"]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Biggoron Sword model/get text and use PASS; saved Weapon_Sword_Biggoron ownership and opened Zora River chest; plans/rounds/r22-lifts.md"
+
+[chest_verified.Item_Bottle]
+destinations = ["Chest"]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: Bottle model/get text and use PASS; BottleC added while original Bug/Empty BottleA/B remain; plans/rounds/r22-lifts.md"
+
+[chest_verified.Obj_Rupee_Gold]
+destinations = ["Chest"]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet02: correct 200-rupee model/get text; saved wallet154->354 and chest closed->open; plans/rounds/r22-lifts.md"
+
+[chest_verified.Item_StickBag_Medium]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet04b: Stick chest grants native20 capacity/refill, usable after natural child return and saved Continue; plans/rounds/r22-lifts.md"
+
+[chest_verified.Item_NutBag_Medium]
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet04b: Nut chest grants native30 capacity/refill and usable Nuts; saved adult/child ownership, DekuSeed cap40 unchanged; plans/rounds/r22-lifts.md"
+
 [songs_anywhere]
 source = "Claude, Round 6 review, 2026-11-08: all twelve Item_Melody_* share the pouch/IsGet grant path. Storms played and Minuet warped from a chest; the other ten are inferred, not individually verified. Opt-in only."
 
 [hand_over]
 excluded_items = []
-source = "Kareem/Claude, R11 seed10 gallery crash reproduced in German and English, Hookshot 2.0.14 (plans/rounds/r11-ocarina.md): an ocarina at a show-item hand-over crashed without the ocarina get-model patch. Lifted (BBender, 2026-11-24, plans/ocarina-song-drops-everywhere.md): run 4.1 reproduced the crash on 6d83c32 without the patch (Longshot stable v3.1.1, guest 0x270); runs 4.2 H1 and H2 gave both ocarinas at KF Shopkeeper Gift and LW Deku Scrub Near Bridge with the patch, no crash, both owned and played, Time kept equipped"
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 gallery07/08: both ocarinas PASS only with PR40 packs and ActorInfo, mandatory in patch.make_seed; native Time09 crashes and has no fallback (plans/rounds/r22-lifts.md). BBender, Longshot 3.1.1, 2026-11-24 H1/H2: both ocarinas at KF Shopkeeper Gift and LW Deku Scrub Near Bridge with the model, owned and immediately played; native-pack crash reproduced in4.1 (plans/ocarina-song-drops-everywhere.md)."
 
 # Claude, r14 Track E, 2026-11-13: public native seeds refuse unpaired
 # access overrides. Unchanged world defaults are always allowed.
@@ -95,6 +133,7 @@ keysanity = [false, true]
 open_forest = ["closed", "closed_deku", "open"]
 skip_mido = [false, true]
 door_of_time = ["closed", "song_only", "open"]
+bombs_without_bracelet = [false, true]
 
 # Effective recipes contain these fields, but prepare() regenerates them from
 # the selected door mode. Stored values are not user-controlled access overrides.

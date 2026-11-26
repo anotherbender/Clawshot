@@ -2816,7 +2816,7 @@ ids = ["Npc_SkullKid_Child/Event71"]
 [[location]]
 location = "LW Ocarina Memory Game"
 name = "Skull Kids' Ocarina Game"
-where = "Lost Woods (child): from the Kokiri entrance follow the music right and drop to the lower stumps; the third round of the Skull Kids' melody game (earlier rounds pay rupees)"
+where = "Lost Woods (child): from the Kokiri entrance follow the music right and drop to the lower stumps; win the Skull Kids' melody game once (first completed won round in every seed)"
 oot_randomizer_name = "LW Ocarina Memory Game"
 source = "https://zeldacentral.com/games/ocarina-of-time-remake/mini-games/#skull-kid-melody-game; https://www.eurogamer.net/all-heart-pieces-locations-zelda-ocarina-of-time#section-3; data: census gift step(s) Npc_SkullKid_Child_02/Event24 (src/clawshot/data/locations.toml; gift_rules.toml class swap; plans/03-game-data.md section 19)"
 ids = ["Npc_SkullKid_Child_02/Event24"]

@@ -107,6 +107,13 @@ group = "World"
 logic_override = "free_time_travel"
 clears = { logic = ["free_time_travel"] }
 help = "Experimental, off by default. After Sheik's first adult scene, return to child before the Forest Temple and change age freely. Seeds may expect those early trips. Prelude still follows Forest completion. Early return, repeated age changes, first adult arrival, Prelude and the repaired child sword return have passed in game. This does not repair an old seed or save."
+[bombs_without_bracelet]
+label = "Bag bombs without the Bracelet (experimental)"
+kind = "boolean"
+group = "World"
+logic_override = "bombs_without_bracelet"
+clears = { logic = ["bombs_without_bracelet"] }
+help = "Off by default. Use bombs from the Bomb Bag without strength upgrades; logic follows. The Bomb Bag is still required. Bomb Flowers still need strength, and Bombchus still need the Bomb Bag. Played on Longshot 3.2.0: with the Bomb Bag and no Bracelet, bag bombs worked, also after reloading, while Goron City's Bomb Flowers still could not be picked up. Not every route this opens has been played."
 [starting_items]
 label = "Starting items (experimental)"
 kind = "multi"
@@ -138,7 +145,7 @@ label = "Skippable story dialogue"
 kind = "boolean"
 group = "World"
 hidden = true
-help = "Skippable story dialogue isn't available yet. The scene replacement is deferred to round 19."
+help = "Skippable story dialogue isn't available yet."
 [skip_saria_farewell]
 label = "Skip Saria's bridge farewell (experimental)"
 kind = "boolean"
@@ -272,7 +279,7 @@ useless = "Useless hints"
 [shuffle.choice_help]
 Chest = "Chests across the remake. Finding a different item in a chest, including a large reward in a small chest, has been tried in game. Trap chests and the Treasure Chest Game's ordinary boxes stay as usual."
 Shop = "Shelves in ordinary shops, using items the shop can display properly. Refills, ammo, bottle contents, hearts and magic sold in shops only ever appear on shop shelves. Kokiri purchases and affordable prices have been tried in game. Mask loans stay as usual."
-Gift = "Gifts from characters and song rewards, including Great Fairies, frogs and minigames. Fairy rewards that can be collected only once, the supported frog rewards and the shuffled 40-token House reward have been tried in game. Not every gift or replacement item has been played; held checks stay unchanged."
+Gift = "Gifts from characters and song rewards, including Great Fairies, frogs, minigames and the adult Rolling Goron's and King Zora's tunic gifts. Fairy rewards that can be collected only once, the supported frog rewards, the shuffled 40-token House reward and both tunic gifts have been tried in game. With chests shuffled, eight played gift items, such as Light Arrows and Biggoron's Sword, can also be found in chests, never at scrub sales. Not every gift or replacement item has been played; held checks stay unchanged."
 Scrub = "One-time Deku Scrub purchases. Repeat vendors do not change. The adult Mirror Shield purchase that previously froze now finishes in game; not every reward or age combination has been played."
 BossHeart = "Heart containers after bosses can become hearts, heart pieces, shields, a red rupee, either ocarina or (with songs anywhere) a song. King Dodongo's replacement shield was collected without adding a heart and did not return in Kareem's test; both ocarinas and two songs were played at Queen Gohma's heart."
 Freestanding = "Heart pieces lying around the world can become the same items as boss hearts. The ranch tower's replacement shield was collected and equipped without adding a heart piece in Kareem's test."

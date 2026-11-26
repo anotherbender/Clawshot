@@ -41,11 +41,13 @@ from typing import Any
 from clawshot import save as save_format
 from clawshot.app.schema import validate
 from clawshot.generate import Settings
+from clawshot.patch import shops
 from clawshot.patch.logic_world import logic_world
+from clawshot.settings import shop_price
 from clawshot.tracker import seeds, state
 from clawshot.tracker.seeds import DUNGEON_INFO, OTHER_AREA, Seed, installed_version
-from clawshot.tracker.state import skip_fields
-from clawshot.world.model import Location, World
+from clawshot.tracker.state import _Reader, skip_fields
+from clawshot.world.model import Event, Location, World
 from clawshot.world.rules import ADULT, CHILD
 from clawshot.world.search import Search
 
@@ -87,12 +89,14 @@ class CellMap:
 
 @dataclass(frozen=True)
 class StoryStep:
-    """A logic name the save records as one saved Bool (``[story.<name>]``). ``vanilla_at``: the flag counts only while
-    that location keeps its vanilla item (it is not one of the seed's shuffled checks)."""
+    """A saved logic name (``[story.<name>]``). ``vanilla_at`` limits item credit to its fixed source.
+    ``saved_only`` prevents the tracker projecting completion from reachable gear; ``after`` labels an area hint."""
 
     flag: str
     source: str
     vanilla_at: str | None = None
+    saved_only: bool = False
+    after: str | None = None
 
 
 @dataclass(frozen=True)
@@ -145,7 +149,10 @@ def load_mapping() -> Mapping_:
         for cell_id, info in data["cells"].items()
     }
     story = {
-        name: StoryStep(info["flag"], info["source"], info.get("vanilla_at")) for name, info in data["story"].items()
+        name: StoryStep(
+            info["flag"], info["source"], info.get("vanilla_at"), bool(info.get("saved_only", False)), info.get("after")
+        )
+        for name, info in data["story"].items()
     }
     return Mapping_(
         cells=cells,
@@ -220,9 +227,12 @@ class Inventory:
 
     counts: Mapping[str, int]
     unknown: tuple[str, ...]
+    rupees: int | None = None
 
     def as_json(self) -> str:
-        return json.dumps({"counts": dict(self.counts), "unknown": list(self.unknown)}, sort_keys=True)
+        return json.dumps(
+            {"counts": dict(self.counts), "unknown": list(self.unknown), "rupees": self.rupees}, sort_keys=True
+        )
 
 
 def _cells(save: save_format.Save | None) -> dict[str, dict[str, Any]]:
@@ -341,7 +351,7 @@ def inventory(seed: Seed, save: save_format.Save | None, world: World, mapping: 
 
     known = set(world.items) | {event.name for event in world.events}
     kept = {name: n for name, n in sorted(counts.items()) if n > 0 and name in known}
-    return Inventory(kept, tuple(sorted(unknown)))
+    return Inventory(kept, tuple(sorted(unknown)), cells["wallet"]["count"])
 
 
 def search_items(inv: Inventory, world: World) -> list[str]:
@@ -365,6 +375,7 @@ class VanillaRow:
     item: str
     item_label: str
     shared: bool
+    kind: str
 
 
 def logic_reads(world: World) -> frozenset[str] | None:
@@ -456,6 +467,7 @@ def vanilla_rows(seed: Seed, world: World, scope: str | None = None) -> tuple[Va
                 item=loc.vanilla,
                 item_label=shown.get(loc.vanilla, loc.vanilla),
                 shared=any(_can_give(world, given, item.name) for given in pool),
+                kind=seeds._classify(name, place, described.ids if described else (), {}, {}, {})[0],
             )
         )
     return tuple(rows)
@@ -561,9 +573,11 @@ class _SourceLogic:
     route). Searches and explanations live only as long as the saved inventory; no placed reward is consulted.
     """
 
-    def __init__(self, world: World, inv: Inventory, full: Search) -> None:
+    def __init__(self, world: World, inv: Inventory, full: Search, purchases: Mapping[int, Mapping[str, Any]]) -> None:
         self.world = world
         self.items = search_items(inv, world)
+        self.purchases = purchases
+        self.budget = "saved rupees" if inv.rupees is not None else "wallet capacity"
         resource_names = {
             event.name
             for event in world.events
@@ -602,18 +616,21 @@ class _SourceLogic:
                 without = needed - {name}
                 if self._search(without).can_access(location, age):
                     needed = without
-            witness = self._search(needed)
             for name in self.names:
                 if name not in needed:
                     continue
                 sources = []
+                first_source = self._search(needed - {name})
                 for event in self.world.events:
                     if event.name != name:
                         continue
                     source = Location(name, event.region, event.rule, "Event", None, event.source)
-                    ages = [a for a in (CHILD, ADULT) if witness.can_access(source, a)]
+                    ages = [a for a in (CHILD, ADULT) if first_source.can_access(source, a)]
                     if ages:
-                        sources.append({"region": event.region, "ages": ages, "rule": event.rule.text})
+                        detail = {"region": event.region, "ages": ages, "rule": event.rule.text}
+                        if purchase := self.purchases.get(id(event)):
+                            detail["purchase"] = {**purchase, "budget": self.budget}
+                        sources.append(detail)
                 result.append({"item": name, "sources": sources})
         self.explanations[cached] = result
         return result
@@ -629,6 +646,46 @@ class SeedLogic:
         self._search: Search | None = None
         self._vanilla: tuple[tuple[VanillaRow, _Reading], ...] | None = None
         self._sources: _SourceLogic | None = None
+        world = loaded.world
+        self._gates = {
+            name: step.after or name
+            for name, step in load_mapping().story.items()
+            if step.saved_only and world is not None and any(event.name == name for event in world.events)
+        }
+        self._purchases: dict[int, dict[str, Any]] = {}
+        events = [event for event in world.events if event.name not in self._gates] if world is not None else []
+        if world is not None and loaded.settings is not None and "Shop" not in loaded.settings.shuffle:
+            # Use the same native copies and pricing function as world.shops; never inspect shuffled placements.
+            slots: dict[str, shops.Slot] = {}
+            for slot in shops.load():
+                if slot.location not in slots or slot.price > slots[slot.location].price:
+                    slots[slot.location] = slot
+            reads = logic_reads(world)
+            for name, slot in slots.items():
+                location = world.locations.get(name)
+                if (
+                    location is None
+                    or location.n64_only
+                    or location.type != "Shop"
+                    or location.vanilla not in world.items
+                    or reads is not None
+                    and location.vanilla not in reads
+                ):
+                    continue
+                price = shop_price(
+                    slot.shop,
+                    slot.vanilla_item,
+                    slot.price,
+                    shuffled=False,
+                    policy=loaded.settings.shop_prices,
+                    cheap_shield=loaded.settings.cheap_deku_shield,
+                )
+                event = Event(location.vanilla, location.region, location.rule, location.source)
+                events.append(event)
+                # Identity joins local provenance only; the exposed location ID is still its stable world name.
+                self._purchases[id(event)] = {"location": name, "shop": slot.shop, "price": price}
+        self._world = replace(world, events=events) if self._gates or self._purchases else world
+        self._after_searches: dict[str, Search] | None = None
 
     def vanilla(self, seed: Seed) -> tuple[VanillaRow, ...]:
         """The seed's vanilla rows, built once per loaded seed (8.1); none while logic is unavailable."""
@@ -649,9 +706,51 @@ class SeedLogic:
         """The search for this inventory, fed as the generator feeds assumed items (D16)."""
         key = inv.as_json()
         if self._search is None or key != self._key:
-            self._key, self._search = key, Search(self.loaded.world, search_items(inv, self.loaded.world))
+            world = self._world
+            if inv.rupees is not None and self._purchases:
+                world = replace(
+                    world,
+                    events=[
+                        event
+                        for event in world.events
+                        if id(event) not in self._purchases or self._purchases[id(event)]["price"] <= inv.rupees
+                    ],
+                )
+            self._key, self._search = key, Search(world, search_items(inv, world))
             self._sources = None
+            self._after_searches = None
         return self._search
+
+    def _after_events(
+        self, checks: list[dict[str, Any]], inv: Inventory, totals: Mapping[str, int]
+    ) -> dict[str, list[str]]:
+        """One read-but-undone saved event alone makes at least one otherwise closed check reachable."""
+        if self._after_searches is None:
+            world = self._search.world
+            items = search_items(inv, world)
+            unknown = set(inv.unknown)
+            self._after_searches = {
+                name: Search(world, [*items, name])
+                for name in self._gates
+                if not inv.counts.get(name) and f"story: {name}" not in unknown
+            }
+        open_checks = [
+            entry
+            for entry in checks
+            if entry["collected"] is not True and not entry.get("marked") and not entry.get("skipped")
+        ]
+        return {
+            key: [
+                self._gates[name]
+                for name, search in self._after_searches.items()
+                if not totals[key]
+                and any(
+                    search.can_access(search.world.locations[entry["id"]], None if key == "either" else key)
+                    for entry in open_checks
+                )
+            ]
+            for key in AGE_KEYS
+        }
 
     def annotate(
         self,
@@ -678,17 +777,26 @@ class SeedLogic:
         logic["unknown_items"] = list(inv.unknown)
         search = self.search(inv)
         if self._sources is None:
-            self._sources = _SourceLogic(world, inv, search)
+            self._sources = _SourceLogic(search.world, inv, search, self._purchases)
         for area in state["areas"]:
             area["in_logic"] = _flag_open(area["checks"], world, search, self._sources)
         grouped: dict[str, list[dict[str, Any]]] = {}
+        bracelet_owned = (_Reader(save).stock("Armor_Child_Gauntlet_Goron") or 0) > 0
         for row, reading in self._vanilla_readings(seed):
             collected, reason = _collected(row, inv, reading)
+            empty = (
+                row.location == "GC Darunias Joy"
+                and row.item == "Goron Bracelet"
+                and bracelet_owned
+                and collected is not True
+            )
+            if empty:
+                collected = True
             entry: dict[str, Any] = {
                 "id": row.location,
                 "label": row.label,
                 "where": row.where,
-                "kind": "vanilla",
+                "kind": row.kind,
                 "dungeon": row.dungeon,
                 "collected": collected,
                 "basis": "inventory" if collected is not None else None,
@@ -696,6 +804,9 @@ class SeedLogic:
                 "item": row.item,
                 "item_label": row.item_label,
             }
+            if empty:
+                entry["empty"] = True
+                entry["basis"] = "empty_bonus"
             if collected is None:
                 entry["reason"] = reason
                 entry["markable"] = True  # as for the seed's own `?` checks (tracker.state.markable)
@@ -716,6 +827,10 @@ class SeedLogic:
             }
             for name, checks in grouped.items()
         ]
+        for area in (*state["areas"], *state["vanilla_areas"]):
+            after = self._after_events(area["checks"], inv, area["in_logic"])
+            if any(after.values()):
+                area["after_events"] = after
 
 
 def _flag_open(
