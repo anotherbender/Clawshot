@@ -109,6 +109,8 @@ MERCHANT_SHOPS = {
     "Wasteland Bombchu Salesman": ("SimpleShopRoot", "Event150"),
 }
 GRANNY_CHECK = "Kak Granny Buy Blue Potion"
+# A refill is not a bottle-container prize. Keep one ordinary, already-supported junk copy in the pool.
+GRANNY_POOL_ITEM = "Rupees (5)"
 ANALYZED = "RSDB/GameAnalyzedEventInfo.Product.111.rstbl.byml.zs"
 
 # Merchant stock actors identify native sources, not the generic gift's payout actor.
@@ -1212,11 +1214,23 @@ def shopkeeper_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def logic_spec(spec: Mapping[str, Any], settings: Settings) -> Mapping[str, Any]:
-    """Gift/NPC shuffle's reachability change, dump-free: :func:`shopkeeper_spec` when ``Gift`` or ``NPC`` is
-    shuffled (``NPC`` also covers an effective settings string, where ``Gift`` is expanded to :data:`GIFT_TYPES`),
-    else the spec unchanged. Shared with the tracker's logic world (``clawshot.patch.logic_world``)."""
-    if SHUFFLE in settings.shuffle or "NPC" in settings.shuffle:
-        return shopkeeper_spec(spec)
+    """Gift/NPC shuffle's shared world policy: the shopkeeper check and Granny's non-container pool item.
+
+    An explicit native identity pin uses keep_vanilla and retains Blue Potion outside the fill.
+    The tracker uses the same conversion through clawshot.patch.logic_world.
+    """
+    if SHUFFLE not in settings.shuffle and "NPC" not in settings.shuffle:
+        return spec
+    spec = shopkeeper_spec(spec)
+    granny = spec["locations"].get(GRANNY_CHECK)
+    if granny and granny.get("vanilla") == "Blue Potion" and granny.get("keep_vanilla") is None:
+        spec = {
+            **spec,
+            "locations": {
+                **spec["locations"],
+                GRANNY_CHECK: {**granny, "vanilla": GRANNY_POOL_ITEM},
+            },
+        }
     return spec
 
 
@@ -1244,10 +1258,11 @@ def seed_checks(
     actors: ItemActors,
 ) -> list[str]:
     """The world locations a gift shuffle may move, in world order: a gift check of class ``swap`` or ``rewrite``
-    whose vanilla logic item's actor (``item_actors.toml``) is what every one of its steps gives, so the pool item it
-    adds is the one it gave. A Great Fairy, given once through a new GameDataList flag, is one of them (Kareem, in
-    game, 2026-11-08: the game keeps the flag and an older save loads; 03-game-data.md section 19). The
-    :data:`ANCHORS` stay vanilla in copy-only seed worlds; direct legacy worlds release them with free travel."""
+    whose vanilla logic item's actor (``item_actors.toml``) is what every one of its steps gives. Granny's native
+    refill is the exception: it contributes ordinary Rupees (5), never a new bottle. A Great Fairy, given once
+    through a new GameDataList flag, is one of them (Kareem, in game, 2026-11-08: the game keeps the flag and an
+    older save loads; 03-game-data.md section 19). The :data:`ANCHORS` stay vanilla in copy-only seed worlds;
+    direct legacy worlds release them with free travel."""
     steps = check_steps(gifts, definitions)
     out = []
     for name in movable_checks(world, rules):
@@ -1261,6 +1276,10 @@ def seed_checks(
         if name in progressive.TIERED_GIFTS:
             item, native = progressive.TIERED_GIFTS[name]
             if loc.vanilla == item and {s.vanilla_item for s in steps[name]} == native:
+                out.append(name)
+            continue
+        if name == GRANNY_CHECK and loc.vanilla == GRANNY_POOL_ITEM:
+            if {s.vanilla_item for s in steps[name]} == {"Item_Bottle_BluePotion"}:
                 out.append(name)
             continue
         if {actors.aliases.get(s.vanilla_item, s.vanilla_item) for s in steps[name]} != {
@@ -1333,7 +1352,11 @@ def seed_step(
 
     def step(placements: Mapping[str, str]) -> dict[str, Callable[[bytes], bytes]]:
         moved = {
-            name: actors.actor(placements[name])
+            name: (
+                steps[name][0].vanilla_item
+                if name == GRANNY_CHECK and placements[name] == "Blue Potion"
+                else actors.actor(placements[name])
+            )
             for name in shuffled
             if placements[name] != vanilla[name]
             or rules[name].once

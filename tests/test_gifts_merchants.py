@@ -4,6 +4,9 @@ Every flow is built here from labels, never from a decoded game fixture, and wri
 step. A small interpreter plays one conversation through local and cross-flow calls and changes only what a
 player sees in a save: rupees, bottle slots, pouch stock and saved Bools. Reloading serializes the save, so
 runtime prices and unsaved Bools do not survive it.
+
+Granny's ordinary pool item is Rupees (5); her native Blue Potion appears only through the explicit identity pin.
+Placed items resolve through the production item table, which has no Blue Potion row.
 """
 
 import json
@@ -18,7 +21,8 @@ from clawshot.census import definitions
 from clawshot.census.gifts import Gift, reachable
 from clawshot.formats import byml, evfl
 from clawshot.patch import gifts
-from clawshot.patch.items import ItemActors
+from clawshot.patch import items as item_actors
+from clawshot.patch.items import ItemActorError
 
 GRANNY, MEDIGORON, CARPET = gifts.GRANNY_CHECK, "GC Medigoron", "Wasteland Bombchu Salesman"
 GRANNY_FLOW, MEDIGORON_FLOW, CARPET_FLOW = "Npc_Hylia_053_Adult", "Npc_Goron_Medigoron_Adult", "Npc_Hylia_044_Adult"
@@ -33,7 +37,7 @@ class Merchant(NamedTuple):
     flow: str
     event: str  # the sale step
     stock: str  # native stock actor
-    item: str  # its logic item
+    item: str  # its ordinary pool item
     call: str  # the native sale the step calls
     entries: tuple[str, ...]
 
@@ -43,7 +47,7 @@ MERCHANTS = {
         GRANNY_FLOW,
         "Event12",
         "Item_Bottle_BluePotion",
-        "Blue Potion",
+        gifts.GRANNY_POOL_ITEM,
         "Dm_SY_GetInEvent:GetInEventInBottle_BlueBottleShop",
         ("Buy_BluePotion", "Talk"),
     ),
@@ -60,27 +64,21 @@ MERCHANTS = {
     ),
 }
 PATHS = {name: f"synthetic/{name}.bfevfl" for name in (GRANNY_FLOW, MEDIGORON_FLOW, CARPET_FLOW, "SimpleShop")}
-ACTORS = ItemActors(
-    {
-        **{merchant.item: merchant.stock for merchant in MERCHANTS.values()},
-        "Megaton Hammer": "Item_Hammer",
-        "Iron Boots": "Item_HeavyBoot",
-        "Hover Boots": "Item_HoverBoot",
-        "Bottle": "Item_Bottle",
-        "Bottle with Milk": "Item_Bottle_Milk",
-    },
-    {},
-)
-# What a granted actor adds: a new bottle holding something, or pouch stock (capped by a capacity, if any).
+PIN = {GRANNY: "Blue Potion"}  # the explicit identity pin: Granny held native, then specialized as a refill
+ACTORS = item_actors.load()  # the production item table: it has no Blue Potion row
+# What a granted actor adds: rupees, a new bottle holding something, or pouch stock (capped by any capacity).
 POUCH = {
+    "TBox_Rupee_Blue": ("rupees", 5),
     "Item_Bottle": ("bottle", "Empty"),
     "Item_Bottle_Milk": ("bottle", "Milk"),
     "Item_Bottle_BluePotion": ("bottle", "BluePotion"),
     "Item_Hammer": ("stock", "Item_Hammer", 1),
     "Item_HeavyBoot": ("stock", "Item_HeavyBoot", 1),
     "Item_HoverBoot": ("stock", "Item_HoverBoot", 1),
-    "Shop_Sword_Giant": ("stock", GIANT, 1),
-    "Shop_BombchuBundle_01": ("stock", "Bombchu", 10),
+    "Shop_Sword_Giant": ("stock", GIANT, 1),  # Medigoron's native stock
+    "Item_Sword_Giant": ("stock", GIANT, 1),  # Giants Knife as a placed item
+    "Shop_BombchuBundle_01": ("stock", "Bombchu", 10),  # the carpet seller's native stock
+    "Item_BombchuBundle_Medium": ("stock", "Bombchu", 10),  # Bombchus (10) as a placed item
     "Shop_Arrow_10": ("stock", "Arrow", 10),
 }
 BOTTLE_ITEMS = {2: "BluePotion"}  # the BottleItem value of Granny's native refill
@@ -391,25 +389,40 @@ def flag(check):
     return gifts.GiftChange(gifts.load()[check], (gift_steps()[check],), MERCHANTS[check].stock).flag
 
 
-def transforms(placements):
-    """The seed's gift step for all three merchants; ``placements``: check -> logic item, vanilla by default."""
-    vanilla = {check: merchant.item for check, merchant in MERCHANTS.items()}
+def step(checks, vanilla):
+    """The seed's gift step for ``checks`` (``vanilla``: each check's logic item in the world)."""
     rules = gifts.load()
-    step = gifts.seed_step(
-        list(MERCHANTS),
-        gift_steps().values(),
+    steps = gift_steps()
+    return gifts.seed_step(
+        list(checks),
+        [steps[check] for check in checks],
         census(),
-        {check: rules[check] for check in MERCHANTS},
+        {check: rules[check] for check in checks},
         ACTORS,
         vanilla,
         PATHS,
     )
-    return step({**vanilla, **placements})
 
 
-def seed(placements=None):
+def transforms(placements=None, *, pin=False):
+    """Ordinary seeds move every merchant from its pool item; ``placements``: check -> logic item.
+
+    ``pin``: Granny is held native (out of the ordinary fill) and composed separately as the explicit identity pin.
+    """
+    ordinary = [check for check in MERCHANTS if not (pin and check == GRANNY)]
+    vanilla = {check: MERCHANTS[check].item for check in ordinary}
+    out = step(ordinary, vanilla)({**vanilla, **(placements or {})})
+    if pin:
+        assert PATHS[GRANNY_FLOW] not in out
+        pinned = step([GRANNY], PIN)(PIN)
+        assert gifts.ANALYZED not in pinned  # the native refill needs no ordinary get-scene preload
+        out[PATHS[GRANNY_FLOW]] = pinned[PATHS[GRANNY_FLOW]]
+    return out
+
+
+def seed(placements=None, *, pin=False):
     """The patched synthetic game, every flow written and read back."""
-    changed = transforms(placements or {})
+    changed = transforms(placements, pin=pin)
     charts = {}
     for name, fc in native().items():
         data = evfl.write(evfl.EventFlowFile(name, flowchart=fc))
@@ -502,6 +515,8 @@ class Visit:
             return 0 if save.pouch.get(params["Actor"], 0) >= params["Num"] else 1
         if name == "PouchSystemActor.EventQueryCanAddToPorch":
             kind, *content = POUCH[params["Actor"]]
+            if kind == "rupees":
+                return 0
             if kind == "bottle":
                 return 0 if None in save.bottles else 2
             stock, amount = content
@@ -534,7 +549,9 @@ class Visit:
 
     def give(self, actor):
         kind, *content = POUCH[actor]
-        if kind == "bottle":
+        if kind == "rupees":
+            self.save.rupees += content[0]
+        elif kind == "bottle":
             self.save.bottles[self.save.bottles.index(None)] = content[0]  # a new container
         else:
             stock, amount = content
@@ -589,8 +606,13 @@ def break_knife(save):
 # --- Granny -------------------------------------------------------------------------------------------------------
 
 
-def test_granny_identity_potion_refills_the_owned_empty_bottle_and_completes_once():
-    charts = seed()
+def granny_seed(reward):
+    """``None``: the explicit native pin; otherwise an ordinary seed placing ``reward`` at Granny."""
+    return seed(pin=True) if reward is None else seed({GRANNY: reward})
+
+
+def test_granny_identity_pin_refills_the_owned_empty_bottle_and_completes_once():
+    charts = seed(pin=True)
     save = granny_save()
     talk(charts, GRANNY_FLOW, save)
     # Not a new bottle C: the generic container grant fails here with three bottles.
@@ -598,7 +620,14 @@ def test_granny_identity_potion_refills_the_owned_empty_bottle_and_completes_onc
     assert save.valid_bottles == 2
 
 
-@pytest.mark.parametrize("reward", ["Blue Potion", "Iron Boots", "Bottle"])
+def test_only_granny_resolves_the_native_potion_without_an_item_alias():
+    with pytest.raises(ItemActorError):
+        ACTORS.actor("Blue Potion")
+    with pytest.raises(ItemActorError):
+        transforms({CARPET: "Blue Potion"})
+
+
+@pytest.mark.parametrize("reward", [pytest.param(None, id="native pin"), "Rupees (5)", "Iron Boots", "Bottle"])
 @pytest.mark.parametrize(
     ("accept", "setup"),
     [
@@ -608,15 +637,28 @@ def test_granny_identity_potion_refills_the_owned_empty_bottle_and_completes_onc
     ],
 )
 def test_granny_refusals_charge_nothing_and_never_complete_the_check(reward, accept, setup):
-    charts = seed({GRANNY: reward})
+    charts = granny_seed(reward)
     assert_refused(charts, GRANNY, granny_save(**setup), accept=accept)
     completed = granny_save(**setup)
     completed.flags[flag(GRANNY)] = True
     assert_refused(charts, GRANNY, completed, accept=accept)
 
 
+def test_ordinary_granny_gives_her_five_rupees_once_then_sells_the_native_refill():
+    charts = seed()  # an ordinary seed leaves Granny her pool item, Rupees (5), never a Blue Potion
+    save = granny_save()
+    talk(charts, GRANNY_FLOW, save)
+    completed = {TRADE: True, flag(GRANNY): True}
+    assert save == Save(5, ["Bug", "Empty", None, None], flags=completed)
+    save = save.reload()
+    save.rupees = 100  # rupees only, on a copy
+    assert_native_sale(charts, GRANNY, save)
+    assert save == Save(0, ["Bug", "BluePotion", None, None], flags=completed)
+    assert save.valid_bottles == 2
+
+
 def test_granny_identity_check_then_native_refills_after_reload_and_drinking():
-    charts = seed()
+    charts = seed(pin=True)
     save = granny_save()
     talk(charts, GRANNY_FLOW, save)
     for _ in range(2):
@@ -762,6 +804,7 @@ def test_granny_preload_registers_the_get_scene_only_for_a_non_refill_reward():
         {"__RowId": "Npc_Hylia_053_Adult_D_T", "SubFlowList": ["Dm_SY_GetInEvent"]},
         {"__RowId": "Npc_Hylia_053_Adult_Near_D_T", "SubFlowList": ["Dm_SY_GetInEvent"]},
     ]
-    assert gifts.ANALYZED not in transforms({})
-    out = byml.read(transforms({GRANNY: "Iron Boots"})[gifts.ANALYZED](byml.write(rows)))
-    assert out == [{**rows[0], "SubFlowList": ["Dm_SY_Get", "Dm_SY_GetInEvent"]}, rows[1]]
+    assert gifts.ANALYZED not in transforms(pin=True)
+    for placements in ({}, {GRANNY: "Iron Boots"}):  # her ordinary Rupees (5), or a swapped reward
+        out = byml.read(transforms(placements)[gifts.ANALYZED](byml.write(rows)))
+        assert out == [{**rows[0], "SubFlowList": ["Dm_SY_Get", "Dm_SY_GetInEvent"]}, rows[1]]

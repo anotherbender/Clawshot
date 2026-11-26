@@ -350,12 +350,13 @@ def test_dump_gift_shuffle_moves_great_fairies_through_their_new_flags(romfs):
     ]
     _, world = prepare(spec, settings)
     placements = {name: loc.vanilla for name, loc in world.locations.items()}
+    baseline = step(placements)  # admitted merchants normalize their saved checks even when unmoved
     placements["DMT Great Fairy Reward"], placements["ZF Great Fairy Reward"] = "Farores Wind", "Dins Fire"
     transforms = step(placements)
     dicts = zsdic.Dictionaries.from_romfs(romfs)
     data = dicts.decompress(GAME_DATA_LIST, (romfs / GAME_DATA_LIST).read_bytes())
-    before, after = byml.read(data), byml.read(transforms[GAME_DATA_LIST](data))
-    added = [int(e["Hash"]) for e in after["Data"]["Bool"][len(before["Data"]["Bool"]) :]]
+    before = {int(e["Hash"]) for e in byml.read(baseline[GAME_DATA_LIST](data))["Data"]["Bool"]}
+    added = {int(e["Hash"]) for e in byml.read(transforms[GAME_DATA_LIST](data))["Data"]["Bool"]} - before
     # the Din flag's name is the one Kareem's save showed set (03-game-data.md section 19, in game)
     assert len(added) == 2 and murmur3_32(b"Clawshot.Gift.Dm_FairyFountain_Din.Event212") in added
     steps = gifts.check_steps(scan_gifts(romfs), definitions.load())
@@ -364,6 +365,27 @@ def test_dump_gift_shuffle_moves_great_fairies_through_their_new_flags(romfs):
             out = transforms[s.file](dicts.decompress(s.file, (romfs / s.file).read_bytes()))
             event = next(e for e in evfl.read(out).flowchart.events if e.name == s.event)
             assert event.params[s.param] == actor, s.id
+
+
+@pytest.mark.dump
+def test_dump_gift_setup_moves_granny_from_her_five_rupees_and_holds_no_blue_potion(romfs):
+    from clawshot.generate import Settings, prepare
+    from clawshot.generate.fill import shuffled_locations
+    from clawshot.patch import items
+    from clawshot.world.load import load_spec
+
+    spec, settings, step = gifts.seed_setup(romfs, load_spec(), Settings(shuffle=("Chest", gifts.SHUFFLE)))
+    _, world = prepare(spec, settings)
+    assert gifts.GRANNY_CHECK in shuffled_locations(world, settings)
+    assert world.locations[gifts.GRANNY_CHECK].vanilla == gifts.GRANNY_POOL_ITEM
+    assert all(location.vanilla != "Blue Potion" for location in world.locations.values())
+    (granny,) = gifts.check_steps(scan_gifts(romfs), definitions.load())[gifts.GRANNY_CHECK]
+    assert granny.vanilla_item == "Item_Bottle_BluePotion"  # the native refill the census records
+    transforms = step({name: location.vanilla for name, location in world.locations.items()})
+    dicts = zsdic.Dictionaries.from_romfs(romfs)
+    out = transforms[granny.file](dicts.decompress(granny.file, (romfs / granny.file).read_bytes()))
+    event = next(e for e in evfl.read(out).flowchart.events if e.name == granny.event)
+    assert event.params[granny.param] == items.load().actor(gifts.GRANNY_POOL_ITEM)
 
 
 @pytest.mark.dump

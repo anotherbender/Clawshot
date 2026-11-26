@@ -618,3 +618,28 @@ pool contribution with one existing junk item. cs22d chooses Rupees(5): already 
 junk, no progression or bottle capacity. Native Blue Potion survives only an explicit Granny
 identity plan pin; it is never a global actor alias. Final focused proof/gate23/play rows/sweep25
 must all bind the final admitted SHA, with no merge before new play plus paired sweep PASS.
+
+## Admitted branch pool policy and final focused proof
+
+Claude authorized the frozen-v2 admission port as its own commit after the refill repair:
+repair `31d4fd15acb344a708b4b499dc207d1547df7fae`, admission data
+`e6fab017f497a4c228fcbb175dea2e8f0ed691eb`. The latter commit records every ported file
+and its candidate-src SHA-256; candidate-src remains untouched provenance. Holds are lifted
+on this branch only; main still waits for new human play and the full paired sweep.
+
+Under gift/NPC shuffle, Granny contributes Rupees (5), replacing her plain Blue Potion
+one-for-one. It is existing mapped junk, no progression or bottle capacity. The shared
+logic_spec conversion preserves source data and is idempotent. There is no Blue Potion actor
+alias. An explicit keep_vanilla identity pin retains native Blue Potion at Granny alone;
+its separate scoped sale step uses the native refill wrapper and composes saved flags with
+the ordinary gift step. Real Bottle and Bottle with Milk prizes remain container grants.
+
+Final focused proof:75 passed in34.29s (`test_gifts_merchants`, `test_gifts_fill`,
+`test_gifts_release`, `test_world_remake_adult_goron_city`), all OOT variables unset,
+UI extra, xdist-n2/CLAWSHOT_WORKERS1. Consumer cases cover pool-count conservation/no Blue
+Potion across ordinary seeds, identity-only refill, serialized repeat sales, funds/capacity/
+decline gates, bottle counts and Medigoron's native replacement restrictions. The wallet
+contract now reflects the played default-wallet sale; LACS/Great Fairy flag oracles compare
+against the normalized identity-merchant baseline rather than asserting no GameData change.
+Changed Python files pass the narrow format check. Dump/full-gate and live proof are not
+claimed here. Gate23, fresh play rows and sweep25 must bind the final admitted commit.

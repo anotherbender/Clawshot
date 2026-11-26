@@ -2491,14 +2491,21 @@ and one explicit 100-rupee charge; real Bottle/Milk container prizes remain cont
 The ordinary gift path registers Dm_SY_Get only on Granny's Talk analyzed-event row. Decline,
 poverty, capacity and missing-empty-bottle refusals do not consume the check.
 
+Claude's approved pool policy replaces shuffled Granny's plain Blue Potion one-for-one with
+Rupees (5), existing mapped junk with no progression or bottle capacity. Blue Potion is not an
+actor alias and cannot move to another check. An explicit Granny identity plan pin keeps her
+native Blue Potion outside the fill using keep_vanilla plus the scoped native sale step.
+
 Round22, Claude's 2026-11-26 ruling after Kareem's packet-v2 play: the old generic identity
 grant added a third bottle while the second stayed empty, and old completion gates removed
 native repeat services. The refill/native-repeat repair and semantic regressions are required
 before new play and admission (r22-merchants.md). Native graph round-trips are not live proof.
 
-Data-sourced rules retain existing adult/trade/room/approach predicates; Granny adds her bottle
-requirement and carpet drops the unsupported upgraded-wallet/Bombchu prerequisites (price 90).
-Every merchant stays held vanilla pending Kareem. Graph/state, serialization, allocation and
+Data-sourced rules retain adult/trade/room/approach predicates and Granny's bottle requirement.
+The copied A-Knife/A-Granny controls show native default-wallet purchases at 200/100 rupees
+(r22-merchants.md, packet-v2 native-control receipts); carpet's price is 90. The approved v2
+admission/wallet data is active only on r22/merchants, not main. New repeat/refill play and the
+full paired sweep are still required before merge. Graph/state, serialization, allocation and
 saved-Bool proofs do not establish engine presentation, actual grants/use or Save/Continue.
 
 ### D31: native child-trade sequence
