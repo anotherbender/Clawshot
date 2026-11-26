@@ -1210,6 +1210,18 @@ def test_token_off_keeps_skulltulas_native_and_the_spoiler_without_token_rows():
     assert "tokens" not in SeedOutput(seed, Links({}, {}, []), Plan([], [], [])).spoiler()["patch"]
 
 
+def test_spoiler_names_the_optional_steps_that_ran():
+    from clawshot.generate import Settings, generate
+    from clawshot.patch import OPTIONAL_STEPS, SONG_GET_EFFECTS, SeedOutput
+    from clawshot.patch.plan import Links
+
+    seed = generate(token_spec(), 1, Settings(shuffle=("Chest",)))
+    assert SeedOutput(seed, Links({}, {}, []), Plan([], [], [])).spoiler()["patch"]["steps"] == []
+    output = SeedOutput(seed, Links({}, {}, []), Plan([], [], []), steps=(SONG_GET_EFFECTS,))
+    assert output.spoiler()["patch"]["steps"] == ["song_get_effects"]
+    assert OPTIONAL_STEPS == ("ocarina_get_model", "song_get_effects")
+
+
 @pytest.mark.parametrize(
     ("names", "definitions", "locations", "message"),
     [

@@ -213,17 +213,11 @@ source = "LogicHelpers.json:165. Round 19 Master Sword shuffle (cs19c; plans/rou
 
 # Region rules, in world file order.
 
-[events."KF Outside Deku Tree"."Deku Stick Drop"]
-# adult_weapon: Enemy_Dekubaba Hammer 1.0.
-rule = "(adult_weapon and not entrance_shuffle) or can_use(Kokiri_Sword) or can_use(Boomerang)"
-was = "(is_adult and not entrance_shuffle) or can_use(Kokiri_Sword) or can_use(Boomerang)"
-source = "Overworld.json:225. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult's Deku Babas are cut down: adult_sword (no adult alternative named)."
-
 [events."KF Outside Deku Tree"."Deku Nut Drop"]
 # adult_weapon: Enemy_Dekubaba Hammer 1.0.
-rule = "adult_weapon and not entrance_shuffle"
+rule = "is_adult and (adult_weapon or can_use(Bow) or has_explosives) and not entrance_shuffle"
 was = "is_adult and not entrance_shuffle"
-source = "Overworld.json:226. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult's Deku Babas are cut down: adult_sword (no adult alternative named)."
+source = "Overworld.json:226; round 19 sword guard retained as adult_weapon (owned blade or Hammer, never an assumed sword with shuffle_master_sword). Round 22: Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24, got nuts from adult Deku Babas with Bow/bombs and no sword; add those played kill methods. Native DropLotteryMasterData.DropUnlockCondition names Get_StoneOfForest_IsAfter_GoInside_Exp for Obj_DekuNut, not Sequence_IsChildhood. Adult nuts remain; plans/rounds/r22-tracker.md."
 
 [locations."SFM Wolfos Grotto Chest"]
 # adult_weapon: Enemy_Wolfos Hammer 1.0.
@@ -260,15 +254,11 @@ rule = "adult_sword or can_child_attack or Nuts"
 was = "is_adult or can_child_attack or Nuts"
 source = "Deku Tree.json:10. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
-[events."Deku Tree Lobby"."Deku Stick Drop"]
-rule = "adult_sword or (is_child and (Kokiri_Sword or Boomerang))"
-was = "is_adult or Kokiri_Sword or Boomerang"
-source = "Deku Tree.json:12. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
-
 [events."Deku Tree Lobby"."Deku Nut Drop"]
-rule = "adult_sword or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
+rule = "adult_sword or can_use(Bow) or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
 was = "is_adult or Slingshot or Sticks or has_explosives or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Deku Tree.json:13. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+# Round 22: Bow kills yield nuts even without an adult sword (Kareem, Longshot 3.2.0, 0.2.6, 2026-11-24).
 
 [locations."Deku Tree GS Basement Gate"]
 rule = "adult_sword or can_child_attack"
@@ -287,29 +277,19 @@ rule = "adult_weapon or (is_child and Kokiri_Sword)"
 was = "is_adult or Kokiri_Sword"
 source = "Forest Temple.json:21. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the Stalfos fight: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
 
-[events."Forest Temple NW Outdoors"."Deku Stick Drop"]
-# adult_weapon: Enemy_Dekubaba Hammer 1.0.
-rule = "adult_weapon or (is_child and (Kokiri_Sword or Boomerang))"
-was = "is_adult or Kokiri_Sword or Boomerang"
-source = "Forest Temple.json:48. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
-
 [events."Forest Temple NW Outdoors"."Deku Nut Drop"]
 # adult_weapon: Enemy_Dekubaba Hammer 1.0.
-rule = "adult_weapon or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
+rule = "adult_weapon or can_use(Bow) or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
 was = "is_adult or Slingshot or Sticks or has_explosives or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Forest Temple.json:49. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
-
-[events."Forest Temple NE Outdoors"."Deku Stick Drop"]
-# adult_weapon: Enemy_Dekubaba Hammer 1.0.
-rule = "adult_weapon or (is_child and (Kokiri_Sword or Boomerang))"
-was = "is_adult or Kokiri_Sword or Boomerang"
-source = "Forest Temple.json:89. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+# Round 22: Bow kills yield nuts even without an adult sword (Kareem, Longshot 3.2.0, 0.2.6, 2026-11-24).
 
 [events."Forest Temple NE Outdoors"."Deku Nut Drop"]
 # adult_weapon: Enemy_Dekubaba Hammer 1.0.
-rule = "adult_weapon or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
+rule = "adult_weapon or can_use(Bow) or (is_child and (Slingshot or Sticks or Kokiri_Sword)) or has_explosives or can_use(Dins_Fire)"
 was = "is_adult or Slingshot or Sticks or has_explosives or Kokiri_Sword or can_use(Dins_Fire)"
 source = "Forest Temple.json:90. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): Deku Babas: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+# Round 22: Bow kills yield nuts even without an adult sword (Kareem, Longshot 3.2.0, 0.2.6, 2026-11-24).
 
 [locations."Forest Temple Bow Chest"]
 rule = "not shuffle_master_sword or can_kill_stalfos"
@@ -373,9 +353,9 @@ source = "Gerudo Training Ground.json:8. Round 19 Master Sword shuffle (cs19c; p
 [locations."Gerudo Training Ground Beamos Chest"]
 # adult_weapon for the fight; the Beamos (Enemy_Beamos 2867582777575272608, 0.0 from the chest) takes the Hammer too:
 # Kareem, Longshot 3.0.0, 2026-11-23, one Hammer hit destroyed an Enemy_Beamos (r21-hammer.md, Beamos G1).
-rule = "can_blast_or_smash and (adult_weapon or (is_child and Kokiri_Sword))"
+rule = "(can_blast_or_smash or can_use(Mirror_Shield)) and (adult_weapon or (is_child and Kokiri_Sword))"
 was = "has_explosives and (is_adult or Kokiri_Sword)"
-source = "Gerudo Training Ground.json:9. Round 19 Master Sword shuffle (cs19c; plans/rounds/r18-master-sword-design.md section 7): the room's fight after the Beamos: the adult branch was OoT Randomizer's always-held Master Sword: adult_sword; child weapons gated to the child; the any-age alternatives it names kept."
+source = "Gerudo Training Ground.json:9; r19 Master Sword shuffle guards the room's other fight with adult_weapon or child Kokiri Sword. Enemy_Beamos 2867582777575272608 shares the played Hammer kill (r21-hammer.md). Round 22 cs22d: Kareem, Longshot 3.2.0, 0.2.6, adult before bombs/Hammer, redirected a Beamos beam with the Mirror Shield back at it and killed it outright; add adult-only shield use, not passive blocking. Keep the other fight requirement; plans/rounds/r22-logic.md."
 
 [exits."Gerudo Training Ground Lobby"."Gerudo Training Ground Boulder Room"]
 # adult_weapon: Enemy_Stalfos Hammer 1.0.

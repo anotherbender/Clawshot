@@ -13,6 +13,7 @@
 #   gate    what stops the check giving twice in the game (evidence; not used by the patch)
 #   once    equipped-Deku-Shield queries replaced with the check's saved Bool; set after every grant branch
 #   purchase specialize the native merchant sale; add/set a saved Bool only after the successful grant
+#   display window-only GetPouchContent:DisplayGetByActorName calls, paired with the grant's actor (r21-pr40)
 
 [check."KF Shopkeeper Gift"]
 class = "rewrite"
@@ -135,6 +136,7 @@ track = [
 [check."HF Ocarina of Time Item"]
 class = "swap"
 gate = "the cutscene plays once"
+display = ["Dm_MelodyGet_Time/Event229"]
 track = [
   { played = "Dm_MelodyGet_Time", source = "EventSetting row Dm_MelodyGet_Time; grant Dm_MelodyGet_Time/Event70 on every walk of cut EntryPoint0; audit plans/tracker-auto-checks-audit.md", accepted = true, played_by = "Kareem, Longshot 3.0.0, 2026-11-23, seed 921101" },
 ]
@@ -262,13 +264,14 @@ track = [
 [check."LW Gift from Saria"]
 class = "swap"
 gate = "the cutscene plays once"
+display = ["Dm_Kokiri_0155/Event77"]
 track = [
   { played = "Dm_Kokiri_0155", source = "EventSetting row Dm_Kokiri_0155; grant Dm_Kokiri_0155/Event68 on every walk of cut C01; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]
 
 [check."LW Ocarina Memory Game"]
 class = "swap"
-gate = "Minigame_SkullKidSession_IsGetHeartPiece"
+gate = "Minigame_SkullKidSession_IsGetHeartPiece; shuffled prize on first won round, then native repeats"
 track = [
   { bool = "Minigame_SkullKidSession_IsGetHeartPiece", source = "Npc_SkullKid_Child_02/Event58 sets it on every path through grant Npc_SkullKid_Child_02/Event24 and on no other; audit plans/tracker-auto-checks-audit.md", accepted = false },
 ]

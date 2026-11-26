@@ -33,7 +33,7 @@ def _intended(fc: evfl.Flowchart, flow: str, changes) -> set[int]:
         out |= {index[s.event] for s in change.steps if s.flow == flow}
         out |= {
             index[r.split("/")[1]]
-            for r in (*change.rule.given, *change.rule.writes, *change.rule.once)
+            for r in (*change.rule.given, *change.rule.writes, *change.rule.once, *change.rule.display)
             if r.split("/")[0] == flow
         }
         if (
@@ -238,7 +238,8 @@ def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
         for s in steps[name]:
             data = dicts.decompress(s.file, (tmp_path / "seed" / "romfs" / s.file).read_bytes())
             event = next(e for e in evfl.read(data).flowchart.events if e.name == s.event)
-            assert event.params[s.param] == actors.actor(seed.placements[name]), s.id
+            actor = actors.actor(seed.placements[name])
+            assert event.params[s.param] == gifts.TUNIC_GIFT_ACTORS.get(actor, actor), s.id
     rules = gifts.load()
     for name in seed.shuffled:
         if name in rules:
@@ -269,7 +270,8 @@ def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
         for s in steps[name]:
             original = dicts.decompress(s.file, (romfs / s.file).read_bytes())
             event = next(e for e in evfl.read(transforms[s.file](original)).flowchart.events if e.name == s.event)
-            assert event.params[s.param] == actors.actor(item), s.id
+            actor = actors.actor(item)
+            assert event.params[s.param] == gifts.TUNIC_GIFT_ACTORS.get(actor, actor), s.id
 
 
 @pytest.mark.dump

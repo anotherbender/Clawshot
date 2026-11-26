@@ -98,9 +98,15 @@
   `sometimes` and random hints name only items worth having (progression, heart pieces and containers, upgrades);
   never rupees, ammo, refills or shop items. Barren ("foolish") hints still mark empty areas. This departs from OoT
   Randomizer, whose random and `sometimes` hints can name junk.
-- **D30 Bombs need the Bomb Bag and Goron's Bracelet in logic** (Kareem, 2026-11-08, Claude's recommendation). The
-  remake's `Item_Bomb` requires lift grade Low, which only the Bracelet (or a higher strength upgrade) grants; Bombchus
-  require none (round 7, section 30; Kareem used Bombchus without a bag). The logic follows the game; no patch.
+- **D30 Bombs need the Bomb Bag and Goron's Bracelet in logic; Bombchus need the Bomb Bag** (Kareem, 2026-11-08,
+  Claude's recommendation; the Bombchus clause corrected 2026-11-24 from Kareem's play, round 22). The remake's
+  `Item_Bomb` requires lift grade Low, which only the Bracelet (or a higher strength upgrade) grants; `Item_Bombchu`
+  requires no lift grade (round 7, section 30) but is unusable without the bag. Kareem on Longshot 3.2.0 with a
+  Clawshot 0.2.6 seed (2026-11-24): Bombchus bought before the Bomb Bag showed a count of 0 and could not be used,
+  also with the Bracelet, with no strength-refusal animation; once he had the bag the bought amount appeared. The
+  round 7 note that he used Bombchus without a bag (section 30) no longer counts for logic. Every Bombchus helper
+  requires the bag whatever `free_bombchu_drops` says (`remake/bombchus.toml`, `shops.toml`). The logic follows
+  the game; no patch.
   Patching bombs to need no strength (N64 behaviour) is a possible later option. Game-confirmed: on Kareem's 7c save the
   same bombs failed before Darunia's Bracelet and worked after it (2026-11-09).
 - **D31 The Weird Egg and Zelda's Letter stay at their vanilla checks** (Claude, 2026-11-09, provisional; Kareem

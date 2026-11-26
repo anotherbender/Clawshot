@@ -33,7 +33,7 @@ import json
 import tomllib
 from collections import Counter
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from functools import cache
 from pathlib import Path
 from typing import Any
@@ -96,6 +96,17 @@ class StoryStep:
 
 
 @dataclass(frozen=True)
+class SilverPuzzle:
+    """A silver rupee puzzle the save records only as the room's own saved clear Bool (``[silver_rupees.<logic
+    name>]``): set, it counts as ``count`` of the logic name, the puzzle's whole group in the world; a puzzle not yet
+    cleared counts none, however many of its rupees were taken (D4: conservative)."""
+
+    flag: str
+    count: int
+    source: str
+
+
+@dataclass(frozen=True)
 class Mapping_:
     """The whole mapping file, parsed."""
 
@@ -107,6 +118,7 @@ class Mapping_:
     story: Mapping[str, StoryStep]
     unmapped: Mapping[str, str] = field(default_factory=dict)
     stock: Mapping[str, Mapping[str, str]] = field(default_factory=dict)  # actor -> {item, label}
+    silver_rupees: Mapping[str, SilverPuzzle] = field(default_factory=dict)
 
     def logic_names(self) -> set[str]:
         """Every logic name a save can grant, dungeon items named for each of ``seeds.DUNGEON_INFO``'s dungeons."""
@@ -114,7 +126,7 @@ class Mapping_:
         names |= {entry["item"] for entry in self.stock.values()}
         names |= {self.bottles["bottle"], self.bottles["letter"], self.hearts["item"], self.tokens["item"]}
         names |= {template.format(dungeon=d) for template in self.dungeon_items.values() for d in DUNGEON_INFO}
-        return names | set(self.story)
+        return names | set(self.story) | set(self.silver_rupees)
 
 
 @cache
@@ -144,6 +156,10 @@ def load_mapping() -> Mapping_:
         story=story,
         unmapped=dict(data["unmapped"]),
         stock={actor: dict(entry) for actor, entry in data.get("stock", {}).items()},
+        silver_rupees={
+            name: SilverPuzzle(info["flag"], int(info["count"]), info["source"])
+            for name, info in data.get("silver_rupees", {}).items()
+        },
     )
 
 
@@ -219,7 +235,8 @@ def _tier_actors() -> dict[str, tuple[str, ...]]:
 
 def inventory(seed: Seed, save: save_format.Save | None, world: World, mapping: Mapping_ | None = None) -> Inventory:
     """The logic inventory the save holds (D1-D4, D17, D18): only what the save reads, never the spoiler's
-    placements. Per logic name the largest grant of any source counts; names the world lacks are dropped."""
+    placements. Per logic name the largest grant of any source counts; names the world lacks are dropped. A silver
+    rupee puzzle counts its whole group once its saved clear Bool is set (``[silver_rupees]``), otherwise none."""
     mapping = mapping or load_mapping()
     reader = state._Reader(save)
     cells = _cells(save)
@@ -314,6 +331,13 @@ def inventory(seed: Seed, save: save_format.Save | None, world: World, mapping: 
             unknown.add(f"story: {name}")
         elif value:
             grant({name: 1})
+
+    for name, puzzle in mapping.silver_rupees.items():
+        value = reader.flag(puzzle.flag)
+        if value is None:
+            unknown.add(name)
+        elif value:
+            grant({name: puzzle.count})
 
     known = set(world.items) | {event.name for event in world.events}
     kept = {name: n for name, n in sorted(counts.items()) if n > 0 and name in known}
@@ -457,6 +481,8 @@ def _unknown_sources(mapping: Mapping_) -> dict[str, set[str]]:
             add(f"{dungeon} {_FAMILY_PLURALS[family]}", {template.format(dungeon=dungeon)})
     for name in mapping.story:
         add(f"story: {name}", {name})
+    for name in mapping.silver_rupees:
+        add(name, {name})
     return out
 
 
@@ -527,6 +553,72 @@ def save_age(save: save_format.Save | None) -> str | None:
     return None if value is None else CHILD if value else ADULT
 
 
+class _SourceLogic:
+    """Explain derived resource items, never change the authoritative search.
+
+    Counterfactual searches disable resource-event grants, not story/age events or saved items. For a check that
+    then closes, remove dispensable resources in world order to retain one sufficient route (not every possible
+    route). Searches and explanations live only as long as the saved inventory; no placed reward is consulted.
+    """
+
+    def __init__(self, world: World, inv: Inventory, full: Search) -> None:
+        self.world = world
+        self.items = search_items(inv, world)
+        resource_names = {
+            event.name
+            for event in world.events
+            if event.name in world.items
+            and world.items[event.name].type != "Event"
+            and not inv.counts.get(event.name)
+            and event.name not in world.start_items
+        }
+        self.names = tuple(
+            dict.fromkeys(
+                event.name
+                for event in world.events
+                if event.name in resource_names
+                and any(full.inventory(age).get(event.name, 0) for age in (CHILD, ADULT))
+            )
+        )
+        self.searches = {frozenset(self.names): full}
+        self.explanations: dict[tuple[str, str], list[dict[str, Any]]] = {}
+
+    def _search(self, allowed: frozenset[str]) -> Search:
+        if allowed not in self.searches:
+            excluded = set(self.names) - allowed
+            world = replace(self.world, events=[event for event in self.world.events if event.name not in excluded])
+            self.searches[allowed] = Search(world, self.items)
+        return self.searches[allowed]
+
+    def explain(self, location: Location, key: str) -> list[dict[str, Any]]:
+        cached = (location.name, key)
+        if cached in self.explanations:
+            return self.explanations[cached]
+        age = None if key == "either" else key
+        result = []
+        if self.names and not self._search(frozenset()).can_access(location, age):
+            needed = frozenset(self.names)
+            for name in self.names:
+                without = needed - {name}
+                if self._search(without).can_access(location, age):
+                    needed = without
+            witness = self._search(needed)
+            for name in self.names:
+                if name not in needed:
+                    continue
+                sources = []
+                for event in self.world.events:
+                    if event.name != name:
+                        continue
+                    source = Location(name, event.region, event.rule, "Event", None, event.source)
+                    ages = [a for a in (CHILD, ADULT) if witness.can_access(source, a)]
+                    if ages:
+                        sources.append({"region": event.region, "ages": ages, "rule": event.rule.text})
+                result.append({"item": name, "sources": sources})
+        self.explanations[cached] = result
+        return result
+
+
 class SeedLogic:
     """One loaded seed's logic, kept by the tracker session for as long as the seed stays loaded. The search is
     rebuilt only when the inventory changes (3.5)."""
@@ -536,6 +628,7 @@ class SeedLogic:
         self._key: str | None = None
         self._search: Search | None = None
         self._vanilla: tuple[tuple[VanillaRow, _Reading], ...] | None = None
+        self._sources: _SourceLogic | None = None
 
     def vanilla(self, seed: Seed) -> tuple[VanillaRow, ...]:
         """The seed's vanilla rows, built once per loaded seed (8.1); none while logic is unavailable."""
@@ -557,6 +650,7 @@ class SeedLogic:
         key = inv.as_json()
         if self._search is None or key != self._key:
             self._key, self._search = key, Search(self.loaded.world, search_items(inv, self.loaded.world))
+            self._sources = None
         return self._search
 
     def annotate(
@@ -583,8 +677,10 @@ class SeedLogic:
         inv = inventory(seed, save, world)
         logic["unknown_items"] = list(inv.unknown)
         search = self.search(inv)
+        if self._sources is None:
+            self._sources = _SourceLogic(world, inv, search)
         for area in state["areas"]:
-            area["in_logic"] = _flag_open(area["checks"], world, search)
+            area["in_logic"] = _flag_open(area["checks"], world, search, self._sources)
         grouped: dict[str, list[dict[str, Any]]] = {}
         for row, reading in self._vanilla_readings(seed):
             collected, reason = _collected(row, inv, reading)
@@ -615,14 +711,16 @@ class SeedLogic:
                 "unknown": sum(c["collected"] is None for c in checks),
                 "marked": sum(c.get("marked", False) for c in checks),
                 "skipped": sum(c.get("skipped", False) for c in checks),
-                "in_logic": _flag_open(checks, world, search),
+                "in_logic": _flag_open(checks, world, search, self._sources),
                 "checks": checks,
             }
             for name, checks in grouped.items()
         ]
 
 
-def _flag_open(checks: list[dict[str, Any]], world: World, search: Search) -> dict[str, int]:
+def _flag_open(
+    checks: list[dict[str, Any]], world: World, search: Search, sources: _SourceLogic | None = None
+) -> dict[str, int]:
     """Give each open check ``in_logic`` (3.1, 3.2) and return how many are in logic per age (3.4)."""
     totals = dict.fromkeys(AGE_KEYS, 0)
     for entry in checks:
@@ -636,6 +734,10 @@ def _flag_open(checks: list[dict[str, Any]], world: World, search: Search) -> di
             "either": search.can_access(location),
         }
         entry["in_logic"] = flags
+        if sources is not None:
+            assumed = {key: sources.explain(location, key) for key, value in flags.items() if value}
+            if any(assumed.values()):
+                entry["assumed_sources"] = assumed
         for key, value in flags.items():
             totals[key] += value
     return totals

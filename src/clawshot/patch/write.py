@@ -27,8 +27,9 @@ class NewFile:
     """A new file's decompressed bytes and native sizing/copy provenance.
 
     ``members`` names renamed pack members and their native donor entry plus rounded growth (custom items).
-    ``copied`` names byte-identical members and their native donor pack (Skulltula pickups); other pickup members
-    get measured entries. Both producers share the same path-to-file mapping and size table."""
+    ``copied`` names byte-identical members and their donor pack (Skulltula pickups): a native pack, or a pack the
+    same write changes, whose written member it must equal (song pickups hold the song's changed model); other
+    pickup members get measured entries. Both producers share the same path-to-file mapping and size table."""
 
     data: bytes
     members: Mapping[str, tuple[str, int]] = field(default_factory=dict)
@@ -174,6 +175,7 @@ def _new_file(
     table: rstb.ResourceSizeTable,
     native_packs: dict[str, dict[str, bytes]],
     new_members: dict[str, bytes],
+    written_packs: Mapping[str, dict[str, bytes]] | None = None,
 ) -> tuple[WrittenFile, bytes]:
     """Build one new file, retaining native/custom sizing and validating pickup copy provenance."""
     _patch_path(path)
@@ -194,6 +196,12 @@ def _new_file(
                 _absent(romfs, table, name, f"{path}: new member")
                 table.set(name, entry + growth)
                 new_members[name] = content
+            elif source is not None and source in (written_packs or {}):
+                # A pack this write changes: the copy is its written member, sized with that pack.
+                if written_packs[source].get(name) != content:
+                    raise PatchError(f"{path}: member {name} is not byte-identical to its copy in {source} as written")
+                if table.get(name) is None:
+                    raise PatchError(f"{path}: copied member {name} has no size entry")
             elif source is not None:
                 if source not in native_packs:
                     source_path = _patch_path(source)
@@ -251,6 +259,7 @@ def write(
     table = rstb.read(table_data)
     built: list[tuple[WrittenFile, bytes]] = []
     member_entries: dict[str, int] = {}
+    written_packs: dict[str, dict[str, bytes]] = {}
     members_grew = False
     paths = sorted(set(plan.files()).union(*(changes.keys() for changes in extra_changes)))
     for path in paths:
@@ -270,6 +279,7 @@ def write(
         if path.startswith("Pack/Actor/") and path.endswith(".pack.zs"):
             growths = member_growth(data, new_data) | getitem_member_growth(data, new_data)
             old_members, packed_members = sarc.read(data), sarc.read(new_data)
+            written_packs[path] = packed_members
             for member, content in packed_members.items():
                 if member not in old_members and table.get(member) is None:
                     _absent(romfs, table, member, f"{path}: added pack member")
@@ -308,7 +318,7 @@ def write(
     for path, file in sorted(new_files.items()):
         if path in paths:
             raise PatchError(f"{path}: a new file must be one the dump does not hold")
-        built.append(_new_file(path, file, romfs, dicts, table, native_packs, new_members))
+        built.append(_new_file(path, file, romfs, dicts, table, native_packs, new_members, written_packs))
     occupied = set(paths) | set(new_files)
     for file in sorted(fast_start_files, key=lambda f: f.path):
         relative = _patch_path(file.path)

@@ -478,3 +478,60 @@ paired350 sweep retained by Claude's explicit approval. The shipping variant sti
 ocarina model packs/ActorInfo for hand-overs; native-pack09's crash is not waived. Native Fairy10
 remains unplayed and outside the shipping path. Eight lifts stay Chest-scoped, not Scrub-scoped.
 Receipt-only documentation commits do not move the frozen gate SHA.
+
+### Queue16 merge-kind successor: integration in progress
+
+Claude's review found a design conflict: the lift branch selected the ocarina get model from actual
+placements, overriding BBender's PR41 option2 (maintainers, 2026-11-23). The old passing gate does not
+certify this merge. **Claude, 2026-11-25: merge origin/main874f30a, do not rebase.** The earlier07d9
+reference was a corrected slip, not a merge parent.
+
+Approved settings rule: **Gift or any expanded gift kind always runs the get model**, including Gift-only
+settings. Placements never turn that step on/off. Ocarinas outside this coverage are refused; gift ocarinas
+still require an audited receipt. Both PR41 optional steps and spoiler `patch.steps` remain.
+The obsolete chest-only predicate is replaced by `getitem.ocarina_get_model_possible`; song settings
+documentation follows that name. Both the tunic shop-palette exception and eight destination-scoped
+Chest lifts are retained.
+
+Native regressions cover three full-world configurations: both ocarinas in chests, both at display
+hand-overs without ocarina chests, and the identical Chest+Gift+Token recipe with both ocarinas at audited
+direct-pouch gifts. The latter still must write the model and its spoiler step. A separate four-location
+synthetic world verifies real native model/flow output with Gift-only settings and no Chest checks.
+This does not claim the full game's Gift-only recipe is supported.
+Negative cases cover the absent donor, missing audited receipt, and externally supplied ocarina outside the
+settings rule. Existing tunic and all-eight Chest/Scrub consumer contracts remain.
+
+Prepared private runners: `work/r22-lifts/merge16.sh` and `merge16_sweep.py`. The fresh paired350 uses the
+same immutable seed IDs/recipes but regenerates **both arms**, against exact874f30a rather than stale5bc
+results; the existing effective-settings delta whitelist and fill/oracle/retry engine are reused.
+No new seed or native preflight has run outside the required lock. Changed Python formatter/lint passed.
+Focused checks precede the merge commit; full synthetic/sweep/dump will bind the resulting immutable SHA.
+Commit tooling cannot finalize an in-progress merge: the mandated selective namespace refuses it. Claude
+has been asked to stage/finalize the resolved merge after the focused proof; this agent does not bypass it
+with plain `git add`/`git commit`. No READY or frozen merge SHA yet.
+
+Initial focused run: **117 passed,1 failed,5 setup errors in944.00s**, n8/workers3, CIM players0 and
+own line16 lock retained. Printed causes:
+
+- Full-world Gift-only is correctly rejected because its eight progressive chains require shuffled Chest
+  destinations. Production stays unchanged. The no-Chest native-writer case uses an independent synthetic
+  world, not a disabled progressive policy or an assertion that this is a playable whole-game recipe.
+  Its gallery source uses the reviewed native pool item, Bullet Bag40, rather than N64 Slingshot.
+- The Token producer now uses the same Boomerang donor and refuses its absence before the get-model step.
+  The missing-donor regression therefore uses Chest+Gift (no Token), preserving the exact model-step
+  `PatchError` assertion rather than accepting an unrelated refusal.
+
+The passing focus includes the same-settings direct-pouch output, gift audit refusal, uncovered-placement
+refusal, tunic shop/native-actor contracts and all eight destination scopes. First aimed rerun:
+**donor refusal1 passed;5 no-Chest setup errors in168.73s**. The isolated fixture also needed the complete
+canonical item domain (`prepare(load_spec(), Settings())` item metadata), not raw unsplit items or only
+its four placed items. Preflight now proves no unknown actor items, no progressive chains and all four
+native checks selected. Final aimed no-Chest rerun: **5 passed in78.13s**, formatter/lint clean,
+retained own lock and fresh CIM players0. Together with the original117 passing cases and separately
+corrected donor refusal, every focused case now passes; production and native assertions are unchanged.
+
+**Resolved and ready for Claude to finalize the merge**, not READY for shipping. Resolved conflict files:
+`patch/__init__.py`, `patch/getitem.py`, `patch/gifts.py`, `test_getitem.py`, `test_getitem_ocarina_dump.py`;
+the helper-reference docstring in `patch/songs.py`, README's stale exclusivity claim, settings reference and
+this round receipt also changed. Existing main-only merge paths are retained. No `git add`/`git commit`
+was used by this agent. After Claude's merge commit, bind the retained lock and fresh full gates to its SHA.

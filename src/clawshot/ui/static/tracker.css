@@ -133,7 +133,9 @@ body.tracker-transparent, body.tracker-transparent .tracker-cell { background: t
 .tracker-state-marked { border-color: var(--amber); background: var(--amber); }
 .tracker-state-skipped { border-color: var(--muted); background: linear-gradient(135deg, transparent 40%, var(--muted) 40% 60%, transparent 60%); }
 /* Mark by hand: a square, not a ring, so it stays distinct from out-of-logic rings in a 1080p stream capture. */
-.tracker-state-manual, .tracker-check-manual .tracker-state { width: 12px; height: 12px; border-radius: 0; }
+.tracker-state-manual, .tracker-check-manual .tracker-state:not(.tracker-state-source) { width: 12px; height: 12px; border-radius: 0; }
+/* A separate diamond: this check is reachable, but its resource supply is derived rather than saved stock. */
+.tracker-state-source { width: 8px; height: 8px; border: 1px solid var(--amber); border-radius: 0; transform: rotate(45deg); margin: 0 3px; }
 .tracker-check-in-logic { color: var(--success); font-weight: 600; }
 .tracker-check-out-of-logic { color: var(--muted); opacity: .75; }
 .tracker-check-collected, .tracker-check-marked, .tracker-check-skipped { color: var(--muted); }
@@ -143,3 +145,4 @@ body.tracker-transparent, body.tracker-transparent .tracker-cell { background: t
 .check-details dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 7px 14px; margin: 6px 0 0; font-size: 14px; line-height: 1.45; }
 .check-details dt { color: var(--amber); }
 .check-details dd { margin: 0; }
+.tracker-detail-list dd { white-space: pre-line; overflow-wrap: anywhere; }

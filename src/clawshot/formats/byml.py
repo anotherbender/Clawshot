@@ -1,6 +1,7 @@
-"""BYML v7, little-endian (magic ``YB``, placement files) or big-endian (magic ``BY``, ``GameDataList``): read to
-and write from Python trees. :func:`load`/:func:`dump` keep a file's byte order; :func:`read`/:func:`write` work on
-the tree alone (``write`` defaults to little-endian).
+"""BYML v7, little-endian (magic ``YB``, placement files) or big-endian (magic ``BY``, ``GameDataList``), and v5
+(the effect files ``Effect/*.vsetb.byml``): read to and write from Python trees. :func:`load`/:func:`dump` keep a
+file's byte order and version; :func:`read`/:func:`write` work on the tree alone (``write`` defaults to
+little-endian version 7).
 
 Node types map to Python types so that a tree read from a file writes back with the same types:
 
@@ -8,6 +9,7 @@ Node types map to Python types so that a tree read from a file writes back with 
 type      node                 Python
 ========  ===================  ============================
 0xA0      string               ``str``
+0xA2      binary data          :class:`Binary` (bytes and their alignment)
 0xC0      array                ``list``
 0xC1      map (string keys)    ``dict`` with ``str`` keys
 0x20      hash map, 32-bit     :class:`Hash32Map` (``int`` keys)
@@ -23,6 +25,10 @@ type      node                 Python
 ========  ===================  ============================
 
 Use :func:`same` to compare trees: ``==`` treats ``I32(1)`` and ``U32(1)`` as equal.
+
+Version 5 differs only in the binary node and where it lies (plans/song-get-effects.md, decoded from the effect
+files): after the 8-byte values, zeros up to the data's alignment, the node ``u32 size, u32 alignment`` right
+before the data (data - 8), the data, and the containers (root first) at the next multiple of 4.
 """
 
 import struct
@@ -32,8 +38,10 @@ from typing import Any
 MAGIC_LITTLE = b"YB"
 MAGIC_BIG = b"BY"
 VERSION = 7
+VERSIONS = (5, 7)
 
 STRING = 0xA0
+BINARY = 0xA2
 ARRAY = 0xC0
 MAP = 0xC1
 STRING_TABLE = 0xC2
@@ -127,6 +135,21 @@ class F64(float):
         return f"F64({float(self)!r})"
 
 
+@dataclass(frozen=True)
+class Binary:
+    """A binary node (type 0xA2): raw bytes stored at a multiple of ``alignment`` (a power of two)."""
+
+    data: bytes
+    alignment: int = 4
+
+    def __post_init__(self):
+        if self.alignment < 1 or self.alignment & (self.alignment - 1):
+            raise BymlError(f"binary alignment {self.alignment} is not a power of two")
+
+    def __repr__(self):
+        return f"Binary({len(self.data)} bytes, alignment=0x{self.alignment:x})"
+
+
 class Hash32Map(dict):
     """A hash map node with 32-bit integer keys (type 0x20)."""
 
@@ -152,6 +175,8 @@ def node_type(value) -> int:
         return BOOL
     if isinstance(value, str):
         return STRING
+    if isinstance(value, Binary):
+        return BINARY
     if isinstance(value, Hash32Map):
         return HASH32_MAP
     if isinstance(value, Hash64Map):
@@ -222,8 +247,8 @@ class _Reader:
         self.big = byte_order(data) == "big"
         self.e = ">" if self.big else "<"
         self.version, keys_off, strings_off, self.root_off = struct.unpack_from(self.e + "HIII", data, 2)
-        if self.version != VERSION:
-            raise BymlError(f"BYML version {self.version}; only {VERSION} is supported")
+        if self.version not in VERSIONS:
+            raise BymlError(f"BYML version {self.version}; only versions {VERSIONS} are supported")
         self.keys = self.string_table(keys_off)
         self.strings = self.string_table(strings_off)
 
@@ -242,9 +267,14 @@ class _Reader:
         d = bytes(self.d)
         return [d[off + o : d.index(b"\0", off + o)].decode("utf-8") for o in offs[:n]]
 
-    def value(self, t: int, raw: int):
+    def value(self, t: int, raw: int, at: int):
+        """The value of type ``t`` stored as ``raw`` in the container at ``at`` (named in errors)."""
         if t == STRING:
             return self.strings[raw]
+        if t == BINARY:
+            size, alignment = struct.unpack_from(self.e + "II", self.d, raw)
+            start = (raw + 8 + alignment - 1) // alignment * alignment
+            return Binary(bytes(self.d[start : start + size]), alignment)
         if t in CONTAINERS:
             return self.container(raw)
         if t == BOOL:
@@ -263,7 +293,7 @@ class _Reader:
             return F64(struct.unpack_from(self.e + "d", self.d, raw)[0])
         if t == NULL:
             return None
-        raise BymlError(f"unsupported BYML value type 0x{t:02x}")
+        raise BymlError(f"unsupported BYML value type 0x{t:02x} in the container at 0x{at:x}")
 
     def container(self, off: int):
         t, n = self.header(off)
@@ -272,14 +302,14 @@ class _Reader:
             types = bytes(d[off + 4 : off + 4 + n])
             vals = off + 4 + ((n + 3) & ~3)
             raws = struct.unpack_from(f"{self.e}{n}I", d, vals)
-            return [self.value(types[i], raws[i]) for i in range(n)]
+            return [self.value(types[i], raws[i], off) for i in range(n)]
         if t == MAP:
             out = {}
             for i in range(n):
                 # 24-bit key index, then the value's type byte
                 kv, raw = struct.unpack_from(self.e + "II", d, off + 4 + 8 * i)
                 key, vt = (kv >> 8, kv & 0xFF) if self.big else (kv & 0xFFFFFF, kv >> 24)
-                out[self.keys[key]] = self.value(vt, raw)
+                out[self.keys[key]] = self.value(vt, raw, off)
             return out
         if t in (HASH32_MAP, HASH64_MAP):
             hash_size = 4 if t == HASH32_MAP else 8
@@ -289,13 +319,13 @@ class _Reader:
             fmt = self.e + ("II" if t == HASH32_MAP else "QI")
             for i in range(n):
                 h, raw = struct.unpack_from(fmt, d, off + 4 + entry * i)
-                out[h] = self.value(types[i], raw)
+                out[h] = self.value(types[i], raw, off)
             return out
         raise BymlError(f"unsupported BYML container type 0x{t:02x} at 0x{off:x}")
 
 
 def read(data: bytes):
-    """Parse a BYML v7 document of either byte order; returns its root node (None for an empty document)."""
+    """Parse a BYML v5 or v7 document of either byte order; returns its root node (None for an empty document)."""
     r = _Reader(data)
     if not r.root_off:
         return None
@@ -329,6 +359,7 @@ class _Writer:
         self.strings: set[str] = set()
         self.long_order: list[bytes] = []  # 8-byte values in first-use order
         self.long_index: dict[tuple[int, bytes], int] = {}  # (type, bytes): equal bytes of two types stay apart
+        self.binaries: dict[int, Binary] = {}  # id -> node, in first-use order, placed after the 8-byte values
         self.container_order: list[tuple[int, object]] = []  # (identity, node) in layout order
         self.ident: dict[int, int] = {}  # id(node) -> identity; every node stays alive in the tree
         self.node_entries: dict[int, list] = {}  # id(node) -> entries in written order
@@ -371,6 +402,8 @@ class _Writer:
         if t == STRING:
             self.strings.add(value)
             return value
+        if t == BINARY:
+            return (id(value), value.alignment)
         if t == BOOL:
             return int(value)
         if t == NULL:
@@ -410,6 +443,8 @@ class _Writer:
                     if (vt, raw) not in self.long_index:
                         self.long_index[vt, raw] = len(self.long_order)
                         self.long_order.append(raw)
+                elif vt == BINARY:
+                    self.binaries.setdefault(id(value), value)
 
         walk(self.root)
 
@@ -447,8 +482,11 @@ def _map_entry(key: int, vt: int, e: str) -> bytes:
     return key.to_bytes(3, "big" if e == ">" else "little") + bytes([vt])
 
 
-def write(root, byte_order: str = "little") -> bytes:
-    """Serialize a tree (a map, array or hash map at the root) as BYML v7, ``"little"`` or ``"big"`` endian."""
+def write(root, byte_order: str = "little", version: int = VERSION) -> bytes:
+    """Serialize a tree (a map, array or hash map at the root) as BYML ``version`` (7 or 5), ``"little"`` or
+    ``"big"`` endian."""
+    if version not in VERSIONS:
+        raise BymlError(f"BYML version {version}; only versions {VERSIONS} are supported")
     if byte_order not in ("little", "big"):
         raise BymlError(f"byte order must be 'little' or 'big', not {byte_order!r}")
     if node_type(root) not in CONTAINERS:
@@ -473,6 +511,14 @@ def write(root, byte_order: str = "little") -> bytes:
     long_base = len(out)
     for raw in w.long_order:
         out += raw
+    binary_offset: dict[int, int] = {}
+    for ident, value in w.binaries.items():
+        start = (len(out) + 8 + value.alignment - 1) // value.alignment * value.alignment
+        out += bytes(start - 8 - len(out))
+        binary_offset[ident] = len(out)
+        out += struct.pack(e + "II", len(value.data), value.alignment)
+        out += value.data
+    out += bytes(-len(out) % 4)
     offset = len(out)
     container_offset: dict[int, int] = {}
     for identity, node in w.container_order:
@@ -480,13 +526,15 @@ def write(root, byte_order: str = "little") -> bytes:
         offset += _container_size(node_type(node), len(node))
     root_off = container_offset[w.ident[id(root)]]
     magic = MAGIC_BIG if e == ">" else MAGIC_LITTLE
-    struct.pack_into(e + "2sHIII", out, 0, magic, VERSION, keys_off, strings_off, root_off)
+    struct.pack_into(e + "2sHIII", out, 0, magic, version, keys_off, strings_off, root_off)
 
     def raw_value(vt: int, value) -> int:
         if vt in CONTAINERS:
             return container_offset[w.ident[id(value)]]
         if vt == STRING:
             return string_index[value]
+        if vt == BINARY:
+            return binary_offset[id(value)]
         r = w.scalar(vt, value)
         if vt in LONG_VALUES:
             return long_base + 8 * w.long_index[vt, r]
@@ -515,17 +563,20 @@ def write(root, byte_order: str = "little") -> bytes:
 
 @dataclass
 class Document:
-    """A tree and the byte order of the file it came from, so that it is written back the same way."""
+    """A tree and the byte order and version of the file it came from, so that it is written back the same way."""
 
     root: Any
     byte_order: str = "little"
+    version: int = VERSION
 
 
 def load(data: bytes) -> Document:
-    """Parse a BYML v7 document and remember its byte order."""
-    return Document(read(data), byte_order(data))
+    """Parse a BYML v5 or v7 document and remember its byte order and version."""
+    root = read(data)
+    order = byte_order(data)
+    return Document(root, order, struct.unpack_from((">" if order == "big" else "<") + "H", data, 2)[0])
 
 
 def dump(document: Document) -> bytes:
-    """Serialize a document in its own byte order."""
-    return write(document.root, document.byte_order)
+    """Serialize a document in its own byte order and version."""
+    return write(document.root, document.byte_order, document.version)

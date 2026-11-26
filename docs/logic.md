@@ -52,21 +52,27 @@ removed. The cow-shed pickup does exist, with its own actor and map anchor in al
 variants; its owl/Hookshot roof route is unchanged. The nonexistent Ice Cavern loose blue rupee
 is excluded. Native tokens have a different, liftable pickup contract: this is not a blanket
 Boomerang ban. [Per-rule evidence and unplayed alternatives](../plans/rounds/r20-audit.md).
-Dodongo's torch-room exit also needs usable fire rather than adult age/sword ownership alone.
-Child Sticks and Din's remain valid; the adult Fire Arrows branch retains the existing shuffled-sword
-guard. Ordinary-Bow torch chaining there remains unplayed and is not newly admitted.
+Dodongo's torch-room route accepts plain adult arrows through its permanently lit candle: Kareem
+played that method on Longshot 3.2.0 (0.2.6), without Fire Arrows. Child Sticks and Din's remain valid.
+Its three candles open the room-8 door to the room-9 floor switch, which opens the staircase door;
+they do not directly open the latter. The adult's possible 3 m lobby ledge shortcut remains unplayed.
 
-**Deku Sticks and Nuts (0.2.6): pots are not a source.** A child has sticks in logic only from a
-shop's Deku Stick (`Buy Deku Stick (1)`/`(5)`, or a shuffled `Deku Stick (1)`) or from the Deku Babas a
-weapon kills (`Deku Stick Drop` in KF Outside Deku Tree, the Deku Tree Lobby and the Forest Temple's two
-courtyards: the Kokiri Sword or Boomerang as a child). Nuts likewise come from shops, a shuffled
-`Deku Nuts (5)`/`(10)` or those Babas (`Deku Nut Drop`). OoT Randomizer's "Stick Pot" (Goron City, Zora's
+**Deku Sticks and Nuts: pots are not a source.** A child has sticks in logic from held or bought
+Deku Sticks (`Buy Deku Stick (1)`/`(5)`, or a shuffled `Deku Stick (1)`) or from a child Kokiri Sword
+kill of a Deku Baba (`Deku Stick Drop` in KF Outside Deku Tree, the Deku Tree Lobby and the Forest Temple's
+two courtyards). Adult Baba kills never supply sticks: the native drop-unlock table gates dropped sticks
+on childhood, with green-rupee replacements. The Boomerang's stick yield is unproven and is not counted.
+Kareem, Longshot 3.2.0, Clawshot 0.2.6 (2026-11-24), saw sideways sword kills give sticks and Bow/bomb kills
+give nuts, including as an adult with no sword. Adult nut sources accept those real kill methods even
+with Master Sword shuffle; an unowned sword never counts. Nuts have a forest-story unlock, not the stick's
+childhood gate. They also come from shops or shuffled `Deku Nuts (5)`/`(10)`.
+OoT Randomizer's "Stick Pot" (Goron City, Zora's
 Domain, Bottom of the Well) and "Nut Pot" events are closed (`remake/pot_drops.toml`): Kareem found Goron
 City's pot gives one stick, refilled only by leaving and re-entering; the remake's other stick pots are the
 same kind, Bottom of the Well has none, and no pot holds a fixed nut (a pot without a set drop gives one only
 by chance). Loose sticks outside pots (Deku Tree grass, a Lake Hylia floor stick) are not in logic: unplayed.
 The tracker's in-logic view rebuilds the same world, so it follows.
-[Per-event evidence](../plans/rounds/r21-sticks.md).
+[Pot-source evidence](../plans/rounds/r21-sticks.md), [Baba drop audit](../plans/rounds/r22-tracker.md).
 
 **Child Gold Skulltulas need a kill (0.2.6).** A token is the death drop of its Gold Skulltula, so a
 child token needs `can_child_attack` like the rest: `LLR GS Tree` and `Market GS Guard House` (Kareem, in
@@ -83,10 +89,41 @@ explosives open one of those actors read `can_blast_or_smash` (explosives or the
 fights read the world helper `adult_weapon`
 (a durable blade or the Hammer), which matters only with Master Sword shuffle on. The ground Beamos
 (`Enemy_Beamos`, Spirit Temple's Beamos hall and Gerudo Training Ground's Beamos room) also takes the
-Hammer: Kareem destroyed one with a single Hammer hit (Longshot 3.0.0, 2026-11-23). Unchanged: King
-Dodongo (bombs, or Bomb Flowers with the Bracelet), the Shadow Temple skull pots and spider webs
-(their damage tables give the Hammer 0), eye switches, Bomb Flower chains, the high Beamos, and the
-boss fights. [Class-by-class evidence](../plans/rounds/r21-hammer.md).
+Hammer: Kareem destroyed one with a single Hammer hit (Longshot 3.0.0, 2026-11-23). The adult's
+Mirror Shield also kills it by **redirecting its beam back onto it**, not merely blocking (Kareem,
+Longshot 3.2.0, 0.2.6); only Beamos-kill predicates gain that alternative, not cracked walls.
+King Dodongo (bombs, or Bomb Flowers with the Bracelet), the Shadow Temple skull pots and webs
+(Hammer rate 0), eye switches, in-place Bomb Flower chains, high-Beamos Hammer reach and boss
+fights keep their prior requirements. [Hammer evidence](../plans/rounds/r21-hammer.md).
+
+**Adult Bomb Flowers:** audited Dodongo's Cavern local flower routes admit a fixed Goron Bracelet
+as adult Low lift without inventing a progressive strength copy. The same played capability now
+opens Goron City's Lost Woods shortcut and stops its adult Rolling Goron; other Goron City flower
+routes remain conservative. In Dodongo's Cavern, ordinary adult arrows also kill the Lizalfos pairs,
+so Bracelet + Bow reaches the Bomb Bag without bag explosives or a durable sword. Flowers must be
+carried to each cited wall; a Hammer hitting a growing fruit does not imply transport or a working
+staircase chain. No global strength/rock policy changes. [Per-rule audit](../plans/rounds/r22-logic.md).
+
+**Bombchus need the Bomb Bag (0.2.8).** Kareem (Longshot 3.2.0, a 0.2.6 seed, 2026-11-24): Bombchus
+bought before the Bomb Bag showed a count of 0 and could not be used, also with the Goron's Bracelet,
+and no strength refusal played; the bought amount appeared once he had the bag. Every Bombchus helper
+requires `Bomb_Bag` whatever `free_bombchu_drops` says (`has_bombchus` and `found_bombchus` in
+`remake/bombchus.toml`, `can_refill_bombchus` in `shops.toml`), so `has_explosives` and
+`has_both_explosives` count Bombchus only with the bag; none needs lift strength. The setting, on in
+every seed, still picks the supply: on, a found Bombchus item (and only then are Bombchus explosives);
+off, a purchase, with `found_bombchus` the bag alone. Before, a Bombchus item held without a bag
+counted as explosives: in the tracker, a bought stock read from the save; in generation, a pack that
+stays vanilla (the Wasteland Bombchu Salesman in every seed, the 40-token reward unless gifts are
+shuffled). Shuffled packs already went only where the bag is guaranteed (D25). The tracker's in-logic
+view rebuilds the same world, so it follows. [Decision D30](../plans/decisions.md).
+
+**Bag bombs without the Bracelet (experimental, default off):** `bombs_without_bracelet` is paired with
+`patch.bombs`, which lowers only `Item_Bomb`'s required lift grade. `remake/bombs.toml` then requires the
+Bomb Bag but no strength for `Bombs`; `can_use(Bombs)`, explosives and both Octorok bomb shortcuts inherit it.
+Bomb Flowers, child Dodongo's Cavern entrance and other local lift routes retain strength; Bombchus remain
+independent and still need their bag. Built, not played on Longshot 3.2.0.
+[Native trigger chain and checks](../plans/rounds/r22-games.md).
+
 
 **Water Temple source gate (0.2.2): confirmed by a played save-edit control.** Entry requires
 access to the real Ice Cavern end chest as well as Hookshot and Iron Boots, independent of where
@@ -98,6 +135,12 @@ and `Step_SageOfWater=Step05`, made the switch work and the door open. This conf
 Ice end-chest state enables entry; which of the two values matters was not separated. It is a
 played save-edit control, not a normal-progression or modded Clawshot certification. See
 [the Water gate evidence](../plans/rounds/r16-water-gate.md).
+
+**Zora's River entrance wall:** both directions between `ZR Front` and `Zora River` require
+`can_blast_or_smash` or the native `Zora River Domain Arrival` event. Entering from the Lost Woods
+does not bypass the downstream wall. Kareem met it going downstream on Longshot 3.2.0 (0.2.6);
+this mirrors the already verified upstream predicate, a tightening only.
+[Evidence](../plans/rounds/r22-logic.md).
 
 ## Rule language
 
@@ -222,6 +265,14 @@ neither race reward can supply it. There is no reverse race return, and the wind
 not the N64 Song of Time. Ordinary windmill access from Kakariko is unchanged. Kareem's no-Hookshot
 check on Longshot rc.7 (2026-11-19) refused the race and faded back in front of Dampé, with normal
 movement and the existing warp back up usable. It did not return Link to the surface.
+
+**Dampé's first race (Round 22, played).** The first prize has no one-minute condition: finish the course
+and open its chest. Descent/admission still requires a usable Hookshot (either tier). The race stays available
+until `IsTreasureBoxOpen.16041366920820397198` is true, including old second-race saves and an unopened retry.
+After collection the native second race and its timed prize resume. Kareem played these paths on Longshot
+3.2.0 (2026-11-24), so the first chest now admits progression under the ordinary item-family restrictions.
+Without either tool, Dampé explains the requirement before race setup, then returns Link to the surface.
+[Native trigger chain and played evidence](../plans/rounds/r22-dampe.md).
 
 Child Bolero and both-age Requiem arrivals require an already playable Minuet, Serenade, Nocturne or
 Prelude. The final Wasteland leg into Colossus has the same guard, before its one-way boundary.
@@ -420,14 +471,19 @@ lacks are dropped.
   Bow and Slingshot are their chains' first tiers; quiver and bullet-bag tiers count only while that weapon
   is held. The Ocarina cell grants Fairy Ocarina or Ocarina of Time.
 - Trade items, masks, the three shields, Bombchus and Ruto's Letter count when held now **or** their
-  acquired-once `IsGet` flag is set. Every other item counts only while held. Deku Sticks and Nuts count
-  only as held stock: a new game sets the nut `IsGet` with no nuts held. Magic beans count as held now.
+  acquired-once `IsGet` flag is set. Bombchus additionally require a held Bomb Bag. Every other item counts
+  only while held. Deku Sticks and Nuts count only as held stock: a new game sets the nut `IsGet` with no nuts held.
+  Magic beans count as held now.
 - Bottles follow `has_bottle`: each owned slot without the letter is one `Bottle`; a slot holding Ruto's
   Letter is one `Rutos Letter`, never also a bottle. Contents are not mapped.
 - Hearts beyond the starting three count as four `Piece of Heart` each; loose saved pieces are not
   added. Gold Skulltula tokens use the native stock.
 - Per dungeon, small keys are the found count including spent keys; boss keys, maps and compasses are
   their saved flags.
+- Silver-rupee groups read native saved completion Bools from `[silver_rupees]`: true grants the group's five,
+  false grants none, absent is unknown. All sixteen live groups are mapped, including all four castle puzzles.
+  GTG lava uses its unique all-five unlock event's history; the other fifteen use room-clear Bools.
+  Partial puzzles are not counted; pouches are not invented.
 - `Field Owl Arrival` reads `HyruleField_ArriveEntrance` and `Met Child Zelda` reads
   `HavePlayedEvent.Dm_HrlField_0020` (Impa's send-off). Other events and the remake story steps without an
   audited save flag are listed in `unmapped` and derived by the search. A test fails when a progression

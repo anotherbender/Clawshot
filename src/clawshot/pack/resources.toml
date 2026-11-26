@@ -11,6 +11,7 @@ files = [
     "RSDB/GameActorInfo.Product.111.rstbl.byml.zs",
     "Pack/Actor/Item_ZeldaLetter.pack.zs", # the custom items' donor pack
     "Pack/Actor/Weapon_Sword_Master.pack.zs", # R19: shuffled canonical sword, chest display/name input
+    "Pack/Actor/Item_Bomb.pack.zs", # R22: opt-in bag-bomb lift requirement
     "Event/EventFlow/EventFlowFileEntry.Product.110.byml.zs",
     "System/Resource/ResourceSizeTable.Product.111.Nin_Ounce_NVN2.rsizetable.zs",
     "Component/AIScheduleParam/Npc_Kokiri_Mido_Child.game__component__AIScheduleParam.bgyml", # R18: kept-Mido schedule guard

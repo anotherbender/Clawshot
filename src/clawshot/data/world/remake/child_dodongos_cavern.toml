@@ -12,11 +12,11 @@
 # metres, y up; room = DefaultDungeonRoomIndex (1 main hall, 10 staircase room, 13 blade room with the Bomb Bag
 # ledge, 16 upper Lizalfos, 17 double eye-switch passage, 18 Gold Skulltula side room, 21 cracked floor, 22 boss).
 
-# Round 20 replaces the old sword-only placeholder with the room's actual fire puzzle.
+# The lit candle plus plain adult arrows is played; neither Fire Arrows nor a sword is needed.
 [exits."Dodongos Cavern Lobby"."Dodongos Cavern Staircase Room"]
-rule = "at('Dodongos Cavern Torch Room', (is_child and Sticks) or can_use(Dins_Fire) or (adult_sword and can_use(Fire_Arrows)))"
+rule = "at('Dodongos Cavern Torch Room', (is_child and Sticks) or can_use(Dins_Fire) or can_use(Bow))"
 was = "at('Dodongos Cavern Torch Room', is_adult or Sticks or can_use(Dins_Fire))"
-source = "Dodongos Cavern.json:27; r19 Master Sword shuffle guard retained. R20 native room 8: timed candle hashes 7766157973751052842, 3412578102610136516, 1677399996748274653 link to shutter 18414161731649864422. DodongoCavern_Level_Room_08_Prefab_c4aa requires all three Burning before EventRequestActor 13693449133434520250 runs DodongoCavern_Gimmick_CandleStickShutter and saves DodongoCavern_CandleStick. Candle graphs accept fire contact/lit child Sticks, not sword ownership; adults have no Sticks (r18 played Lake grotto). Keep child Sticks/Din's Fire; require usable Fire Arrows in the old adult_sword branch, retaining that guard to avoid a shuffled-sword logic loosening. Ordinary Bow chaining here is unplayed. plans/rounds/r20-audit.md, Distance switches."
+source = "Kareem, Longshot 3.2.0, Clawshot 0.2.6, adult before the Bomb Bag: shot ordinary arrows through the already-lit candle to light the three timed candles. Native permanent candle14652077694215389560 (48.5,100,-51.5), room8, is 12.7-14.7m from timed candles7766157973751052842,3412578102610136516,1677399996748274653. Room_08_Prefab_c4aa ANDs their Burning states, runs DodongoCavern_Gimmick_CandleStickShutter, saves DodongoCavern_CandleStick, and unbars room8->9 lattice18414161731649864422. Room9's floor switch3719343789467822676 saves DodongoCavern_StepSwitch_01 and opens lobby->staircase shutter9691562485383977530 (Room_01_Prefab_8756). This is the candle route to the switch, not an adult ledge bypass; 3m ledge remains staged. Played plain Bow supersedes the r20 Fire-Arrows/shuffled-sword guard. plans/rounds/r22-logic.md."
 
 # The Bomb Bag ledge. OoT Randomizer's "Far Bridge" holds both the ledge with the Bomb Bag chest (reached from the
 # upper Lizalfos through the double eye-switch passage) and the bridge over the skull with the lift switch. In the
@@ -50,9 +50,9 @@ source = "the upper Lizalfos lead to the Bomb Bag ledge (exit Upper Lizalfos -> 
 # Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword, child
 # weapons the child's; it folds to the rule before while shuffle_master_sword is false. Round 21 cs21e: adult_weapon
 # (the Megaton Hammer too; Enemy_MiddleBoss_Lizalfos Hammer 1.0, r21-hammer.md class enemy).
-rule = "(adult_weapon or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs) and (can_use(Slingshot) or can_use(Bow))"
+rule = "(adult_weapon or can_use(Bow) or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs) and (can_use(Slingshot) or can_use(Bow))"
 new = true
-source = "OoT Randomizer's rule for leaving the upper Lizalfos (Dodongos Cavern.json:136, defeat the pair), plus the double eye-switch passage: Nintendo Life, IGN and QuestFern shoot one eye, cross, then the second eye through a window before the fire returns; data: room 17 holds two Obj_EyeSwitch_A_05 with LimitTime 10 and two Obj_DodongoCave_FireWall_A_01. The Slingshot (child) or Bow (adult) is already needed one room before (Before Upper Lizalfos -> Upper Lizalfos)"
+source = "Kareem, Longshot 3.2.0, 0.2.6: killed the upper Lizalfos with arrows (the bagless kill); Bombchus were also used but may have followed the Bomb Bag and are not the evidence. Enemy_MiddleBoss_Lizalfos Arrow1.0, room16 pair1539353330400110799/2541558834648863509; enemy counter opens the reward/exit. Preserve other fight weapons and the double eye-switch passage's usable Slingshot/Bow requirement: room17 eyes12790243399538496729/13951311116548645685, LimitTime10, two fire walls. Plain adult Bow needs no sword; plans/rounds/r22-logic.md."
 
 [exits."Dodongos Cavern Bomb Bag Ledge"."Dodongos Cavern Upper Lizalfos"]
 rule = "can_use(Slingshot) or can_use(Bow)"

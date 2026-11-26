@@ -3844,3 +3844,23 @@ keeps the bridge shut until Gohma; Defaults use `forest = closed`, D24). Leading
 before Gohma, Saria's `Npc_Kokiri_Saria_Child_WarpDone` schedule holds her own `Npc_Equipment_009` on `Weapon_R`,
 and Event7 binds the prop to the same bone turned 180 degrees. The round 22 fix proposed there stows her equipment
 first; `skip_saria_farewell` already avoids it.
+
+## 51. Song get effects: size entries for effect users, ELink tables and effect files (2026-11-23)
+
+Measured by Claude, 2026-11-23, dump 1.1.1 (update v131072), Clawshot `566c159` plus the BYML v5 reader, with a
+research script outside the repository; checked by `tests/test_rstb_dump.py`. Used by the song get effects
+(`plans/song-get-effects.md`, spec decision S7).
+
+- **ELinkParam members** (`*.engine__component__ELinkParam.bgyml` inside actor packs): all 1309 unique members have
+  entry = size rounded to 32 + **5064** (`rstb.OVERHEAD`).
+- **ELink tables** (`ELink2/elink2.Product.100.belnk`, `.110.belnk`): both have entry = size + **272**, which for
+  these two sizes is also size rounded to 32 + 264. The two formulas differ for other sizes (size + 272 is up to 16
+  bytes lower when the size is 8 or 16 above a multiple of 32), so a grown table takes the larger of the two
+  (BBender's call, proposed by Claude, 2026-11-23; `rstb.ELINK_TABLE`).
+- **Effect files** (`Effect/*.Nin_Ounce_NVN2.vsetb.byml`, BYML version 5): 1431 of 1432 have entry = size rounded to
+  32 + **264**. `static` alone has rounded + **4136** (size 52,401,096, entry 52,405,256). What sets it apart: 569
+  effects (the others at most 114), 393 textures (at most 108), its blob at 0x9000 (the others at 0x1000 to 0x3000).
+  The other 1431 keep +264 at any size (up to 34,933,832 bytes), effect or texture count, so nothing measured
+  predicts the extra 3872. `static` gets a formula of its own, rounded + 4136, which equals its native entry plus its
+  rounded growth (BBender's call, proposed by Claude, 2026-11-23; `rstb.OWN_FORMULA`). Whether the grown `static`
+  loads with it is in-game check 4.5 of the spec.

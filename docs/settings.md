@@ -26,6 +26,13 @@ Conflicting forest/door fields are still refused. Effective return-kit fields
 are regenerated from the selected mode; stored copies cannot override the world.
 Versioned share-prefix checks are unchanged; this adds no cross-version import support.
 
+Bag bombs without the Bracelet is also supported, off by default:
+`--logic bombs_without_bracelet=true` (app: **Bag bombs without the Bracelet (experimental)**).
+It lowers only the ordinary bag bomb's lift requirement and removes strength from the shared `Bombs`
+logic predicate. The Bomb Bag is still necessary, including for Bombchus. Bomb Flowers and strength-gated
+rocks keep their native requirements; this does not open Dodongo's Cavern's child entrance with bag bombs.
+Built, not played on Longshot 3.2.0; [trace and staged check](../plans/rounds/r22-games.md).
+
 OoT-only access overrides such as `open_kakariko=open`, `gerudo_fortress=open`,
 `scarecrow_behavior=free` and `skip_child_zelda=true` are refused: no native patch
 makes them true. The same policy applies to CLI settings strings, app validation
@@ -157,7 +164,7 @@ Choose a concrete upgrade tier, not a number of copies: Longshot includes Hooksh
 include the child Bracelet and Silver Gauntlets, and Quiver/Bullet Bag upgrades include Bow/Slingshot
 and their containers. Lower selections in the same family do not add extra tiers.
 Native bag grants supply their declared ammunition; a Bomb Bag never invents Bombchu ownership.
-Bombs still require age-appropriate strength. Other equipment is owned, not forcibly worn:
+Bombs still require age-appropriate strength unless **Bag bombs without the Bracelet** is on. Other equipment is owned, not forcibly worn:
 equip sword/shield in the pause menu. The selected ocarina is active (Time wins if both are chosen).
 With the adult-return guarantee, starting strength no longer proves the child learned Saria's Song.
 If that song remains at its fixed child source, also start with it, enable Gift/song shuffle, or enable
@@ -255,6 +262,12 @@ are confirmed in game (`R10-MINIGAMES-CHILD-JABU`, `R10-MINIGAMES-ADULT`).
 Rental weapons do not become inventory rewards. Both expert galleries remain unshuffled:
 native expert wins pay repeatable wallet rupees, with no separate first-win prize.
 
+In every seed, **LW Ocarina Memory Game** gives its prize on the first completed won round and sets the
+native once-flag: the shuffled reward with `Gift`, or the vanilla Heart Piece without it.
+It then keeps the native post-prize session state and repeat payouts. Failure or declining gives nothing.
+No setting: this matches the other minigames' first-win policy. Its all-five-ocarina-buttons logic
+requirement is unchanged. Built, not played on Longshot 3.2.0; [checklist](../plans/rounds/r22-games.md).
+
 With `Gift` selected, the child Market Potion Shop bottle tutorial and Dampé's graveyard
 digging prize give shuffled rewards. Both passed their in-game checks on 2026-11-10
 (`R10-MARKET-BOTTLE-FIX`, `R10-DIGGING`). Accept the shop owner's offer by day; the shuffled
@@ -305,9 +318,13 @@ With `--shuffle Chest Gift`, `--songs song` (default) keeps songs on song checks
 `--songs anywhere` releases all twelve for chest placement, subject to other destination restrictions.
 Storms, Minuet and Epona have been played from chests; the rest use the shared grant path but are
 **inferred, not individually verified**. A song in a chest shows a green rupee with the song's own text.
-Both chest ocarinas work and show their model in small and big chests; only seeds that can put an ocarina
-in a chest (Chest and Gift shuffle) change the ocarinas' get model. BBender and Claude played small and big
-chests on Longshot v3.1.1 (2026-11-22, [chest ocarina record](../plans/chest-ocarina-model.md)). Kareem
+Both chest ocarinas work and show their model in small and big chests. Gift shuffle, or any of its expanded
+gift kinds in effective settings, always includes the ocarina get model, even without Chest shuffle or when
+neither instrument lands at a display hand-over. This settings-based build rule is reported in the spoiler's
+`patch.steps`; uncovered ocarina placements and unavailable model inputs are refused.
+This does not relax the whole-game progressive pool's separate requirement to shuffle Chest checks.
+BBender and Claude played small and big chests on Longshot v3.1.1
+(2026-11-22, [chest ocarina record](../plans/chest-ocarina-model.md)). Kareem
 played small chests in both orders on Longshot 3.0.0 (2026-11-23): the Ocarina of Time stayed the equipped
 one, also after Save and Continue, and Saria's farewell, Zelda's escape and the moat looked as before
 ([chest ocarina check](../plans/rounds/r21-pr40.md#played-results-kareem-longshot-300-2026-11-23-pass)).
@@ -315,10 +332,11 @@ The Ocarina of Time plays songs. Din's Fire and Adult's Wallet have chest eviden
 Other gift actors remain subject to the sourced chest allowlist and destination holds, not blanket
 permission for every gift to go in a chest. Authoritative restrictions: `data/settings.toml`.
 
-Shuffled ocarinas avoid show-item hand-overs: ordinary gifts, minigame prizes, frog rewards,
-digging rewards and Deku Scrub purchases exclude both instruments before fill, including external
-placements. Chests and direct story grants remain allowed; Ocarina of Time also has its separately
-played Skulltula pickup. The show-item crash is not established to be age-specific.
+Ocarinas may use item-display hand-overs only with the required get model: both ocarina actor packs and
+ActorInfo changes, never native-pack fallback. Kareem passed the PR40-active hand-overs on Longshot 3.2.0;
+the native-pack Time arm crashed. Gift destinations also require an audited native receipt.
+Chests and direct story grants remain allowed under the same settings rule; Ocarina of Time retains its
+separately played Skulltula pickup. See the [played scope and limits](../plans/rounds/r22-lifts.md).
 
 Ocarinas remain separate fixed items, **not progressive copies**. Newly generated seeds still give the
 Fairy Ocarina when found, but keep the Ocarina of Time selected if it is already owned, at either age.
@@ -372,6 +390,12 @@ requirement and the native 200/500/1000 wallet capacities, retaining release, re
 gates. These fields replay through CS1. The 10-rupee Kokiri shield/nuts purchase and restock were
 observed (R6-PRICES); partial shelves and fixed scrub fees are built/tested, not independently
 certified in game by that observation.
+
+New shuffled potion-shop shelves include the missing non-bottle offer and refusal dialogue,
+so shields, tunics, ammo, hearts and magic use their native purchase paths rather than a
+bottle-only message table. Bottle/container, ownership, stock and price checks remain.
+This repair covers Market and Kakariko at every shuffled shelf; **built, not played** on
+Longshot 3.2.0 ([round 22 shop checks](../plans/rounds/r22-shops.md)).
 
 **Scrub offer wording:** newly generated shuffled one-time sales name their actual
 reward and effective price (English in all16 languages). HF and DMC have separate
@@ -428,13 +452,13 @@ stop/fly-away, with banner/map/Malon preserved. The Field owls near Kakariko and
 also passed: no speech, a short look-and-fly-away. The summit and Lake travel owls kept a short offer and working flights.
 These results do not cover every owl scene; later Woods/Zora owl additions remain unplayed.
 
-Every new seed also refuses to start Dampé's race without an owned Hookshot or Longshot.
-Kareem accepted the no-tool candidate (2026-11-19): no race, fade out/in at the **same spot before Dampé**,
-normal control, and the existing warp back up remains usable. The intended surface return was **not**
-observed; no further behavior change was requested. Both prizes remain shuffled.
-With a Hookshot or Longshot owned, Dampé always runs his second race, so the first-race chest never appears
-(Kareem, 0.2.6, 2026-11-24). From 0.2.7 that chest only holds non-progression items; seeds from 0.2.3 to 0.2.6
-could put a needed item there.
+Every new seed refuses Dampé's race without an owned Hookshot or Longshot: he explains the requirement
+before race setup, then fades out and returns Link to the surface. With either tool, the first race and its
+chest remain available until that chest is opened; an unopened retry and old second-race saves are supported.
+The first race has no one-minute prize condition. After collection, the native second race/timed prize resumes.
+Kareem played refusal, retry, both prizes and old-save recovery on Longshot 3.2.0 (2026-11-24); the first chest
+now accepts progression under the usual item restrictions. This replaces 0.2.7's non-progression workaround.
+New generation does not rewrite old seed outputs, which may retain the item-based second-race-only bug.
 
 Every new seed enables the D-pad HUD shortcuts from the start, independently of fast-start
 choices (including `--skip` with no selections): **Navi, Ocarina, Boots and Masks**.

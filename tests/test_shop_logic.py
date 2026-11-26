@@ -165,13 +165,20 @@ def test_bought_refills_do_not_supply_a_bottle(spec, item, helper):
         ("Deku Nuts (5)", "Nuts"),
         ("Deku Stick (1)", "Sticks"),
         ("Buy Deku Stick (5)", "Sticks"),
-        ("Buy Bombchu (8)", "can_refill_bombchus"),
     ],
 )
 def test_other_bought_item_helpers_read_normal_inventory_or_native_bundle(spec, item, helper):
     world = build_world({**spec, "goal": helper})
     assert not Search(world).won()
     assert Search(world, [item]).won()
+
+
+def test_bombchu_refill_capability_needs_its_bag(spec):
+    world = build_world({**spec, "goal": "can_refill_bombchus"})
+    bought = Search(world, ["Buy Bombchu (8)"])
+    assert not bought.won()
+    bought.collect("Bomb Bag")
+    assert bought.won()
 
 
 def test_all_fill_stages_respect_native_display_restrictions():

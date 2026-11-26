@@ -50,6 +50,7 @@ from clawshot.patch import bags
 from clawshot.patch import items as item_actors
 from clawshot.patch.gamedata import GAME_DATA_LIST
 from clawshot.patch.items import ItemActors
+from clawshot.patch.key_targets import DUNGEON_TARGETS, DungeonGrant
 from clawshot.patch.plan import PatchError
 from clawshot.save import TYPES, murmur3_32
 from clawshot.settings import CATALOG, DEFAULTS
@@ -59,7 +60,7 @@ RULES_TOML = Path(__file__).with_name("gift_rules.toml")
 SWAP, REWRITE, MORE = "swap", "rewrite", "more"
 CLASSES = (SWAP, REWRITE, MORE)
 FLAG_PREFIX = "Clawshot.Gift."
-FIELDS = {"class", "gate", "given", "flag", "skip", "reason", "writes", "once", "purchase", "track"}
+FIELDS = {"class", "gate", "given", "flag", "skip", "reason", "writes", "once", "purchase", "track", "display"}
 # Tracker-only native once-flags (spec tracker-auto-checks D1, D6): the patch never reads them.
 TRACK_KINDS = ("bool", "played", "quest")
 TRACK_FIELDS = {*TRACK_KINDS, "step", "source", "accepted", "played_by"}
@@ -85,6 +86,10 @@ BOWLING_FIRST = "Market Bombchu Bowling First Prize"
 BOWLING_SECOND = "Market Bombchu Bowling Second Prize"
 BOWLING_CHECKS = (BOWLING_FIRST, BOWLING_SECOND)
 
+SKULL_KID_CHECK = "LW Ocarina Memory Game"
+SKULL_KID_FLOW = "Npc_SkullKid_Child_02"
+SKULL_KID_FLAG = "Minigame_SkullKidSession_IsGetHeartPiece"
+
 DAMPE_CHECK = "Graveyard Dampe Gravedigging Tour"
 DAMPE_FLAG = "GraveYard_DiggingHoleTour_Drop_HeartPiece"
 
@@ -104,6 +109,13 @@ MERCHANT_SHOPS = {
     "Wasteland Bombchu Salesman": ("SimpleShopRoot", "Event150"),
 }
 GRANNY_CHECK = "Kak Granny Buy Blue Potion"
+
+# The native pouch rows are identical; only the actors' presentation differs.
+# Gift scenes use their Obj_ actors, never a shelf display (r22-shops.md).
+TUNIC_GIFT_ACTORS = {
+    "Shop_Armor_Goron": "Obj_Armor_Goron",
+    "Shop_Armor_Zora": "Obj_Armor_Zora",
+}
 
 # GameDataList: a saved story flag as the game's own (9338 of its Bools), and the save layout it implies.
 FLAG_RESET_TYPE = 8
@@ -146,6 +158,7 @@ class Rule:
     once: tuple[str, ...] = ()  # equipped-shield queries replaced by saved check-completion queries
     purchase: bool = False  # specialize a native sale and save completion only after its grant
     track: tuple[TrackEntry, ...] = ()  # tracker only; the patch ignores it (D1)
+    display: tuple[str, ...] = ()  # window-only GetPouchContent:DisplayGetByActorName calls paired with the grant
 
 
 def _nonempty(value: object) -> bool:
@@ -209,6 +222,9 @@ def loads(text: str) -> dict[str, Rule]:
         cls = entry.get("class")
         if cls not in CLASSES:
             raise GiftPatchError(f"{check}: class {cls!r}, expected one of {CLASSES}")
+        displays = entry.get("display", [])
+        if not isinstance(displays, list) or any(not isinstance(ref, str) for ref in displays):
+            raise GiftPatchError(f"{check}: display must be a list of '<flow>/<event>' references")
         rule = Rule(
             check,
             cls,
@@ -221,7 +237,12 @@ def loads(text: str) -> dict[str, Rule]:
             tuple(_ref(check, r) for r in entry.get("once", [])),
             entry.get("purchase", False),
             _track(check, entry["track"]) if "track" in entry else (),
+            tuple(_ref(check, ref) for ref in displays),
         )
+        if len(set(rule.display)) != len(rule.display):
+            raise GiftPatchError(f"{check}: duplicate display reference")
+        if rule.display and cls == MORE:
+            raise GiftPatchError(f"{check}: display belongs to a changeable gift")
         if type(rule.purchase) is not bool:
             raise GiftPatchError(f"{check}: purchase must be a Bool")
         if (rule.given or rule.skip or rule.flag or rule.writes or rule.once or rule.purchase) and cls != REWRITE:
@@ -256,7 +277,8 @@ def load(path: str | Path = RULES_TOML) -> dict[str, Rule]:
 class GiftChange:
     rule: Rule
     steps: tuple[Gift, ...]
-    item: str  # the actor name the check gives now
+    item: str  # native grant actor; plan resolves tunic shelf displays to their Obj_ gift actors
+    dungeon_grant: DungeonGrant | None = None
 
     @property
     def check(self) -> str:
@@ -315,7 +337,8 @@ def plan(
             raise GiftPatchError(f"{check}: no rule in gift_rules.toml")
         if rule.cls == MORE:
             raise GiftPatchError(f"{check}: cannot be changed yet ({rule.reason})")
-        out.append(GiftChange(rule, steps[check], placements[check]))
+        item = placements[check]
+        out.append(GiftChange(rule, steps[check], TUNIC_GIFT_ACTORS.get(item, item)))
     return out
 
 
@@ -482,6 +505,22 @@ def _set_item(fc: evfl.Flowchart, step: Gift, item: str) -> None:
             f"{step.id}: {step.param} is {params.get(step.param)!r}, the census said {step.vanilla_item!r}"
         )
     params[step.param] = item
+
+
+def _display_item(fc: evfl.Flowchart, flow: str, ref: str, vanilla: set[str], item: str) -> None:
+    event = fc.events[_index(fc, flow, ref.split("/")[1])]
+    actor = (getattr(event, "params", None) or {}).get("ActorName")
+    if (
+        not isinstance(event, evfl.SubFlowEvent)
+        or (event.flowchart, event.entry_point) != ("GetPouchContent", "DisplayGetByActorName")
+        or not isinstance(actor, str)
+        or isinstance(actor, evfl.Argument)
+        or actor not in vanilla
+    ):
+        raise GiftPatchError(
+            f"{ref}: expected DisplayGetByActorName with literal ActorName in {sorted(vanilla)}, got {event!r}"
+        )
+    event.params["ActorName"] = item
 
 
 def _set_flag_after(fc: evfl.Flowchart, step: Gift, flag: str) -> None:
@@ -783,6 +822,65 @@ def _bowling_order(fc: evfl.Flowchart) -> None:
         event.cases = [(case, _index(fc, fc.name, name)) for case, name in enumerate(targets)]
 
 
+def _skull_kid_first_win(fc: evfl.Flowchart) -> None:
+    """Give the unclaimed prize after a complete win, at the native serial reward boundary."""
+    join = fc.events[_index(fc, fc.name, "Event178")]
+    dispatch = _index(fc, fc.name, "Event9")
+    grade = fc.events[_index(fc, fc.name, "Event12")]
+    gate = fc.events[_index(fc, fc.name, "Event64")]
+    grant = fc.events[_index(fc, fc.name, "Event24")]
+    flag = fc.events[_index(fc, fc.name, "Event58")]
+    if (
+        not isinstance(join, evfl.JoinEvent)
+        or join.next != dispatch
+        or not isinstance(grade, evfl.ActionEvent)
+        or fc.actors[grade.actor].name != GAME_DATA_ACTOR
+        or fc.actors[grade.actor].actions[grade.action] != "EventTriggerSetGameDataInt"
+        or grade.params
+        != {"GameDataName": "Minigame_SkullKidSession_CurrentGradeSoundNumForSession", "Index": -1, "Value": 8}
+        or grade.next != _index(fc, fc.name, "Event23")
+        or not isinstance(gate, evfl.SwitchEvent)
+        or fc.actors[gate.actor].name != GAME_DATA_ACTOR
+        or fc.actors[gate.actor].queries[gate.query] != READ_QUERY
+        or gate.params != {"GameDataName": SKULL_KID_FLAG, "Index": -1}
+        or gate.cases != [(0, _index(fc, fc.name, "Event154")), (1, _index(fc, fc.name, "Event24"))]
+        or not isinstance(grant, evfl.SubFlowEvent)
+        or (grant.flowchart, grant.entry_point, grant.next)
+        != ("Dm_SY_GetInEvent", "GetInEvent_NotTurn_NotNpc", _index(fc, fc.name, "Event58"))
+        or not isinstance(flag, evfl.ActionEvent)
+        or fc.actors[flag.actor].name != GAME_DATA_ACTOR
+        or fc.actors[flag.actor].actions[flag.action] != SET_ACTION
+        or flag.params != {"GameDataName": SKULL_KID_FLAG, "Index": -1, "Value": True}
+    ):
+        raise GiftPatchError(f"{fc.name}: stale memory-game reward boundary: {join!r}, {grade!r}, {gate!r}")
+    # Native Bool queries use 0=true, 1=false. A completed source keeps the entire native dispatcher.
+    first = deepcopy(gate)
+    first.name = f"{NEW_EVENT_PREFIX}SkullKidFirstWin"
+    first.cases = [(0, dispatch), (1, len(fc.events) + 1)]
+    completed_grade = deepcopy(grade)
+    completed_grade.name = f"{NEW_EVENT_PREFIX}SkullKidPrizeGrade"
+    # Match the native third-win state, then its rally reset, camera, gift, once-flag and Ready tail.
+    completed_grade.next = _index(fc, fc.name, "Event68")
+    join.next = len(fc.events)
+    fc.events.extend((first, completed_grade))
+
+
+def skull_kid_changes() -> dict[str, Callable[[bytes], bytes]]:
+    """Every seed gives the memory game's native or shuffled prize on its first complete win."""
+
+    def transform(data: bytes) -> bytes:
+        tree = evfl.read(data)
+        if tree.flowchart is None or tree.flowchart.name != SKULL_KID_FLOW:
+            raise GiftPatchError(f"{SKULL_KID_FLOW}: the file holds no flowchart of that name")
+        _skull_kid_first_win(tree.flowchart)
+        out = evfl.write(tree)
+        if evfl.read(out) != tree:
+            raise GiftPatchError(f"{SKULL_KID_FLOW}: the written flow does not read back as the changed tree")
+        return out
+
+    return {f"Event/EventFlow/{SKULL_KID_FLOW}.bfevfl.zs": transform}
+
+
 def _dampe_reward(fc: evfl.Flowchart, step: Gift) -> None:
     """Reuse the native completion flag around the real gift, not the temporary floor prop."""
     index = _index(fc, fc.name, step.event)
@@ -822,6 +920,8 @@ def patch_flowchart(fc: evfl.Flowchart, flow: str, changes: Sequence[GiftChange]
         for step in change.steps:
             if step.flow == flow:
                 _set_item(fc, step, change.item)
+                if change.dungeon_grant is not None:
+                    _set_flag_after(fc, step, change.dungeon_grant.field)
                 if (change.new_flag or change.rule.once) and not change.rule.purchase and not change.expert:
                     _set_flag_after(fc, step, change.flag)
                 if change.check == MARKET_BOTTLE_CHECK:
@@ -831,6 +931,9 @@ def patch_flowchart(fc: evfl.Flowchart, flow: str, changes: Sequence[GiftChange]
                     _set_flag_after(fc, step, "MiniGame_BombchuBowling_ClearThirdTime")
                 if change.check == DAMPE_CHECK:
                     _dampe_reward(fc, step)
+        for ref in change.rule.display:
+            if ref.split("/")[0] == flow:
+                _display_item(fc, flow, ref, vanilla, change.item)
         for ref in change.rule.given:
             if ref.split("/")[0] == flow:
                 _read_flag(fc, flow, ref, vanilla, change.flag)
@@ -855,7 +958,14 @@ def flows_changed(changes: Iterable[GiftChange]) -> list[str]:
     for change in changes:
         out |= {step.flow for step in change.steps}
         out |= {
-            ref.split("/")[0] for ref in (*change.rule.given, *change.rule.skip, *change.rule.writes, *change.rule.once)
+            ref.split("/")[0]
+            for ref in (
+                *change.rule.given,
+                *change.rule.skip,
+                *change.rule.writes,
+                *change.rule.once,
+                *change.rule.display,
+            )
         }
         if change.rule.purchase and change.check in MERCHANT_SHOPS:
             out.add("SimpleShop")
@@ -1121,7 +1231,7 @@ def seed_checks(
                 out.append(name)
             continue
         if {actors.aliases.get(s.vanilla_item, s.vanilla_item) for s in steps[name]} != {
-            actors.actors.get(loc.vanilla)
+            TUNIC_GIFT_ACTORS.get(actors.actors.get(loc.vanilla), actors.actors.get(loc.vanilla))
         }:
             continue
         out.append(name)
@@ -1177,6 +1287,8 @@ def seed_step(
     actors: ItemActors,
     vanilla: Mapping[str, str],
     files: Mapping[str, str],
+    *,
+    dungeon_grants: Mapping[tuple[str, str], DungeonGrant] | None = None,
 ) -> Callable[[Mapping[str, str]], dict[str, Callable[[bytes], bytes]]]:
     """The seed's patch step for gifts: placements (location -> logic item) in, the flow and GameDataList
     transforms out, for moved gifts and once-gate normalization (``vanilla``: check -> its logic item)."""
@@ -1193,7 +1305,13 @@ def seed_step(
             or name in BOWLING_CHECKS
             or any(s.call in VARIABLE_RUPEE_CALLS for s in steps[name])
         }
-        return file_changes(plan(moved, gifts, definitions, rules), files)
+        changes = plan(moved, gifts, definitions, rules)
+        if dungeon_grants:
+            changes = [
+                replace(change, dungeon_grant=dungeon_grants.get((change.check, placements[change.check])))
+                for change in changes
+            ]
+        return file_changes(changes, files)
 
     return step
 
@@ -1246,7 +1364,17 @@ def seed_setup(
     dicts = zsdic.Dictionaries.from_romfs(Path(romfs))
     versions = {str(k): str(v) for k, v in read_romfs_byml(Path(romfs), dicts, FLOW_VERSIONS)["Versions"].items()}
     files = flow_files(Path(romfs), versions)
-    gift_step = seed_step(shuffled, census, definitions, rules, actors, vanilla, files)
+    # Generic pouch grants do not credit dungeon maps/compasses. Reuse the chest grant's target/field contract.
+    # Same-dungeon gifts only; admission remains chest-held until the staged lesson check passes.
+    dungeon_grants = {
+        (name, item): DungeonGrant(DUNGEON_TARGETS[info.dungeon].id, info.type)
+        for name in shuffled
+        for item, info in world.items.items()
+        if info.type in {"Map", "Compass"}
+        and info.dungeon in DUNGEON_TARGETS
+        and info.dungeon == world.regions[world.locations[name].region].dungeon
+    }
+    gift_step = seed_step(shuffled, census, definitions, rules, actors, vanilla, files, dungeon_grants=dungeon_grants)
 
     def step(placements: Mapping[str, str]) -> dict[str, Callable[[bytes], bytes]]:
         hints = skulltula_hint_changes(
@@ -1281,6 +1409,9 @@ def held_items(
                 out[item] = (SONG_TYPE,)
         else:
             actor = actors.actor(item)
+            # Gift sources must not remove tunics from their existing native shop palette.
+            if actor in TUNIC_GIFT_ACTORS:
+                continue
             receipt = CATALOG["chest_verified"].get(actor)
             destinations = receipt.get("destinations") if receipt is not None else None
             if destinations is None and (actor in chest_actors or receipt is not None):

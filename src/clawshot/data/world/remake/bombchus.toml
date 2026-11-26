@@ -1,0 +1,17 @@
+# D30 (corrected 2026-11-24): Bombchus need the Bomb Bag. Kareem, Longshot 3.2.0, Clawshot 0.2.6 seed: Bombchus
+# bought before the Bomb Bag showed a count of 0 and could not be used, also with the Goron's Bracelet, and no
+# strength-refusal animation played; once he had the bag the bought amount appeared. So every Bombchus helper requires
+# Bomb_Bag, whatever free_bombchu_drops says, and none requires lift strength (Item_Bombchu LiftableParam None,
+# 03-game-data.md section 30). has_explosives and has_both_explosives read has_bombchus, so they follow;
+# can_refill_bombchus is shops.toml's [helpers] line, applied after these overrides, and requires the bag there.
+# free_bombchu_drops keeps its other meaning, the supply: on (every seed), a found Bombchus item, and only then do
+# Bombchus count as explosives; off, a purchase or drop (can_refill_bombchus), and found_bombchus is the bag alone.
+[helpers.has_bombchus]
+rule = "Bomb_Bag and ((free_bombchu_drops and found_bombchus) or (not free_bombchu_drops and can_refill_bombchus))"
+was = "(free_bombchu_drops and found_bombchus) or (not free_bombchu_drops and can_refill_bombchus and Bomb_Bag)"
+source = "D30 as corrected 2026-11-24: Kareem, Longshot 3.2.0, Clawshot 0.2.6 (plans/rounds/r22-tracker.md): bought Bombchus stayed at 0 and unusable before the Bomb Bag, with or without the Goron's Bracelet, and appeared with the bag. The bag now guards both supply branches; off-mode was already bag-gated. 03-game-data.md section 24: the Bomb Bag expands bombs and Bombchus (ActorFullOnlyIfIsGetWhenGetBag singles out Bombchus)."
+
+[helpers.found_bombchus]
+rule = "Bomb_Bag and ((free_bombchu_drops and (Bombchus or Bombchus_5 or Bombchus_10 or Bombchus_20)) or not free_bombchu_drops)"
+was = "(free_bombchu_drops and (Bombchus or Bombchus_5 or Bombchus_10 or Bombchus_20)) or (not free_bombchu_drops and Bomb_Bag)"
+source = "D30 as corrected 2026-11-24 (Kareem, Longshot 3.2.0, Clawshot 0.2.6): a found or bought Bombchus item is unusable until the Bomb Bag. Free-drops mode now needs the bag with the found item; off-mode stays the bag alone. Before this, a fixed vanilla pack reachable without a bag (Wasteland Bombchu Salesman, keep_vanilla in every seed; Kak 40 Gold Skulltula Reward unless gifts are shuffled) satisfied this helper in generator searches, because D25 screens only shuffled packs."

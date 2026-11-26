@@ -20,6 +20,7 @@ from pathlib import Path, PurePosixPath
 from unittest import mock
 
 import pytest
+from dampe_flow import assert_first_race_cycle
 
 from clawshot.census.gifts import FLOW_DIR, FLOW_SUFFIX, FLOW_VERSIONS, flow_files, reachable
 from clawshot.census.scan import read_romfs_byml
@@ -487,6 +488,7 @@ def _modules(*names: str) -> frozenset[str]:
 # stops running one loses coverage; a module outside every set is a writer no recipe was chosen for.
 _EVERY_RECIPE = _modules(
     "bags",
+    "dampe_first_race",
     "dampe_safety",
     "darunia",
     "door_story",
@@ -508,7 +510,9 @@ _OPT_IN = _modules(
     "receive_event",
     "reward_bridge",
     "rewards",
+    "scene_gifts",
     "scrub_shields",
+    "talon",
     "text",
 )
 WRITERS = {
@@ -651,3 +655,4 @@ def test_production_seed_declares_every_event_dependency_it_adds(romfs, recipe):
     found = writers(output)
     assert WRITERS[recipe] <= found, f"{recipe} no longer runs {sorted(WRITERS[recipe] - found)}"
     assert found <= FLOW_WRITERS, f"event writers no recipe covers: {sorted(found - FLOW_WRITERS)}"
+    assert_first_race_cycle(patched.charts["MiniGame_DampeRace"])

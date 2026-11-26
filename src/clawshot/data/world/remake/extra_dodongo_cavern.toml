@@ -11,8 +11,8 @@ new = true
 region = "Dodongos Cavern Lobby"
 type = "Chest"
 vanilla = "Rupees (5)"
-rule = "can_blast_or_smash or Progressive_Strength_Upgrade"
-source = "Census 8607798771661947511, west lobby alcove behind a cracked wall, with a nearby Bomb Flower. Explosives or the Bracelet's flower route. https://www.ign.com/wikis/ocarina-of-time-remake/Dodongo_Cavern_Dungeon_Walkthrough. Round 21 cs21e (plans/rounds/r21-hammer.md, class cracked wall): the wall is WallCrack 14106977092420306644 (7.4 from the chest), whose CrackStoneObject damage table takes Hammer 100 (= Bomb 100, MaxLife 6); Kareem broke the same WallCrack actor on Death Mountain Trail with the Hammer (0.2.5)."
+rule = "can_blast_or_smash or dc_bomb_flower"
+source = "Census 8607798771661947511, west lobby alcove behind WallCrack 14106977092420306644 (-22.8,99.8,-8), CrackStoneObject Hammer 100 = Bomb 100, MaxLife 6; its death removes collision (r21-hammer.md). Flower 18295893136718890181 is 21.1 m away: carry it, not in-place ignition. Round 22 dc_bomb_flower admits the adult fixed Bracelet/Low capability already played by Kareem (Longshot 3.2.0, 0.2.6), without a bag; no new flower transport path. Full audit: plans/rounds/r22-logic.md."
 
 [locations."Dodongo Cavern Room 5 Chest (TBox_Rupee_Red)"]
 new = true
@@ -22,8 +22,8 @@ vanilla = "Rupees (20)"
 # Round 19 Master Sword shuffle (remake/master_sword.toml header): adult_sword for the implicit adult sword, child
 # weapons the child's; it folds to the rule before while shuffle_master_sword is false. Round 21 cs21e: adult_weapon
 # (the Megaton Hammer too; Enemy_MiddleBoss_Lizalfos Hammer 1.0, r21-hammer.md class enemy).
-rule = "adult_weapon or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs"
-source = "Census 7764016096998075927, lower-Lizalfos arena room 5; appear-chest event DodongoCavern_Gimmick_DefeatLizalfos01. Inherited normal Lizalfos fight rule (Dodongos Cavern.json:55). https://www.ign.com/wikis/ocarina-of-time-remake/Dodongo_Cavern_Dungeon_Walkthrough."
+rule = "adult_weapon or can_use(Bow) or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs"
+source = "Census7764016096998075927, room5 lower-Lizalfos reward, DodongoCavern_Gimmick_DefeatLizalfos01; enemy counter8075926014768809555 opens shutter9415944883117694992. Same Enemy_MiddleBoss_Lizalfos actor's Arrow1.0 damage table as the played upper pair (Kareem, Longshot3.2.0, 0.2.6, arrows). Add usable adult Bow, retain other weapons; no Bombchu-without-bag inference. plans/rounds/r22-logic.md."
 
 [locations."Dodongo Cavern Room 10 Chest (Item_ScrubBusinessSeed)"]
 new = true
@@ -39,5 +39,5 @@ region = "Dodongos Cavern Upper Lizalfos"
 type = "Chest"
 vanilla = "Scrub Business Seed"
 # Round 19 Master Sword shuffle (remake/master_sword.toml header): as Room 5's. Round 21 cs21e: adult_weapon, as Room 5's.
-rule = "adult_weapon or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs"
-source = "Census 850464708089653824, upper-Lizalfos arena room 16; appear-chest event DodongoCavern_Gimmick_DefeatLizalfos02. Inherited normal Lizalfos fight rule (Dodongos Cavern.json:136). https://www.ign.com/wikis/ocarina-of-time-remake/Dodongo_Cavern_Dungeon_Walkthrough."
+rule = "adult_weapon or can_use(Bow) or (is_child and (Sticks or Slingshot or Kokiri_Sword)) or Bombs"
+source = "Census850464708089653824, room16 upper-Lizalfos reward, DodongoCavern_Gimmick_DefeatLizalfos02. Kareem, Longshot3.2.0, 0.2.6: killed this pair with arrows; Bow is the bagless kill, Bombchus may have been after the bag. Native Enemy_MiddleBoss_Lizalfos Arrow1.0 and death counter trigger the chest. Preserve other weapons; plans/rounds/r22-logic.md."

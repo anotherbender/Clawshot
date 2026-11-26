@@ -1,0 +1,22 @@
+# Round 22 cs22b: dropped sticks are child-only, regardless of the weapon that killed the Baba.
+# The three pot-only events remain False in pot_drops.toml. Native shop purchases/held sticks are unchanged.
+
+[events."KF Outside Deku Tree"."Deku Stick Drop"]
+rule = "is_child and Kokiri_Sword"
+was = "(is_adult and not entrance_shuffle) or can_use(Kokiri_Sword) or can_use(Boomerang)"
+source = "Round 22 cs22b, build e0f3ccfa; plans/rounds/r22-tracker.md: Enemy_Dekubaba ActorHolder DekuStickDrop -> Enemy_Dekubaba_DekuStickDrop; its DropSubTable gives Obj_DekuStick, count1/probability100/IsReplace=true. GameParameter/DropGlobalParam/Default.game__drop__DropGlobalParam.bgyml, DropLotteryMasterData.DropUnlockCondition: Obj_DekuStick requires Sequence_IsChildhood; ReplaceSetting targets it to Obj_Rupee_Green. Kareem, Longshot 3.2.0, Clawshot 0.2.6, 2026-11-24: sideways sword kills give sticks; Bow/bomb kills give nuts, including as adult. Keep child Kokiri Sword; Boomerang stick yield unproven and removed conservatively (Overworld.json:225). Tightening approved by Claude, 2026-11-24."
+
+[events."Deku Tree Lobby"."Deku Stick Drop"]
+rule = "is_child and Kokiri_Sword"
+was = "is_adult or Kokiri_Sword or Boomerang"
+source = "Round 22 cs22b, build e0f3ccfa; plans/rounds/r22-tracker.md: GameParameter/DropGlobalParam/Default.game__drop__DropGlobalParam.bgyml, DropLotteryMasterData.DropUnlockCondition gates Obj_DekuStick on Sequence_IsChildhood; ReplaceSetting targets it to Obj_Rupee_Green. Enemy_Dekubaba_DekuStickDrop DropSubTable names that actor with IsReplace=true. Kareem, Longshot 3.2.0, 0.2.6, 2026-11-24: sideways sword kill yields sticks; Bow/bombs yield nuts. Child Kokiri Sword retained; Boomerang yield unproven (Deku Tree.json:12). Tightening approved by Claude, 2026-11-24."
+
+[events."Forest Temple NW Outdoors"."Deku Stick Drop"]
+rule = "is_child and Kokiri_Sword"
+was = "is_adult or Kokiri_Sword or Boomerang"
+source = "Round 22 cs22b, build e0f3ccfa; plans/rounds/r22-tracker.md: GameParameter/DropGlobalParam/Default.game__drop__DropGlobalParam.bgyml, DropLotteryMasterData.DropUnlockCondition gates Obj_DekuStick on Sequence_IsChildhood; ReplaceSetting targets it to Obj_Rupee_Green. Enemy_Dekubaba_DekuStickDrop DropSubTable names that actor with IsReplace=true. Kareem, Longshot 3.2.0, 0.2.6, 2026-11-24: sideways sword kill yields sticks; Bow/bombs yield nuts. Child Kokiri Sword retained; Boomerang yield unproven (Forest Temple.json:48). Tightening approved by Claude, 2026-11-24."
+
+[events."Forest Temple NE Outdoors"."Deku Stick Drop"]
+rule = "is_child and Kokiri_Sword"
+was = "is_adult or Kokiri_Sword or Boomerang"
+source = "Round 22 cs22b, build e0f3ccfa; plans/rounds/r22-tracker.md: GameParameter/DropGlobalParam/Default.game__drop__DropGlobalParam.bgyml, DropLotteryMasterData.DropUnlockCondition gates Obj_DekuStick on Sequence_IsChildhood; ReplaceSetting targets it to Obj_Rupee_Green. Enemy_Dekubaba_DekuStickDrop DropSubTable names that actor with IsReplace=true. Kareem, Longshot 3.2.0, 0.2.6, 2026-11-24: sideways sword kill yields sticks; Bow/bombs yield nuts. Child Kokiri Sword retained; Boomerang yield unproven (Forest Temple.json:89). Tightening approved by Claude, 2026-11-24."

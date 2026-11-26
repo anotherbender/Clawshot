@@ -348,20 +348,23 @@ class Handler(BaseHTTPRequestHandler):
 
     def reply(self, status, value, content_type="application/json"):
         raw = json.dumps(value, ensure_ascii=False).encode("utf-8") if content_type == "application/json" else value
-        self.send_response(status)
-        self.send_header("Content-Type", content_type + "; charset=utf-8")
-        self.send_header("Content-Length", str(len(raw)))
-        self.send_header("Cache-Control", "no-store")
-        self.send_header("X-Content-Type-Options", "nosniff")
-        self.send_header("Referrer-Policy", "no-referrer")
-        self.send_header("Cross-Origin-Resource-Policy", "same-origin")
-        self.send_header(
-            "Content-Security-Policy",
-            "default-src 'none'; script-src 'self'; style-src 'self'; "
-            "connect-src 'self'; img-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
-        )
-        self.end_headers()
-        self.wfile.write(raw)
+        try:
+            self.send_response(status)
+            self.send_header("Content-Type", content_type + "; charset=utf-8")
+            self.send_header("Content-Length", str(len(raw)))
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("Cross-Origin-Resource-Policy", "same-origin")
+            self.send_header(
+                "Content-Security-Policy",
+                "default-src 'none'; script-src 'self'; style-src 'self'; "
+                "connect-src 'self'; img-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+            )
+            self.end_headers()
+            self.wfile.write(raw)
+        except ConnectionError:
+            self.close_connection = True  # A departed client cannot receive an error response either.
 
     def do_GET(self):
         self.dispatch("GET")

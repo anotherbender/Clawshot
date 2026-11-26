@@ -233,8 +233,9 @@ helpers are changed only through the `remake` override with its `was` guard.
 Low-or-higher lift strength: the actual fixed Goron Bracelet as child, any strength upgrade as adult.
 In seed worlds the approved child-capability exception requires the native Darunia source, not a
 copy Bracelet; adult strength counts copies. `can_use(Bombs)` and the Octorok bomb shortcuts share that predicate.
-Bombchu supply and local strength-gated Bomb Flower routes are unchanged. This is logic matching
-native lift requirements, not a gameplay patch or an extra bag/strength grant (sections 30–31).
+Bombchu helpers separately require the Bomb Bag, regardless of `free_bombchu_drops` (D30 corrected by Kareem,
+Longshot 3.2.0, 2026-11-24). Local strength-gated Bomb Flowers are unchanged. This is logic, not a bag/strength grant
+or gameplay patch (sections 30–31; round 22 tracker).
 
 ## The rule language
 

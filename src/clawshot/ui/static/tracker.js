@@ -478,7 +478,8 @@ function parseDungeonNames(fragment) {
       else if (manual) action = "mark";
       else if (open && check.skippable) action = "skip";
     }
-    return {done, open, inLogic, manual, action};
+    const sources = inLogic === true ? check.assumed_sources?.[key] || [] : [];
+    return {done, open, inLogic, manual, action, sources};
   }
   const STATE_WORDS = {collected: "Collected (your save)", marked: "Marked done by you", skipped: "Skipped by you"};
   function stateWords(state, noSave) {
@@ -500,6 +501,7 @@ function parseDungeonNames(fragment) {
     ["skipped", "Skipped", "Skipped by you"],
     ["in-logic", "In logic", "Open, and in logic with what your save holds"],
     ["out-of-logic", "Out of logic", "Open, and out of logic with what your save holds"],
+    ["source", "Needs a source", "In logic only after obtaining an item from a source the logic assumes"],
     ["manual", "Mark by hand", "Your save can't show this check: click it when you have it"],
   ];
   function marker(kind) {
@@ -582,6 +584,18 @@ function parseDungeonNames(fragment) {
     if (view.unknown.length) words += " May be conservative: the save could not read " + view.unknown.join(", ") + ", so they count as not held.";
     return words;
   }
+  const SOURCE_ITEMS = {"Deku Stick Drop": "Deku Sticks", "Deku Nut Drop": "Deku Nuts"};
+  function sourceWords(sources) {
+    return sources.map((entry) => {
+      const label = SOURCE_ITEMS[entry.item];
+      const item = label ? label + " (" + entry.item + ")" : entry.item;
+      return item + ": " + entry.sources.map((source) => {
+        const region = source.region === "KF Outside Deku Tree" ? "Kokiri Forest, outside the Deku Tree" : source.region;
+        const where = entry.item === "Deku Stick Drop" || entry.item === "Deku Nut Drop" ? "Deku Babas in " + region : region;
+        return where + ", as " + source.ages.join(" / ") + " (" + source.rule.replaceAll("_", " ") + ")";
+      }).join("; ");
+    }).join("\n");
+  }
   function showDetails() {
     if (!checksShown()) return;
     const entry = selected && rows.get(selected);
@@ -603,6 +617,8 @@ function parseDungeonNames(fragment) {
     const add = (term, value) => { if (value) list.append(node("dt", "", term), node("dd", "", value)); };
     add("State", stateWords(state, noSaveNow));
     add("In logic", logicWords(entry));
+    if (state.sources.length) add("Needs a source", sourceWords(state.sources) +
+      "\nNot saved stock: the logic assumes you obtain it at a reachable source. One sufficient route is shown; other routes may exist.");
     add("Save", howWords(check));
     add("Area", area + (check.dungeon && check.dungeon !== area ? " · " + check.dungeon : ""));
     add("Kind", KIND_WORDS[check.kind] || check.kind);
@@ -638,6 +654,10 @@ function parseDungeonNames(fragment) {
     line.append(marker(kind));
     const label = check.label || check.name || check.id;
     line.append(node("span", "tracker-check-label", shortLabel(label, area) + (check.item ? ": " + (check.item_label || check.item) : "")));
+    if (state.sources.length) {
+      line.classList.add("tracker-check-needs-source");
+      line.append(marker("source"));
+    }
     if (check.vanilla) {
       line.classList.add("tracker-check-vanilla");
       const tag = node("span", "tracker-vanilla-tag", "vanilla");
@@ -645,8 +665,8 @@ function parseDungeonNames(fragment) {
       line.append(tag);
     }
     const words = stateWords(state, noSaveNow);
-    line.title = words + (state.action ? ". " + ACTION_WORDS[state.action] : "");
-    line.setAttribute("aria-label", label + ": " + words);
+    line.title = words + (state.sources.length ? "; needs a source" : "") + (state.action ? ". " + ACTION_WORDS[state.action] : "");
+    line.setAttribute("aria-label", label + ": " + words + (state.sources.length ? "; needs a source" : ""));
     if (!state.action) line.setAttribute("aria-disabled", "true");
     else line.dataset.keyAction = state.action === "mark" ? "Mark done" : state.action === "skip" ? "Skip" : "Undo";
     line.addEventListener("click", () => { choose(check.id); if (state.action) act(check, state.action); });

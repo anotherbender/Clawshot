@@ -48,8 +48,9 @@ Hookshot's GitHub repository has been offline since 2026-11-13. Get Longshot's l
 the game on your PC from your own dump. Kareem verified app Play on **Longshot v3.0.0-rc.2**
 on 2026-11-13: the seed loaded with isolated saves, game options carried over, shuffled rewards matched,
 Xbox prompts displayed correctly, and progress survived reload. His later in-game checks ran on **Longshot 3.0.0**.
-On **Longshot 3.2.0**, two seeds started without a crash, loaded a save and loaded their mod (a start-up check on
-2026-11-24); nothing has been played on 3.2.0 yet. Not every runtime/item combination is played.
+On **Longshot 3.2.0**, focused story-scene checks passed on 2026-11-25: the moat and Saria gave one Heart Piece
+and healed, and Talon's shuffled first prize worked without the milk prop or bottle wording. Not every runtime/item
+combination is played.
 
 Keep the terminal open. **My seeds** finds your earlier seeds after a restart. Copy the number,
 settings and short hash to share a seed recipe, never the generated game files. **On Discord, use
@@ -126,6 +127,11 @@ may also reach Skulltulas without becoming chest-safe; fixed Nut/Stick upgrades 
 shooting-gallery prizes give the seed's rewards (`R10-MINIGAMES-CHILD-JABU`,
 `R10-MINIGAMES-ADULT`). Later wins give the game's usual rupees. Expert galleries stay unshuffled:
 their native rewards are repeatable wallet rupees (Market 30, Kakariko 70), not unique first prizes.
+
+**In every seed, the Lost Woods ocarina memory game's first won round gives its prize once**, whether
+shuffled or the vanilla Heart Piece; later sessions retain native payouts. Built, not played on Longshot 3.2.0.
+The separate **Bag bombs without the Bracelet** option is experimental and off by default; it keeps the
+Bomb Bag requirement and leaves Bomb Flowers unchanged. [Checks and evidence](plans/rounds/r22-games.md).
 
 **New with Gift shuffle:** the child Market Potion Shop bottle tutorial and Dampé's graveyard
 digging prize now give shuffled rewards. Both passed their in-game checks on 2026-11-10
@@ -227,8 +233,8 @@ Kareem reported these played checks:
 **Longshot 3.0.0 stable (2026-11-22/23):**
 
 - **Ocarinas in chests:** the Fairy Ocarina and the Ocarina of Time show their model and text, in either order.
-  The Ocarina of Time stays the one you play, also after Save and Continue. Only seeds that can put an ocarina in
-  a chest (Chest and Gift shuffle) change. Saria's farewell, Zelda's escape and the moat looked as before.
+  The Ocarina of Time stays the one you play, also after Save and Continue.
+  Saria's farewell, Zelda's escape and the moat looked as before.
 - **Megaton Hammer:** one Hammer hit destroys a ground Beamos. Logic now also counts the adult's Hammer for cracked
   walls, boulders and bomb grottos, which Kareem broke with it in game, and as an adult weapon. King Dodongo, the
   Shadow Temple's skull pots and webs, eye switches, Bomb Flowers and the bosses keep their usual requirements
@@ -236,15 +242,22 @@ Kareem reported these played checks:
 - **Ganon's trials:** count 1 end to end and count 2's first trial (see At a glance).
 - **Very strong hints:** all ten Gossip Stone texts checked in a new game were correct.
 - **Tracker:** ten gift checks read as collected from the game's own records ([Tracker guide](docs/tracker.md)).
+- **Dampé:** the no-tool refusal and safe surface return, first race with the Hookshot owned, unopened-chest
+  retry, first-to-second race transition, and first-prize recovery on an old save passed on Longshot 3.2.0
+  (2026-11-24). New seeds allow progression in the first chest; the escape-tool requirement remains.
 
 Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
 
 ### Known issues
 
-- **Dampé's first-race prize can't be collected.** With a Hookshot or Longshot in hand (which the race needs),
-  Dampé always runs his second race, so the first-race chest never appears. From 0.2.7 it only ever holds a minor
-  item; skip it on the tracker. Seeds from 0.2.3 to 0.2.6 can need the item placed there and may not be
-  finishable: look up `Graveyard Dampe Race Hookshot Chest` in that seed's `spoiler.json`.
+- **Older seed outputs can skip Dampé's first prize.** The former item-based selector always chose the second
+  race with a Hookshot/Longshot owned. New seeds repair this, but do not rewrite an older seed's overlay.
+  Seeds from 0.2.3 to 0.2.6 can need that missing item: look up `Graveyard Dampe Race Hookshot Chest` in their
+  `spoiler.json`. The 0.2.7 workaround limited it to minor items; that hold is removed for new repaired seeds.
+- **Goron City's sign-puzzle grotto is out of logic.** The remake has no Time Block there, and no other way in
+  has been played yet, so from 0.2.8 the grotto only ever holds minor items; skip it on the tracker. The solution
+  chest also needs a sword, Bombs or the Hookshot to finish the puzzle. Seeds up to 0.2.7 can need an item placed
+  there and may not be finishable: look up `Goron City Chest (TBox_Rupee_Purple) #2` in that seed's `spoiler.json`.
 - **Saves started with older builds:** after an age-unusable item pickup, Save and Continue before using
   other items; changing areas does not clear the old item-bar jam. Newly generated seeds initialize an empty
   nut slot (0/20). Kareem verified child Bow first, then Boomerang use without a reload on 2026-11-12.
@@ -258,9 +271,12 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
   This follows the [static game-data trace](plans/rounds/r13-gerudo-card.md), not a played D39 acceptance test.
 - A song found in a chest shows a green rupee with the song's own text; the song works normally. Only some
   songs have been individually played from chests. Chest ocarinas show their own model.
-- Saria's own ocarina looks doubled or mirrored in her farewell at the Lost Woods bridge when the farewell plays
-  before Gohma, which only an open forest (`forest = closed_deku` or `open`) allows. The unmodified game does
-  the same; Defaults (`forest = closed`) never reach it. Cosmetic; `skip_saria_farewell` skips the movie.
+- **Saria can hold two ocarinas before Gohma.** Her carried ocarina overlaps the farewell's props; a red ocarina
+  can be pinned to her right hand while she presents the Fairy Ocarina. The same pre-Gohma save showed the double
+  with no Clawshot mod on **Longshot 3.0.0**; it persists in the **3.2.0** candidate. The attempted stow fix had no
+  visible effect and is withdrawn, not shipped as a fix. Defaults (`forest = closed`) keep Gohma first;
+  `closed_deku`/`open` can reach this cosmetic issue. `skip_saria_farewell` skips the movie.
+  [Played no-mod control and limits](plans/rounds/r21-pr40.md#research-why-a-fresh-new-game-shows-the-doubled-ocarina-and-the-natural-save-doesnt).
 - Previously generated seeds can lose boss keys, maps and compasses placed in small chests,
   despite showing their pickup text. Repaired map/compass saves and menus, boss-key credit,
   pickup indicator and normal boss-door opening passed in-game. Rebuilding cannot re-award opened chests.

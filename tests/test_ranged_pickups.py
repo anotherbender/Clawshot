@@ -61,29 +61,26 @@ def test_cow_shed_pickup_keeps_its_separate_rooftop_route():
     ("age", "items", "reachable"),
     [
         (ADULT, [], False),
-        (ADULT, ["Bow"], False),
+        (ADULT, ["Bow"], True),
         (ADULT, ["Deku Stick Drop"], False),
         (ADULT, ["Dins Fire", "Magic Meter"], True),
         (ADULT, ["Fire Arrows", "Bow", "Magic Meter"], True),
         (CHILD, ["Goron Bracelet", "Deku Stick Drop"], True),
+        (CHILD, ["Goron Bracelet", "Slingshot", "Bow"], False),
     ],
 )
-def test_dodongo_torch_exit_requires_a_usable_fire_source_not_adult_age(age, items, reachable):
+def test_dodongo_torch_exit_needs_fire_or_played_plain_adult_arrows(age, items, reachable):
     world = starting_at("Dodongos Cavern Lobby", age)
     search = Search(world, items)
     assert search.can_reach("Dodongos Cavern Torch Room", age)
     assert search.can_reach("Dodongos Cavern Staircase Room", age) is reachable
 
 
-@pytest.mark.parametrize("has_sword", [False, True])
-def test_dodongo_fire_arrows_do_not_bypass_existing_shuffled_sword_guard(has_sword):
+def test_dodongo_plain_arrows_light_the_candles_without_a_shuffled_sword():
     world = starting_at("Dodongos Cavern Lobby", ADULT, shuffle_master_sword=True)
-    items = ["Fire Arrows", "Bow", "Magic Meter"]
-    if has_sword:
-        items.append("Master Sword")
-    search = Search(world, items)
+    search = Search(world, ["Bow"])
     assert search.can_reach("Dodongos Cavern Torch Room", ADULT)
-    assert search.can_reach("Dodongos Cavern Staircase Room", ADULT) is has_sword
+    assert search.can_reach("Dodongos Cavern Staircase Room", ADULT)
 
 
 @pytest.mark.parametrize(

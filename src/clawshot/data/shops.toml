@@ -1550,7 +1550,9 @@ price = 70
 "Fish" = "has_bottle and ('Fish' or Buy_Fish)"
 "Fairy" = "has_bottle and ('Fairy' or Buy_Fairys_Spirit)"
 "Blue_Fire" = "has_bottle and ('Blue Fire' or Buy_Blue_Fire) or (blue_fire_arrows and can_use(Blue_Fire_Arrows))"
-"can_refill_bombchus" = "Buy_Bombchu_1 or Buy_Bombchu_3 or Buy_Bombchu_5 or Buy_Bombchu_8 or Buy_Bombchu_10 or Buy_Bombchu_15 or Buy_Bombchu_20 or Buy_Bombchu_30 or Bombchu_Drop"
+# D30 as corrected 2026-11-24 (Kareem, Longshot 3.2.0, Clawshot 0.2.6): a purchase without the Bomb Bag succeeds but
+# its Bombchus show 0 and cannot be used until the bag; remake/bombchus.toml guards the other Bombchus helpers.
+"can_refill_bombchus" = "Bomb_Bag and (Buy_Bombchu_1 or Buy_Bombchu_3 or Buy_Bombchu_5 or Buy_Bombchu_8 or Buy_Bombchu_10 or Buy_Bombchu_15 or Buy_Bombchu_20 or Buy_Bombchu_30 or Bombchu_Drop)"
 
 [items."Deku Shield"]
 display = "Shop_Weapon_Shield_Deku"
