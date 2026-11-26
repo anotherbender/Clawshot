@@ -150,3 +150,133 @@ the lock after Jabu: obtain a new explicit grant before full gates or test-seed 
 No game boot or admission shipment is authorized. Purchase identity normalization and its
 regression remain in the active external candidate; shipping activation still requires the
 merchant PLAY results and must land with admission, not separately as dormant scaffolding.
+
+### Line 18 grant and rebuilt play candidate
+
+Claude explicitly superseded the queue hold with relay `claude-18-after-cs22a-0108`, after
+line17 released. Authorized: merge main `b98fb9b` with `--no-ff`, rebuild the active external
+candidate, full format/lint/synthetic/dump gate, real identity2211250003 and swapped2211250002
+builds, then exactly one `bootcheck_when_idle.sh` call per seed. No product admission is authorized.
+
+Shipping merge: `317f5ddaf0e35fb1aa1ba28fc30a9b178587fb6a`. The shipping three holds and both
+wallet predicates remain. The original candidate was preserved as
+`work/r22-merchants/candidate-src-874f30a-preserved`; `candidate-src` was rebuilt from the merged
+shipping tree and the same five-file merchant proposal was reapplied, retaining main's new
+hand-over restrictions and tracker/lift changes. The builder records main and the shipping merge.
+
+The exclusive `gate.lock` was acquired for cs22d line18; CIM reported0 players. Runner:
+`work/r22-merchants/run_line18.sh`; evidence: `work/r22-merchants/gate-main-b98fb9b/`.
+CIM checks precede every stage. Synthetic uses n8/workers4, or n2/workers1 with Kareem's game
+running. Dump uses n8/workers3 and must wait while his game runs; both seed builds and boots
+also wait. Longshot3.2.0 is pinned; each boot wrapper retains its default quiet-window protection.
+No result is claimed until its log reports it. Full gate and play-build results follow below.
+
+Initial candidate gate: format/lint passed; full synthetic reported4804 passed,912 skipped and
+one failed in600.42s. Printed failure: `test_gifts_release.py:44` still required all three merchant
+locations to stay vanilla. Only the external candidate's existing release contract was corrected:
+all three merchants must be selected without holds; both expert galleries remain held. No runtime
+fix or shipping contract change was needed. One cause-aimed full gate rerun uses the distinct
+`gate-main-b98fb9b-contract-fixed` evidence directory; initial failure logs remain intact.
+
+First full dump:873 passed,1 skipped,5 failed and31 fixture errors in3045.93s. Causes were printed
+before any rerun. The old r21/pr41 layered fixture lacks `Pack/Actor/Item_Bomb.pack.zs` now required
+by main. A new merchant-owned fixture extends the complete line16 fixture by the three new native
+merchant donor packs; source fixtures and the original RomFS are never modified.
+
+The real admission defect was a missing `Dm_SY_Get` preload for Granny's scheduled Talk event.
+Native `EventSetting` binds `Npc_Hylia_053_Adult_D_T` to `Npc_Hylia_053_Adult:Talk`; Near and the
+separate trade entries do not gain this dependency. The external candidate now adds the preload
+when the purchase rewrite is emitted, using the same sorted-union/readback pattern as story gifts.
+The registration oracle remains unchanged: no allowance or suppressed gap was added.
+
+Two LACS cases incorrectly prohibited any GameData transform despite merchant identity
+normalization; one fairy case pinned the total appended Bool count to2. Candidate contracts now
+compare against an identity-normalized baseline: LACS must add no state, while the fairy's played
+Din collection flag and both changed grants are still verified. Shipping tests remain unchanged.
+The cause-aimed gate uses `gate-main-b98fb9b-native-fixed`; no seed or boot ran before these fixes.
+
+Recovery full gate: format/lint passed; synthetic4805 passed,912 skipped in482.67s. The complete
+fixture verified all1300 required files byte-for-byte against RomFS and added only the three
+merchant donor packs. Recovery full dump reported908 passed,1 skipped and one failed in4274.79s:
+the native flow oracle counted the new analyzed-table transform as another flow (59 versus60).
+All registration and NUP/layered-matrix cases passed.
+
+Claude required retaining exhaustive flow coverage: count only
+`Event/EventFlow/*.bfevfl.zs`, and give the analyzed table its own oracle. The candidate retains
+that flow count and every original per-flow roundtrip/diff check. A separate native case requires
+the analyzed-table output to roundtrip and to differ only in `Npc_Hylia_053_Adult_D_T`, whose
+SubFlowList must be its original set plus `Dm_SY_Get`. The count-deletion replay was cancelled
+before seed generation. The corrected pair runs in `gate-main-b98fb9b-coverage-fixed`, followed by
+the authorized seeds and boots only after PASS; runtime source is unchanged from the full gate.
+
+### Harness diagnosis, ordinary generation and corrected play recipe
+
+The initial identity fill exhausted its normal10 attempts before writing output. Claude requested
+actual counts before choosing a harness or product fix. The builder passed no `vanilla=` pins:
+it constrained destinations with `excluded_items`, leaving the merchants shuffled.
+
+| Actual production setup | Shuffled locations | Pool items | Copies of each native merchant item in pool |
+|---|---:|---:|---:|
+| Gift off | 178 | 178 | 0 |
+| Plain Gift on | 240 | 240 | 1 |
+| One-way merchant constraints | 240 | 240 | 1 |
+
+This is a **HARNESS constraint dead end, not pool overflow or double donation**. An instrumented
+single fill printed Knife already placed at OGC's Fairy and Bombchus10 at the child rolling Goron,
+with Medigoron/carpet still empty and two rupee items left. The builder now reserves requested
+items bidirectionally: merchants accept only their requested reward and every other check excludes
+those reserved items. It still uses ordinary fill/beatability, with no preplacements, raw writer
+plan, post-fill swaps, extra attempts or production fill edits.
+
+Claude's additional ordinary-generation proof passed:20 unconstrained Gift-on production builds,
+seeds2211260100–2211260119, one worker, CIM0 before every seed; all240 shuffled checks include all
+three merchants, no exhausted seeds. Records: `work/r22-merchants/plain-gift-20.json` and its log.
+**A full paired sweep is still required before merchant admission merges.** This20-seed sample
+is not a substitute, and no paired sweep is claimed here.
+
+The prepared swapped reward recipe was also invalid: raw Progressive Hookshot copies are
+Chest-only in the existing product. The operator selected `legal_major_items` in the form:
+keep Hammer at Medigoron; Granny gives Iron Boots and carpet gives Hover Boots, subject to normal
+placement checks. The builder and PLAY rows now use that ordinary-equipment recipe; no progressive
+NPC feature is added or tested. Production holds and wallet predicates remain unchanged.
+
+The two-way all-three identity reservation exposed a separate normal ammo-safety constraint:
+carpet's Bombchus10 assignment is allowed before screens but forbidden by D25's container screen.
+Its source rule is only `can_jumpslash`, so the source is reachable without a Bomb Bag. Printed
+`pin-screen.log` confirms this is not a larger pool or an overflow, and no screen was bypassed.
+Claude explicitly selected the original identity criterion at Granny: identity2211250003 now
+reserves only Medigoron's Knife and Granny's Blue Potion, leaving carpet freely shuffled. PLAY
+requires Granny's unchanged potion purchase, Save/Continue, an emptied bottle and no repeat sale.
+No fill special case, new pre-placement mechanism or production rule change was added.
+
+### Final line18 evidence — READY for PLAY only
+
+Final runtime source is unchanged from the recovery full gate. Format/lint passed. Full synthetic:
+4805 passed,912 skipped. Full dump:908 passed,1 skipped plus the obsolete flow-count failure;
+the corrected exhaustive-flow case and new analyzed-table case both passed in9.16s after Claude's
+coverage ruling. This is full-run-plus-aimed-replay evidence, not a claimed fresh all-green dump
+invocation. The20 ordinary production builds above passed with no constraints or exhausted seeds.
+
+Both real constrained test seeds were written using normal fill and beatability:
+
+| Build | Seed | Controlled merchant rewards | Shuffled checks | Spheres | Written resources |
+|---|---:|---|---:|---:|---:|
+| Identity | 2211250003 | Medigoron Knife; Granny Blue Potion; carpet free | 240 | 28 | 180 |
+| Swapped | 2211250002 | Medigoron Hammer; Granny Iron Boots; carpet Hover Boots | 240 | 20 | 180 |
+
+Manifests and source/builder hashes are under `work/r22-merchants/`, outside the repository.
+No output, save or source fixture was overwritten. Final run evidence:
+`work/r22-merchants/gate-main-b98fb9b-granny-identity/`.
+
+Exactly one `bootcheck_when_idle.sh` call ran per seed, with the default quiet window and pinned
+Longshot3.2.0 (source1f0bf123). Each reported crash0, fatal0, save1, modfiles17 and exactly one mod.
+Both logged the modded GameDataList and GameAnalyzedEventInfo table. CIM reported0 player games
+before each final build and boot stage. The runtime boot checks used scratch users, not the
+interactive launchers or the native-control save.
+
+PLAY: `E:/OOTRemake/work/r22-merchants/PLAY.md`. Native wallet control must precede the swapped
+launcher's copy of the genuinely owned-Knife save. Identity's persisted-repeat row is Granny.
+No gameplay/purchase result is claimed; startup does not prove merchant-area file loading.
+All three shipping holds and wallet predicates remain. Admission, purchase identity normalization
+and its regression still land together only after PLAY and a full paired sweep; no admission
+or dormant implementation was shipped by this turn. The owned lock release is the final handoff.
