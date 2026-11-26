@@ -455,3 +455,131 @@ persisted-repeat regression's contract: once-only randomized completion versus s
 legitimate native potion purchases. Neither code nor tests were changed.
 Full external report: `packet-v2/FLOW-REVIEW-20261126.md`. No original dump, spoilers or
 placement files were opened; no source save edits, gates, sweeps, seeds, boots or heavy work.
+
+## Final packet receipts: carpet PASS old contract, Granny identity FAIL — 2026-11-26
+
+Before parsing, B-Carpet/C-Granny profiles and logs were physically copied into
+`packet-v2/receipts/B-Carpet/1795718965086250000-read-only-inspection/` and
+`C-Granny/1795718965403125700-read-only-inspection/`. Supplied screenshots in
+`packet-v2/kareem-evidence/` were read and their hashes recorded. No originals were edited.
+
+B-Carpet PASS under the old once-only randomized contract: real purchase90->0, Hover Boots1,
+own Bool true; currency-only funding0->90; copied slots01/02 retain90/Hover1/own Bool true,
+other merchant Bools false. Kareem declined/bought and obtained Hover Boots. On funded revisit
+the visible90 offer remains, but choosing buy cancels without charging/granting. The screenshot
+shows that offer and90 wallet. This misleading offer and loss of repeat merchandise require
+the approved redesign, not an admission PASS. Older slot00 is pre-purchase.
+
+Kareem approached from Gerudo Fortress and reports crossing needs Longshot/Hover Boots; he
+used approved travel noclip. That makes the merchant transaction usable for testing, not an
+access/beatability proof. Hover Boots at the carpet in2211250002 is explicitly user-reported;
+no seed/spoiler/placement files were opened to look it up.
+
+C-Granny product FAIL: paid100->0 and collected Bool saved true, but BottleA Bug and BottleB
+Empty persist while new BottleC Blue Potion becomes valid. Count2->3 instead of native A's2->2:
+free bottle/pool duplication. R correctly rejects the changed count before the currency edit.
+The new copied progress hash equals the failed-R snapshot exactly; no successful funding
+receipt exists. Guard PASS, not a fixture problem. C-Granny is STOPPED; no R retry, loosening,
+repair/drinking away the evidence or revisit before redesign. PLAY's old identity replay
+instructions were replaced with this stop; `fixtures.py` is unchanged.
+
+Full per-row evidence/checks/quoted observations/load-log references and hashes are
+`packet-v2/receipts/B-Carpet-PLAY-20261126.json` and `C-Granny-PLAY-20261126.json`.
+Logs prove the one intended mod and actual merchant flow, GameData/analyzed table/merged
+resource table (SimpleShop for carpet, Dm_SY_GetInEvent for both).
+
+Claude's design ruling accepts one shuffled reward followed by pristine native repeat sales:
+Granny, carpet, and Medigoron's Knife replacements if native repeats after breakage. The
+earlier no-second-purchase product assumption is superseded, not the once-only shuffled check.
+`packet-v2/REVISED-CONTRACT.md` records success-only completion, native repeat/refusal behavior,
+prices, saved-repeat regression changes and new post-fix play-row specifications. No new
+launchers are staged. The Blue Potion fix/test needs explicit OK; no implementation now.
+
+### Packet ends with C-Knife PASS
+
+Kareem via Claude: opened Medigoron, declined first, bought the Knife successfully; funded
+repeat showed Biggoron-owned dialogue and no repeat sale. Copied profile/log:
+`packet-v2/receipts/C-Knife/1795719389557874700-read-only-inspection/`.
+Frozen purchase proves200->0 and Knife0->1 with the merchant Bool true. Currency-only funding
+restores200; new slots00/01 retain200/Knife1/own Bool true/other merchant Bools false.
+Runtime loads prove the identity mod's Medigoron and SimpleShop plus GameData/analyzed table/
+merged table. Receipt `C-Knife-PLAY-20261126.json` PASS old contract. This is not a post-redesign
+broken-Knife replacement play. Packet v2's seven rows are now complete; no further replay.
+
+### Blue Potion root cause, published exposure and fix proposal (no code)
+
+Candidate admission adds `Blue Potion -> Item_Bottle_BluePotion` in item_actors.toml. Identity
+purchase normalization still calls Granny's `_purchase`, which replaces the native
+GetInEventInBottle_BlueBottleShop fill wrapper with GetInEvent_NotTurn_NotNpc. That generic
+wrapper calls GetPouchContentByActorName_ForGetInEvent: a filled-bottle/container grant, not a
+refill of the selected owned bottle. It allocates C while B stays Empty. The native sale uses
+PushToSelectedBottle and preserves the valid count; the identity row directly exposed this
+semantic mismatch, not a bad fixture.
+
+Published main0.2.9 was checked directly at git object5dcb21b (not assumed from another tree):
+- Plain Blue Potion has one vanilla logic location, Granny's sale, and that location is held.
+- item_actors has no Blue Potion or Bottle with Blue Potion mapping. The only bottle-container
+  mappings are Bottle and Bottle with Milk. Buy Blue Potion is a shop-type logic definition,
+  but no native shelf contributes it; Bottle with Blue Potion is also only a logic definition.
+- fill.py pools vanilla items from shuffled_locations, which excludes keep_vanilla checks;
+  normalize_pool only expands native progressive chains, none a potion/bottle chain.
+Thus the erroneous Blue Potion payload cannot reach the generic grant through supported
+0.2.9 seed pools/locations. The generic container machinery is reachable and correct for
+genuine Bottle/Milk prizes. Native held Granny still refills normally. No shipping hotfix is
+established by this candidate bug.
+
+cs22d's proposed fix, requiring explicit OK: preserve Granny's native Blue Potion wrapper
+for a plain Blue Potion assignment, with the existing empty-bottle/funds/decline checks and
+the private completion flag written only after success. Let the native wrapper charge once;
+do not also append the generic replacement's charge. Other randomized prizes remain gifts.
+After completion, route to a pristine native sale graph under the approved repeat contract.
+Plain potion refill semantics must remain distinct from an intentional new filled-bottle
+item at any admitted destination; do not globally redefine bottle-container grants, silently
+drop the identity case, or ban its placement instead of fixing it.
+
+Proposed regression updates the existing merchant state oracle, not a callee-name assertion:
+synthetic A Bug/B Empty/C invalid,100,uncollected ->0/A Bug/B Blue Potion/C invalid/count2/
+collected; no-empty-bottle or insufficient-funds refusal leaves money/pouch/completion unchanged.
+Serialize/reload, normally empty the potion, buy native repeat for100 ->0 with count2 and the
+same completion Bool; a non-potion first reward must not be repeated. Preserve real Bottle/
+Milk container semantics. The current generic path must fail by adding a third valid bottle.
+Existing actor-echo rewards assertions are insufficient and must not be re-pinned to that bug.
+No code, test changes or test runs were made; the bottle guard remains unchanged.
+
+### Native repeat applicability and carpet rule settled
+
+Native and actual B Npc_Hylia_044_Adult files were physically copied and decoded by the parent
+in `packet-v2/research-20261126/`. Both native Event1/Buy-flag cases lead through offer
+Event15/Talk_08 or Event16/Talk_09 to Event3/SimpleShopRoot: the flag changes dialogue, not
+availability. SimpleShop tests choice/funds/capacity then buys; native Bombchu sales repeat.
+Actual B Event3 calls its private entry after the unchanged offer. Collected ClawshotGift171
+routes to ClawshotGift159_Event26/Sub_ShopCancel, explaining the misleading offer/cancel.
+
+Native Medigoron repeats replacement Knife purchases: no intact Giant -> Event7/BrokenGiant
+(either outcome) ->200 sale; successful native SimpleShop Event25/Event115 consumes the broken
+weapon. Native Biggoron/intact-Knife ownership restrictions remain part of post-check fallback,
+not blockers for the first shuffled reward. Granny native repeatability was already traced.
+Thus Claude's native-repeat ruling applies to all three merchants, not just Granny.
+
+The effective Fortress-side carpet route retains adult+Membership Card at GF Gate Open
+(gerudo_fortress.toml13/52), then GF Outside Gate -> Wasteland Near Fortress. The seller is
+inside Haunted Wasteland; its incoming exit is
+`logic_wasteland_crossing or can_use(Hover_Boots) or can_use(Longshot)`
+(haunted_wasteland.toml17; reverse46). Crossing trick defaults false (world/settings.toml197).
+The candidate local override is only can_jumpslash (remake/gifts.toml105-108); no remake gate/
+crossing override removes the region prerequisite. Existing jumpslash remains unverified.
+So Hover Boots parked at the seller cannot bootstrap this default route. An independently
+reachable Longshot can cross; the placement alone does not establish deadlock. Noclip play
+does not prove access and no seed search/placement inspection was run.
+
+### Consolidated handoff
+
+`work/r22-merchants/packet-v2/RESULTS.md` is the one complete seven-row summary:
+A-Granny PASS native sale/reload; A-Knife PASS native wallet/Knife; B-Medigoron, B-Granny,
+B-Carpet and C-Knife PASS the old one-time contract; C-Granny FOUND BUG/FAIL, guard PASS/STOP.
+It includes the Blue Potion mapping/wrapper root cause, directly checked main0.2.9 exclusion,
+refill/semantic regression proposal, confirmed native repeats and carpet access caveats.
+PLAY links it and `REVISED-CONTRACT.md`; all old-packet replay instructions are closed.
+No code, tests, fixture guard or original saves were changed. No new seeds, gates, sweeps,
+boots or heavy work. Packet complete is not admission; wait for explicit code OK, then the
+revised regressions/new human rows and required full paired sweep. Merge main, never rebase.
