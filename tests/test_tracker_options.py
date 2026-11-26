@@ -161,7 +161,9 @@ const context = {
   for (const action of actions) {
     const target = action.id
       ? byId(action.id)
-      : all().filter((el) => el.classList.contains(action.class))[action.index || 0];
+      : action.check
+        ? all().find((el) => el.dataset.check === action.check)
+        : all().filter((el) => el.classList.contains(action.class))[action.index || 0];
     if ('value' in action) target.value = action.value;
     if ('checked' in action) target.checked = action.checked;
     target.dispatch(action.event);
@@ -178,9 +180,16 @@ const context = {
       id: el.dataset.check, text: el.textContent, className: el.className, shown: shown(el),
       disabled: el.attributes['aria-disabled'] === 'true',
     })),
-    areaHeads: all().filter((el) => el.classList.contains('tracker-area-counts')).map((el) => ({
-      text: el.textContent, shown: shown(el),
-    })),
+    // Each area's counts, with its name and the ready and after-event notes beside them in its heading.
+    areaHeads: all().filter((el) => el.classList.contains('tracker-area-counts')).map((el) => {
+      const beside = (name) => el.parentElement.childNodes.filter((child) => child.classList.contains(name))
+        .map((child) => child.textContent);
+      return {
+        name: el.parentElement.childNodes.find((child) => child.tagName === 'STRONG')?.textContent ?? null,
+        text: el.textContent, shown: shown(el),
+        ready: beside('tracker-area-ready'), after: beside('tracker-area-after'),
+      };
+    }),
     notes: text('tracker-logic-note'),
     warnings: text('tracker-warnings'),
     controls: {
@@ -196,6 +205,11 @@ const context = {
     details: obs ? null : {
       title: panel['description-title'].textContent, text: panel['description-text'].textContent,
       body: panel['check-details'].textContent, shown: !panel['check-details'].hidden,
+      // The side panel's rows, term to value.
+      rows: Object.fromEntries(panel['check-details'].descendants().filter((el) => el.tagName === 'DT').map((term) => {
+        const siblings = term.parentElement.childNodes;
+        return [term.textContent, siblings[siblings.indexOf(term) + 1]?.textContent ?? ''];
+      })),
     },
     posts,
     storage: stored,
@@ -225,10 +239,11 @@ const context = {
 def render_tracker(tmp_path, snapshot, *, obs, fragment="", **page):
     """The shipped renderer drawing one tracker ``snapshot``: the app tab, or (``obs``) the OBS page opened with URL
     ``fragment``. Returns the rendered text by element class (``status``, ``counts``, ``areas``) and the routes it
-    polled; for the in-logic controls also ``checks``, ``areaHeads``, ``notes``, ``controls``, ``posts`` and
-    ``storage``. ``page`` may give ``actions`` (``{id or class, value/checked, event}``, dispatched in order after the
-    first render), ``storage`` (localStorage's contents; None makes every access throw), ``confirm`` (what
-    ``window.confirm`` answers) and ``after`` (the snapshot a POST answers)."""
+    polled; for the in-logic controls also ``checks``, ``areaHeads`` (each with its ``name`` and ``ready`` and
+    ``after`` note texts), ``notes``, ``controls``, ``details`` (with its ``rows``, term to value), ``posts`` and
+    ``storage``. ``page`` may give ``actions`` (``{id, check (a row's check ID) or class with index, value/checked,
+    event}``, dispatched in order after the first render), ``storage`` (localStorage's contents; None makes every
+    access throw), ``confirm`` (what ``window.confirm`` answers) and ``after`` (the snapshot a POST answers)."""
     runner = tmp_path / "tracker-render.cjs"
     runner.write_text(RENDER, encoding="utf-8")
     result = subprocess.run(

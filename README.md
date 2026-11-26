@@ -233,8 +233,8 @@ Kareem reported these played checks:
 **Longshot 3.0.0 stable (2026-11-22/23):**
 
 - **Ocarinas in chests:** the Fairy Ocarina and the Ocarina of Time show their model and text, in either order.
-  The Ocarina of Time stays the one you play, also after Save and Continue. Only seeds that can put an ocarina in
-  a chest (Chest and Gift shuffle) change. Saria's farewell, Zelda's escape and the moat looked as before.
+  The Ocarina of Time stays the one you play, also after Save and Continue.
+  Saria's farewell, Zelda's escape and the moat looked as before.
 - **Megaton Hammer:** one Hammer hit destroys a ground Beamos. Logic now also counts the adult's Hammer for cracked
   walls, boulders and bomb grottos, which Kareem broke with it in game, and as an adult weapon. King Dodongo, the
   Shadow Temple's skull pots and webs, eye switches, Bomb Flowers and the bosses keep their usual requirements

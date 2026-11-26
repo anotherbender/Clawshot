@@ -506,10 +506,10 @@ class Delivery:
 
 
 def songs_can_move(shuffle: Iterable[str]) -> bool:
-    """Whether the settings let songs leave their places (today: Gift shuffle on): a seed gets :func:`build` exactly
-    then, as the ocarina get model runs when the settings could put an ocarina in a chest
-    (``getitem.chest_ocarinas_possible``). One rule for both steps, so the settings string says which build a seed
-    has (PR #41, the maintainers' option 2, 2026-11-23); other seeds keep these files byte-identical to the dump."""
+    """Whether the settings let songs leave their places (today: Gift or an expanded gift kind).
+
+    Like ``getitem.ocarina_get_model_possible``, this selects the build from settings, not actual placements
+    (PR #41 option 2, 2026-11-23). Other seeds keep these files byte-identical to the dump."""
     return bool(getitem.gift_kinds(shuffle))
 
 

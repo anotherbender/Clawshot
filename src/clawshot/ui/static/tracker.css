@@ -120,6 +120,8 @@ body.tracker-transparent, body.tracker-transparent .tracker-cell { background: t
 .tracker-area-head, .tracker-check { display: flex; align-items: baseline; gap: 7px; width: 100%; min-height: 0; border: 0; background: none; text-align: left; color: var(--fg); }
 .tracker-area-head { flex-wrap: wrap; padding: 3px 4px; font-size: 14px; }
 .tracker-area-head .tracker-area-counts { margin-left: auto; color: var(--muted); font-size: 12px; font-weight: 400; }
+.tracker-area-ready { color: var(--success); border: 1px solid currentColor; border-radius: 3px; padding: 0 4px; font-size: 11px; font-weight: 500; }
+.tracker-area-after { flex-basis: 100%; color: var(--muted); font-size: 12px; font-weight: 400; }
 .tracker-area-fold { flex: none; width: 0; height: 0; border-top: 5px solid currentColor; border-left: 4px solid transparent; border-right: 4px solid transparent; align-self: center; }
 .tracker-area-collapsed .tracker-area-fold { transform: rotate(-90deg); }
 .tracker-check { padding: 2px 4px; font-size: 13px; line-height: 1.35; }
@@ -132,13 +134,14 @@ body.tracker-transparent, body.tracker-transparent .tracker-cell { background: t
 .tracker-state-collected { border-color: var(--success); background: var(--success); }
 .tracker-state-marked { border-color: var(--amber); background: var(--amber); }
 .tracker-state-skipped { border-color: var(--muted); background: linear-gradient(135deg, transparent 40%, var(--muted) 40% 60%, transparent 60%); }
+.tracker-state-empty { border-color: var(--muted); background: linear-gradient(transparent 40%, var(--muted) 40% 60%, transparent 60%); }
 /* Mark by hand: a square, not a ring, so it stays distinct from out-of-logic rings in a 1080p stream capture. */
 .tracker-state-manual, .tracker-check-manual .tracker-state:not(.tracker-state-source) { width: 12px; height: 12px; border-radius: 0; }
 /* A separate diamond: this check is reachable, but its resource supply is derived rather than saved stock. */
 .tracker-state-source { width: 8px; height: 8px; border: 1px solid var(--amber); border-radius: 0; transform: rotate(45deg); margin: 0 3px; }
 .tracker-check-in-logic { color: var(--success); font-weight: 600; }
 .tracker-check-out-of-logic { color: var(--muted); opacity: .75; }
-.tracker-check-collected, .tracker-check-marked, .tracker-check-skipped { color: var(--muted); }
+.tracker-check-collected, .tracker-check-marked, .tracker-check-skipped, .tracker-check-empty { color: var(--muted); }
 .tracker-check-skipped .tracker-check-label { text-decoration: line-through; }
 .tracker-area[hidden], .tracker-check[hidden], .tracker-area-checks[hidden], .tracker-legend[hidden] { display: none; }
 .tracker-vanilla-tag { flex: none; font-size: 10px; padding: 0 4px; border: 1px solid currentColor; border-radius: 3px; opacity: .7; }

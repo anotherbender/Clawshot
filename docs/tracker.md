@@ -27,6 +27,10 @@ These new source adapters and their played tracker updates still await in-game a
 5. Save in the game. The page polls once a second and updates without reloading. This is
    saved progress, not live process memory: unsaved pickups will not appear yet.
 
+   If Ruto's Letter has not appeared, save with **Save and Continue** and follow **Newest saved slot**.
+   The tracker reads bottle contents and `IsGet.Item_Bottle_Letter`; restarting Clawshot against the same
+   unchanged save cannot reveal an unsaved pickup.
+
 Items show current holdings and tiers, songs, stones, medallions, hearts/pieces and Gold Skulltula
 tokens. Bottles show the number owned and each slot's current contents, not every content ever
 acquired. An acquired-once flag is not proof a consumed trade item or broken shield is still held.
@@ -64,14 +68,20 @@ you chose to skip. Every open check (not collected, not marked done and not skip
 when the seed's own logic says you can reach it with what
 your save holds, or **out of logic** otherwise. Each area heading counts its finished checks and "N in
 logic".
+Within each area, open in-logic checks come first, then other open checks, then finished checks.
+**All in logic** marks an area with at least one remaining listed check and every remaining listed check
+in logic for the selected age. It includes visible vanilla rows, but is not a promise of one-trip clearance.
+Filtering to **Open and in logic** does not make a partially reachable area fully clearable.
 
 An amber diamond, **Needs a source**, means the check is in logic only after obtaining a resource
 the logic derives from a reachable source, rather than stock your save holds. Point at the check:
 the side panel names the event (for example `Deku Stick Drop`), its reachable region(s), the age
 that supplies it and its rule. It shows one sufficient route; alternatives may exist.
-This annotation does not change reachability, assume a shop purchase, collect an unchecked reward or
-reveal a shuffled item. It follows the age selector and disappears when saved stock already suffices.
-The source-marker design is provisional (Claude, round 22); Kareem may change it.
+With shop shuffle off, a source may instead be a vanilla purchase: its shop and price are shown,
+using saved rupees when readable, otherwise wallet capacity. This matches the generator's assumption
+that reachable vanilla stock can be obtained; it does not mark the shelf bought or add a shuffled reward.
+Other fixed progression pickups still need actual saved ownership. The source marker follows the age
+selector and disappears when saved stock already suffices.
 
 **Show** chooses the rows: **All checks** (the default), **Open checks** (collected, marked and skipped checks
 leave the list) or **Open and in logic**. Areas with nothing left to show fold away, and **Hide finished
@@ -96,13 +106,22 @@ can be marked.
 - **Bottles.** Each bottle you own counts as a bottle, except one holding Ruto's Letter, which counts as
   the letter only: as in the seed's logic, the letter is not also an empty bottle.
 - **Hearts** count whole hearts; loose Pieces of Heart are not added.
-- **Story steps.** Meeting Zelda (Impa's send-off) and the owl's arrival in Hyrule Field are read from
-  the save. Other story steps are worked out from the logic itself.
+- **Story steps.** Meeting Zelda (Impa's send-off), the owl's arrival in Hyrule Field, defeating Queen Gohma,
+  and showing Zelda's Letter to the Kakariko guard are read from the save. Closed-forest exits wait for
+  saved Gohma completion; Keaton Mask access waits for the saved letter-show event, not merely the letter.
+  An area blocked solely by one undone event can show an **After:** hint. Other story steps are worked
+  out from the logic itself; the generator's reachability is unchanged.
 - **Goron's Bracelet.** The seed's logic counts the child's Bracelet only from Darunia's gift, so the
   tracker counts it once the save records the cutscene in which Darunia hands it over, not from a
   Bracelet found in a chest or from the adult gauntlets. Confirmed on real saves: Kareem's Longshot saves
   from just before and just after Darunia's dance (2026-11-13) read the Bracelet as not held, then held, and
   the vanilla **Darunia's Dance** row as open, then collected ([check record](../plans/rounds/r21-checks.md)).
+  The adult physical Bracelet still enables Dodongo's Cavern's Bomb Flower routes; the higher route needs
+  its separate combat/projectile equipment. A child copy-only Bracelet retains the generator's existing
+  Darunia-source restriction. While the child Bracelet is already owned, the anchored vanilla Darunia
+  bonus is shown as **Empty bonus**, not an open reward. This is inferred from current child-Bracelet
+  stock, not adult gauntlets or a permanent mark; if that ownership disappears or becomes unreadable,
+  the inference disappears. A saved completed gift still shows as collected.
 - **Unknown fields.** Anything the save cannot show counts as not held, and the side panel's **In logic**
   row names it for the check you point at: in-logic may then be more cautious than the game.
 

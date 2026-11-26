@@ -1238,6 +1238,16 @@ def seed_checks(
     return out
 
 
+HAND_OVER_SCRUB_TYPES = ("Scrub", "GrottoScrub")
+
+
+def is_hand_over(source_type: str | None, steps: Iterable[Gift]) -> bool:
+    """Whether the native recipient creates the item actor rather than granting directly to the pouch."""
+    return source_type in HAND_OVER_SCRUB_TYPES or any(
+        step.call not in (DIRECT, "GetPouchContent:GetPouchContentByActorName") for step in steps
+    )
+
+
 def restrict_spec(
     spec: Mapping[str, Any], shuffled: Iterable[str], steps: Mapping[str, tuple[Gift, ...]] | None = None
 ) -> dict[str, Any]:
@@ -1255,11 +1265,8 @@ def restrict_spec(
                 **info,
                 "keep_vanilla": "gift shuffle: not changeable yet (gift_rules.toml, plans/03-game-data.md section 19)",
             }
-        hand_over = info.get("type") in ("Scrub", "GrottoScrub") or (
-            name in keep
-            and any(
-                step.call not in (DIRECT, "GetPouchContent:GetPouchContentByActorName") for step in steps.get(name, ())
-            )
+        hand_over = (info.get("type") in HAND_OVER_SCRUB_TYPES or name in keep) and is_hand_over(
+            info.get("type"), steps.get(name, ())
         )
         if hand_over:
             info = {
@@ -1391,6 +1398,8 @@ def held_items(
 
     The other eleven songs are inferred from the Song of Storms chest result, not individually verified.
     Non-song gifts still need a vanilla chest actor or a sourced ``chest_verified`` catalog entry for chests.
+    Scoped records add only their named destination kinds to existing Gift/Token eligibility.
+    Unscoped records retain the existing item-type hold release.
     Independently played Token rewards may also use Skulltulas; this does not certify their chest path.
     """
     out = {}
@@ -1398,14 +1407,18 @@ def held_items(
         if world.items[item].type == SONG_TYPE:
             if songs == "song":
                 out[item] = (SONG_TYPE,)
-        # Tunics already travel through the native shop palette; adding their gift
-        # sources must not confine the same items to NPCs or remove shop destinations.
-        elif (
-            actors.actor(item) not in TUNIC_GIFT_ACTORS
-            and actors.actor(item) not in chest_actors
-            and actors.actor(item) not in CATALOG["chest_verified"]
-        ):
+        else:
+            actor = actors.actor(item)
+            # Gift sources must not remove tunics from their existing native shop palette.
+            if actor in TUNIC_GIFT_ACTORS:
+                continue
+            receipt = CATALOG["chest_verified"].get(actor)
+            destinations = receipt.get("destinations") if receipt is not None else None
+            if destinations is None and (actor in chest_actors or receipt is not None):
+                continue
             out[item] = tuple(t for t in GIFT_TYPES if songs == "anywhere" or t != SONG_TYPE)
             if token_shuffle and item in token_policy.REWARDS:
                 out[item] += (token_policy.SHUFFLE,)
+            if destinations is not None:
+                out[item] += tuple(destinations)
     return dict(sorted(out.items()))

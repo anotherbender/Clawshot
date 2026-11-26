@@ -3,7 +3,7 @@ from dataclasses import replace
 import pytest
 
 from clawshot.census.gifts import DIRECT, Gift
-from clawshot.generate import Settings, generate
+from clawshot.generate import Settings, generate, prepare
 from clawshot.generate.fill import allowed
 from clawshot.patch import gifts, items
 from clawshot.world.load import build_world
@@ -85,9 +85,7 @@ def gift_step(call):
 
 @pytest.mark.parametrize("item", ["Fairy Ocarina", "Ocarina of Time"])
 @pytest.mark.parametrize("mode", ["song", "anywhere"])
-def test_ocarina_fill_uses_reachable_chests_instead_of_hand_over_gifts(item, mode):
-    # Seed 1 previously put either instrument at Gift. The second chest needs it,
-    # so restricting destinations must also preserve the assumed-fill proof.
+def test_ocarina_fill_may_use_reachable_chests_or_hand_overs(item, mode):
     spec = {
         "start": "Root",
         "goal": repr(item),
@@ -109,20 +107,25 @@ def test_ocarina_fill_uses_reachable_chests_instead_of_hand_over_gifts(item, mod
     )
     world = build_world(spec)
     held = gifts.held_items(world, world.items, items.load(), {"TBox_Rupee_Red", "Item_Boomerang"}, songs=mode)
-    settings = Settings(shuffle=("Chest", "NPC"), songs=mode, item_location_types=held)
+    settings = Settings(
+        shuffle=("Chest", *gifts.GIFT_TYPES),
+        songs=mode,
+        item_location_types=held,
+        exclusive_location_types=("Song",) if mode == "song" else (),
+    )
     seed = generate(spec, 1, settings, attempts=1)
-    assert seed.placements["Early Chest"] == item
-    assert seed.placements["Gift"] != item
+    source = next(name for name, placed in seed.placements.items() if placed == item)
+    assert source in ("Early Chest", "Gift")
     sphere_of = {name: index for index, sphere in enumerate(seed.spheres) for name in sphere}
-    assert sphere_of["Early Chest"] < sphere_of["Locked Chest"]
+    assert sphere_of[source] < sphere_of["Locked Chest"]
     for kind in gifts.GIFT_TYPES:
         world.locations["Gift"] = replace(world.locations["Gift"], type=kind)
-        assert not allowed(world, settings, "Gift", item)
+        assert allowed(world, settings, "Gift", item) is (kind != "Song" or mode == "anywhere")
 
 
 @pytest.mark.parametrize("item", ["Fairy Ocarina", "Ocarina of Time"])
 @pytest.mark.parametrize("call", [DIRECT, "GetPouchContent:GetPouchContentByActorName"])
-def test_gift_only_ocarinas_still_have_direct_story_destinations(item, call):
+def test_direct_story_and_hand_over_destinations_have_distinct_model_requirements(item, call):
     places = {
         "Story Scene": {"type": "NPC", "vanilla": item, "rule": "True"},
         "Hand Over": {"type": "NPC", "vanilla": "Rupees (20)", "rule": "True"},
@@ -141,12 +144,15 @@ def test_gift_only_ocarinas_still_have_direct_story_destinations(item, call):
     spec = gifts.restrict_spec(spec, places, steps)
     world = build_world(spec)
     held = gifts.held_items(world, world.items, items.load(), set(), songs="anywhere")
-    seed = generate(spec, 1, Settings(shuffle=("NPC",), item_location_types=held), attempts=1)
-    assert seed.placements == {"Story Scene": item, "Hand Over": "Rupees (20)"}
+    settings = Settings(shuffle=("NPC",), item_location_types=held)
+    assert not gifts.is_hand_over("NPC", steps["Story Scene"])
+    assert gifts.is_hand_over("NPC", steps["Hand Over"])
+    for name in places:
+        assert allowed(world, settings, name, item)
 
 
 @pytest.mark.parametrize("kind", ["Scrub", "GrottoScrub"])
-def test_ocarina_restriction_covers_scrub_sales_in_a_mixed_pool(kind):
+def test_ocarina_scrub_sales_are_model_requiring_destinations(kind):
     places = {
         "Chest": {"type": "Chest", "vanilla": "Rupees (20)", "rule": "True"},
         "Sale": {"type": kind, "vanilla": "Fairy Ocarina", "rule": "True"},
@@ -159,12 +165,23 @@ def test_ocarina_restriction_covers_scrub_sales_in_a_mixed_pool(kind):
         "locations": {name: {"type": info["type"]} for name, info in places.items()},
     }
     spec = gifts.restrict_spec(spec, ())
-    seed = generate(spec, 1, Settings(shuffle=("Chest", kind)), attempts=1)
-    assert seed.placements == {"Chest": "Fairy Ocarina", "Sale": "Rupees (20)"}
+    world = build_world(spec)
+    settings = Settings(shuffle=("Chest", kind))
+    assert gifts.is_hand_over(kind, ())
+    assert allowed(world, settings, "Sale", "Fairy Ocarina")
 
 
-@pytest.mark.parametrize("item", ["Bottle", "Bottle with Milk", "Double Defense", "Stone of Agony", "Rupees (200)"])
-def test_played_gift_rewards_can_reach_skulltulas_without_becoming_chest_safe(item):
+@pytest.mark.parametrize(
+    "item,chest_safe",
+    [
+        ("Bottle", True),
+        ("Bottle with Milk", False),
+        ("Double Defense", True),
+        ("Stone of Agony", True),
+        ("Rupees (200)", True),
+    ],
+)
+def test_token_grants_keep_unplayed_chest_variants_held(item, chest_safe):
     token = "Gold Skulltula Token"
     places = {
         "Gift": {"type": "NPC", "vanilla": item, "rule": "True", "excluded_items": [item]},
@@ -181,14 +198,19 @@ def test_played_gift_rewards_can_reach_skulltulas_without_becoming_chest_safe(it
         },
         "regions": [{"name": "Root", "locations": places}],
     }
-    world = build_world(spec)
+    settings, world = prepare(spec, Settings(shuffle=("Chest", "NPC", "Token")))
     actors = items.load()
     held = gifts.held_items(world, [item], actors, set(), token_shuffle=True)
     legacy = gifts.held_items(world, [item], actors, set())
-    assert "Token" not in legacy[item] and "Chest" not in held[item]
-    assert set(held[item]) == {*legacy[item], "Token"}
-    seed = generate(spec, 7, Settings(shuffle=("Chest", "NPC", "Token"), item_location_types=held), attempts=1)
-    assert seed.placements == {"Gift": "Fairy Ocarina", "Chest": token, "Skulltula": item}
+    if not chest_safe:
+        assert "Token" not in legacy[item] and "Chest" not in held[item]
+        assert set(held[item]) == {*legacy[item], "Token"}
+    settings = replace(settings, item_location_types=held)
+    assert allowed(world, settings, "Skulltula", item)
+    assert allowed(world, settings, "Chest", item) is chest_safe
+    seed = generate(spec, 7, settings, attempts=1)
+    assert seed.placements["Gift"] == "Fairy Ocarina"
+    assert seed.placements["Skulltula"] in (item, token)
     assert generate(spec, 7, Settings.from_string(seed.settings.to_string()), attempts=1).placements == seed.placements
 
 
@@ -197,3 +219,59 @@ def test_unplayed_gift_grant_does_not_gain_token_destinations():
     actors = items.loads('[items]\nLetter = { actor = "Item_ZeldaLetter" }\n')
     held = gifts.held_items(world, ["Letter"], actors, set(), token_shuffle=True)
     assert "Token" not in held["Letter"] and "Chest" not in held["Letter"]
+
+
+@pytest.mark.parametrize(
+    "item",
+    [
+        "Light Arrows",
+        "Nayrus Love",
+        "Farores Wind",
+        "Stone of Agony",
+        "Double Defense",
+        "Biggoron Sword",
+        "Bottle",
+        "Rupees (200)",
+    ],
+)
+@pytest.mark.parametrize("token_shuffle", [False, True])
+def test_played_chest_lifts_refuse_unplayed_scrub_destinations(item, token_shuffle):
+    kinds = {"Gift": "NPC", "Chest": "Chest", "Scrub": "Scrub", "Skulltula": "Token"}
+    world = build_world(
+        {
+            "start": "Root",
+            "goal": "True",
+            "items": {item: {"class": "normal"}},
+            "regions": [
+                {"name": "Root", "locations": {name: {"type": kind, "rule": "True"} for name, kind in kinds.items()}}
+            ],
+        }
+    )
+    held = gifts.held_items(world, [item], items.load(), set(), token_shuffle=token_shuffle)
+    shuffle = ("Chest", "NPC", "Scrub") + (("Token",) if token_shuffle else ())
+    settings = Settings(shuffle=shuffle, item_location_types=held)
+    assert allowed(world, settings, "Chest", item)
+    assert not allowed(world, settings, "Scrub", item)
+    assert allowed(world, settings, "Gift", item)
+    assert allowed(world, settings, "Skulltula", item) is token_shuffle
+
+
+def test_unscoped_chest_catalog_records_keep_legacy_item_type_release(monkeypatch):
+    item = "Bottle with Milk"
+    world = build_world(
+        {
+            "start": "Root",
+            "goal": "True",
+            "items": {item: {"class": "normal"}},
+            "regions": [
+                {"name": "Root", "locations": {kind: {"type": kind, "rule": "True"} for kind in ("Chest", "Scrub")}}
+            ],
+        }
+    )
+    monkeypatch.setitem(
+        gifts.CATALOG["chest_verified"], items.load().actor(item), {"source": "synthetic unscoped receipt"}
+    )
+    held = gifts.held_items(world, [item], items.load(), set())
+    settings = Settings(shuffle=("Chest", "Scrub"), item_location_types=held)
+    assert allowed(world, settings, "Chest", item)
+    assert allowed(world, settings, "Scrub", item)

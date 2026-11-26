@@ -292,17 +292,22 @@ def make_seed(
     plan, progressive_changes = progressive.changes(romfs, plan, prior_changes=changes)
     changes += (progressive_changes, bags.changes(romfs))
     changes += (ocarina.changes(romfs, prior_changes=changes),)
-    # Cosmetic get-display steps run when the settings could produce what they show (PR #41, the maintainers'
-    # option 2, 2026-11-23), so the settings string says which build a seed has; the spoiler's ``patch.steps`` names
-    # them. A placement the settings rule does not cover is refused rather than shown with the wrong model (S8).
+    # Cosmetic get-display steps follow settings, not actual placements (PR #41 option 2).
+    # Gift-only settings also need the ocarina model: display hand-overs crash with native packs (r22 arms07–09).
     steps: list[str] = []
-    # The chest-ocarina get model: when Chest and Gift shuffle are both on. Last on ActorInfo and the ocarina packs,
-    # after every row edit.
-    if getitem.chest_ocarinas_possible(settings.shuffle):
+    ocarinas = getitem.ocarina_locations(out.placements, out.shuffled, table)
+    gift_ocarinas = [name for name in ocarinas if out.world.locations[name].type in gifts.GIFT_TYPES]
+    if gift_ocarinas:
+        receipts = gifts.check_steps(gifts.scan_gifts(romfs), definitions)
+        missing = [name for name in gift_ocarinas if not receipts.get(name)]
+        if missing:
+            raise PatchError(f"ocarina gifts lack an audited receipt; native-pack hand-overs are unsafe: {missing}")
+    # Last on the ocarina packs and after prior ActorInfo row edits. Missing model inputs fail closed.
+    if getitem.ocarina_get_model_possible(settings.shuffle):
         changes += (getitem.ocarina_changes(romfs),)
         steps.append(OCARINA_GET_MODEL)
-    elif found := getitem.chest_ocarinas(out.placements, chests, table):
-        raise PatchError(f"{found} hold an ocarina, but the settings do not run the ocarina get model")
+    elif ocarinas:
+        raise PatchError(f"{ocarinas} hold an ocarina, but the settings do not run the ocarina get model")
     # Song get effects: when the settings let songs leave their places. Songs show an ocarina with their own effect;
     # the floor pickups stay unwritten until a feature places them (Kareem, 2026-11-23, rounds/r21-pr41.md
     # finding 4). Last on ActorInfo and the song packs.

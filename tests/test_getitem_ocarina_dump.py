@@ -1,21 +1,37 @@
-"""The chest ocarinas' get model in a real generated seed, against the dump (plans/chest-ocarina-model.md, run O).
+"""Ocarina get models in real produced seeds: chests and hand-overs without any ocarina chest.
 
-A Chest + Gift + Token seed with both ocarinas in chests, so ActorInfo also carries another step's rows; every
-difference from the dump is named. Settings without Gift shuffle carry none of it
-(by setting: PR #41, the maintainers' option 2)."""
+Every difference from the dump is named. Gift-capable settings carry the model regardless of actual placements;
+settings without Gift or its expanded kinds keep native packs and rows (PR #41 option 2)."""
+
+import json
+from dataclasses import asdict
+from pathlib import Path
 
 import pytest
 
+from clawshot.census import definitions
 from clawshot.formats import byml, rstb, sarc, zsdic
-from clawshot.generate import Settings
+from clawshot.generate import Settings, prepare
 from clawshot.generate.fill import allowed
-from clawshot.patch import getitem, gifts, make_seed, ocarina, songs, write_seed
+from clawshot.patch import (
+    OCARINA_GET_MODEL,
+    SONG_GET_EFFECTS,
+    getitem,
+    gifts,
+    make_seed,
+    ocarina,
+    songs,
+    write_seed,
+)
+from clawshot.patch import items as item_actors
+from clawshot.patch.plan import PatchError
 from clawshot.patch.shops import actor_path, member_path
 from clawshot.world.load import load_spec
 
 SETTINGS = Settings(shuffle=("Chest", "Gift", "Token"))
 # Both ocarinas go to these chests (swapped with what the fill put there), whatever the fill chose.
 CHESTS = {"KF Midos Top Left Chest": "Fairy Ocarina", "KF Midos Top Right Chest": "Ocarina of Time"}
+HAND_OVERS = {"Market Shooting Gallery Reward": "Fairy Ocarina", "LW Skull Kid": "Ocarina of Time"}
 # Steps allowed to change ActorInfo rows besides the ocarina step: they add rows of their own.
 ROW_STEPS = {
     "clawshot.patch.tokens",
@@ -25,40 +41,98 @@ ROW_STEPS = {
 }
 
 
-def chest_ocarina_seed(romfs):
-    """As the CLI builds a Gift seed (``gifts.seed_setup``), then both ocarinas moved into :data:`CHESTS`.
+def gift_only_spec():
+    """Independent no-Chest writer world; the full game's progressive policy still requires Chest shuffle."""
+    _, native = prepare(load_spec(), Settings())
+    locations = {
+        "LW Gift from Saria": "Fairy Ocarina",
+        "HF Ocarina of Time Item": "Ocarina of Time",
+        "Market Shooting Gallery Reward": "Bullet Bag (40)",
+        "LW Skull Kid": "Piece of Heart",
+    }
+    return {
+        "start": "Root",
+        "goal": "True",
+        "items": {
+            name: asdict(item)
+            | {"class": "progression" if item.progression else "priority" if item.priority else "normal"}
+            for name, item in native.items.items()
+        },
+        "regions": [{"name": "Root", "locations": {name: "True" for name in locations}}],
+        "locations": {
+            name: {"type": "NPC", "vanilla": item, "source": "synthetic no-Chest writer contract"}
+            for name, item in locations.items()
+        },
+    }
 
-    The chest's item goes to the ocarina's source when that source may hold it; otherwise (a token cannot go to a
-    gift) through the first chest holding non-progression that the source may take, so the swap never depends on
-    what the fill happened to put in the chest."""
-    spec, settings, step = gifts.seed_setup(romfs, load_spec(), SETTINGS)
+
+def ocarina_seed(romfs, targets, *, recipe=SETTINGS, spec=None):
+    """Use the public recipe and compatible swaps; ``None`` selects audited direct-pouch gifts."""
+    spec, settings, step = gifts.seed_setup(romfs, load_spec() if spec is None else spec, recipe)
     filled = make_seed(romfs, 7, settings, spec, extra_steps=[step])
     world, effective = filled.seed.world, filled.seed.settings
     placements = {name: filled.seed.placements[name] for name in filled.seed.shuffled}
-    for chest, item in CHESTS.items():
+    if targets is None:
+        receipts = gifts.check_steps(gifts.scan_gifts(romfs), definitions.load())
+        targets = {}
+        for item in CHESTS.values():
+            destination = next(
+                name
+                for name in placements
+                if name not in targets
+                and world.locations[name].type in gifts.GIFT_TYPES
+                and receipts.get(name)
+                and not gifts.is_hand_over(world.locations[name].type, receipts[name])
+                and allowed(world, effective, name, item)
+            )
+            targets[destination] = item
+    for destination, item in targets.items():
         source = next(name for name, placed in placements.items() if placed == item)
-        displaced = placements[chest]
+        displaced = placements[destination]
         if not allowed(world, effective, source, displaced):
             via = next(
                 name
                 for name, placed in placements.items()
-                if name not in CHESTS
-                and world.locations[name].type == "Chest"
+                if name not in targets
                 and not world.items[placed].progression
                 and allowed(world, effective, source, placed)
                 and allowed(world, effective, name, displaced)
             )
             placements[via], displaced = displaced, placements[via]
-        placements[source], placements[chest] = displaced, item
+        placements[source], placements[destination] = displaced, item
     return make_seed(romfs, 7, settings, spec, extra_steps=[step], placements=placements)
 
 
-@pytest.fixture(scope="module")
-def seed(romfs, tmp_path_factory):
-    output = chest_ocarina_seed(romfs)
-    assert {name: output.seed.placements[name] for name in CHESTS} == CHESTS
+@pytest.fixture(
+    scope="module",
+    params=(
+        (SETTINGS, CHESTS, None),
+        (SETTINGS, HAND_OVERS, None),
+        (Settings(shuffle=("Gift",)), HAND_OVERS, gift_only_spec()),
+        (SETTINGS, None, None),
+    ),
+    ids=("chests", "hand-overs-no-ocarina-chests", "gift-only-hand-overs", "direct-pouch-only-ocarinas"),
+)
+def seed(request, romfs, tmp_path_factory):
+    recipe, targets, spec = request.param
+    output = ocarina_seed(romfs, targets, recipe=recipe, spec=spec)
+    if targets is not None:
+        assert {name: output.seed.placements[name] for name in targets} == targets
+    if targets != CHESTS:
+        chests = [name for name in output.seed.shuffled if output.seed.world.locations[name].type == "Chest"]
+        assert getitem.ocarina_locations(output.seed.placements, chests, item_actors.load()) == []
+    if targets is None:
+        receipts = gifts.check_steps(gifts.scan_gifts(romfs), definitions.load())
+        locations = getitem.ocarina_locations(output.seed.placements, output.seed.shuffled, item_actors.load())
+        assert {output.seed.placements[name] for name in locations} == set(CHESTS.values())
+        assert all(
+            output.seed.world.locations[name].type in gifts.GIFT_TYPES
+            and not gifts.is_hand_over(output.seed.world.locations[name].type, receipts[name])
+            for name in locations
+        )
     out = tmp_path_factory.mktemp("ocarina-seed")
     written = {info.path: info for info in write_seed(output, romfs, out)}
+    assert json.loads((out / "spoiler.json").read_text())["patch"]["steps"] == [OCARINA_GET_MODEL, SONG_GET_EFFECTS]
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)
 
     def read(path, root=None):
@@ -66,6 +140,41 @@ def seed(romfs, tmp_path_factory):
         return dictionaries.decompress(path, (root / path).read_bytes())
 
     return output, written, read, lambda path: read(path, out)
+
+
+@pytest.mark.dump
+def test_hand_over_ocarinas_refuse_output_without_the_model_donor(romfs, monkeypatch):
+    recipe = Settings(shuffle=("Chest", "Gift"))
+    forced = ocarina_seed(romfs, HAND_OVERS, recipe=recipe)
+    placements = {name: forced.seed.placements[name] for name in forced.seed.shuffled}
+    chests = [name for name in forced.seed.shuffled if forced.seed.world.locations[name].type == "Chest"]
+    assert getitem.ocarina_locations(placements, chests, item_actors.load()) == []
+    spec, settings, step = gifts.seed_setup(romfs, load_spec(), recipe)
+    donor = romfs / getitem.pack_path(getitem.DONOR)
+    native_is_file = Path.is_file
+    monkeypatch.setattr(Path, "is_file", lambda path: path != donor and native_is_file(path))
+    with pytest.raises(PatchError, match=r"ocarina get model copies from"):
+        make_seed(romfs, 7, settings, spec, extra_steps=[step], placements=placements)
+
+
+@pytest.mark.dump
+def test_gift_ocarinas_refuse_output_without_an_audited_receipt(romfs, monkeypatch):
+    forced = ocarina_seed(romfs, HAND_OVERS)
+    placements = {name: forced.seed.placements[name] for name in forced.seed.shuffled}
+    spec, settings, step = gifts.seed_setup(romfs, load_spec(), SETTINGS)
+    monkeypatch.setattr(gifts, "scan_gifts", lambda _: [])
+    with pytest.raises(PatchError, match="ocarina gifts lack an audited receipt"):
+        make_seed(romfs, 7, settings, spec, extra_steps=[step], placements=placements)
+
+
+@pytest.mark.dump
+def test_external_ocarina_placement_is_refused_when_settings_do_not_cover_it(romfs):
+    settings = Settings(shuffle=("Chest",))
+    filled = make_seed(romfs, 7, settings)
+    placements = {name: filled.seed.placements[name] for name in filled.seed.shuffled}
+    placements["KF Midos Top Left Chest"] = "Fairy Ocarina"
+    with pytest.raises(PatchError, match="settings do not run the ocarina get model"):
+        make_seed(romfs, 7, settings, placements=placements)
 
 
 @pytest.mark.dump
@@ -99,7 +208,7 @@ def ocarina_step(output) -> int:
 
 
 @pytest.mark.dump
-def test_a_chest_ocarina_seed_runs_the_ocarina_step_last_on_its_files(seed):
+def test_settings_selected_ocarina_step_is_last_on_its_files(seed):
     output, written, _, _ = seed
     paths = (getitem.ACTOR_INFO, *map(getitem.pack_path, getitem.OCARINAS))
     for path in paths:
@@ -131,7 +240,8 @@ def test_actor_info_differs_from_the_dump_only_by_the_calc_priorities_and_named_
         expected = transform(expected)
     expected_rows = byml.read(expected)
     before = {row["__RowId"] for row in byml.read(native(getitem.ACTOR_INFO))}
-    assert [row["__RowId"] for row in expected_rows if row["__RowId"] not in before], "a Token seed adds pickup rows"
+    if "Token" in output.seed.settings.shuffle:
+        assert [row["__RowId"] for row in expected_rows if row["__RowId"] not in before], "Token pickups add rows"
     for row in expected_rows:
         if row["__RowId"] in getitem.OCARINAS:
             assert row.pop("CalcPriority") == "After", row["__RowId"]
