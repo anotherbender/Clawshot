@@ -95,3 +95,22 @@ def test_sign_solution_rejects_unplayed_or_unusable_attacks(age, items):
     world = build_world(spec, {"shuffle_master_sword": True})
     search = Search.child_only(world, items) if age == CHILD else Search.adult_after_pull(world, items)
     assert not search.can_access(world.locations["Goron City Chest (TBox_Rupee_Purple) #2"], age)
+
+
+@pytest.mark.parametrize(
+    ("age", "items", "available"),
+    [
+        (ADULT, ["Progressive Wallet", "Progressive Strength"], False),
+        (ADULT, ["Progressive Wallet", "Goron Bracelet"], False),
+        (ADULT, ["Progressive Wallet", "Megaton Hammer"], True),
+        (ADULT, ["Progressive Wallet", "Bomb Bag", "Progressive Strength"], True),
+        (ADULT, ["Megaton Hammer"], False),
+        (CHILD, ["Progressive Wallet", "Bomb Bag", "Progressive Strength"], False),
+    ],
+)
+def test_medigoron_requires_adult_room_access_and_keeps_wallet_play_hold(age, items, available):
+    spec = load_spec()
+    spec["start"] = "Goron City"
+    world = build_world(spec)
+    search = Search.child_only(world, items) if age == CHILD else Search.adult_after_pull(world, items)
+    assert search.can_access(world.locations["GC Medigoron"], age) is available
