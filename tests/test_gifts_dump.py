@@ -215,6 +215,7 @@ def test_dump_game_data_list_differs_only_in_the_added_flags(romfs, context):
 @pytest.mark.dump
 def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
     from clawshot.generate import Settings, prepare
+    from clawshot.generate.fill import allowed
     from clawshot.patch import items as item_actors
     from clawshot.patch import make_seed, write_seed
     from clawshot.world.load import load_spec
@@ -244,9 +245,8 @@ def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
             assert rules[name].cls != gifts.MORE, name
     print(f"moved gifts: {[(n, seed.placements[n]) for n in moved]}")
 
-    # The forest slice has no held items after adult trades stay vanilla. A real
-    # unrestricted gift setup still holds Bottle outside chests; exercise its
-    # native hand-over writer with a controlled NPC-to-NPC swap.
+    # Bottle now has a scoped Chest lift, not a Scrub lift. Retain its native
+    # hand-over coverage with a controlled NPC-to-NPC swap.
     held_spec, held_settings, held_step = gifts.seed_setup(
         romfs, load_spec(), Settings(shuffle=("Chest", gifts.SHUFFLE), songs="song")
     )
@@ -259,7 +259,8 @@ def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
     )
     held = held_settings.item_location_types
     assert held_placements[destination] == "Bottle"
-    assert "Chest" not in held["Bottle"]
+    assert allowed(held_world, held_settings, "KF Midos Top Left Chest", "Bottle")
+    assert not allowed(held_world, held_settings, "LW Deku Scrub Near Bridge", "Bottle")
     transforms = held_step(held_placements)
     for name in (source, destination):
         item = held_placements[name]
