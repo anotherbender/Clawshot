@@ -1,8 +1,9 @@
 # Round 22 games (cs22f)
 
 Branch `r22/games`, base main `2091387` (0.2.7). Work and decoded research:
-`E:/OOTRemake/work/r22-games/`. Nothing has been played by this agent; all changed game behavior is
-**built, not played**, pending Kareem on **Longshot 3.2.0**. No game boot or writes to game folders/saves.
+`E:/OOTRemake/work/r22-games/`. The changed game behavior was built here and then **played by Kareem on
+Longshot 3.2.0 on 2026-11-25**, including a reload (see "Played results" at the end). Earlier sections
+keep their "built, not played" wording as the record of the time they were written.
 
 ## Scope and decisions
 
@@ -263,3 +264,21 @@ no sweep has started.
 
 Post-rebase focused shared/native contracts, FROZEN gate queue, locked full gates and at least
 200 broad + 50 Defaults + 50 Recommended seeds, with main digests and a binding cohort.
+
+## Played results (2026-11-25, Longshot 3.2.0)
+
+Kareem played the frozen product head `e86687a` (gated, receipt `work/r22-games/gate-receipt-e86687a.json`),
+each arm from its own mod; observations relayed by Claude, saves and runtime logs read back read-only.
+Receipts: `work/r22-games/play-receipt-cs22f-2026-11-25.json` (play) and
+`work/r22-games/reload-receipt-cs22f-2026-11-25.json` (reload, status READY_TO_MERGE).
+
+- **Skull Kids' first-win prize:** declining or missing gives nothing; the first full win gave the seed's item
+  (a Boomerang in this packet); talking afterwards gives the "no more prizes" line; a repeat win pays a Blue
+  Rupee. After relaunch and Continue the Boomerang still works and Skull Kid keeps the no-prize line. Saves:
+  once-flag true and Boomerang stock 1 in every post-prize slot.
+- **Bag bombs without the Bracelet:** with the option on, the Bomb Bag's bombs and the Boomerang work with no
+  Goron's Bracelet; ordinary Goron City Bomb Flowers still can't be picked up. After relaunch the saved 18
+  bombs, Boomerang and Bomb Bag load with no Bracelet and bag bombs still work. Saves: Bracelet stock 0 and
+  lift grade None in every slot.
+
+Merged to main as `63fa85e` (merge of `e86687a`). Shipped in 0.2.9.
