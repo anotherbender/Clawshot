@@ -142,3 +142,11 @@ and saves: it copies that genuinely owned-Knife result once. No inventory or fla
 The builder's help surface was exercised without generation. Focused candidate/builder formatting
 and lint pass (4 files). Full gates, actual seed/mod outputs and Claude's boot checks still await
 the requested post-Jabu slot; no play result or release acceptance is claimed.
+
+### Explicit queue hold
+
+The operator selected `keep_queued` in the authorization form. This is not permission to acquire
+the lock after Jabu: obtain a new explicit grant before full gates or test-seed generation.
+No game boot or admission shipment is authorized. Purchase identity normalization and its
+regression remain in the active external candidate; shipping activation still requires the
+merchant PLAY results and must land with admission, not separately as dormant scaffolding.
