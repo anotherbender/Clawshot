@@ -98,22 +98,19 @@ vanilla = "Rupees (20)"
 source = "cs8d MiniGame_FrogTenors Event223 -> TeachNewMusic, TimeSong saved Bool. Native melody4; child playable-song rule remains Overworld.json:2525."
 
 [locations."GC Medigoron"]
-rule = "is_adult and Progressive_Wallet and can_blast_or_smash"
+rule = "is_adult and can_blast_or_smash"
 was = "is_adult and Progressive_Wallet and (can_blast_or_smash or Progressive_Strength_Upgrade)"
-keep_vanilla = "Round 8: success-only saved merchant check awaits Kareem's result"
-source = "cs22d: supported dump room barriers are WallCrack (Bomb/Hammer damage rates100, life6); retain blast/Hammer access, not an untraced strength-only flower route (r22-logic, r22-merchants). Retain the imported wallet predicate until default-wallet200 play passes. cs8d: Npc_Goron_Medigoron_Adult/Event11 -> private SimpleShop success grant, price200, independent saved Bool."
+source = "cs22d active play candidate: room WallCrack barriers take Bomb/Hammer, not an unproved strength-only flower route; native price200 fits default200 wallet. Default-wallet purchase remains play-held for release. cs8d Event11 private success grant and independent saved Bool retained."
 
 [locations."Wasteland Bombchu Salesman"]
-keep_vanilla = "Round 8: private once-only 90-rupee sale awaits Kareem's result"
 rule = "can_jumpslash"
 was = "Progressive_Wallet and can_jumpslash and (shuffle_expensive_merchants or not free_bombchu_drops or has_bombchus)"
-source = "cs8d, build e0f3ccfa: Npc_Hylia_044_Adult/Event3 uses price90, within the native99 wallet; SimpleShop checks only choice, funds and capacity, not Bombchu ownership/settings. Approach/jumpslash remains OoTR Overworld.json:1113, unverified in remake. New saved success Bool replaces no world prerequisite."
+source = "cs8d supported dump: Npc_Hylia_044_Adult/Event3 price90 fits native default200 wallet; native choice, funds and capacity remain. Approach/jumpslash remains OoTR Overworld.json:1113; saved success Bool is normalized for identity assignments too. cs22d active play candidate, release held."
 
 [locations."Kak Granny Buy Blue Potion"]
-keep_vanilla = "Round 8: newly censused native potion sale; success-only swap awaits Kareem's result"
-rule = "has_bottle and (Progressive_Wallet and ('Odd Potion Access' or ((selected_adult_trade_item == 'Odd Potion' or selected_adult_trade_item == 'Poachers Saw' or selected_adult_trade_item == 'Broken Sword' or selected_adult_trade_item == 'Prescription' or selected_adult_trade_item == 'Eyeball Frog' or selected_adult_trade_item == 'Eyedrops' or selected_adult_trade_item == 'Claim Check') and not adult_trade_shuffle)))"
+rule = "has_bottle and ('Odd Potion Access' or ((selected_adult_trade_item == 'Odd Potion' or selected_adult_trade_item == 'Poachers Saw' or selected_adult_trade_item == 'Broken Sword' or selected_adult_trade_item == 'Prescription' or selected_adult_trade_item == 'Eyeball Frog' or selected_adult_trade_item == 'Eyedrops' or selected_adult_trade_item == 'Claim Check') and not adult_trade_shuffle))"
 was = "Progressive_Wallet and ('Odd Potion Access' or ((selected_adult_trade_item == 'Odd Potion' or selected_adult_trade_item == 'Poachers Saw' or selected_adult_trade_item == 'Broken Sword' or selected_adult_trade_item == 'Prescription' or selected_adult_trade_item == 'Eyeball Frog' or selected_adult_trade_item == 'Eyedrops' or selected_adult_trade_item == 'Claim Check') and not adult_trade_shuffle))"
-source = "cs8d, build e0f3ccfa: Npc_Hylia_053_Adult/Event12 GetInEventInBottle_BlueBottleShop, bottle2 and price100. Event11 checks100 rupees, Event15 an empty bottle; Event3 quest unlock and Odd Mushroom trade remain untouched. Retain OoTR Overworld.json:1966 trade prerequisites and add native bottle requirement."
+source = "cs22d active play candidate: native100 price fits default200 wallet; default-wallet Blue Potion grant must pass before release. cs8d Npc_Hylia_053_Adult/Event12 retains native unlock, empty-bottle check and Odd Mushroom trade. Saved success-only purchase also applies to identity assignments."
 
 [locations."Market Potion Shop Bottle"]
 new = true

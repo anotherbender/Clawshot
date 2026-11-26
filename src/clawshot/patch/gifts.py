@@ -111,6 +111,13 @@ MERCHANT_SHOPS = {
 GRANNY_CHECK = "Kak Granny Buy Blue Potion"
 ANALYZED = "RSDB/GameAnalyzedEventInfo.Product.111.rstbl.byml.zs"
 
+# Merchant stock actors identify native sources, not the generic gift's payout actor.
+# Keep this local: Shop_BombchuBundle_01 still means Buy Bombchu (10) in ordinary shops.
+_MERCHANT_SOURCE_ACTORS = {
+    "Item_Sword_Giant": "Shop_Sword_Giant",
+    "Item_BombchuBundle_Medium": "Shop_BombchuBundle_01",
+}
+
 # The native pouch rows are identical; only the actors' presentation differs.
 # Gift scenes use their Obj_ actors, never a shelf display (r22-shops.md).
 TUNIC_GIFT_ACTORS = {
@@ -1257,7 +1264,10 @@ def seed_checks(
                 out.append(name)
             continue
         if {actors.aliases.get(s.vanilla_item, s.vanilla_item) for s in steps[name]} != {
-            TUNIC_GIFT_ACTORS.get(actors.actors.get(loc.vanilla), actors.actors.get(loc.vanilla))
+            _MERCHANT_SOURCE_ACTORS.get(
+                actors.actors.get(loc.vanilla),
+                TUNIC_GIFT_ACTORS.get(actors.actors.get(loc.vanilla), actors.actors.get(loc.vanilla)),
+            )
         }:
             continue
         out.append(name)
