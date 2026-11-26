@@ -1,7 +1,7 @@
 # Round 22 shops — cs22c
 
 Branch `r22/shops`, base `2091387`; model `openai-codex/gpt-6.1-sol`.
-Status: **gifts-only split approved by Claude, 2026-11-25**. Both tunic gifts passed Kareem's candidate play and typed receipts. The unproven potion-label fill and its exclusive tests are removed from the tip; the complete original implementation is retained on `r22/shops-potion-held` at `1cfbb7c4dad924aec8b91ce730a23f120f2e7ee9`. Gifts-only replacement full gate is assigned line13 after cs22e's explicit release. Claude waived line12's boot: unchanged played mods, save-only fixture; no boot was performed or lock taken.
+Status: **READY (merge)**, gifts-only. Code freeze `13bc4b27e4`: 4c/4d played PASS, 60 focused contracts passed, replacement full gate passed. Lock released19:35 on2026-11-25 after the assigned Claude12b/cs22g13a turns. No rebase/re-freeze or repeated sweep. Potion hunt closed; the unproven fill remains absent from the tip and retained on `r22/shops-potion-held` at `1cfbb7c4da`. Subsequent receipt changes are documentation only.
 Research/output root: `E:/OOTRemake/work/r22-shops/` (outside this repository).
 
 ## Scope and order
@@ -168,7 +168,7 @@ Both launcher dry-runs exit0 and copied saves match SHA256
 Manifest `work/r22-shops/repro-pair-v4.json` records every edit. PLAY.md 4e is a five-minute,
 control-first diagnostic; candidate only if control fails. Claude waived the line12 boot: the existing mods
 already booted and played; a startup check does not load the fixture. Queued boot worker cancelled before
-acquisition; no new boot or boot-lock claim. The gifts-only full gate is line13, after cs22e's explicit release.
+acquisition; no new boot or boot-lock claim. Line13's gifts-only gate now waits **Claude's line12b `LOCK RELEASED claude`**, not cs22e directly; source stays frozen at 13bc4b2 on its own parent.
 
 ## Gifts-only replacement freeze
 
@@ -177,6 +177,99 @@ Focused proof after removing the potion implementation: **60 passed in 268.83s**
 Command: `uv run --with pytest-xdist pytest -n2 -q tests/test_tunic_gifts.py tests/test_tunic_gifts_dump.py tests/test_shops.py tests/test_shop_settings.py tests/test_event_registration.py`.
 This includes real-dump event registration and both native tunic contracts. Gift production/placement
 code is unchanged from b5e6eb0; retain its binding sweep. The gifts-only withdrawal commit is the new
-code freeze, with full format/lint/synthetic/dump gate assigned line13, after cs22e's explicit release.
+code freeze **13bc4b27e40a6de4d42719aa0483bc7c6397e6ea**; full format/lint/synthetic/dump gate is line13, after Claude's line12b release. Subsequent receipt notes are documentation only, not a new code freeze.
 
+## Final potion disposition — 2026-11-25
+
+Kareem's 0.2.6 report remains valid but **unreproduced**: natural adult, Mirror equipped and Hylian owned,
+Deku never acquired; daytime, English, affordable10, enough rupees; Kakariko selection had no prompt,
+then Goron City sold a Deku Shield. All four exercised comparison states (the child one is a separate capacity check):
+1. 01 control: adult, Hylian equipped/Mirror absent, Deku stock removed but both history flags retained;
+   shield and both tunics sold. This did not reproduce the silent selection.
+2. 02 candidate: child, nuts15/20, partial non-bottle sale succeeded and full-bag repeat refused.
+   This is a separate capacity-path comparison, **not** an unpatched Deku Shield reproduction.
+3. 05 control v4: adult, Mirror equipped, Hylian owned, Deku stock0 and both history flags false;
+   Deku stock0->1, rupees148->138, both history flags false->true; Mirror stayed equipped.
+   `KokiriForest_Shop_SelectActor_Shield_Deku` false->true accompanies the successful adult confirm.
+4. 06 historical control v5: adult, Mirror equipped/Hylian owned, Deku never acquired, **no bottle ever acquired**
+   (all five slots invalid/Empty, all26 bottle history flags false), unchanged seed1942692550 mod.
+   It sold the Deku Shield: stock0->1, rupees148->138, Deku IsGet/HavePlayedGetEvent and SelectActor
+   false->true; Mirror remained equipped. Zero valid bottles and all bottle history flags remained false.
+
+01 candidate launch alone has no saved purchase witness and is not counted as another shield sale.
+The v4 control's four saves equal save-work. Own-control USen loads at log79, adult seller pack at5217;
+Longshot3.2.0 source1f0bf123, normal close7997. Receipt: `work/r22-shops/played-4e-control-v4-20261125.json`.
+Kareem skipped the v4 candidate as instructed. Leads only: Event216 has no case0; Event560's first
+`Shop_33` is missing from both staged potion tables. Neither lead establishes the failure's cause.
+**Claude's final decision:** hunt over, no more fixtures or speculative candidate. Potion fill stays on
+`r22/shops-potion-held`, unmerged. Gifts-only line13 proceeds unchanged; the original report is not dismissed.
+
+## Authorized historical seed and v5 control — 2026-11-25
+
+Kareem authorized his abandoned 0.2.6 seed1942692550 for this investigation only. First copied its mod,
+manifest, log and saves into `work/r22-shops/repro-1942692550/snapshot`; all content reads use that copy.
+No write in the original folder, no unrelated placements reported, no regenerated historical seed.
+
+Static comparison against922301 control: Item3 is identical in both Kakariko copies (Deku Shield,
+index2, price10, unlimited stock, no Release). Seller ActorParam/ShopRef, both potion USen tables,
+DisplayShop/adult seller/ShopGet are identical. Neighbours1/2/4 are Bug/Fish/Nuts10 instead of
+GoronTunic/ZoraTunic/Bug. The child flow differs only in the tutorial reward; the common get graph's
+generated bindings differ, with no demonstrated pre-offer cause.
+
+All six save slots and all six save-work slots already own the Deku Shield; no adult pre-purchase slot
+survives. The copied log proves the correct mod's USen at80, normal adult Kakariko Banc at123995/123996,
+and adult potion seller at124013, but logs no selected-item/query result. Every retained save has zero
+valid bottles and false bottle acquisition flags: a new lead, not failure-moment proof.
+
+Claude requested **one faithful control**, no candidate/boot yet. Final launcher:
+`work/r22-shops/repro-1942692550/ingame/06-kak-never-bottle-control-v5.bat`.
+Its246 mod files match the copied historical mod byte-for-byte. The v4 fallback save keeps Mirror
+equipped, Hylian owned, Deku stock/history false and148rupees. All five bottle slots are invalid/Empty;
+all26 IsGet/HavePlayedGetEvent bottle-form flags match the historical saves (false).
+Relative to v4, eleven fields change: BottleA/B validity, BottleA Bug->Empty, and both history flags
+for Item_Bottle, Item_Bottle_Letter, Item_Bottle_Fish and Item_Bottle_Bug. Fourteen bytes change;
+the manifest records field hashes, offsets and before/after values. Other bottle fields already matched.
+
+Dry-run exit0, copied-save readback matches SHA256
+`2a48f6afae8da6488a174681463b3797a213e9a7b3936eb02a03da48344052b1`.
+Receipts: `repro-1942692550/{static-and-save-potion-facts.json,v5-never-bottle-control.json,v5-never-bottle-control-dry-run.log}`.
+PLAY.md4f: five minutes, select once, Save even on no prompt, read SelectActor afterwards. If it sells,
+stop hunting; if it reproduces, derive the fix/test from that result before building a candidate.
+The unused slot-only draft is not a second play arm. No boot performed or required for this unchanged mod.
+
+### v5 played result: sold; hunt closed
+
+Kareem bought the shield and saved. All three persisted profile slots equal save-work. Own historical-control
+USen loaded at log80 and adult potion seller pack at2873; Longshot3.2.0 source1f0bf123, normal close5038.
+Typed receipt: `repro-1942692550/played-v5-never-bottle-control-20261125.json`.
+The four comparisons and the two still-unproven silent-path leads are consolidated above. No state tried
+reproduced the reported failure; this is not a proof about every possible runtime state. No production
+fix or regression test is claimed for the potion report. No more fixtures; held fill remains unmerged.
+
+
+
+
+## Gifts-only full gate and final handoff — 2026-11-25
+
+Gated **13bc4b27e40a6de4d42719aa0483bc7c6397e6ea** on its own parent, without rebasing to moved main.
+Acquired only after Claude's explicit12b release (18:07) and cs22g's explicit13a release (18:28);
+both posts are preserved in `gifts-only-gate-13bc4b27e40a/release-witness.txt`.
+
+| Check | Result |
+|---|---|
+| `uv run ruff format --check` | PASS |
+| `uv run ruff check` | PASS |
+| Whole synthetic, `--extra ui`, `-n8`, workers4, all OOT variables unset | 4,402 passed,842 skipped,24 existing warnings;462.79s |
+| Full dump, `--extra ui`, `-n8`, workers3 | 840 passed,24 existing warnings;3,568.53s |
+
+Exact-image CIM player count was0 at every stage start. Dump inputs remain the read-only supported
+romfs/NUP/r19 layered dump recorded above. No failure, retry, fixture weakening or new sweep.
+The unchanged gift production/placement code retains b5e6eb0's binding200/50/50 comparison against5bc5577.
+All logs and the successful machine receipt are in `work/r22-shops/gifts-only-gate-13bc4b27e40a/`.
+The runner removed only its own lock and posted **LOCK RELEASED19:35**.
+
+**READY (merge): tunic gifts only.** Both native grant/play receipts are accepted; the potion report is
+unreproduced, its label fill is not shipped, and no more fixtures or speculative fix are proposed.
+This final documentation commit records the investigation and gate; it does not change or re-freeze
+the tested code. Claude owns the later merged-tree check on main.
 
