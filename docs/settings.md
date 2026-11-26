@@ -386,6 +386,12 @@ gates. These fields replay through CS1. The 10-rupee Kokiri shield/nuts purchase
 observed (R6-PRICES); partial shelves and fixed scrub fees are built/tested, not independently
 certified in game by that observation.
 
+New shuffled potion-shop shelves include the missing non-bottle offer and refusal dialogue,
+so shields, tunics, ammo, hearts and magic use their native purchase paths rather than a
+bottle-only message table. Bottle/container, ownership, stock and price checks remain.
+This repair covers Market and Kakariko at every shuffled shelf; **built, not played** on
+Longshot 3.2.0 ([round 22 shop checks](../plans/rounds/r22-shops.md)).
+
 **Scrub offer wording:** newly generated shuffled one-time sales name their actual
 reward and effective price (English in all16 languages). HF and DMC have separate
 offers even though their native pitch shares one message. On Longshot 3.0.0 (Kareem,

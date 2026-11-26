@@ -110,6 +110,13 @@ MERCHANT_SHOPS = {
 }
 GRANNY_CHECK = "Kak Granny Buy Blue Potion"
 
+# The native pouch rows are identical; only the actors' presentation differs.
+# Gift scenes use their Obj_ actors, never a shelf display (r22-shops.md).
+TUNIC_GIFT_ACTORS = {
+    "Shop_Armor_Goron": "Obj_Armor_Goron",
+    "Shop_Armor_Zora": "Obj_Armor_Zora",
+}
+
 # GameDataList: a saved story flag as the game's own (9338 of its Bools), and the save layout it implies.
 FLAG_RESET_TYPE = 8
 SAVE_FILE = 0  # progress.sav
@@ -270,7 +277,7 @@ def load(path: str | Path = RULES_TOML) -> dict[str, Rule]:
 class GiftChange:
     rule: Rule
     steps: tuple[Gift, ...]
-    item: str  # the actor name the check gives now
+    item: str  # native grant actor; plan resolves tunic shelf displays to their Obj_ gift actors
     dungeon_grant: DungeonGrant | None = None
 
     @property
@@ -330,7 +337,8 @@ def plan(
             raise GiftPatchError(f"{check}: no rule in gift_rules.toml")
         if rule.cls == MORE:
             raise GiftPatchError(f"{check}: cannot be changed yet ({rule.reason})")
-        out.append(GiftChange(rule, steps[check], placements[check]))
+        item = placements[check]
+        out.append(GiftChange(rule, steps[check], TUNIC_GIFT_ACTORS.get(item, item)))
     return out
 
 
@@ -1223,7 +1231,7 @@ def seed_checks(
                 out.append(name)
             continue
         if {actors.aliases.get(s.vanilla_item, s.vanilla_item) for s in steps[name]} != {
-            actors.actors.get(loc.vanilla)
+            TUNIC_GIFT_ACTORS.get(actors.actors.get(loc.vanilla), actors.actors.get(loc.vanilla))
         }:
             continue
         out.append(name)
@@ -1390,7 +1398,13 @@ def held_items(
         if world.items[item].type == SONG_TYPE:
             if songs == "song":
                 out[item] = (SONG_TYPE,)
-        elif actors.actor(item) not in chest_actors and actors.actor(item) not in CATALOG["chest_verified"]:
+        # Tunics already travel through the native shop palette; adding their gift
+        # sources must not confine the same items to NPCs or remove shop destinations.
+        elif (
+            actors.actor(item) not in TUNIC_GIFT_ACTORS
+            and actors.actor(item) not in chest_actors
+            and actors.actor(item) not in CATALOG["chest_verified"]
+        ):
             out[item] = tuple(t for t in GIFT_TYPES if songs == "anywhere" or t != SONG_TYPE)
             if token_shuffle and item in token_policy.REWARDS:
                 out[item] += (token_policy.SHUFFLE,)
