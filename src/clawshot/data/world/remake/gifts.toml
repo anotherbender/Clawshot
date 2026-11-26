@@ -98,8 +98,10 @@ vanilla = "Rupees (20)"
 source = "cs8d MiniGame_FrogTenors Event223 -> TeachNewMusic, TimeSong saved Bool. Native melody4; child playable-song rule remains Overworld.json:2525."
 
 [locations."GC Medigoron"]
+rule = "is_adult and Progressive_Wallet and can_blast_or_smash"
+was = "is_adult and Progressive_Wallet and (can_blast_or_smash or Progressive_Strength_Upgrade)"
 keep_vanilla = "Round 8: success-only saved merchant check awaits Kareem's result"
-source = "cs8d, build e0f3ccfa: Npc_Goron_Medigoron_Adult/Event11 -> SimpleShopRoot_Npc_Goron_Medigoron_Adult, price200. New saved Bool after the private grant; native ownership checks are not check-completion flags. Existing adult/wallet/open-room rule remains Overworld.json:2209."
+source = "cs22d: supported dump room barriers are WallCrack (Bomb/Hammer damage rates100, life6); retain blast/Hammer access, not an untraced strength-only flower route (r22-logic, r22-merchants). Retain the imported wallet predicate until default-wallet200 play passes. cs8d: Npc_Goron_Medigoron_Adult/Event11 -> private SimpleShop success grant, price200, independent saved Bool."
 
 [locations."Wasteland Bombchu Salesman"]
 keep_vanilla = "Round 8: private once-only 90-rupee sale awaits Kareem's result"
