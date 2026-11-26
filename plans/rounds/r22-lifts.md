@@ -413,3 +413,68 @@ and required a full synthetic rerun.
 before acquisition; its observed `--plan` now lists only format/lint, candidate350 versus own-parent
 immutable main350, and full dump. The one-attempt14 watcher waits for a new explicit cs22c13 release;
 no directory disappearance or acquisition retry authorizes a turn.
+
+### Queue14 sweep receipt: PASS
+
+Frozen test-only source461f68d6. The explicit cs22c13 release at19:35 authorized one guarded acquisition.
+Full formatter/lint passed before generation. **Fresh candidate350 and matching parent-main350 all
+accepted; zero exhausted.** Shared main300 and the earlier immutable5bc binding50 were reused, not
+regenerated. Exact recipe/seed keys and the intended effective-CS1 delta whitelist passed for every row.
+
+| Cohort | Seeds/arm | Placements equal | Spheres equal | First-try failures candidate/main | Candidate capacity Chest | Candidate capacity Token |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Broad | 200 | 0 | 0 | 0/0 | 256 | 137 |
+| Defaults | 50 | 50 | 50 | 1/1 | 0 | 0 |
+| Recommended | 50 | 0 | 0 | 0/2 | 99 | 0 |
+| Capacity-binding | 50 | 0 | 0 | 5/3 | 47 | 51 |
+
+The main binding cohort has0 Token capacity grants. The candidate exercises both newly played Chest
+capacities and existing Token capacities; all first-attempt failures recovered through the existing
+generator retry path. Defaults have identical placement and sphere digests.
+
+Full per-seed hashes/counts and comparison, with no placements or spoilers:
+`work/r22-lifts/successor14-461f68d67318190265284fd9a6460b406e615e69/`.
+The original461f68d6 gate reused its approved same-SHA full-synthetic receipt. Full dump then exposed
+the two stale native-test contracts below; no READY was claimed.
+
+### Queue14 test-only successor: PASS
+
+Original full dump: **840 passed,2 failed in3838.38s**. Claude required printed causes before edits and
+said to stop on a product Scrub-routing bug. Both causes were test-only:
+
+- The moved gift was **Bottle**, one of the eight explicit Chest-scoped catalog records, not an
+  unrelated gift leaking into Chest. The old assertion rejected every held gift at Chest.
+- The capacity assertion iterated **all shuffled locations**, not the four `scrubs.SALES`. The
+  generated output plus prepared-world metadata proved that the failing location was a Chest, outside
+  `SALES`. Production selects only names in `SALES`; all four real sales had already passed actor,
+  price, tier, copy and restored-flow readback. No placement or Scrub-writer change was needed.
+
+**Claude, 2026-11-25:** approve a test-only successor, retain the sweep if placement is unchanged, and
+rerun full dump. The corrected tests accept Bottle at Chest and refuse it at Scrub, retain its controlled
+NPC writer readback, require exactly the four real Scrub checks, and allow capacities at Chest/Scrub
+for the selected Chest+Scrub settings. All existing native sale/readback assertions remain.
+The separate consumer regressions still cover all eight Chest/Scrub boundaries and Token eligibility.
+
+Aimed native rerun: **2 passed in67.15s**, format/lint clean, retained own lock and CIM players0.
+**FROZEN test-only successor5ee8f0a4738a08656f8c5967f926c5e7a28ecf34** changes only
+`tests/test_gifts_dump.py` and `tests/test_scrubs_dump.py`; no product change or rebase.
+
+New immutable-snapshot gate, retained line14:
+
+- Whole formatter/lint: **PASS**.
+- Full synthetic: **4426 passed,845 skipped,24 warnings in494.19s**, n8/workers4, all three OOT
+  variables unset. The new SHA does not reuse the old synthetic result.
+- Original paired350 sweep retained as explicitly approved: unchanged product/placement source.
+  `work/r22-lifts/successor14-5ee8f0a4738a08656f8c5967f926c5e7a28ecf34/sweep-reference.json`
+  identifies the original461f68d6 sweep and immutable5bc baseline.
+- Full dump: **842 passed,24 warnings in3649.29s**, n8/workers3, after the successful synthetic exit.
+  Every stage checked own-lock identity and CIM players0.
+
+Runner: `work/r22-lifts/resume14-testonly.sh`. New gate logs:
+`work/r22-lifts/successor14-5ee8f0a4738a08656f8c5967f926c5e7a28ecf34/`.
+
+All requested gates now pass on the immutable5ee8f0a4 test-only successor, with the unchanged-product
+paired350 sweep retained by Claude's explicit approval. The shipping variant still requires PR40
+ocarina model packs/ActorInfo for hand-overs; native-pack09's crash is not waived. Native Fairy10
+remains unplayed and outside the shipping path. Eight lifts stay Chest-scoped, not Scrub-scoped.
+Receipt-only documentation commits do not move the frozen gate SHA.
