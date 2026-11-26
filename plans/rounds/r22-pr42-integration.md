@@ -47,3 +47,29 @@ Claude explicitly decided **no version bump** for this private integration: reta
 The commit namespace refuses pending merge operations, as it did for the lifts integration. Claude is asked to finalize the resolved pending merge rather than bypass the selective-commit requirement. Gates bind the resulting immutable integration commit. Ordinary subsequent authored commits use the selective commit namespace and `Assisted-by: openai-codex/gpt-6.1-sol`.
 
 No GitHub post or push is authorized. The PR42 review comment remains **HELD**. Final READY FOR PLAY requires successful full gate, all five actual builds/manifests/baselines/launchers, five idle boot checks, then owned-lock release and thread handoff; it is not merge/play acceptance.
+
+## Approved camera-obstructed ocarina receipt fix — 2026-11-26
+
+Claude approved cs22c's copied-save diagnosis and `work/r22-pr42/integration/diagnosis/rows1-2b-played-20261126-125049/fix-proposal.md` as written. This is a new scoped commit on `r22/pr42-integration`, not a rebase or rewrite of `700fc8e` or Bender's commits. Claude explicitly requested the trailer `Assisted-by: Claude Opus 5.5` for this commit. Keep version0.2.9; existing frozen mods and played profiles remain untouched.
+
+- The existing world-own-add receipt now covers both `Dm_SY_Get` and the native camera-space fallback `Dm_SY_Get_WithoutPlayer`, before the shared keep-Time transform. Each file's transform validates its own original flow independently.
+- The native no-player flow has no `GameDataActor`; the receipt registers that required identity-query actor when absent. The existing actor/scoping checks otherwise remain strict. No get-model setting, presentation, PouchGetType, physics, admission, inventory grant or source-cleanup policy is changed.
+- Behavioral synthetic tests execute the production receipt-plus-keep-Time composition after EVFL serialization/readback. Both paths cover Fairy0 and duplicate Fairy1 after Time1, saved/live selection and autosave, immediate/buffered writes, absent Time despite historical ownership, first Time usability, native reward/history/continuation preservation and changed-source refusal.
+
+### Contributor test-preservation mapping
+
+| Original test | Original assertion | Maintained coverage |
+|---|---|---|
+| `test_an_ocarina_pickup_is_added_again_by_name_after_its_own_add` | Normal receipt's named add and parameters | `test_first_time_receipt_is_usable_before_autosave`, `test_fairy_after_time_keeps_saved_and_live_time_through_cleanup_and_autosave` and `test_fairy_without_time_stock_never_grants_or_selects_time` execute both receipt paths and assert actual reward/history, live selection and saved selection. Parameter/wiring pinning is replaced by consumer behavior. |
+| `test_other_pickups_run_as_before` | Non-ocarina action trace unchanged | `test_other_receipts_preserve_native_rewards_presentation_and_selection` compares complete native/transformed state, presentation, source cleanup and autosave on both paths. |
+| `test_the_fairy_add_gets_the_keep_time_helper_and_the_flow_reads_back` | Fairy add is found by `_targets`; EVFL roundtrip | Behavioral Fairy-after-Time tests execute the composed helper on both paths; the fixture retains EVFL write/read equality for the resulting flows. No wiring-only replacement. |
+| `test_a_flow_without_one_own_add_or_already_patched_is_refused` | Missing own-add and double patch refuse | Retained, parameterized over both presentation paths. |
+| `test_receipt_changes_patch_the_dump_flow` | One-file output, named add and changed-source refusal | Production-composition fixture exercises both transforms in every behavioral case; `test_each_receipt_transform_refuses_a_changed_source` retains refusal for each file. Obsolete one-file output assertion removed. |
+
+### Focused verification only
+
+The first focused run printed the missing-unscoped-`GameDataActor` failure. The native no-player actor table confirmed the cause; registering the required actor and retaining the native pouch actor in the synthetic fixture addressed it. One cause-directed rerun: **54 passed in1.44s**.
+
+Exact pytest arguments: `pytest.main(["-n", "2", "-q", "tests/test_t1a_receipt.py", "tests/test_ocarina.py"])`, launched through `uv run --frozen --with pytest-xdist python` with `CLAWSHOT_WORKERS=1`, `OOT_*` unset and Windows below-normal priority. The launcher used `BELOW_NORMAL_PRIORITY_CLASS`; pytest independently set and printed `PYTEST_PRIORITY_CLASS=0x4000` before creating its two workers. Outputs remain outside the repository: `work/r22-pr42/integration/receipt-fallback-focused-first-failure.log` and `receipt-fallback-focused-corrected.log`.
+
+Per Claude while Kareem's game runs: no formatter/lint/full synthetic/dump gate, seed generation or boots were run. **Built and focused-tested, not played in game.** The new Fairy-after-Time normal/no-player play row and row2c generation/boot remain gated on Claude explicitly saying idle.

@@ -303,7 +303,7 @@ def build(romfs: str | Path, ocarinas: Iterable[str], *, with_static: bool = Tru
 # ---------------------------------------------------------------------------------------------------------------
 # The receipt (plan 17, finding T1-a)
 
-RECEIPT_FLOW = "Dm_SY_Get"  # the world pickup's get event
+RECEIPT_FLOWS = ("Dm_SY_Get", "Dm_SY_Get_WithoutPlayer")
 RECEIPT_PREFIX = "ClawshotOcarinaReceipt_"
 _OWN_ADD = ("PouchContentGuestPerformer", "EventTriggerAddOwnToPouch")
 
@@ -326,6 +326,9 @@ def patch_receipt(chart: evfl.Flowchart) -> None:
         raise PatchError(f"{chart.name}: expected one {_OWN_ADD[1]}, found {len(adds)}")
     own = chart.events[adds[0]]
     onward = own.next
+    # The native no-player flow has no GameDataActor until the receipt needs its identity query.
+    if not any(actor.name == "GameDataActor" for actor in chart.actors):
+        chart.actors.append(evfl.Actor("GameDataActor"))
     game, is_string = keys._operation(chart, "GameDataActor", "queries", "EventQueryIsGameDataString64")
     pouch, add = keys._operation(chart, "PouchSystemActor", "actions", "EventTriggerAddOrRemovePouchContent")
     test = onward
@@ -360,27 +363,34 @@ def patch_receipt(chart: evfl.Flowchart) -> None:
 
 
 def receipt_changes(romfs: str | Path) -> FileChanges:
-    """``Dm_SY_Get`` with :func:`patch_receipt`, for seeds placing an ocarina at a world-pickup kind. Compose it before
-    ``ocarina.changes``, which then keeps Time selected after the added Fairy Ocarina as after any Fairy receipt."""
+    """Patch both normal and camera-obstructed world receipts, preserving their native presentation and cleanup.
+
+    Compose before ``ocarina.changes``, which keeps Time selected after either flow's added Fairy grant.
+    """
     romfs = Path(romfs)
-    path = keys.flow_path(RECEIPT_FLOW)
-    if not (romfs / path).is_file():
-        raise PatchError(f"the dump has no {path}, which the ocarina receipt patches")
-    original = evfl.read(zsdic.Dictionaries.from_romfs(romfs).decompress(path, (romfs / path).read_bytes()))
-    if original.flowchart is None:
-        raise PatchError(f"{path}: not a flowchart")
-    changed = copy.deepcopy(original)
-    patch_receipt(changed.flowchart)
-    encoded = evfl.write(changed)
-    if evfl.read(encoded) != changed:
-        raise PatchError(f"{path}: the ocarina receipt does not read back")
+    dictionaries = zsdic.Dictionaries.from_romfs(romfs)
+    changes = {}
+    for name in RECEIPT_FLOWS:
+        path = keys.flow_path(name)
+        if not (romfs / path).is_file():
+            raise PatchError(f"the dump has no {path}, which the ocarina receipt patches")
+        original = evfl.read(dictionaries.decompress(path, (romfs / path).read_bytes()))
+        if original.flowchart is None:
+            raise PatchError(f"{path}: not a flowchart")
+        changed = copy.deepcopy(original)
+        patch_receipt(changed.flowchart)
+        encoded = evfl.write(changed)
+        if evfl.read(encoded) != changed:
+            raise PatchError(f"{path}: the ocarina receipt does not read back")
 
-    def transform(data: bytes) -> bytes:
-        if evfl.read(data) != original:
-            raise PatchError(f"{path}: the ocarina receipt source changed after binding")
-        return encoded
+        # Bind each flow's source and output independently, not the loop's final values.
+        def transform(data: bytes, *, expected=original, replacement=encoded, source=path) -> bytes:
+            if evfl.read(data) != expected:
+                raise PatchError(f"{source}: the ocarina receipt source changed after binding")
+            return replacement
 
-    return {path: transform}
+        changes[path] = transform
+    return changes
 
 
 def picked_up(placements: Mapping[str, str], world: World, actors: ItemActors) -> bool:

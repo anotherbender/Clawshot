@@ -317,7 +317,7 @@ def make_seed(
     changes += (key_changes,)
     plan, progressive_changes = progressive.changes(romfs, plan, prior_changes=changes)
     changes += (progressive_changes, bags.changes(romfs))
-    # T1-a: an ocarina from a world pickup is added again by name in Dm_SY_Get, before ocarina.changes binds it.
+    # Both normal and camera-obstructed world receipts precede the shared keep-Time guard.
     if ocarina_delivery is not None:
         changes += (ocarina_pickup.receipt_changes(romfs),)
     changes += (ocarina.changes(romfs, prior_changes=changes),)
