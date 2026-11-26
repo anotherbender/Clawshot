@@ -583,3 +583,38 @@ PLAY links it and `REVISED-CONTRACT.md`; all old-packet replay instructions are 
 No code, tests, fixture guard or original saves were changed. No new seeds, gates, sweeps,
 boots or heavy work. Packet complete is not admission; wait for explicit code OK, then the
 revised regressions/new human rows and required full paired sweep. Merge main, never rebase.
+
+## Approved implementation: refill and native repeats
+
+Claude authorized implementation while idle, merging published main5dcb21b without rebase.
+Merge33a6771 completed cleanly. The requested trailer is `Assisted-by: Claude Opus 5.5`.
+
+The writer preserves a pristine native transaction before mutating the randomized caller.
+The saved check dispatches through a local native-entry call after completion; its subflow
+registration is retained. Granny's unchanged Blue Potion uses the native fill/charge wrapper,
+then the success Bool; non-refill first rewards use a generic grant and one explicit fee.
+Medigoron's initial ownership reads remain neutralized; the native fallback preserves sword
+ownership and BrokenGiant replacement consumption. Carpet repeats no longer enter a hidden
+private cancellation gate after its native offer. Original shared native shop consumers remain.
+The Granny Talk preload adds Dm_SY_Get only for a non-refill first reward, not the identity.
+Purchase identity normalization is now explicit in seed_step.
+
+Focused proof before admission changes:89 tests passed in5.32s (`test_gifts_merchants`,
+`test_gifts`, `test_gifts_bottle`, `test_gifts_release`), all OOT variables unset, UI extra,
+xdist-n2/CLAWSHOT_WORKERS1. One helper-only oracle self-test was subsequently discarded;
+all88 consumer/contract cases remain. A formatter-reported line wrap was corrected without
+changing the expression. Eight transforms of already-copied native flow files also round-tripped
+(four flows, both Granny reward forms). No live repeat/potion result is inferred from that proof.
+
+Semantic tests now execute serialized synthetic NPC callers across local/shared subflows,
+money, saved completion, bottle contents/counts, stock/capacity, and broken-Knife replacement.
+They compare completed visits against pristine native behavior rather than pinning a private
+callee or reward echo. The flow-transform count assertion remains; the Granny analyzed-table
+transform has a dedicated row-only round-trip oracle. No game fixture is stored in the repo.
+
+Claude's subsequent admission/pool ruling is a separate next commit: port frozen v2 admission
+data onto this repair, lift holds on the branch only, then replace shuffled Granny's Blue Potion
+pool contribution with one existing junk item. cs22d chooses Rupees(5): already mapped ordinary
+junk, no progression or bottle capacity. Native Blue Potion survives only an explicit Granny
+identity plan pin; it is never a global actor alias. Final focused proof/gate23/play rows/sweep25
+must all bind the final admitted SHA, with no merge before new play plus paired sweep PASS.

@@ -2477,12 +2477,24 @@ Her quest unlock, bottle check and price remain. This corrects the older “no l
 assumption using the active flow itself, not a shelf item or N64 assumption.
 
 Each controlled merchant swap adds its own D22 saved Bool (reset8/save0). Medigoron/carpet get
-private SimpleShop entries; original events/entries, beans and other consumers are unchanged.
+private SimpleShop entries; the original SimpleShop entries, beans and other consumers are unchanged.
 Flags are set inside successful grants, never after an outer call that also returns on refusal.
-Choice, funds, capacity and fees remain native. Medigoron's own two sword-ownership reads become
-check reads; his private generic grant does not consume a broken knife. Granny uses the ordinary
-gift wrapper plus the original 100-rupee charge on its success edge, without filling a bottle.
-Revisits bypass the transaction; cancellation/poverty/full capacity do not consume the check.
+Choice, funds, capacity and fees remain native. Before the shuffled reward, Medigoron's two
+sword-ownership reads become check reads; the private grant does not consume a broken knife.
+After the saved check, each caller dispatches to a pristine native transaction: Granny sells
+repeat Blue Potions, the carpet seller repeat Bombchus, and Medigoron replacement Knives under
+his native intact-Knife/Biggoron restrictions. Only the shuffled reward is once-only.
+
+Granny's unchanged Blue Potion assignment keeps the native owned-empty-bottle fill wrapper
+and its internal charge, then records completion. Other shuffled prizes use an ordinary gift
+and one explicit 100-rupee charge; real Bottle/Milk container prizes remain container grants.
+The ordinary gift path registers Dm_SY_Get only on Granny's Talk analyzed-event row. Decline,
+poverty, capacity and missing-empty-bottle refusals do not consume the check.
+
+Round22, Claude's 2026-11-26 ruling after Kareem's packet-v2 play: the old generic identity
+grant added a third bottle while the second stayed empty, and old completion gates removed
+native repeat services. The refill/native-repeat repair and semantic regressions are required
+before new play and admission (r22-merchants.md). Native graph round-trips are not live proof.
 
 Data-sourced rules retain existing adult/trade/room/approach predicates; Granny adds her bottle
 requirement and carpet drops the unsupported upgraded-wallet/Bombchu prerequisites (price 90).
