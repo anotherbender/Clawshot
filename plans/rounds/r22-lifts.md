@@ -479,7 +479,7 @@ ocarina model packs/ActorInfo for hand-overs; native-pack09's crash is not waive
 remains unplayed and outside the shipping path. Eight lifts stay Chest-scoped, not Scrub-scoped.
 Receipt-only documentation commits do not move the frozen gate SHA.
 
-### Queue16 merge-kind successor: integration in progress
+### Queue16 merge-kind final receipt: PASS
 
 Claude's review found a design conflict: the lift branch selected the ocarina get model from actual
 placements, overriding BBender's PR41 option2 (maintainers, 2026-11-23). The old passing gate does not
@@ -535,3 +535,80 @@ corrected donor refusal, every focused case now passes; production and native as
 the helper-reference docstring in `patch/songs.py`, README's stale exclusivity claim, settings reference and
 this round receipt also changed. Existing main-only merge paths are retained. No `git add`/`git commit`
 was used by this agent. After Claude's merge commit, bind the retained lock and fresh full gates to its SHA.
+
+Claude finalized the merge as **FROZEN aec6e78599da8a481093de677c574f251059d718**, parents12491eb
+and main874f30a24040bbed4ae7223fbfb751fb60174c4d. The immutable candidate snapshot is
+`work/r22-lifts/merge-src-aec6e785`; no further product edits. Full gates do not reuse the old lift gate.
+
+Fresh **main350 passed,zero exhausted in677.02s** on exact874f30a, before any overlapping gate stage.
+First-attempt failures broad1/defaults4/recommended1/binding0 all recovered through the existing engine.
+The new baseline already admits Token capacities: binding98 Token/0 Chest, broad384 Token/0 Chest.
+The old5bc assumption of zero main Token capacities therefore does not apply. The private comparison helper
+has an explicit already-admitted mode: exact effective-settings whitelist adds **only Chest** to the eight
+gift and two capacity holds and preserves Token. Metadata-only proof passed for all four recipes;
+Defaults has no changed hold. No product change or baseline assertion was silently waived.
+
+Main baseline rows/provenance: `work/r22-lifts/merge16-main-874f30a/`; its snapshot is
+`work/r22-lifts/merge-main-874f30a`. Retained own16 lock was rebound to the frozen merge SHA.
+Whole formatter/lint passed. Full synthetic: **4760 passed,912 skipped,24 warnings in505.51s**,
+n8/workers4 with all three OOT variables unset, against the immutable merge snapshot.
+Fresh candidate350 versus main874350: **both350/350 accepted,zero exhausted**. Exact recipe/seed keys
+and the only-Chest-addition effective-settings whitelist pass for every row. Defaults match all placement
+and sphere digests; the existing Token capacity eligibility is preserved, not newly added by this merge.
+
+| Cohort | Seeds/arm | Placements equal | Spheres equal | First-try failures candidate/main | Candidate capacity Chest | Candidate capacity Token |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Broad | 200 | 0 | 0 | 0/1 | 239 | 156 |
+| Defaults | 50 | 50 | 50 | 4/4 | 0 | 0 |
+| Recommended | 50 | 0 | 0 | 0/1 | 93 | 0 |
+| Capacity-binding | 50 | 0 | 0 | 0/0 | 48 | 51 |
+
+The fresh main binding cohort has98 Token capacity grants and0 Chest grants. All first-attempt failures
+recovered through the unchanged generator retry path. No placement/spoiler data is committed.
+Original full dump: **878 passed,1 skipped,31 fixture errors in2594.32s**, n8/workers3,
+after a fresh own-lock/CIM players0 check. All31 errors share the `OOT_DUMP` cache fixture's missing
+`Pack/Actor/Item_Bomb.pack.zs`; no READY. Gate logs:
+`work/r22-lifts/merge16-aec6e78599da8a481093de677c574f251059d718/`.
+
+**Claude's requested classification, before any fix:** exact immutable main874f30a reproduces the
+same `test_pack_nup_dump` Chest parametrization error in3.16s. Thus the failure is inherited from main,
+not caused by the lift merge. Its import path and complete traceback are recorded in
+`main874-inherited-one-case.log` beside the gate logs. `Item_Bomb.pack.zs` was added to the working-set
+manifest on main by the games/bombs option (e86687a), not by lifts.
+Read-only diagnosis, also **printed before repair**, is in `cache-input-diagnosis.json`:
+the old fixture lacks the pack in both base and update131072; it is the **only missing input of1297**
+required by the current manifest. Full RomFS and the real NUP hold identical pack bytes. The production
+stacked reader correctly returns base bytes when the update lacks the pack. This is stale test input,
+not an observed product cache-extraction or update-fallback bug; no code patch is indicated on main or lifts.
+
+The builder created **new** private input `work/r22-lifts/merge16-layered-dump-aec6e785`, preserving the
+original layers and adding only the missing pack to **base/romfs** (the update still lacks it).
+All1297 required file hashes and the version digest match the full RomFS; the original fixture's size/mtime
+inventory is unchanged. `fixture-recovery.json` and `fixture-build.log` record the proof.
+The exact main874 Chest parametrization now **passes in136.58s** with this complete input, proving the
+failure needs no product code change and that the cache correctly reads a base-only resource.
+All31 affected AEC `OOT_DUMP` matrix/cache-byte cases **passed in1242.50s**, n8/workers3,
+fresh CIM players0, with `dump-cache-recovery.xml`/`.log`. Frozen product SHA remains unchanged.
+
+**READY MERGE-KIND: aec6e78599da8a481093de677c574f251059d718.** Final coverage:
+
+- Whole format:610 files clean; lint PASS.
+- Full synthetic:4760 passed,912 skipped,24 existing warnings,505.51s.
+- Fresh paired350 per arm against exact main874:700/700 accepted,zero exhausted; Defaults50/50 identical.
+- Native coverage: original whole-dump878 passing cases plus the31 repaired-input passing cases,
+  **909 distinct passes and1 original skip**. This is an explicit combined receipt, not a claim that a
+  second whole-dump run occurred. Every original error is resolved on the same immutable SHA; no test
+  assertion, selector, product code or passing-case coverage was waived.
+- Inherited input issue classified before repair; exact main fails with the old fixture and passes with
+  complete input. The repaired fixture exercises base-only fallback and matches all1297 native input hashes.
+
+The owned line16 lock was checked and released at00:43, with `LOCK RELEASED cs22g line16` posted.
+Structured receipt: `work/r22-lifts/merge16-aec6e78599da8a481093de677c574f251059d718/gate-receipt.json`.
+For subsequent native gates, use `OOT_DUMP=E:/OOTRemake/work/r22-lifts/merge16-layered-dump-aec6e785`,
+not the obsolete round21 fixture. Do not modify either original input.
+
+Option2 remains authoritative: Gift or any expanded gift kind selects the get model independently of
+placements; uncovered ocarinas and unaudited gift receipts fail closed, with spoiler steps retained.
+Tunic shop/native-actor behavior and the eight Chest-not-Scrub scopes remain. Native-pack09's crash is not
+waived; Fairy10 remains unplayed/outside shipping. No new in-game acceptance is claimed by this merge.
+Subsequent receipt-only documentation commits do not move the frozen gate SHA.
