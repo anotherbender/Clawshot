@@ -3,7 +3,7 @@
 This is the command-line and developer reference. Start with the [README](../README.md) or
 [seed-pack guide](seed-pack.md) to play. Status below distinguishes in-game observations from
 implementation tests; an enabled option is not proof that every combination has been played.
-Evidence: [the roadmap index](../plans/00-roadmap.md) plus the linked round files,
+Evidence: [the roadmap index](../plans/00-roadmap.md) plus the linked play records,
 [player answers](../plans/playtest/answers.md) and [decisions](../plans/decisions.md).
 
 ## Settings strings and reproducibility
@@ -31,7 +31,10 @@ Bag bombs without the Bracelet is also supported, off by default:
 It lowers only the ordinary bag bomb's lift requirement and removes strength from the shared `Bombs`
 logic predicate. The Bomb Bag is still necessary, including for Bombchus. Bomb Flowers and strength-gated
 rocks keep their native requirements; this does not open Dodongo's Cavern's child entrance with bag bombs.
-Built, not played on Longshot 3.2.0; [trace and staged check](../plans/rounds/r22-games.md).
+Kareem played it on Longshot 3.2.0 (2026-11-25): in a New Game with the Bomb Bag and Boomerang but no Bracelet,
+bag bombs worked and so did the Boomerang, while Goron City's Bomb Flowers still could not be picked up. After
+reloading, bag bombs still worked. Not every route the logic opens with bag bombs has been played
+([played results](../plans/rounds/r22-games.md#played-results-2026-11-25-longshot-320)).
 
 OoT-only access overrides such as `open_kakariko=open`, `gerudo_fortress=open`,
 `scarecrow_behavior=free` and `skip_child_zelda=true` are refused: no native patch
@@ -79,7 +82,7 @@ in chests only; see [Progressive items](#progressive-items).
 |---|---|
 | `Chest` | 178 of 184 ordinary chests; changed chest grants work in game. Includes the played bridge bean, ranch Hookshot, late windmill Longshot, Field/Lake, four-torch Lake grotto, Valley grottos, Fortress underground, Fountain scarecrow, Well hidden-hole and sign-puzzle routes. The Well requires the Lens conservatively. Duplicate/failure copies and repeat chests stay unchanged. Treasure Chest Game reward swap is built but untested and held; its 11 game boxes stay unchanged. |
 | `Shop` | Ordinary shop shelves, native-display items only; slot swaps, restock and Castle Town purchases have in-game evidence. Bought goods (refills, ammo, Bombchus, bottle contents, hearts and magic jars) go only to shop shelves in every seed; no setting moves one to a chest, gift, scrub, floor pickup or Skulltula. Mask loans stay unchanged. |
-| `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper and all seven frog checks. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the unaccepted checks below. |
+| `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper, the adult Rolling Goron's and King Zora's tunic gifts, and all seven frog checks. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the unaccepted checks below. |
 | `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. The adult Mirror Shield purchase that previously froze now finishes; other item/age combinations are not all played. |
 | `BossHeart` | Eight boss-heart checks, off by default. Limited to the five native floor pickups below. King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
 | `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
@@ -91,9 +94,12 @@ rooftop man's gift. These source-logic corrections do not expand the floor palet
 every surface ([ranged pickup audit](../plans/rounds/r20-audit.md)).
 
 With Gift and Token selected, played bottles, Double Defense, the Echo Gem and gold rupees may also reach
-Skulltulas; this does not allow their unverified chest grants. Fixed Nut/Stick upgrades may reach Scrub and Token
-checks: the played family representative was Nut native30; Stick native20 is a structurally checked sibling, not
-an individually played result ([round 22 evidence](../plans/rounds/r22-lifts.md)). Both stay out of chests.
+Skulltulas. With Gift selected, eight gift items may also be found in shuffled chests: Light Arrows, Nayru's Love,
+Farore's Wind, the Echo Gem, Double Defense, Biggoron's Sword, an empty Bottle and Rupees (200); they never go
+to one-time scrub sales. Fixed Deku Stick and Nut capacity upgrades may be found in chests as well as at one-time
+scrub sales and, with Token on, at Skulltulas. On Longshot 3.2.0 (2026-11-25) Kareem checked each of these chest
+rewards (right model and text, and the item works) and the Stick upgrade from a Skulltula; the Nut upgrade's
+Skulltula pickup passed earlier on rc.3 ([evidence](../plans/rounds/r22-lifts.md)).
 Token placement retains the existing seeded random ordering; there is no target percentage or weighting.
 Reachability, container requirements, pool composition and earlier fill stages still limit the result.
 
@@ -124,7 +130,7 @@ is not a check and stays native (native trace:
 [section 35](../plans/03-game-data.md#35-round-8-gift-checks-native-identities-and-success-only-merchant-sales-cs8d)).
 Played on **Longshot 3.0.0 stable, 2026-11-20**: the first reward gave Hammer at 100 tokens,
 then the native repeating 200-rupee gold payout. This does not certify every possible replacement
-([round 19 tokens](../plans/rounds/r19-tokens.md)).
+([100-token reward checks](../plans/rounds/r19-tokens.md)).
 
 Cows, pots, crates, loose rupees, recovery hearts, Treasure Chest Game keys and
 silver-rupee puzzles stay unchanged. Dungeon rewards have their own default-off
@@ -132,9 +138,9 @@ option below. Pot and ground-rupee
 experiments are not seed options: grants were observed, but a thrown pot stranded and lost its
 reward. Completion and recovery are not solved by a destruction flag.
 Cow work remains research only: no cow locations, option or production patch shipped
-([round 19 cows](../plans/rounds/r19-cows.md)).
+([cow research](../plans/rounds/r19-cows.md)).
 
-The Round 15 forced diagnostics are not shuffle options or beatable seeds. Their core, reward-family,
+Forced diagnostic placements are not shuffle options or beatable seeds. Their core, reward-family,
 route and first-Time-ocarina parts provide the played evidence for this explicit catalogue; they do not
 establish every item, full-capacity case or route combination.
 
@@ -266,7 +272,10 @@ In every seed, **LW Ocarina Memory Game** gives its prize on the first completed
 native once-flag: the shuffled reward with `Gift`, or the vanilla Heart Piece without it.
 It then keeps the native post-prize session state and repeat payouts. Failure or declining gives nothing.
 No setting: this matches the other minigames' first-win policy. Its all-five-ocarina-buttons logic
-requirement is unchanged. Built, not played on Longshot 3.2.0; [checklist](../plans/rounds/r22-games.md).
+requirement is unchanged. Kareem played it on Longshot 3.2.0 (2026-11-25) with a shuffled prize: declining or
+missing gave nothing, the first won round gave the prize, the Skull Kid then said there were no more prizes, a
+later win paid a Blue Rupee, and after reloading the prize was still owned and not given again. The unshuffled
+Heart Piece case was not played separately ([played results](../plans/rounds/r22-games.md#played-results-2026-11-25-longshot-320)).
 
 With `Gift` selected, the child Market Potion Shop bottle tutorial and Dampé's graveyard
 digging prize give shuffled rewards. Both passed their in-game checks on 2026-11-10
@@ -275,6 +284,12 @@ gift skips the bug-catching lesson. Without `Gift`, the free bottle and lesson s
 and logic still counts that bottle. Digging still shows a heart prize but awards the shuffled item.
 Market expert wins pay 30 rupees and Kakariko expert wins 70, including the first win. Clawshot's
 held first-expert-check experiment would add a new once-only prize; it is off under every setting.
+
+With `Gift`, the adult Rolling Goron's tunic gift and thawed King Zora's tunic gift are shuffled checks. Their
+usual requirements stay: stop the Rolling Goron as adult, or thaw King Zora with Blue Fire. Kareem played both on
+Longshot 3.2.0 (2026-11-25): Ice Arrows and the Mirror Shield came in place of the tunics, neither gift repeated,
+and Goron City's doors and story continued as usual ([shop and gift checks](../plans/rounds/r22-shops.md)).
+The Goron and Zora Tunics themselves can still be found in shops and chests.
 
 Merchant sale experiments (Medigoron, Granny, desert carpet) remain held. The Skulltula House's
 10- and 40-token reward swaps passed; the 20-token preview was observed, not every later threshold.
@@ -323,18 +338,20 @@ gift kinds in effective settings, always includes the ocarina get model, even wi
 neither instrument lands at a display hand-over. This settings-based build rule is reported in the spoiler's
 `patch.steps`; uncovered ocarina placements and unavailable model inputs are refused.
 This does not relax the whole-game progressive pool's separate requirement to shuffle Chest checks.
-BBender and Claude played small and big chests on Longshot v3.1.1
+Small and big chests were played with BBender on Longshot v3.1.1
 (2026-11-22, [chest ocarina record](../plans/chest-ocarina-model.md)). Kareem
 played small chests in both orders on Longshot 3.0.0 (2026-11-23): the Ocarina of Time stayed the equipped
 one, also after Save and Continue, and Saria's farewell, Zelda's escape and the moat looked as before
 ([chest ocarina check](../plans/rounds/r21-pr40.md#played-results-kareem-longshot-300-2026-11-23-pass)).
-The Ocarina of Time plays songs. Din's Fire and Adult's Wallet have chest evidence.
+The Ocarina of Time plays songs. Din's Fire, Adult's Wallet and the eight gift items
+[listed above](#what-enters-the-shuffle) have chest evidence.
 Other gift actors remain subject to the sourced chest allowlist and destination holds, not blanket
 permission for every gift to go in a chest. Authoritative restrictions: `data/settings.toml`.
 
 Ocarinas may use item-display hand-overs only with the required get model: both ocarina actor packs and
-ActorInfo changes, never native-pack fallback. Kareem passed the PR40-active hand-overs on Longshot 3.2.0;
-the native-pack Time arm crashed. Gift destinations also require an audited native receipt.
+ActorInfo changes, never native-pack fallback. On Longshot 3.2.0 (2026-11-25) Kareem received both ocarinas
+at the child Market Shooting Gallery with that model; without it, the Ocarina of Time crashed there. Other
+hand-overs were not each played. Gift destinations also require an audited native receipt.
 Chests and direct story grants remain allowed under the same settings rule; Ocarina of Time retains its
 separately played Skulltula pickup. See the [played scope and limits](../plans/rounds/r22-lifts.md).
 
@@ -363,14 +380,14 @@ old generated folders are not repaired.
 
 Other chest/gift/pickup paths do not use that scrub-only equipment wait. They retain their existing
 native grants and admission rules, not a claim that every item/age pair has been played.
-The [round18 audit](../plans/rounds/r18-equipment.md) separates played results, native-data evidence
+The [equipment audit](../plans/rounds/r18-equipment.md) separates played results, native-data evidence
 and unverified boundaries. Wrong-age item-bar precautions remain [below](#hints-models-and-age-warnings).
 
-Round18's attempted late lesson bypass was withdrawn. Kareem's round19 control on 2026-11-20
+An attempted late lesson bypass was withdrawn. Kareem's control on 2026-11-20
 established that adult Link **can** play the native Minuet lesson with the Fairy Ocarina and
-receive its shuffled reward, consistent with round18 issue34's adult Sun's Song check.
+receive its shuffled reward, consistent with the earlier adult Sun's Song check.
 Lesson logic therefore accepts either ocarina at either age; the no-instrument physical guard
-uses the early caller handoff described below ([round 19 scenes](../plans/rounds/r19-scenes.md)).
+uses the early caller handoff described below ([scene checks](../plans/rounds/r19-scenes.md)).
 
 ## Shops and scrub prices
 
@@ -391,11 +408,13 @@ gates. These fields replay through CS1. The 10-rupee Kokiri shield/nuts purchase
 observed (R6-PRICES); partial shelves and fixed scrub fees are built/tested, not independently
 certified in game by that observation.
 
-New shuffled potion-shop shelves include the missing non-bottle offer and refusal dialogue,
-so shields, tunics, ammo, hearts and magic use their native purchase paths rather than a
-bottle-only message table. Bottle/container, ownership, stock and price checks remain.
-This repair covers Market and Kakariko at every shuffled shelf; **built, not played** on
-Longshot 3.2.0 ([round 22 shop checks](../plans/rounds/r22-shops.md)).
+**Potion shops:** Kareem's 0.2.6 report of a Kakariko Potion Shop shelf that would not sell a shuffled Deku
+Shield, with no prompt, has not been reproduced. On Longshot 3.2.0 (2026-11-25), with no potion-shop change,
+that shelf sold the Deku Shield to an adult who had never owned one and had the Mirror Shield equipped, also with
+Kareem's own 0.2.6 seed and no bottle ever owned; another test sold the shield and both tunics. A proposed
+message fix for non-bottle potion-shop sales is not included. Buying Deku Nuts into a part-full bag at the Market
+Potion Shop, and the refusal once the bag was full, were played only with that unshipped fix
+([shop checks](../plans/rounds/r22-shops.md)).
 
 **Scrub offer wording:** newly generated shuffled one-time sales name their actual
 reward and effective price (English in all16 languages). HF and DMC have separate
@@ -504,7 +523,7 @@ native lesson, then Boomerang; zero stock of both instruments skips straight to 
 Both give correct text, with saved ownership/source completion, no extra Minuet and unchanged ocarina stocks.
 Continue/re-entry was not reported. The native arm's override is inferred from its played lesson
 and saved shuffled reward; two expected file-load lines are absent for an unexplained logger gap.
-The [round record](../plans/rounds/r19-scenes.md#minuet-v2-played-pass-and-accepted-logger-gap)
+The [Minuet play record](../plans/rounds/r19-scenes.md#minuet-v2-played-pass-and-accepted-logger-gap)
 separates that inference from direct load evidence. Logic still conservatively requires **any**
 ocarina for lessons; general Great Fairy/Rauru/story skips and non-instrument prerequisites are unchanged.
 
@@ -564,10 +583,10 @@ shuffle it still gives Light Arrows. In every mode its trigger remains the compl
 Shadow and Spirit awakening scenes, not owned medallions. The vanilla bridge follows
 that Temple story even when its reward is not Light Arrows; the six trials and finale
 still require usable Light Arrows. Ganon's boss key is never awarded by this scene:
-it follows the ordinary boss-key placement rules below. Round 19 corrects the default
-logic to these native readers, without changing the scene or its saved writes.
+it follows the ordinary boss-key placement rules below. Default logic follows these native readers,
+without changing the scene or its saved writes.
 This is **static event-data evidence only, not played**
-([round 19 LACS](../plans/rounds/r19-lacs.md)).
+([Light Arrows scene research](../plans/rounds/r19-lacs.md)).
 
 ## Ganon's trials remaining
 
@@ -613,7 +632,7 @@ Biggoron Sword still counts where a sword is needed, and the final battle requir
 Sword. The breakable Giant's Knife is preserved as equipment, but logic does not rely on its
 unmodelled durability to reach another check.
 
-It requires two existing settings ([round 19 sword](../plans/rounds/r19-sword.md)):
+It requires two existing settings ([Master Sword play record](../plans/rounds/r19-sword.md)):
 
 - **Chest shuffle.** Without `Chest` the settings are refused everywhere: a settings string, the
   command line, `--print-settings` and the app.
@@ -631,8 +650,8 @@ and immediately equipped a usable Master Sword; the owned child/adult round trip
 Exactly two unowned pulls were played, not three; the maintainer accepted the repeated-path coverage.
 The main v4 control also passed. These checks do not certify a full playthrough or finale refusal.
 The pedestal remains silent; no item window is inserted into the scene. Design, deviation and
-evidence: [round 19 sword](../plans/rounds/r19-sword.md) and
-[round 18 Master Sword design](../plans/rounds/r18-master-sword-design.md).
+evidence: [Master Sword play record](../plans/rounds/r19-sword.md) and
+[Master Sword design](../plans/rounds/r18-master-sword-design.md).
 
 ## Door of Time and returning to child
 
@@ -656,7 +675,7 @@ early-mode post-pull callbacks do not roll the completed Door quest back.
 Kareem passed the open-mode send-off gate, early-pull escape/moat order repair and immediate
 child-return clock clear on Longshot rc.7, and reports the day/night clock working as expected in his later
 seeds (2026-11-21). The first-arrival lighting repair below has no separate staged v5 check;
-the [round 18 evidence review](../plans/rounds/r18-docs.md#review-corrections-after-3e31f160cb) retracted the broader pass claim.
+the [evidence review](../plans/rounds/r18-docs.md#review-corrections-after-3e31f160cb) retracted the broader pass claim.
 The late first Forest-exit ordering (send-off before the first bridge departure, panorama never played) has
 no separate played check ([time record](../plans/rounds/r16-time.md#late-first-forest-exit-guard)).
 
@@ -697,7 +716,7 @@ Early return, repeated age changes, the post-Forest Prelude and the fixed first 
 recorded in-game acceptance (R9-FREE-TRAVEL, R9-PRELUDE-PATCHED, R10-FIRST-PULL-FIXED). Default stays off.
 Ordinary adult song-playing logic still requires the Ocarina of Time. Adult Sun's Song worked with Fairy
 in the 2026-11-19 check; the separate adult-Fairy Minuet lesson passed on 2026-11-20
-([round 19 scenes](../plans/rounds/r19-scenes.md#minuet-v2-played-pass-and-accepted-logger-gap)).
+([Minuet play record](../plans/rounds/r19-scenes.md#minuet-v2-played-pass-and-accepted-logger-gap)).
 Neither result certifies every adult song.
 
 The app shows this override as the **Free time travel (experimental)** switch under World, not as a
@@ -713,9 +732,10 @@ hold Spirit Temple keys, maps or compasses: a generic grant there would credit t
 dungeon or nothing.
 
 In every mode, small keys, boss keys, maps and compasses go only to chests, even inside
-their own dungeon (Kareem, 2026-11-23): a song lesson, gift, scrub or floor pickup grants the generic
-item without the dungeon's flag write, which has not been played. The one exception is a released
-floor-key source holding its own native key.
+their own dungeon (Kareem, 2026-11-23). Other pickup types do not generally write the dungeon's
+ownership flag. An own-dungeon map/compass writer for gifts and song lessons is built, but the
+Ice Cavern Sheik map/compass checks remain unplayed and held, so the chest-only rule stays.
+The one exception is a released floor-key source holding its own native key.
 
 `--dungeon-items anywhere` (the UI choice **Small keys anywhere**) moves **small keys only**,
 into shuffled chests whose access and native opening contracts permit it, including other dungeons
@@ -726,8 +746,8 @@ model and native room retirement wiring. Other dungeons' keys, majors, hearts an
 are not floor-key rewards. On Longshot rc.7 on 2026-11-19, Kareem left the Well replacement,
 recovered it, collected its silent +20 rupees, and confirmed it stayed collected after leaving,
 returning and Continue. This proves the checked Well pickup, not every scripted floor key.
-Own-dungeon mode leaves it untouched. Round 19 changes no key behavior: the Shadow Temple floor key
-stays in its usual place under every setting ([round 19 keys](../plans/rounds/r19-keys.md)).
+Own-dungeon mode leaves it untouched. The Shadow Temple floor key stays in its usual place
+under every setting ([floor-key record](../plans/rounds/r19-keys.md)).
 
 `--shuffle-hideout-keys` (UI: **Fortress jail keys (experimental)**) separately releases the four
 Fortress guard floor keys into supported shuffled chests. Default **off** in both presets;
@@ -788,7 +808,7 @@ save, with a compact OBS view; it is separate from the game's current-dungeon co
 
 Acceptance: Gates 1–4 passed in game — native and named key chests of both sizes, in-dungeon
 and out, child and adult, correct remote credit, door spending and reload persistence, ending
-with a whole generated anywhere seed ([round 12](../plans/rounds/r12-keys.md)). That is not every
+with a whole generated anywhere seed ([dungeon-item play record](../plans/rounds/r12-keys.md)). That is not every
 source/target combination or a complete playthrough.
 
 ## Hints, models and age warnings
