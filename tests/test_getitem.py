@@ -296,25 +296,32 @@ def test_the_app_working_set_holds_the_ocarina_inputs():
     [
         (("Chest", "Gift"), True),
         (("Chest", "Gift", "Token"), True),
-        (("Chest", "NPC", "Song", "Cutscene", "Boss"), True),  # Gift as the types it expands to
-        (("Chest",), False),  # the defaults: no ocarina can reach a chest
+        (("Chest", "NPC", "Song", "Cutscene", "Boss"), True),
+        (("Gift",), True),
+        (("NPC",), True),
+        (("Song",), True),
+        (("Cutscene",), True),
+        (("Boss",), True),
+        (("Chest",), False),
         (("Chest", "Token"), False),
-        (("Gift",), False),  # gifts move, chests stay: no ocarina can reach a chest
+        (("Scrub",), False),
+        (("GrottoScrub",), False),
+        (("Shop",), False),
         ((), False),
     ],
 )
-def test_the_ocarina_get_model_runs_when_chest_and_gift_shuffle_are_both_on(shuffle, runs):
-    assert getitem.chest_ocarinas_possible(shuffle) is runs
+def test_the_ocarina_get_model_is_selected_by_gift_settings(shuffle, runs):
+    assert getitem.ocarina_get_model_possible(shuffle) is runs
 
 
-def test_only_a_chest_holding_an_ocarina_asks_for_the_get_model():
+def test_only_selected_locations_are_checked_for_ocarinas():
     from clawshot.patch.items import ItemActors
 
     actors = ItemActors(
         actors={"Fairy Ocarina": getitem.FAIRY, "Ocarina of Time": getitem.TIME, "Bow": "Item_Bow"}, sources={}
     )
     placements = {"Chest A": "Bow", "Chest B": "Ocarina of Time", "Saria": "Fairy Ocarina", "Chest C": "Nothing"}
-    chests = ["Chest A", "Chest B", "Chest C"]
-    assert getitem.chest_ocarinas(placements, chests, actors) == ["Chest B"]
-    # An ocarina outside a chest (a gift, its vanilla spot) does not count.
-    assert getitem.chest_ocarinas(placements, ["Chest A", "Chest C"], actors) == []
+    selected = ["Chest A", "Chest B", "Chest C"]
+    assert getitem.ocarina_locations(placements, selected, actors) == ["Chest B"]
+    assert getitem.ocarina_locations(placements, ["Saria", "Chest B", "Chest C"], actors) == ["Saria", "Chest B"]
+    assert getitem.ocarina_locations(placements, ["Chest A", "Chest C"], actors) == []

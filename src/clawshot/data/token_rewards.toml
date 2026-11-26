@@ -32,10 +32,9 @@ bottle = "Kareem, rc.3 families-1: new Milk bottle and source committed; drank t
 rupee = "Kareem, rc.3 families-1: Obj_Rupee_Red from Field lone tree, rupees 68 -> 88, source pair set and token count unchanged"
 heart_piece = "Kareem, rc.3 families-1: first Heart Piece, stock1 with MaxLife unchanged, source committed; abandoned drop recovered"
 heart_container = "Kareem, rc.3 families-1: whole container raises MaxLife16 -> 20 with Piece stock unchanged, source committed"
-fixed_capacity = "Kareem, rc.3 families-1: Item_NutBag_Medium establishes native30 capacity/refill and source completion; fixed StickBag member retains its own native20 fields"
-# Round 22: patch.scrubs now preserves Scrub+Token for these two members. The Nut native30 above is the played
-# representative; Stick native20 is a structurally checked sibling, not an individually played result.
-# Chest grants remain held; a separate Stick Token check and one chest check per member are staged in r22-lifts.
+fixed_capacity = "Kareem, rc.3 families-1: Item_NutBag_Medium establishes native30 capacity/refill and source completion; Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 packet05b: Item_StickBag_Medium native20, uncollected-drop recovery then one pickup, token18 unchanged, collection pair set and persisted as child"
+# Round 22: both fixed-capacity members now have individual Token play evidence. Each native row still passes
+# the structural guard; actor-specific chest evidence is recorded separately in settings.toml (packet04b).
 gold_rupee = "Kareem, rc.3 packet2 PLAYED PASS: Obj_Rupee_Gold retrieved at Kak GS Watchtower, rupees 148 -> 348 inside wallet capacity500, watchtower pair set, token18; all six packet2 pairs persisted through used-reload (watcher 83/83)"
 refill = "Kareem, rc.3 packet3 PLAYED PASS: the four native small bundles at their Skulltulas, Arrows 20 -> 25 (cap30), Bombs 10 -> 15 (cap20), Deku Nuts 16 -> 19 (cap20, native bundle of 3) and Deku Sticks 7 -> 10 (cap10, native bundle of 3); no bag, quiver or other container granted"
 bombchu = "Kareem, rc.3 packet2 PLAYED PASS: Item_BombchuBundle_Small rolled at LLR GS Tree, Bombchus unowned -> 5/20 with the owned Bomb Bag and cap20 unchanged, one used -> 4/20 and still 4/20 after used-reload"

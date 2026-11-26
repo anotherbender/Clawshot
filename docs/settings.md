@@ -318,9 +318,13 @@ With `--shuffle Chest Gift`, `--songs song` (default) keeps songs on song checks
 `--songs anywhere` releases all twelve for chest placement, subject to other destination restrictions.
 Storms, Minuet and Epona have been played from chests; the rest use the shared grant path but are
 **inferred, not individually verified**. A song in a chest shows a green rupee with the song's own text.
-Both chest ocarinas work and show their model in small and big chests; only seeds that can put an ocarina
-in a chest (Chest and Gift shuffle) change the ocarinas' get model. BBender and Claude played small and big
-chests on Longshot v3.1.1 (2026-11-22, [chest ocarina record](../plans/chest-ocarina-model.md)). Kareem
+Both chest ocarinas work and show their model in small and big chests. Gift shuffle, or any of its expanded
+gift kinds in effective settings, always includes the ocarina get model, even without Chest shuffle or when
+neither instrument lands at a display hand-over. This settings-based build rule is reported in the spoiler's
+`patch.steps`; uncovered ocarina placements and unavailable model inputs are refused.
+This does not relax the whole-game progressive pool's separate requirement to shuffle Chest checks.
+BBender and Claude played small and big chests on Longshot v3.1.1
+(2026-11-22, [chest ocarina record](../plans/chest-ocarina-model.md)). Kareem
 played small chests in both orders on Longshot 3.0.0 (2026-11-23): the Ocarina of Time stayed the equipped
 one, also after Save and Continue, and Saria's farewell, Zelda's escape and the moat looked as before
 ([chest ocarina check](../plans/rounds/r21-pr40.md#played-results-kareem-longshot-300-2026-11-23-pass)).
@@ -328,10 +332,11 @@ The Ocarina of Time plays songs. Din's Fire and Adult's Wallet have chest eviden
 Other gift actors remain subject to the sourced chest allowlist and destination holds, not blanket
 permission for every gift to go in a chest. Authoritative restrictions: `data/settings.toml`.
 
-Shuffled ocarinas avoid show-item hand-overs: ordinary gifts, minigame prizes, frog rewards,
-digging rewards and Deku Scrub purchases exclude both instruments before fill, including external
-placements. Chests and direct story grants remain allowed; Ocarina of Time also has its separately
-played Skulltula pickup. The show-item crash is not established to be age-specific.
+Ocarinas may use item-display hand-overs only with the required get model: both ocarina actor packs and
+ActorInfo changes, never native-pack fallback. Kareem passed the PR40-active hand-overs on Longshot 3.2.0;
+the native-pack Time arm crashed. Gift destinations also require an audited native receipt.
+Chests and direct story grants remain allowed under the same settings rule; Ocarina of Time retains its
+separately played Skulltula pickup. See the [played scope and limits](../plans/rounds/r22-lifts.md).
 
 Ocarinas remain separate fixed items, **not progressive copies**. Newly generated seeds still give the
 Fairy Ocarina when found, but keep the Ocarina of Time selected if it is already owned, at either age.
