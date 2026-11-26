@@ -175,7 +175,7 @@ def test_a_row_names_its_place_and_item_without_spoilers(tmp_path, world):
         "id": "Boomerang Pickup",
         "label": "Boomerang Pickup",
         "where": "",
-        "kind": "vanilla",
+        "kind": "other",
         "dungeon": None,
         "collected": False,
         "basis": "inventory",
