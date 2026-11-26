@@ -1,7 +1,7 @@
 # Round 22 merchants — cs22d
 
 Branch `r22/merchants`, base `874f30a`, assigned by Claude after the gift-gates audit, 2026-11-25.
-Target 0.2.9. Do not merge or lift the three holds without Kareem's play.
+0.2.9 shipped the Medigoron tightening only (main `5dcb21b`, merge `9895d54`); merchant admission targets the next release. Do not lift the three holds without Kareem's play and a full paired sweep.
 
 ## Requested scope and direction split
 
@@ -280,3 +280,69 @@ No gameplay/purchase result is claimed; startup does not prove merchant-area fil
 All three shipping holds and wallet predicates remain. Admission, purchase identity normalization
 and its regression still land together only after PLAY and a full paired sweep; no admission
 or dormant implementation was shipped by this turn. The owned lock release is the final handoff.
+
+## Packet-v2 rebuild — copied, funded, independent rows
+
+Claude reported the original first-adult route unplayable: horse/song/trade work, repeated trade
+and money farming were not acceptable. `work/r22-merchants/PLAY.md` now supersedes that route
+with the PR42-style launcher/start-state/steps/expected-numbers table. Each row starts with a
+debug teleport to its merchant area (Granny at noon); no position/clock save edits or route/quest
+grind. Five minutes is a target, not a measured gameplay result.
+
+The read-only backup survey first copied2963 progress files and2963 captions, then parsed only
+those copies:777 distinct payloads,217 adult. No default-wallet save was strictly past the
+Granny sale gate. Completed-trade sources were Giant's Wallet and therefore rejected. The
+chosen genuine main first-adult source is the November9 backup's slot01, SHA256
+`e63eba9d8173c7c03e1e5338c48ec2dc90cbd2f9b2cad1e487022d5cb46c761c`:
+default wallet,76 rupees, genuine Bomb Bag/bombs6, BottleA Bug and BottleB Empty; no Knife,
+Hammer, Iron Boots or Hover Boots. Later `main`-named test copies were not needed as source.
+
+Byte-decoding the existing written Granny flow with cached dictionaries showed Event167 is
+the Odd Powder handover, not a quest scalar setter. Event3 reads the strict
+`SubEvent_GetSwordBigGoron_IsAfter_Step05_01_Exp`; minimum saved step is Step06.
+Claude explicitly authorized only `Step_SubEvent_GetSwordBigGoron` Ready398436934 -> Step06567736888
+on Granny copies, plus the separately authorized rupees. No Odd Potion/pouch history is
+fabricated; the mismatch is expected and PLAY prohibits visiting Biggoron on these copies.
+
+Native A-Granny is first and uses the same edited starting bytes as B/C Granny. Its real
+100->0 Blue Potion purchase is required to establish the vanilla post-trade sale; if it fails,
+candidate rows are VOID. The three progress baselines are byte-identical, SHA256
+`b5d931ba4f07e208ee4fa7eb783864bfcf3bb23b01ff0d292e496052b38ee725`.
+
+Six profiles are materialized in `work/r22-merchants/packet-v2/ingame/`, each equal to its frozen
+baseline. Initial field edits/readbacks are exact:
+
+| Profiles | CurrentRupee | Trade enum | Other saved fields |
+|---|---|---|---|
+| A/B/C Granny | 76 ->100 | Ready398436934 -> Step06567736888 | unchanged |
+| A/C Knife | 76 ->200 | Ready unchanged | unchanged |
+| B carpet | 76 ->90 | Ready unchanged | unchanged |
+| B Medigoron | actual A-Knife result0 ->200, after play | unchanged | genuine Knife and opened walls inherited, never invented |
+
+`fixtures.py` uses existing `clawshot.save`/PR42 `SaveView` and `table_offsets` tools, typed
+entry/whole-save delta checks and separate physical copies. No original save, old profile,
+age, position, wallet, inventory, bottle or collection flag was edited. B-Medigoron is the only
+true dependency: its complete first-launch copy path requires A's actual saved Knife stock1
+and rupees0; it cannot be materialized or certified before that result exists.
+
+Seven current-template, pinned Longshot3.2.0 launchers passed actual cmd dry-runs; all existing
+profiles stayed unchanged. The new copy-before-parse inspector read back C-Granny as100,
+Step06, Odd Powder stock0/unowned, genuine empty bottle and default wallet. An active-game
+guard test refused boot staging with players2 and created no scratch; this is an expected
+guard result, not a startup test. Receipts: `packet-v2/verification.json`, `dry-runs.json`,
+`rows.json`, `launchers.json`, `survey/` and per-row `receipts/*-before.json`, all outside git.
+
+Claude approved dropping below-price rows and same-launcher funded repetition. On B/C's
+R mode, after a real purchase/Save/quit, the tool freezes the actual saves/log first and funds
+only CurrentRupee0->price on the copied working profile. It never resets a merchant flag or
+grants/removes an item. C-Granny saves the genuine potion before funding, then drinks it in
+game before the funded revisit. The readback can establish saved state, not visual/live-use
+PASS. No-empty-bottle refusal is not claimed by these one-empty-bottle quick rows.
+
+No gate, sweep, seed generation or boot ran during this rebuild. Existing seeds2211250002/3
+and mod trees stand. `packet-v2/boot-queue.json` queues fresh fixture/scratch checks for explicit
+idle handoff; native controls expect0 mods, B/C exactly1. B-Medigoron's check waits for A's
+genuine result. The old seed startup PASS does not certify the new fixtures.
+
+Production holds/wallet predicates remain. Admission still requires actual PLAY and a full
+paired sweep; merge current main into this branch when admission resumes, never rebase.
