@@ -377,3 +377,81 @@ starting trade state. This is not a B/C transaction/repeat PASS or an admission 
 Claude reports B-Medigoron ROW_PREPARED from A's real Knife snapshot, with rupees0->200 as its
 only fixture change; its first-visit result is still pending. Holds and the full paired-sweep
 requirement remain.
+
+## B play receipts and native repeat-service design issue — 2026-11-26
+
+Kareem via Claude: B-Medigoron "working great", but its post-purchase text references Biggoron's
+Sword despite not owning it. B-Granny: decline/purchase/Iron Boots work; funded revisit silently
+focuses Granny then exits, retaining100 rupees. No additional use/decline detail is inferred
+from Medigoron's general report.
+
+Copied B profiles/logs were inspected without editing them. Frozen real-purchase receipts
+prove200->0/Hammer1/own Bool true for Medigoron and100->0/Iron Boots1/own Bool true for Granny.
+Existing funding receipts change only CurrentRupee0->price. New copied Medigoron slots00/01
+retain200, Hammer1, genuine Knife1, Biggoron0 and own Bool true. Granny slots01/02 retain100,
+Iron Boots1, an empty bottle and own Bool true; its slot00 is an older pre-purchase save.
+Other merchant Bools are false; both retain default200 wallet and two valid bottles.
+Both PASS the existing one-time transaction/persisted funded-state contract, not admission.
+Granny also has the design hold below.
+
+Runtime proof in the copied logs: exactly one swapped mod, the actual merchant flow, GameData,
+analyzed table and merged resource table; Medigoron also loads SimpleShop. Full hashes, slot
+facts, exact checks and quotations: `packet-v2/receipts/B-Medigoron-PLAY-20261126.json` and
+`B-Granny-PLAY-20261126.json`, linked from PLAY.
+
+### Medigoron ownership gates and message labels
+
+Cached native inputs and the actual B mod were physically copied, then decoded outside git
+in `packet-v2/research-20261126/`. English labels/text are native, unchanged in the candidate:
+first Biggoron-owned comment Event26/`EventFlowMsg/Npc_Goron_Medigoron_Adult:Talk_08`;
+later Event84/`Talk_30`; Event27 alternatives Event20/`Talk_12` (brother's sword aura) and
+Event28/`Talk_13`. His copied Event26 talk-history Bool was false before funding and true
+after the revisit, while Biggoron stock remains0. The tester did not quote the exact random
+follow-up sentence, so it is not pinned more narrowly. These are specifically the native
+Biggoron-owned branch, not neutral already-sold text; Knife-owned text is Talk_07/Talk_19.
+
+Native Talk -> Event19 queries actual `Weapon_Sword_Biggoron`: present routes to dialogue/
+return, excluding sale regardless of acquisition source. Absent continues via SageOfFire_Check
+to Event6/`Weapon_Sword_Giant`; owned Knife also returns without sale. Event7/BrokenGiant only
+selects different introductions: both paths converge on price200 and Event11/SimpleShop.
+Native SimpleShop removes a broken Knife after a successful replacement purchase.
+The GetSwordBigGoron_IsAfterShowBrokenSword_Medigoron_Adult Bool belongs to the separate
+ShowBrokenSword_Medigoron_Adult entry's dialogue history, not a quest-step gate on Talk sales.
+
+Actual B Event19 AND Event6 already read the independent merchant collected Bool. Its private
+SimpleShop grant bypasses broken-sword removal. Therefore the traced candidate does not need
+not-Biggoron logic: retain the existing ownership-neutralizing patch. This is a static proof,
+not a Biggoron-owned first-purchase play row. The inaccurate dialogue is a presentation issue.
+
+Published `5dcb21b` still has Medigoron's keep_vanilla and
+`is_adult and Progressive_Wallet and can_blast_or_smash`;0.2.9 shipped room tightening only.
+Native Biggoron ownership still suppresses the unshuffled Knife shop, as before. This does
+not invalidate that tightening or expose a newly admitted progression check in0.2.9.
+
+### Granny repeat shop: product decision required, no code change
+
+Vanilla eligible Talk -> Event3/after-Step05_01 -> Event31 calls Buy_BluePotion on every visit.
+Event143/FirstTalk and Event144/IsAfterFirstTalk_MakeBluePotion only select the introduction,
+then still offer the purchase. Accept -> funds100/Event11 -> empty bottle/Event15 ->
+price100/Event179 -> Event12/GetInEventInBottle_BlueBottleShop; the native wrapper fills
+the bottle and charges, then returns to thanks/close. No sale-completion Bool is tested/set.
+Thus native Blue Potion purchases repeat with money and an empty bottle.
+
+Patched Buy_BluePotion starts at ClawshotGift155: collected=true/case0 -> NONE/immediate
+return; uncollected -> Event143. Caller Event31 also returns. There is NO done-message node
+on the collected branch. The silent focus/exit is our added gate, not a native done branch.
+Current once-only normalization has removed a vanilla repeatable Blue Potion service.
+This is a DESIGN HOLD despite the technical PASS, not approval of the removed service.
+
+cs22d proposes, for maintainers to choose:
+- Recommended: one shuffled reward, then a pristine native Blue Potion sale graph on repeats.
+  Keep the collected Bool true; never route back into the mutated randomized-gift Event12.
+- Explicitly approve one-time shop closure and intentional done dialogue, accepting loss of
+  the native repeat service.
+- Keep Granny vanilla/held until the decision is settled.
+
+Preserving repeats would also change C-Granny's current no-second-sale expectation and the
+persisted-repeat regression's contract: once-only randomized completion versus subsequent
+legitimate native potion purchases. Neither code nor tests were changed.
+Full external report: `packet-v2/FLOW-REVIEW-20261126.md`. No original dump, spoilers or
+placement files were opened; no source save edits, gates, sweeps, seeds, boots or heavy work.
