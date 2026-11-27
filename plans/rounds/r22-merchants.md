@@ -643,3 +643,75 @@ contract now reflects the played default-wallet sale; LACS/Great Fairy flag orac
 against the normalized identity-merchant baseline rather than asserting no GameData change.
 Changed Python files pass the narrow format check. Dump/full-gate and live proof are not
 claimed here. Gate23, fresh play rows and sweep25 must bind the final admitted commit.
+
+## Line23 test-infrastructure recovery — 2026-11-26
+
+The first gate on3967848c7f stopped on the old shopkeeper-only spec equality. Per Claude,
+the test was narrowed, not deleted: preserve unchanged behavior without Gift/NPC, require
+the whole shuffled spec to equal shopkeeper_spec except Granny's Rupees (5), check the
+tracker's actual vanilla conversion, and cover keep_vanilla retaining native Blue Potion.
+Test-only child `f06f2362bd58135bcee7cfb790e2e870904dce8d` passed19 focused cases.
+
+The full restart onf06 passed format/lint and4835 synthetic cases, then failed only
+`test_tracker_logic_ui.py::test_age_control_defaults_to_either`: tracker-render through
+`C:/Program Files/Volta/node.EXE` exceeded its10-second subprocess deadline under parallel
+load (-n8, BelowNormal). Claude classified this as test infrastructure, not the merchant
+change; the case passed in the396 run and cs22c's line22 gate.
+
+Claude required five isolated runs without xdist, with the same shim/deadline. All passed:
+pytest-reported seconds9.37,0.32,8.83,0.32,0.32; full-command wall seconds
+10.332,1.074,9.568,1.052,1.055. Exact outputs and commands are outside the repo in
+`work/r22-merchants/tracker-volta-alone-{1..5}.log` and
+`tracker-volta-alone-results.json`. No test timeout, Node resolution or product code changed.
+
+Approved recovery: retain same-SHA f06 format/lint results; rerun only synthetic, then dump,
+under the retained line23 lock. Play builds and sweep still bind f06 and wait for the
+complete gate. Candidate infrastructure fixes are deferred to main: resolve the real
+node.exe once per session, or allow that subprocess more time. Neither lands on this branch.
+
+## Native registration coverage-pair correction
+
+The f06 recovery passed4836 synthetic cases, then native910 passed/1 skipped/1 failed
+in3309.73s. The broad event-registration harness moved Bombchus (5) from a scrub to
+KF Shop Item2. Its pair selector used allowed() on an unscreened world; production
+from_placements correctly applied the D25 container/tier screens and rejected that move.
+
+cs22d corrected only the harness: construct with_screens from the generated shuffled pool
+and fixed placements before selecting either side of the pair. Fill rules, the pool-preserving
+swap, ordinary replay validation, all writer/dependency/debt assertions and the Dampé-cycle
+check remain. Focused native broad recipe passed1 in130.81s, BelowNormal/n2/workers1;
+the modified file passes its format check. No whitelist, location or ammo special case.
+
+Test-only child `c5625a0118fe82266d06ebab3bb88ae92799876a` is the new gate/play/sweep
+candidate; production code is unchanged. Full gate restarts on that clean frozen checkout.
+The first temporary f06 tier-recovery launch used the wrong cwd; its own process tree was
+stopped, its log marked ABORTED/not gate evidence, and the driver corrected before the
+accepted f06 recovery. All failed and aborted logs remain outside the repository.
+
+## Line23 complete on c5625a0118 — fresh v3 packet boot-only ready
+
+Exact frozen `c5625a0118fe82266d06ebab3bb88ae92799876a` passed the full restart:
+format613 clean, lintPASS, synthetic4836 passed/914 skipped in439.70s, native911 passed/
+1 skipped in4034.11s. Detached BelowNormal, n8/workers4 synthetic with all OOT variables
+unset and the UI extra, then n8/workers3 with all three native layers. No Node/timeout fix
+or verification waiver is included in this final gate. Logs: `work/r22-merchants/gate23-c5625a0118`.
+
+Both fresh constrained seeds were built directly from that same clean checkout:
+2211250003 identity (Medigoron Giant's Knife; Granny explicit native-refill pin; carpet
+unpinned), and2211250002 swapped. Binding verified source/receipt SHA, the composed saved
+flags, native refill calls and no plain-Blue new-container alias. All four actual launchers
+passed dry-run with profiles byte-identical; exactly one fresh-scratch Longshot3.2.0 boot
+per row passed with one bound mod, its GameDataList loaded, mounted scratch save and no
+crash/fatal lines. These are startup proofs only, not merchant area-load or transaction play.
+
+`work/r22-merchants/packet-v3/PLAY.md` is ready for Granny-Identity (the fresh C-Granny
+case), Granny-Swapped, Carpet-Swapped and Medigoron-Swapped. Every copied profile matches
+its frozen baseline. Granny/carpet payloads are byte-identical to their source copies;
+Medigoron has exactly one changed Int word: CurrentRupee0->200 at byte offset84164.
+No position, clock, flag or inventory edits. Original saves and all packet-v2/failed-C
+evidence remain untouched. Build, binding, edit, dry-run and per-row boot receipts are in
+packet-v3; driver proof: `play23-c5625a0118/status.json`.
+
+Human play and admission remain pending. Line25 regenerates the full paired sweep on
+c5625a0118, Gift-on versus Gift-off, only after line24's explicit release. The updated
+queue inserts cs22c's22b after this line23 release and before24. No main merge is authorized.
