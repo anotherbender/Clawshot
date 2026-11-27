@@ -49,7 +49,7 @@ def ocarina_members(ocarina: str) -> dict[str, bytes]:
             {"Components": {"ModelInfoRef": "?" + model(ocarina), "PouchContentRef": "?" + pouch(ocarina)}}
         ),
         model(ocarina): doc({"FmdbName": ocarina, "ModelProjectName": ocarina, "Scale": 1}),
-        pouch(ocarina): doc({"SpecialDeal": 7}),
+        pouch(ocarina): doc({"SpecialDeal": 7, **({"GetType": byml.U32(0x681AE117)} if ocarina == TIME else {})}),
         "Component/Other/Equipment.bgyml": doc({"Equip": True}),
         BOX: doc({"Box": "the moat body"}),
     }
@@ -99,7 +99,22 @@ def test_pickup_is_the_arrow_pointing_at_the_ocarina(ocarina):
         "$parent": "Work/" + pouch(ocarina).replace(".bgyml", ".gyml"),
         "GetDemoOffsetPos": byml.read(arrow_members()[ARROW_POUCH])["GetDemoOffsetPos"],
         "PouchActor": f"Work/Actor/{ocarina}.engine__actor__ActorParam.gyml",
+        **({"GetType": byml.U32(0x681AE117)} if ocarina == FAIRY else {}),
     }
+
+
+@pytest.mark.parametrize("ocarina", [FAIRY, TIME])
+def test_world_ocarina_uses_large_get_without_changing_its_native_pouch_or_grant(ocarina):
+    from clawshot.patch.actor_packs import resolve_node
+
+    members, _ = built(ocarina)
+    native = ocarina_members(ocarina)
+    own_pouch = names(ocarina)[2]
+    resolved = resolve_node([members], own_pouch)
+    assert byml.same(resolved["GetType"], byml.U32(0x681AE117))
+    assert resolved["PouchActor"] == f"Work/Actor/{ocarina}.engine__actor__ActorParam.gyml"
+    assert resolved["SpecialDeal"] == 7
+    assert members[pouch(ocarina)] == native[pouch(ocarina)]
 
 
 @pytest.mark.parametrize("ocarina", [FAIRY, TIME])
@@ -213,16 +228,17 @@ def test_game_actor_info_rows_are_the_arrow_renamed():
         assert out[pickup] == {"__RowId": pickup, "IsRespawn": True, "MainRigidBodyLayer": "Object"}
 
 
-def test_pouch_actor_info_rows_are_the_ocarinas_without_their_ocarina_type():
+def test_pouch_actor_info_uses_large_world_get_and_keeps_native_rows_byte_identical():
     rows = [
         row(FAIRY, PouchGetType="Small", PouchSpecialDeal="Ocarina", OcarinaTypeValue=byml.I32(1)),
         row(TIME, PouchGetType="Large", PouchSpecialDeal="Ocarina", OcarinaTypeValue=byml.I32(2)),
     ]
     out = {r["__RowId"]: r for r in byml.read(ocarina_pickup.patch_pouch_actor_info(byml.write(rows)))}
     fairy, time = ocarina_pickup.PICKUPS[FAIRY], ocarina_pickup.PICKUPS[TIME]
-    assert out[fairy] == {"__RowId": fairy, "PouchGetType": "Small", "PouchSpecialDeal": "Ocarina"}
+    assert out[fairy] == {"__RowId": fairy, "PouchGetType": "Large", "PouchSpecialDeal": "Ocarina"}
     assert out[time] == {"__RowId": time, "PouchGetType": "Large", "PouchSpecialDeal": "Ocarina"}
-    assert byml.same(out[FAIRY], rows[0]) and byml.same(out[TIME], rows[1])
+    for native in rows:
+        assert byml.write(out[native["__RowId"]]) == byml.write(native)
 
 
 def test_the_rows_can_be_limited_to_one_ocarina():

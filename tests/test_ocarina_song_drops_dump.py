@@ -88,11 +88,22 @@ def test_dump_ocarina_pickup_pack_and_rows_read_back(written, ocarina):
     assert not [name for name in pack if "/Box." in name or "Ptm_ObjDynamicLarge" in name]
     arrow = closure([sarc.read(read_dump(written, "Obj_Arrow_Fire"))], "Obj_Arrow_Fire").components
     assert components["PhysicsRef"] == arrow["PhysicsRef"]
+    own_pouch = components["PouchContentRef"].removeprefix("?")
+    if ocarina == getitem.FAIRY:
+        assert byml.same(byml.read(pack[own_pouch])["GetType"], byml.U32(0x681AE117))
+    native = sarc.read(read_dump(written, ocarina))
+    parent_pouch = closure([native], ocarina).components["PouchContentRef"].removeprefix("?")
+    assert pack[parent_pouch] == native[parent_pouch]
     table = rstb.read(read(rstb.TABLE_PATH))
     assert table.get(path) == rstb.required_size(path, len(read(path)))
     for registry in tokens.REGISTRIES:
-        ids = [row["__RowId"] for row in byml.read(read(registry))]
-        assert ids == sorted(ids, key=str.encode) and pickup in ids
+        rows = {row["__RowId"]: row for row in byml.read(read(registry))}
+        assert list(rows) == sorted(rows, key=str.encode) and pickup in rows
+        if registry == ocarina_pickup.POUCH_ACTOR_INFO:
+            assert rows[pickup]["PouchGetType"] == "Large"
+            originals = {row["__RowId"]: row for row in byml.read(written["dump"](registry))}
+            for native_ocarina in ocarina_pickup.PICKUPS:
+                assert byml.write(rows[native_ocarina]) == byml.write(originals[native_ocarina])
 
 
 def read_dump(written, actor):
@@ -107,6 +118,12 @@ def test_dump_a_skulltula_drop_per_group_reads_back(written, group):
     (source,) = [hash_ for hash_, actor in delivery.drops.items() if actor == pickup]
     pack = sarc.read(read(tokens.pack_path(pickup)))
     assert tokens.TOKEN_GRAPH in pack
+    if group == "fairy":
+        components = closure([pack], pickup).components
+        own_pouch = components["PouchContentRef"].removeprefix("?")
+        assert byml.same(byml.read(pack[own_pouch])["GetType"], byml.U32(0x681AE117))
+        rows = {row["__RowId"]: row for row in byml.read(read(ocarina_pickup.POUCH_ACTOR_INFO))}
+        assert rows[pickup]["PouchGetType"] == "Large"
     for path in written["census"][source].files:
         actors = byml.read(read(path))["Actors"]
         assert [a["Dynamic"][tokens.DROP] for a in actors if a.get("Hash") == source] == [pickup]

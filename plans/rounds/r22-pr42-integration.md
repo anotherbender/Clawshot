@@ -2,7 +2,7 @@
 
 Authorized by Claude: line21, relay `claude-21-after-029`, after release0.2.9 and explicit line20 LOCK RELEASED. Branch `r22/pr42-integration`, worktree `E:/OOTRemake/clawshot-r22/pr42-integration`. Contributor head `ceab0744c00a325c80de46a7c6df6f2f24388778`; main `5dcb21b5e29b78e96e8c254d0106647267ad4d87` (tag `v0.2.9`). Main is merged INTO the contributor branch; none of Bender's commits is rebased or rewritten.
 
-Latest played disposition: **child2c Time PASS; both adult Fairy keep-Time rows FAIL on ca62**. The preparation/full-gate/sweep results below are historical and do not supersede those played failures. Diagnosis-only Small/Large proposal is pending approval; no rebuild or lock. See the final section and `work/r22-pr42/PLAY.md`.
+Latest played disposition: **child2c Time PASS; both adult Fairy keep-Time rows FAIL on ca62**. The preparation/full-gate/sweep results below do not supersede those played failures. Claude subsequently approved the scoped generated-Fairy Large normalization and line26 retests; that candidate is not a played fix. See the final section and `work/r22-pr42/PLAY.md`.
 
 ## Integration choices
 
@@ -181,4 +181,21 @@ Blast radius is world Fairy on Freestanding/BossHeart and generated Token donor 
 Safe alternative, separately approved: exclude Fairy from **Freestanding/BossHeart shared floor admission and Token catalogue**, matching0.2.9's Fairy exclusion while retaining Time and songs. Align producer/donor selection and screened external-placement refusal; keep Fairy in its pool and supported other delivery routes, never silently drop/substitute it or repair old outputs/saves. This deliberately reduces Fairy-world scope instead of shipping the demonstrated failure.
 
 Full evidence/proposal: `diagnosis-and-proposal.md` in the preserved snapshot root. Posted to `cs-r22` at09:04. **Awaiting Claude's OK; no implementation, rebuild or lock.** GitHub comment/push remains held.
+
+## Approved generated-Fairy Large normalization — line26
+
+Claude explicitly approved the proposed two-field normalization after the diagnosis: **only** generated Fairy's wrapper PouchContentParam.GetType becomes the native Time/Fire Arrow Large U32 enum, and its inserted PouchActorInfo.PouchGetType becomes Large. Native Item_Fairy/Pouch rows and parent members, Time, grant identity, receipts, physics and saves are unchanged. cs22c implements that contract; no runtime patch or version bump. The0.2.9-style Freestanding/Token/BossHeart Fairy exclusion above remains **written but unapplied**, reserved for a played failure.
+
+Focused synthetic verification at actual BelowNormal0x4000, workers1 / pytest-xdist2: **96 passed in5.81s** (`test_ocarina_pickup.py`, `test_t1a_receipt.py`, `test_ocarina.py`). Serialized generated component and registry assert Large; native parent bytes and canonical native row bytes remain identical. The real-dump composition regression additionally verifies generated floor/Token classification and native rows; it runs with the full dump gate, not claimed here.
+
+Read-only production before/after native proof under `work/r22-pr42/line26-large/verification/{before,after}-native.json`:
+
+- **17,121 canonical native rows byte-identical** across ActorInfo, GameActorInfo and PouchActorInfo. Source table bytes also unchanged.
+- The generated Fairy pack changes **only** its own wrapper pouch member, adding typed U32 GetType; every native copied member and every other generated member is identical. Generated Time's entire pack is byte-identical.
+- The generated Fairy PouchGetType is the **only** registry-row delta; all native Item_Fairy/Time rows and all ActorInfo/GameActorInfo content remain identical.
+- **All five composed receipt EventFlow files are byte-identical** before/after, using production receipt then keep-Time transforms on actual read-only native inputs. Existing normal/no-player behavioral regression tests also pass. This does not prove native dispatch or a played pickup.
+
+Contributor test mapping: `test_pouch_actor_info_rows_are_the_ocarinas_without_their_ocarina_type` is adapted/renamed to `test_pouch_actor_info_uses_large_world_get_and_keeps_native_rows_byte_identical`; it preserves the original no-OcarinaTypeValue/native-row guarantees and updates only generated Fairy's approved Small->Large contract. No behavior coverage is dropped.
+
+Next approved order: commit this focused change; compare several existing Broad and WorldPickupsAnywhere placement digests against the line24 ca62 controls (no new sweep if identical); atomically acquire line26 lock or exit73 and check player absence; full format/lint/synthetic/dump gate; then one build and one boot per adult roof, open roof and **original row2 child Fairy** (not the later Time four-cycle). Child baseline remains original Din's Fire-owned/both-instruments-never-owned; owl or travel noclip allowed, off before pickup. A cheap existing-baseline Token Fairy row is conditional on a verified candidate. Fresh independent profiles only; never reset/repair old played profiles. Release with @cs22d and launchers. Pickup animation/text/Time selection/Continue are **future player expectations**, not boot acceptance.
 
