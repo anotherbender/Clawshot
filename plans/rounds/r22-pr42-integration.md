@@ -2,7 +2,7 @@
 
 Authorized by Claude: line21, relay `claude-21-after-029`, after release0.2.9 and explicit line20 LOCK RELEASED. Branch `r22/pr42-integration`, worktree `E:/OOTRemake/clawshot-r22/pr42-integration`. Contributor head `ceab0744c00a325c80de46a7c6df6f2f24388778`; main `5dcb21b5e29b78e96e8c254d0106647267ad4d87` (tag `v0.2.9`). Main is merged INTO the contributor branch; none of Bender's commits is rebased or rewritten.
 
-Latest played disposition: **child2c Time PASS; both adult Fairy keep-Time rows FAIL on ca62**. The preparation/full-gate/sweep results below do not supersede those played failures. Claude subsequently approved the scoped generated-Fairy Large normalization and line26 retests; that candidate is not a played fix. See the final section and `work/r22-pr42/PLAY.md`.
+Latest ruling: **Kareem approved option1: revert179600d and exclude Fairy from Freestanding only; BossHeart retained on Gohma PASS; Token waits for daylight d′ play and Claude's final kind set.** Adult a/b are retired duplicate-Fairy regression controls with records preserved. Child c remains an empty-roof first-acquisition blocker, no flag/metadata guesses. d′ was built/one-boot verified first on frozen7968343, then the approved code changes began. Focused tests only, no full gate or PR42 GitHub comment; the historical experiments below are not current fixes.
 
 ## Integration choices
 
@@ -314,4 +314,17 @@ archived to `line26-large/lock-owner.txt`; only that owner file and the empty lo
 were removed. **LOCK RELEASED for @cs22d.** Launchers/checklist are ready for maintainer play.
 Fairy exclusion fallback remains documented and **unapplied**; a played failure returns to
 Claude for the decision. No release version bump, GitHub push or gameplay claim.
+
+
+## Accepted line26 diagnosis and option1 — 2026-11-27
+
+Claude accepted the copied-save/artifact report. Adult a/b's own-both-then-collect-another-Fairy state is not ordinary single-copy production progression; those controls are retired, not erased. Child c's unconsumed empty roof remains unresolved. The Large normalization179600d changed nothing observable and its dispatcher hypothesis is falsified as a remedy; no ELink/model/physics/flag flip is justified. Historical evidence remains in the private line26 snapshot, with the complete2c-versus-c generated-artifact comparison and single-copy/progressive/starting-item qualifications.
+
+Original row d was an impossible fixture: this pre-Zelda child is pinned at noon, so the night-only Kak GS cannot spawn. The stop-if-night-unavailable condition applies; this is our fixture error, not Kareem's. His Market GS pickup is incidental Saria-song PASS evidence; the old intended Fairy GS remains untested.
+
+Approved daylight d′ finished **before code changes**, on unchanged7968343/settings/seed924202/native three-merchant pins, with a separate exact original four-file child. The initial Saria-roof two-cycle failed the full oracle before output/boot: native child bombs need Darunia's fixed Bracelet, which needs Saria's Song; the owl roof needs bombs and Din's Fire. Progressive Strength cannot replace that Bracelet. The user chose a different-song roof. Final pool-preserving four-cycle: Market GS Guard House=Fairy, Impa cow-shed roof=Bolero, Ganon's Castle Shadow Trial Front Chest=Piece of Heart, LW Gift from Saria=Saria's Song. All other assignments remain frozen.
+
+Production build/all pool/admission/screens/physical-trap/goal/age-return/tier oracles passed with23spheres; Saria and Market Fairy are sphere3, roof Bolero sphere9. Complete original baseline/dry-run, exactly one scratch boot and startup verifier passed; independent written-actor/grant and four-file SHA256 readback passed. Both instruments/Saria/Bolero never owned, source pair/roof unset, Din1/tokens4/life12/pieces0. Readback's first invocation printed the engine-built-in Default pouch leaf missing; specifying that known built-in boundary corrected the decoder, without rebuilding/booting/editing artifacts. Ready launcher: `work/r22-pr42/line26-large/tokenprime2/ingame/pr42-924202.bat`; exact crate/Market directions and OPTIONAL second Bolero summit/owl/roof pickup are in PLAY.md. Lock released and READY posted14:12. Pickups remain unplayed.
+
+Kareem then approved **option1**, implemented only on this branch without rebase: reverse179600d's generated Fairy GetType/PouchGetType overrides, keep native classification/grant/parent bytes and historical records, and add the separately scoped Fairy Freestanding hold. Tests retain native preservation and inherited-contract coverage rather than deleting it with the ineffective Large expectation. BossHeart remains supported on the Gohma PASS; chests/NPC delivery, Time and songs remain unchanged. Token policy is parameterized/pending d′; no final Token decision, release, full gate or GitHub comment is claimed.
 

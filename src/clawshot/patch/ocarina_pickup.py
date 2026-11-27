@@ -8,8 +8,7 @@ the song floor actors use (``songs.pickup_pack``; played at floors, boss hearts 
 
 - the pack: the arrow's, its ActorParam renamed and pointing at the ocarina (ActorName, the ocarina's ModelInfo
   member, an AnimationParam of its own built in code, a PouchContentParam of its own ``{$parent: the ocarina's,
-  PouchActor: the ocarina, GetDemoOffsetPos: the arrow's}`` (Fairy additionally overrides ``GetType=Large``),
-  an ELinkParam of its own naming its glow user); the
+  PouchActor: the ocarina, GetDemoOffsetPos: the arrow's}``, an ELinkParam of its own naming its glow user); the
   arrow's GameParameterTable, SLink and Capture references dropped; every other member, the pickup body included,
   copied unchanged;
 - the glow (BBender, 2026-11-24: a slight floor glow like the songs' light, without sparks or aura, warm white): an
@@ -19,8 +18,7 @@ the song floor actors use (``songs.pickup_pack``; played at floors, boss hearts 
 - the rows: the arrow's ``ActorInfo`` row with the ocarina's model fields, ``ActorName``, animations and glow user;
   the arrow's ``GameActorInfo`` row; the ocarina's ``PouchActorInfo`` row without ``OcarinaTypeValue`` (as the
   native ``Obj_Ocarina_Time`` row is ``Item_Ocarina_Time``'s without it; keeping it did not make the picked-up
-  ocarina playable, run G1t). Generated Fairy also uses ``PouchGetType=Large``: the native Small pickup showed
-  the rupee/ammo popup and replaced Time selection in both played adult line22 rows (2026-11-27).
+  ocarina playable, run G1t).
 
 One actor per ocarina serves the boss heart and free-standing floors and the Skulltula drop (as the Token donor; the
 native ``Obj_Ocarina_Time`` donor left the Fairy as the instrument until a reload, run TB3). A seed gets them only
@@ -129,15 +127,13 @@ def pickup_pack(ocarina: str, *, arrow: bytes, ocarina_pack: bytes) -> NewFile:
     pack[model_member] = members[model_member]
     pack[pouch_parent] = members[pouch_parent]
     pack[animation] = getitem.animation_param(ocarina)
-    pouch_data = {
-        "$parent": "Work/" + pouch_parent.replace(".bgyml", ".gyml"),
-        "GetDemoOffsetPos": donor_pouch["GetDemoOffsetPos"],
-        "PouchActor": actor_path(ocarina),
-    }
-    if ocarina == FAIRY:
-        # Native Time/Fire Arrow's Large enum; override only the generated wrapper, never its native parent.
-        pouch_data["GetType"] = byml.U32(0x681AE117)
-    pack[pouch] = byml.write(pouch_data)
+    pack[pouch] = byml.write(
+        {
+            "$parent": "Work/" + pouch_parent.replace(".bgyml", ".gyml"),
+            "GetDemoOffsetPos": donor_pouch["GetDemoOffsetPos"],
+            "PouchActor": actor_path(ocarina),
+        }
+    )
     pack[param] = byml.dump(document)
     data = sarc.write(pack)
     if sarc.read(data) != pack:
@@ -175,15 +171,13 @@ def patch_game_actor_info(data: bytes, ocarinas: Iterable[str] = tuple(PICKUPS))
 
 
 def patch_pouch_actor_info(data: bytes, ocarinas: Iterable[str] = tuple(PICKUPS)) -> bytes:
-    """Insert each ocarina's row without ``OcarinaTypeValue``; generated Fairy uses the Large get contract."""
+    """Insert each ocarina's row, renamed and without ``OcarinaTypeValue``."""
     document, rows = _rows(data, POUCH_ACTOR_INFO)
     ocarinas = list(ocarinas)
     _need(rows, POUCH_ACTOR_INFO, *ocarinas)
     new = []
     for ocarina in ocarinas:
         pickup = {k: copy.deepcopy(v) for k, v in rows[ocarina].items() if k != POUCH_ROW_DROPPED}
-        if ocarina == FAIRY:
-            pickup["PouchGetType"] = "Large"
         new.append({**pickup, "__RowId": PICKUPS[ocarina]})
     return _insert(document, POUCH_ACTOR_INFO, new)
 
