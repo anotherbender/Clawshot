@@ -2,6 +2,8 @@
 
 Authorized by Claude: line21, relay `claude-21-after-029`, after release0.2.9 and explicit line20 LOCK RELEASED. Branch `r22/pr42-integration`, worktree `E:/OOTRemake/clawshot-r22/pr42-integration`. Contributor head `ceab0744c00a325c80de46a7c6df6f2f24388778`; main `5dcb21b5e29b78e96e8c254d0106647267ad4d87` (tag `v0.2.9`). Main is merged INTO the contributor branch; none of Bender's commits is rebased or rewritten.
 
+Latest played disposition: **child2c Time PASS; both adult Fairy keep-Time rows FAIL on ca62**. The preparation/full-gate/sweep results below are historical and do not supersede those played failures. Diagnosis-only Small/Large proposal is pending approval; no rebuild or lock. See the final section and `work/r22-pr42/PLAY.md`.
+
 ## Integration choices
 
 Proposed by cs22c under Claude's explicit “keep lifts' safety checks” requirement:
@@ -143,4 +145,40 @@ Every completed seed records each special floor placement's logical item, source
 Detached actual priority0x4000, four workers, two successful ten-minute progress/direct-thread polls; all five capture/sweep/report stages exit0. Total driver time2,250.55s. The owned lock was removed after matching its exact owner, and **LOCK RELEASED cs22c line24** was posted with **@cs22d at22:52**, allowing line25. `lock-released.txt` preserves the posted handoff. Herdr delivery was unavailable, so the CLI explicitly reported the message persisted to the watched thread rather than claiming an agent notification.
 
 **Preparation work complete; gameplay still pending.** `work/r22-pr42/PLAY.md` links the faithful adult roof replay, open-roof normal-path control and original-child row2c Time comparison. Each has its own untouched baseline/profile, pinned ca62 mod and one startup proof. The expected normal/no-player branches and child roof appearance/collection remain unplayed, not inferred from startup. Version remains0.2.9; old failures, saves and outputs stay preserved; GitHub comment/push remains held.
+
+## Played line22 diagnosis — 2026-11-27
+
+Claude relayed Kareem's **2c PASS**, **adult roof FAIL**, **open lab-roof FAIL**; he then confirmed **both** adult Fairy pickups used the small rupee/ammo popup with no item-get animation, including the open-space control. `PLAY.md` records the reports verbatim. The earlier expected camera/IsSpace split did not establish actual branch coverage, and ca62 does **not** keep Time on these pickups.
+
+All three complete played profiles/logs were copied **before interpretation** to `work/r22-pr42/keep-time-ca62f1e6ac/diagnosis/line22-played-20261127-083915/{2c,roof,open}`. All45source/copy file hashes match. No lock, generation, rebuild, test suite, boot, live-profile edit or runtime manipulation.
+
+Actual parent-run typed copied-save checkers, not a raw-string inference, establish:
+
+| Case | Fairy stock/history | Time stock/history | Persisted selector | Source | Life/pieces |
+|---|---|---|---|---|---|
+| 2c | absent retained | absent -> owned/stock1 | empty -> Time | consumed | 12/0 unchanged |
+| Adult roof | owned/stock1 retained | owned/stock1 retained | Time -> Fairy | consumed | 24/0 unchanged |
+| Open lab roof | owned/stock1 retained | owned/stock1 retained | Time -> Fairy | consumed | 24/0 unchanged |
+
+Save/save-work pairs agree. Detailed per-image facts/hashes are in `typed-save-facts.json` and the three `*-typed-readback.log` files. No unreported Continue/route observation is invented for2c.
+
+Both Dm_SY_Get flows and GetPouchContent load once in every copied log's startup/pre-map block, from the correct case mod root. No event-execution tracer identifies the pickup branch. Actual written EVFL readback confirms both Fairy receipts continue into KeepTime and the helper entry exists, byte-identically across the three cases (`written-receipts.json`). Resource loads and the checker's coarse LOADED_IN_PLAY label are not execution proof. Late adult Item_Fairy pack loads corroborate a presentation difference but do not establish exact pickup timing or which consumer requested the model.
+
+`ClawshotOcarinaKeepTime` is an EventFlow entry; receipt labels are nodes, **not persistent markers**. Typed GameDataList name-hash lookups find no custom marker/receipt row. Native saved fields **do** exist but are unchanged in every baseline/current image: HavePlayedEvent.Dm_SY_Get=true, WithoutPlayer=false, GetPouchContent=false. Sticky/no-delta fields do not count new invocations or prove subflow execution/bypass. 2c's Time branch does not call the Fairy-only KeepTime helper, so its PASS does not prove that helper executed.
+
+### Native classification finding and proof limit
+
+Claude proposed Small/Large as a hypothesis. Read-only actual resources confirm generated Fairy's PouchActorInfo is Small and Time's Large; both retain Ocarina special deal. **Additional pack-level difference:** generated Fairy inherits its native Fairy PouchContentParam with no explicit GetType override; generated Time inherits an explicit Large GetType. Both wrappers grant the correct native Item_Ocarina actor. A registry-only edit could leave this separate component representation unequal. Evidence: `pouch-metadata.json`, `pouch-components.json`.
+
+All914native EVFL files decoded without errors. The only serialized own-add performer actions found are Dm_SY_Get/Event35 and WithoutPlayer/Event0; no explicit native EquipOcarina write or standalone Small world-grant routine was found in the inspected EVFL/pack data. The data identifies the native Ocarina special-deal target, **not its exact compiled dispatcher/selector-write site**. `dsm.open` rejected the installed Nintendo NSO as unsupported; no existing native-clock ELF/database was found. Small-path bypass is strongly supported, **not proved at an engine instruction**; late overwrite/identity or ownership-dependent routing is not excluded. The old child Fairy disappearance is not declared explained.
+
+### Approval-gated proposal, NOT APPLIED
+
+cs22c recommends normalizing **only the generated world Fairy** to the checked Time/donor Large contract in **both** representations: generated wrapper PouchContentParam.GetType and generated PouchActorInfo.PouchGetType. Preserve native Item_Fairy/Pouch_Fairy rows, grant identity, OcarinaTypeValue policy, Time, songs, receipt guards, physics/model/positions, source flags and every save. This is a candidate experiment, not a claimed fix.
+
+Blast radius is world Fairy on Freestanding/BossHeart and generated Token donor descendants; Token's ocarina family already permits Small/Large, and its composer preserves donor pouch semantics. Prompt/get-pose routing, camera fallback, remote retrieval and cleanup/autosave timing need played proof. After approval, use fresh original-baseline copies for both failed adult cases; retain actual Time selection before/after Continue, stock/history, source-once and life/pieces. Never-owned Fairy/absent-Time and Token/BossHeart delivery must remain correct; the child missing-Fairy actor needs separate play evidence. Existing explicit EVFL simulations do not exercise native classification dispatch.
+
+Safe alternative, separately approved: exclude Fairy from **Freestanding/BossHeart shared floor admission and Token catalogue**, matching0.2.9's Fairy exclusion while retaining Time and songs. Align producer/donor selection and screened external-placement refusal; keep Fairy in its pool and supported other delivery routes, never silently drop/substitute it or repair old outputs/saves. This deliberately reduces Fairy-world scope instead of shipping the demonstrated failure.
+
+Full evidence/proposal: `diagnosis-and-proposal.md` in the preserved snapshot root. Posted to `cs-r22` at09:04. **Awaiting Claude's OK; no implementation, rebuild or lock.** GitHub comment/push remains held.
 
