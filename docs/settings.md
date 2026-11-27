@@ -160,9 +160,12 @@ until Save/Continue. Time is owned/selected; Kareem confirmed both instruments f
 accepted this as cosmetic. The five remaining floor/GrottoScrub/song-use/spin checks are planned separately,
 not claimed played: [integration record](../plans/rounds/r22-pr42-integration.md).
 
-Fairy's Token admission is unchanged on this private integration branch pending the daylight Market GS play and
-the maintainers' final kind set. The ineffective generated-Fairy Large override is reverted; native classification,
-grant identity, physics and receipts stay unchanged. No claim that c's empty roof is fixed.
+Fairy's final world-pickup kinds are **Token and BossHeart, not Freestanding**; supported chest/NPC
+delivery is unchanged. Kareem's daylight Market GS gave a spinning Fairy, full item-get animation, playable
+instrument and updated D-pad. The same child's shed roof gave Bolero with a Time-ocarina model/red VFX;
+Bolero was playable and Fairy stayed selected. These passes were on7968343, before the ineffective
+generated-Fairy Large override was reverted. Final-head Token artifact comparison/replay is tracked in the
+integration record; this play does not prove the reverted classification. No claim that c's empty Fairy roof is fixed.
 
 Both floor kinds keep **Heart Container, Piece of Heart, Deku Shield, Hylian Shield and red rupee**,
 **Ocarina of Time** and, with `--songs anywhere`, **the twelve songs**. **Fairy Ocarina is BossHeart-only

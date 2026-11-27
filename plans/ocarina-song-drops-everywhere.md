@@ -459,8 +459,8 @@ omfs\...`; no `CRASH:` lines. It looked
 Kareem approved reverting ineffective generated-Fairy Large normalization179600d and holding **only Fairy at
 Freestanding** after the original child's empty roof. **Fairy BossHeart remains admitted on the Gohma PASS**;
 Time and all twelve songs keep every already-admitted kind and the existing song-mode restriction. Fairy stays
-in its pool and supported chest/NPC deliveries. Its Token entry remains unchanged pending the played daylight
-Market GS row d′ and Claude's final kind set; this is not a new Token approval.
+in its pool and supported chest/NPC deliveries. Claude's final kind ruling after Kareem's daylight Market
+GS d′ PASS retains **Token+BossHeart**, excluding Freestanding; Time/all songs retain every admitted kind.
 
 `ocarina_pickup.KINDS` is the per-native-identity kind matrix. `drops.floor_items(..., kind=...)` supplies distinct
 BossHeart/Freestanding palettes; both writers/production external admission enforce them. Settings-selected
@@ -474,5 +474,8 @@ duplicate-Fairy fixtures are retired controls; c's first-acquisition blocker is 
 7968343 daylight d′ packet was production-built/all-oracle verified and scratch-booted exactly once before this
 cutover; Market Fairy comes first and an optional Bolero roof pickup second in the same original-child profile.
 The initial Saria-roof cycle failed the full oracle (fixed Bracelet/bombs/Saria dependency); the user chose a
-different-song discriminator. Focused tests only now; full gate and GitHub PR42 comment remain held.
+different-song discriminator. d′ subsequently passed both Market Fairy and Bolero on that same roof/child.
+The exact quote/screenshots and final-head classification caveat are in the integration record. The reverted
+final head must rebuild d′ and compare Token-consumed bytes; any relevant difference requires one replay.
+Full gate, then200-seed WPA Gift/songs-anywhere sweep are authorized under the lock; GitHub comment stays held.
 

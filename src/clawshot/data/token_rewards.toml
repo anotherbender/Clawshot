@@ -45,7 +45,7 @@ lens = "Kareem, rc.3 packet2 PLAYED PASS: Item_GlassTruth at LLR GS House Window
 agony_stone = "Kareem, rc.3 packet2 PLAYED PASS: Item_AgonyStone (the Echo Gem) at Kak GS Near Gate Guard, owned, and the equipped Gem reacted at the Kakariko watchtower Skulltula, the accepted Gem-effect proof"
 double_defense = "Kareem, rc.3 packet3 PLAYED PASS: Item_FairyBless_DefenseDouble at Kak GS Near Gate Guard, owned with reduced bomb-blast damage on a comparable blast and MaxLife28 unchanged"
 scrub_seed = "Kareem, rc.3 packet3 PLAYED PASS: Obj_ScrubBusinessSeed at Kak GS Watchtower, stock 2 -> 3 of cap30 and usable; using it without buying does not consume it, which is native behaviour, not a bug"
-ocarina = "Kareem, rc.3 packet3 S1 part PLAYED PASS: native Time at LLR GS Tree, stock0->1, Sun's Song and reload passed. BBender T1/TB3/TB4, 2026-11-24/25: generated Fairy and Time donors; Fairy immediately usable. TB4 on Longshot3.2.0 still showed/played Fairy after Time was collected second until Save/Continue despite Time ownership/selection. Kareem via Claude accepted this as model/sound only, both instruments function identically; no immediate live-model switch fix is claimed (plans/rounds/r22-pr42-integration.md)."
+ocarina = "Kareem, rc.3 packet3 S1 part PLAYED PASS: native Time at LLR GS Tree, stock0->1, Sun's Song and reload passed. BBender T1/TB3/TB4, 2026-11-24/25: generated Fairy and Time donors; Fairy immediately usable. TB4 on Longshot3.2.0 still showed/played Fairy after Time was collected second until Save/Continue despite Time ownership/selection. Kareem via Claude accepted this as model/sound only, both instruments function identically. Kareem, d′2026-11-27 on7968343: Market GS drops spinning Fairy, full itemget, playable and Dpad updated; final Token admission approved. That build carried Large normalization; reverted final-head artifact comparison/replay is tracked separately (plans/rounds/r22-pr42-integration.md)."
 song = "BBender T1/TB3, 2026-11-24: Prelude of Light at Deku GS Compass Room and Zeldas Lullaby at Basement Vines, spinning/effect, learned and played. The other ten are inferred, not individually played; Kareem via Claude accepted that analogy on2026-11-25 (plans/rounds/r22-pr42-integration.md)."
 
 [rewards."Gold Skulltula Token"]
@@ -251,7 +251,7 @@ source = "PouchActorInfo Item_Ocarina_Time: KeyItem/KeyItem tab, GetType Large, 
 [rewards."Fairy Ocarina"]
 actor = "Obj_Clawshot_Ocarina_Fairy"
 family = "ocarina"
-source = "PouchActorInfo Item_Ocarina_Fairy: KeyItem/KeyItem tab, GetType Small, SpecialDeal Ocarina, BundleActorNum 1, IsAutoSaveAfterGet; the generated floor actor Obj_Clawshot_Ocarina_Fairy (clawshot.patch.ocarina_pickup) is the donor; played at a Skulltula (BBender, runs T1 and TB3, 2026-11-24)"
+source = "PouchActorInfo Item_Ocarina_Fairy: KeyItem/KeyItem tab, native GetType Small, SpecialDeal Ocarina, BundleActorNum 1, IsAutoSaveAfterGet; Obj_Clawshot_Ocarina_Fairy is the generated donor. BBender T1/TB3,2026-11-24; Kareem d′2026-11-27 Market GS: spinning Fairy, full itemget animation, playable, Dpad updated. Claude finalized Token+BossHeart, not Freestanding. d′ ran7968343 with effective Large normalization;89becb8 reverted it, so final-head Token artifact equivalence or one replay remains required; do not claim the reverted classification played from this result."
 
 [rewards."Bolero of Fire"]
 actor = "Obj_Clawshot_Melody_FireBolero"

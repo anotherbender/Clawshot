@@ -2,7 +2,7 @@
 
 Authorized by Claude: line21, relay `claude-21-after-029`, after release0.2.9 and explicit line20 LOCK RELEASED. Branch `r22/pr42-integration`, worktree `E:/OOTRemake/clawshot-r22/pr42-integration`. Contributor head `ceab0744c00a325c80de46a7c6df6f2f24388778`; main `5dcb21b5e29b78e96e8c254d0106647267ad4d87` (tag `v0.2.9`). Main is merged INTO the contributor branch; none of Bender's commits is rebased or rewritten.
 
-Latest ruling: **Kareem approved option1: revert179600d and exclude Fairy from Freestanding only; BossHeart retained on Gohma PASS; Token waits for daylight d′ play and Claude's final kind set.** Adult a/b are retired duplicate-Fairy regression controls with records preserved. Child c remains an empty-roof first-acquisition blocker, no flag/metadata guesses. d′ was built/one-boot verified first on frozen7968343, then the approved code changes began. Focused tests only, no full gate or PR42 GitHub comment; the historical experiments below are not current fixes.
+Latest ruling: **d′ BOTH PASS; Fairy final kinds Token+BossHeart, NOT Freestanding; Time/all songs retain every admitted kind.** Exact played quote and screenshot descriptions are recorded below. d′ ran7968343 with Large normalization;89becb8 reverted it, so build the same contract on the final head and compare Token-consumed drop pack/registry/receipt bytes. Any relevant difference requires one same-contract replay, not an assumed transfer of the pass. Then full gate under lock and200-seed WPA Gift/songs-anywhere sweep. No merge, push or GitHub comment. Adult a/b remain retired controls; c's generated Fairy Freestanding trace is round23, not a claimed fix.
 
 ## Integration choices
 
@@ -379,4 +379,37 @@ pytest-xdist2, read-only OOT_ROMFS canonical dump; exact commands/results/source
 No post-cutover full pytest, whole dump tier, sweep, packet generation/boot, version bump, rebase, push or
 GitHub PR42 comment. **Token admission remains unchanged and final-kind/full-gate approval waits for played d′.**
 The frozen ready7968343 packet and all historical/played profiles remain untouched.
+
+## d′ played BOTH PASS and final kind ruling — 2026-11-27
+
+Kareem via Claude, verbatim:
+
+> Market: Skulltula drops spinning Fairy ocarina, plays full itemget animation, playable, Dpad updated. Spinning OoT with red VFX on shed roof, Fairy remains played and on Dpad, Bolero playable.
+
+Screenshots reported by Claude: child full get pose **“You were given a Fairy Ocarina!”** in the guard house;
+**“You learned the Bolero of Fire!”** with the Time-ocarina song model and red VFX on the roof.
+These are reported screenshot contents, not a claim that cs22c independently opened the images.
+
+Conclusions accepted by Claude: **Fairy-from-Token PASS; song-at-Freestanding PASS** on the very roof
+where Fairy came up empty, same child. Empty roof is specific to generated Fairy at Freestanding;
+round23 owns the trace. FINAL: Fairy=Token+BossHeart (+chests/NPC as0.2.9), NOT Freestanding.
+Time and all songs keep every admitted kind. The Token catalogue entry stays present, now with this evidence.
+
+Evidence boundary: both passes are on7968343, whose generated Fairy normalization was Large.
+The final branch includes89becb8 reverting that override. Before transferring Token readiness, rebuild
+the exact four-cycle/original four-file child/native-merchant-pin d′ contract on the final head, then
+compare actual Token-consumed drop-pack, registry, component closure and receipt bytes against the played
+packet. Byte identity permits no replay; any relevant difference means exactly one same-contract replay row.
+Do not “fix” a difference by restoring the ineffective normalization or by editing saves/flags.
+
+Actual game-process preflight was empty. Before semantic inspection, all274 files of the played tokenprime2
+packet/profiles/logs were copied to `work/r22-pr42/final-token-proof/played-dprime-20261127-145302`;
+source/copy hashes all match and source size/mtime are unchanged (`played-capture.json`).
+Atomic final-validation lock owner: cs22c, queue26final, relay `claude-final-token-kind`.
+The authorized pre-gate comparison build records gate NOT_RUN honestly, never fabricated passed receipts.
+The old ordinary-fill equality is not a valid cross-policy oracle now Fairy Freestanding is excluded:
+record any changed ordinary hash, but final external assignments must still equal the played four-cycle,
+with unchanged settings/pool/fixed sources and every production admission/goal/age-return/tier oracle.
+After comparison/replay preparation: full format/lint/synthetic/whole-dump gate on the immutable final head,
+then200-seed WPA Gift on/songs anywhere. No merge, push, version bump or GitHub comment.
 

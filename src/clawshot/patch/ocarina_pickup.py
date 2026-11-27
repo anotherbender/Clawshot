@@ -49,7 +49,7 @@ GAME_ACTOR_INFO = "RSDB/GameActorInfo.Product.111.rstbl.byml.zs"
 POUCH_ACTOR_INFO = "RSDB/PouchActorInfo.Product.111.rstbl.byml.zs"
 POUCH_ROW_DROPPED = "OcarinaTypeValue"
 FLOOR_KINDS = ("BossHeart", "Freestanding")
-# Fairy's Freestanding first acquisition failed; BossHeart retains the Gohma PASS. Token awaits d-prime's ruling.
+# Kareem, d′2026-11-27: Fairy Token PASS; BossHeart keeps Gohma PASS. Empty child roof holds Freestanding.
 KINDS = {FAIRY: ("Token", "BossHeart"), TIME: ("Token", *FLOOR_KINDS)}
 DROPPED = PICKUP_DROPPED
 ROW_DROPPED = ("SLinkUserName",)
