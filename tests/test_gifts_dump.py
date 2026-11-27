@@ -1,5 +1,8 @@
 """The gift patch on the player's dump: every changeable gift check, changed, gives a flow that round-trips and differs
-from the game's only in the intended events, and a GameDataList that differs only in the added flags."""
+from the game's only in the intended events, a GameDataList that differs only in the added flags, and an analyzed-event
+table that differs only in Granny's Talk row."""
+
+from copy import deepcopy
 
 import pytest
 
@@ -66,13 +69,43 @@ def _intended(fc: evfl.Flowchart, flow: str, changes) -> set[int]:
     return out
 
 
+def _same_graph(before: evfl.Flowchart, start: int, after: evfl.Flowchart, clone: int) -> None:
+    """The clone is the untouched native graph: equal events, other than their names, along equal edges."""
+    edges = ("name", "next", "cases", "forks", "join")
+    seen: dict[int, int] = {}
+    stack = [(start, clone)]
+    while stack:
+        a, b = stack.pop()
+        if evfl.NONE in (a, b):
+            assert a == b, (a, b)
+            continue
+        if a in seen:
+            assert seen[a] == b, (before.events[a].name, after.events[b].name)
+            continue
+        seen[a] = b
+        native, copy = before.events[a], after.events[b]
+        assert type(native) is type(copy), (native, copy)
+        fields = [{k: v for k, v in vars(e).items() if k not in edges} for e in (native, copy)]
+        assert fields[0] == fields[1], native.name
+        if hasattr(native, "cases"):
+            assert [case for case, _ in native.cases] == [case for case, _ in copy.cases], native.name
+            stack += [(x, y) for (_, x), (_, y) in zip(native.cases, copy.cases, strict=True)]
+        if isinstance(native, evfl.ForkEvent):
+            stack += [*zip(native.forks, copy.forks, strict=True), (native.join, copy.join)]
+        if hasattr(native, "next"):
+            stack.append((native.next, copy.next))
+
+
 @pytest.mark.dump
 def test_dump_each_changed_flow_round_trips_and_differs_only_where_intended(romfs, context):
     dicts, files, changes = context
     transforms = gifts.file_changes(changes, files)
     table = rstb.read(dicts.decompress(rstb.TABLE_PATH, (romfs / rstb.TABLE_PATH).read_bytes()))
     flows = gifts.flows_changed(changes)
-    assert len(flows) == len([p for p in transforms if p != GAME_DATA_LIST])
+    flow_paths = [path for path in transforms if path.startswith("Event/EventFlow/") and path.endswith(".bfevfl.zs")]
+    # Every flow transform round-trips; only event flows count, not the known non-flow tables.
+    assert len(flows) == len(flow_paths)
+    assert set(transforms) - set(flow_paths) == {GAME_DATA_LIST, gifts.ANALYZED}
     report = []
     for flow in flows:
         path = files[flow]
@@ -87,22 +120,29 @@ def test_dump_each_changed_flow_round_trips_and_differs_only_where_intended(romf
         added = after.events[len(before.events) :]
         for a, b in zip(before.actors, after.actors, strict=True):
             assert (a.name, a.actions, a.queries) == (b.name, b.actions[: len(a.actions)], b.queries[: len(a.queries)])
-        expected_entries = before.entry_points.copy()
-        granny = next((c for c in changes if c.check == gifts.GRANNY_CHECK), None)
-        if granny and flow == granny.steps[0].flow:
-            from copy import deepcopy
-
-            expected_entries = deepcopy(expected_entries)
-            root = next(e for e in expected_entries if e.name == "Buy_BluePotion")
-            gate = after.events[after.entry_point(root.name).main_event]
-            assert gate.cases == [(0, evfl.NONE), (1, root.main_event)]
-            assert gate.params == {"GameDataName": granny.flag, "Index": -1}
-            root.main_event = after.entry_point(root.name).main_event
+        expected_entries = deepcopy(before.entry_points)
+        native_entries = set()
+        for change in changes:
+            if not change.rule.purchase or flow != change.steps[0].flow:
+                continue
+            # A saved check dispatches to an untouched clone of the native transaction; otherwise to the gift.
+            entry = "Buy_BluePotion" if change.check == gifts.GRANNY_CHECK else "Talk"
+            root = next(e for e in expected_entries if e.name == entry)
+            gate_index = after.entry_point(entry).main_event
+            gate = after.events[gate_index]
+            assert after.actors[gate.actor].queries[gate.query] == gifts.READ_QUERY, flow
+            assert gate.params == {"GameDataName": change.flag, "Index": -1}, flow
+            done = dict(gate.cases)[0]
+            assert gate.cases == [(0, done), (1, root.main_event)], flow
+            call = after.events[done]
+            assert isinstance(call, evfl.SubFlowEvent) and (call.flowchart, call.next) == ("", evfl.NONE), call
+            native = after.entry_point(call.entry_point)
+            _same_graph(before, root.main_event, after, native.main_event)
+            native_entries.add(native.name)
+            root.main_event = gate_index
+            root.sub_flow_events = [*root.sub_flow_events, done]
         bottle = next((c for c in changes if c.check == gifts.MARKET_BOTTLE_CHECK), None)
         if bottle and flow == gifts.MARKET_BOTTLE_FLOW:
-            from copy import deepcopy
-
-            expected_entries = deepcopy(expected_entries)
             root = next(e for e in expected_entries if e.name == "Item_Bottle_TutorialEvent_Talk")
             gate = after.events[after.entry_point(root.name).main_event]
             assert gate.params == {"GameDataName": gifts.MARKET_BOTTLE_FLAG, "Index": -1}
@@ -112,6 +152,7 @@ def test_dump_each_changed_flow_round_trips_and_differs_only_where_intended(romf
         specialized = [s for c in changes for s in c.steps if s.flow == flow and s.call == FROG_SONG_CALL]
         extra_entries = after.entry_points[len(before.entry_points) :]
         expected_extra = {next(e for e in after.events if e.name == s.event).entry_point for s in specialized}
+        expected_extra |= native_entries
         if flow == "SimpleShop":
             for change in changes:
                 if change.rule.purchase and change.check in gifts.MERCHANT_SHOPS:
@@ -125,6 +166,22 @@ def test_dump_each_changed_flow_round_trips_and_differs_only_where_intended(romf
             f"size entry {table.get(path)} needs {rstb.required_size(path, len(out))}"
         )
     print("\n".join(report))
+
+
+@pytest.mark.dump
+def test_dump_granny_purchase_preload_round_trips_and_changes_only_its_talk_row(romfs, context):
+    dicts, files, changes = context
+    transforms = gifts.file_changes(changes, files)
+    raw = dicts.decompress(gifts.ANALYZED, (romfs / gifts.ANALYZED).read_bytes())
+    before = byml.read(raw)
+    encoded = transforms[gifts.ANALYZED](raw)
+    after = byml.read(encoded)
+    assert byml.read(byml.dump(byml.load(encoded))) == after
+    changed = [(old, new) for old, new in zip(before, after, strict=True) if old != new]
+    assert len(changed) == 1, changed
+    original, updated = changed[0]
+    assert original["__RowId"] == "Npc_Hylia_053_Adult_D_T"
+    assert updated == {**original, "SubFlowList": sorted(set(original["SubFlowList"]) | {"Dm_SY_Get"})}
 
 
 @pytest.mark.dump
@@ -293,12 +350,13 @@ def test_dump_gift_shuffle_moves_great_fairies_through_their_new_flags(romfs):
     ]
     _, world = prepare(spec, settings)
     placements = {name: loc.vanilla for name, loc in world.locations.items()}
+    baseline = step(placements)  # admitted merchants normalize their saved checks even when unmoved
     placements["DMT Great Fairy Reward"], placements["ZF Great Fairy Reward"] = "Farores Wind", "Dins Fire"
     transforms = step(placements)
     dicts = zsdic.Dictionaries.from_romfs(romfs)
     data = dicts.decompress(GAME_DATA_LIST, (romfs / GAME_DATA_LIST).read_bytes())
-    before, after = byml.read(data), byml.read(transforms[GAME_DATA_LIST](data))
-    added = [int(e["Hash"]) for e in after["Data"]["Bool"][len(before["Data"]["Bool"]) :]]
+    before = {int(e["Hash"]) for e in byml.read(baseline[GAME_DATA_LIST](data))["Data"]["Bool"]}
+    added = {int(e["Hash"]) for e in byml.read(transforms[GAME_DATA_LIST](data))["Data"]["Bool"]} - before
     # the Din flag's name is the one Kareem's save showed set (03-game-data.md section 19, in game)
     assert len(added) == 2 and murmur3_32(b"Clawshot.Gift.Dm_FairyFountain_Din.Event212") in added
     steps = gifts.check_steps(scan_gifts(romfs), definitions.load())
@@ -307,6 +365,27 @@ def test_dump_gift_shuffle_moves_great_fairies_through_their_new_flags(romfs):
             out = transforms[s.file](dicts.decompress(s.file, (romfs / s.file).read_bytes()))
             event = next(e for e in evfl.read(out).flowchart.events if e.name == s.event)
             assert event.params[s.param] == actor, s.id
+
+
+@pytest.mark.dump
+def test_dump_gift_setup_moves_granny_from_her_five_rupees_and_holds_no_blue_potion(romfs):
+    from clawshot.generate import Settings, prepare
+    from clawshot.generate.fill import shuffled_locations
+    from clawshot.patch import items
+    from clawshot.world.load import load_spec
+
+    spec, settings, step = gifts.seed_setup(romfs, load_spec(), Settings(shuffle=("Chest", gifts.SHUFFLE)))
+    _, world = prepare(spec, settings)
+    assert gifts.GRANNY_CHECK in shuffled_locations(world, settings)
+    assert world.locations[gifts.GRANNY_CHECK].vanilla == gifts.GRANNY_POOL_ITEM
+    assert all(location.vanilla != "Blue Potion" for location in world.locations.values())
+    (granny,) = gifts.check_steps(scan_gifts(romfs), definitions.load())[gifts.GRANNY_CHECK]
+    assert granny.vanilla_item == "Item_Bottle_BluePotion"  # the native refill the census records
+    transforms = step({name: location.vanilla for name, location in world.locations.items()})
+    dicts = zsdic.Dictionaries.from_romfs(romfs)
+    out = transforms[granny.file](dicts.decompress(granny.file, (romfs / granny.file).read_bytes()))
+    event = next(e for e in evfl.read(out).flowchart.events if e.name == granny.event)
+    assert event.params[granny.param] == items.load().actor(gifts.GRANNY_POOL_ITEM)
 
 
 @pytest.mark.dump

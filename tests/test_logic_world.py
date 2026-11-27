@@ -116,11 +116,29 @@ def test_scrub_seed_setup_uses_the_shared_step(monkeypatch, spec):
     assert calls == [1]
 
 
-def test_gift_logic_spec_is_the_shopkeeper_step_only_for_gift_or_npc(spec):
-    assert gifts.logic_spec(spec, Settings(shuffle=("Chest",))) == spec
-    shop = gifts.shopkeeper_spec(spec)
+@pytest.mark.parametrize("keep_native", [False, True])
+def test_gift_logic_spec_only_changes_shopkeeper_and_unpinned_granny(spec, keep_native):
+    native = copy.deepcopy(spec)
+    if keep_native:
+        native["locations"][gifts.GRANNY_CHECK]["keep_vanilla"] = "explicit native refill identity pin"
+    unchanged = copy.deepcopy(native)
+    assert gifts.logic_spec(native, Settings(shuffle=("Chest",))) == unchanged
+    expected = copy.deepcopy(gifts.shopkeeper_spec(native))
+    granny_item = "Blue Potion" if keep_native else "Rupees (5)"
+    expected["locations"][gifts.GRANNY_CHECK]["vanilla"] = granny_item
     for shuffle in (("Gift",), ("NPC",), gifts.GIFT_TYPES):
-        assert gifts.logic_spec(spec, Settings(shuffle=shuffle)) == shop
+        settings = Settings(shuffle=shuffle)
+        assert gifts.logic_spec(native, settings) == expected
+        effective, tracked = logic_world.logic_world(settings, native)
+        _, prepared = prepare(expected, effective)
+        assert tracked.locations[gifts.GRANNY_CHECK].vanilla == granny_item
+        assert signature(tracked) == signature(prepared)
+        assert {name: loc.vanilla for name, loc in tracked.locations.items()} == {
+            name: loc.vanilla for name, loc in prepared.locations.items()
+        }
+        if keep_native:
+            assert tracked.locations[gifts.GRANNY_CHECK].keep_vanilla == "explicit native refill identity pin"
+    assert native == unchanged
 
 
 @pytest.mark.dump

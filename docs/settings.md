@@ -82,7 +82,7 @@ in chests only; see [Progressive items](#progressive-items).
 |---|---|
 | `Chest` | 178 of 184 ordinary chests; changed chest grants work in game. Includes the played bridge bean, ranch Hookshot, late windmill Longshot, Field/Lake, four-torch Lake grotto, Valley grottos, Fortress underground, Fountain scarecrow, Well hidden-hole and sign-puzzle routes. The Well requires the Lens conservatively. Duplicate/failure copies and repeat chests stay unchanged. Treasure Chest Game reward swap is built but untested and held; its 11 game boxes stay unchanged. |
 | `Shop` | Ordinary shop shelves, native-display items only; slot swaps, restock and Castle Town purchases have in-game evidence. Bought goods (refills, ammo, Bombchus, bottle contents, hearts and magic jars) go only to shop shelves in every seed; no setting moves one to a chest, gift, scrub, floor pickup or Skulltula. Mask loans stay unchanged. |
-| `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper, the adult Rolling Goron's and King Zora's tunic gifts, and all seven frog checks. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the unaccepted checks below. |
+| `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper, the adult Rolling Goron's and King Zora's tunic gifts, all seven frog checks, and the first paid item from Medigoron, Granny and the Wasteland carpet seller. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the remaining held checks below. |
 | `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. The adult Mirror Shield purchase that previously froze now finishes; other item/age combinations are not all played. |
 | `BossHeart` | Eight boss-heart checks, off by default. Limited to the five native floor pickups below. King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
 | `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same five-pickup palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
@@ -291,8 +291,31 @@ Longshot 3.2.0 (2026-11-25): Ice Arrows and the Mirror Shield came in place of t
 and Goron City's doors and story continued as usual ([shop and gift checks](../plans/rounds/r22-shops.md)).
 The Goron and Zora Tunics themselves can still be found in shops and chests.
 
-Merchant sale experiments (Medigoron, Granny, desert carpet) remain held. The Skulltula House's
-10- and 40-token reward swaps passed; the 20-token preview was observed, not every later threshold.
+With `Gift` selected, **Medigoron, Granny and the Wasteland carpet seller each sell one shuffled
+item once**, at their normal price. Declining does not use up the shuffled item. After buying it,
+their normal sales return; saving and continuing does not give another shuffled reward.
+
+| Seller | Price of the shuffled item | Afterwards |
+|---|---:|---|
+| Medigoron | 200 rupees | Sells a replacement Giant's Knife only after the Knife breaks. An intact Knife does not unlock another purchase; “come back if it breaks” is dialogue only. |
+| Granny | 100 rupees | Refills an existing empty bottle with Blue Potion for 100 rupees. She does not give an extra bottle. |
+| Wasteland carpet seller | 90 rupees | Sells his normal Bombchus for 90 rupees. |
+
+Granny's Blue Potion leaves the shuffled item pool and is replaced by **Rupees (5)**. This does
+not make Granny's shuffled reward a fixed five rupees; she can sell another item from the pool.
+Without `Gift`, these merchants keep their normal sales.
+
+Medigoron needs **no wallet upgrade**: the starting wallet holds his 200-rupee price. His adult
+room-access requirement remains. To reach the carpet seller, come from the **Gerudo Fortress
+side of the Wasteland** and cross with **Hover Boots or Longshot**, or enable the existing opt-in
+Wasteland crossing trick. The trick is off by default; it is not a new merchant shortcut.
+
+Kareem played the shuffled purchases, saved returns and normal repeat sales on Longshot 3.2.0
+(2026-11-27), including Blue Potion refills without extra bottles and Medigoron's replacement
+Knife after a normal break. All merchant rows passed ([play record](../plans/rounds/r22-merchants.md)).
+
+The Skulltula House's 10- and 40-token reward swaps passed; the 20-token preview was observed,
+not every later threshold.
 With `Gift`, the 40-token reward contributes **Bombchus (20)** to the pool and gives its
 assigned item, using the usual forty-token requirement and collected state. Without `Gift`,
 it stays the usual twenty-Bombchu bundle. Kareem passed the changed reward on Longshot rc.7

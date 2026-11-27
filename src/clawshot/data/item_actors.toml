@@ -62,6 +62,8 @@
 "Bombs (5)" = { actor = "Item_BombBundle_Small", source = "census: 3 chests; holds 5 bombs" }
 "Bombchus (5)" = { actor = "Item_BombchuBundle_Small", source = "Gerudo Training Ground Maze Right Central Chest; holds 5 bombchus" }
 "Bombchus (20)" = { actor = "Item_BombchuBundle_Large", source = "GatheringTokenGold Event200; PouchActorInfo BundleActorNum=20, r8-gifts.md" }
+"Bombchus (10)" = { actor = "Item_BombchuBundle_Medium", source = "cs22d: PouchActorInfo BundleActorNum=10; carpet's Shop_BombchuBundle_01 source is matched locally by gifts; r22 merchant play candidate" }
+"Giants Knife" = { actor = "Item_Sword_Giant", source = "cs22d: native PouchActorInfo binds both equipment fields to Weapon_Sword_Giant; Medigoron stock source is Shop_Sword_Giant; r22 merchant play candidate" }
 "Arrows (5)" = { actor = "TBox_ArrowBundle_Medium", source = "census: 2 chests; holds 5 arrows" }
 "Arrows (10)" = { actor = "TBox_ArrowBundle_Large", source = "census: 1 chest; holds 10 arrows" }
 

@@ -33,7 +33,7 @@ Baseline: `d9deb65cedf841495ef3bbe2fb2d1083fa42bb43`, the supplied 0.2.3 candida
 | 2 | **Three newly identified logic discrepancies**: DMT PoH damage/Hover route, DC Longshot-only Scarecrow token, adult DC torch progression. | Later logic track: native/route evidence and negative-access regressions before changing overrides; sweep if changed. See8. |
 | 3 | **Fire blue-warp → Kakariko → reload** is a published immobility/save-hang report, not certified absent here. Our reward edits are narrower. | Scenes/rewards: preserve native landing, weather/Nocturne and sage completion; test actual output, then paired play including reload. See3a. |
 | 4 | **Standard item-get replacements can grant nothing or freeze** despite valid item/logic. Sheik/Fairy scene animation context, NPC bindings and preload relationships matter. | Scenes/lacs: no palette expansion on generic-grant similarity alone; add caller-context regression and paired play before admission. See1c–d. |
-| 5 | **Cow and merchant expansion must not release repeatable/missable progression.** Current holds avoid these new exposures. | Cows: per-source saved identity and reload recovery; later commerce: successful-payment-only completion, prices and wallet logic together. See5–6. |
+| 5 | **Cow and merchant expansion must not release repeatable/missable progression.** Current holds avoid these new exposures. (Merchants since admitted: §6 status.) | Cows: per-source saved identity and reload recovery; later commerce: successful-payment-only completion, prices and wallet logic together. See5–6. |
 
 No new product choice is made. D39 still holds the card at the captain. Nothing overnight needs Kareem.
 All proposals below are **nothing**, **test to add**, or **fix for a later track**; no fix is implemented here.
@@ -271,6 +271,9 @@ Merchant success flags are deliberately inside native sale-success paths
 The held merchant prototype already has semantic refusal/shortfall/capacity, successful charge and
 saved-state repeat tests (`tests/test_gifts_merchants.py:179-234`). Its simulated reload copies interpreter
 state, not a serialized save or played acceptance; do not mistake the prototype for enabled shuffle.
+**Status, round 22:** these three merchant holds are superseded. The merchants are admitted with Gift:
+success-only completion, native prices and wallet logic land together, after play and a paired sweep
+(`r22-merchants.md`).
 
 **Proposal: nothing** to adopt their pricing/defaults/palette. Reuse the merchant tests already present.
 **Test to add** only for new price/shelf contracts before later commerce release: offered price = charged

@@ -45,7 +45,7 @@ from `matrix.py`.
 | Kind (world type) | Live / shuffled | Setting (default) | Status | Why the rest stay vanilla (class) |
 |---|---|---|---|---|
 | Chests (`Chest`) | 178 of 217 | `Chest` (on) | location | 10 Treasure Chest Game boxes plus its reward (D17, policy). Six trap chests are item-less (D10, DUMP). Copies that are noncanonical or missable (DUMP, Kareem 2026-11-17). The sign-puzzle failure chest (Kareem 2026-11-09). |
-| NPC gifts (`NPC`) | 37 of 75 | `Gift` (off) | location | Trade chain and child trade cell (R13, D31: PLAYED). Gerudo card (D39: PLAYED). Merchants and expert galleries "await Kareem's result" (ASSUMED, pending since round 8 or 10). Others "not changeable yet" (`patch/gift_rules.toml`; DUMP, no movable grant step). |
+| NPC gifts (`NPC`) | 37 of 75 | `Gift` (off) | location | Trade chain and child trade cell (R13, D31: PLAYED). Gerudo card (D39: PLAYED). Merchants and expert galleries "await Kareem's result" (ASSUMED, pending since round 8 or 10); the three merchants are since admitted (round 22, `r22-merchants.md`). Others "not changeable yet" (`patch/gift_rules.toml`; DUMP, no movable grant step). |
 | Cutscene gifts (`Cutscene`) | 8 of 9 | `Gift` | location | Five Great Fairies, Saria's gift, the Light Arrows scene. "Gift from Sages" holds no item. |
 | Song lessons (`Song`) | 12 of 12 | `Gift` | location | (none held vanilla) |
 | Dungeon rewards (`Boss` becomes `DungeonReward`) | 9 incl. Rauru | `dungeon_rewards` (off) | location | Stay vanilla when off. |

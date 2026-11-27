@@ -109,6 +109,16 @@ MERCHANT_SHOPS = {
     "Wasteland Bombchu Salesman": ("SimpleShopRoot", "Event150"),
 }
 GRANNY_CHECK = "Kak Granny Buy Blue Potion"
+# A refill is not a bottle-container prize. Keep one ordinary, already-supported junk copy in the pool.
+GRANNY_POOL_ITEM = "Rupees (5)"
+ANALYZED = "RSDB/GameAnalyzedEventInfo.Product.111.rstbl.byml.zs"
+
+# Merchant stock actors identify native sources, not the generic gift's payout actor.
+# Keep this local: Shop_BombchuBundle_01 still means Buy Bombchu (10) in ordinary shops.
+_MERCHANT_SOURCE_ACTORS = {
+    "Item_Sword_Giant": "Shop_Sword_Giant",
+    "Item_BombchuBundle_Medium": "Shop_BombchuBundle_01",
+}
 
 # The native pouch rows are identical; only the actors' presentation differs.
 # Gift scenes use their Obj_ actors, never a shelf display (r22-shops.md).
@@ -667,6 +677,15 @@ def _completion_gate(fc: evfl.Flowchart, entry: str, flag: str, done: int) -> No
     root.main_event = len(fc.events) - 1
 
 
+def _native_purchase_gate(fc: evfl.Flowchart, entry: str, change: GiftChange) -> None:
+    """Keep the untouched native transaction after the saved randomized check."""
+    native = _clone_entry(fc, entry, {}, name=NEW_EVENT_PREFIX + "NativePurchase" + change.steps[0].flow)
+    index = len(fc.events)
+    fc.events.append(evfl.SubFlowEvent(f"{NEW_EVENT_PREFIX}{index}", "", native, evfl.NONE))
+    fc.entry_point(entry).sub_flow_events.append(index)
+    _completion_gate(fc, entry, change.flag, index)
+
+
 def _purchase(fc: evfl.Flowchart, flow: str, change: GiftChange) -> None:
     (step,) = change.steps
     if change.check == GRANNY_CHECK:
@@ -675,23 +694,25 @@ def _purchase(fc: evfl.Flowchart, flow: str, change: GiftChange) -> None:
         grant = fc.events[_index(fc, flow, step.event)]
         if not isinstance(grant, evfl.SubFlowEvent) or grant.entry_point != "GetInEventInBottle_BlueBottleShop":
             raise GiftPatchError(f"{step.id}: not Granny's native bottle sale")
-        # This wrapper normally fills a bottle AND charges. The ordinary gift wrapper does neither charge
-        # nor touch bottles, so restore only the native charge on the successful grant edge.
-        grant.entry_point = "GetInEvent_NotTurn_NotNpc"
-        grant.params = {"ActorName": change.item, "IsNpcEventStarter": False}
+        _native_purchase_gate(fc, "Buy_BluePotion", change)
+        if change.item != step.vanilla_item:
+            # Non-refill rewards use an ordinary gift; only that path needs an explicit charge.
+            # _set_item resolves its actor after the pristine native graph has been preserved.
+            grant.entry_point = "GetInEvent_NotTurn_NotNpc"
+            grant.params = {"ActorName": step.vanilla_item, "IsNpcEventStarter": False}
         _set_flag_after(fc, step, change.flag)
-        pouch = next(i for i, a in enumerate(fc.actors) if a.name == "PouchSystemActor")
-        fc.events.append(
-            evfl.ActionEvent(
-                f"{NEW_EVENT_PREFIX}{len(fc.events)}",
-                pouch,
-                _slot(fc.actors[pouch].actions, "EventTriggerAddGameDataIntToRupee"),
-                grant.next,
-                {"IsSignInverse": True, "GameDataName": "SimpleShop_Price"},
+        if change.item != step.vanilla_item:
+            pouch = next(i for i, a in enumerate(fc.actors) if a.name == "PouchSystemActor")
+            fc.events.append(
+                evfl.ActionEvent(
+                    f"{NEW_EVENT_PREFIX}{len(fc.events)}",
+                    pouch,
+                    _slot(fc.actors[pouch].actions, "EventTriggerAddGameDataIntToRupee"),
+                    grant.next,
+                    {"IsSignInverse": True, "GameDataName": "SimpleShop_Price"},
+                )
             )
-        )
-        grant.next = len(fc.events) - 1
-        _completion_gate(fc, "Buy_BluePotion", change.flag, evfl.NONE)
+            grant.next = len(fc.events) - 1
         return
 
     entry, success = MERCHANT_SHOPS[change.check]
@@ -700,6 +721,7 @@ def _purchase(fc: evfl.Flowchart, flow: str, change: GiftChange) -> None:
         call = fc.events[_index(fc, flow, step.event)]
         if not isinstance(call, evfl.SubFlowEvent) or (call.flowchart, call.entry_point) != ("SimpleShop", entry):
             raise GiftPatchError(f"{step.id}: not the native merchant sale")
+        _native_purchase_gate(fc, "Talk", change)
         call.entry_point = specialized
         if change.check == "GC Medigoron":
             # Sword ownership (including Biggoron's Sword) must not consume an independent reward.
@@ -726,7 +748,6 @@ def _purchase(fc: evfl.Flowchart, flow: str, change: GiftChange) -> None:
         call = deepcopy(fc.events[_index(fc, flow, "Event124")])
         call.entry_point = buy
         replacements[call.name] = call
-        cancel = "Event26"
     else:
         native = fc.events[_index(fc, flow, success)]
         if not isinstance(native, evfl.SubFlowEvent) or native.entry_point != "GetInEventItemSwordMedigoron":
@@ -742,12 +763,10 @@ def _purchase(fc: evfl.Flowchart, flow: str, change: GiftChange) -> None:
         autosave = deepcopy(fc.events[_index(fc, flow, "Event62")])
         autosave.name = "Event25"
         replacements[autosave.name] = autosave
-        cancel = "Event116"
     prefix = f"{NEW_EVENT_PREFIX}{len(fc.events)}_"
     _clone_entry(fc, entry, replacements, name=specialized)
     if change.check == "GC Medigoron":
         _set_flag_after(fc, replace(step, flow=flow, event=prefix + success), change.flag)
-    _completion_gate(fc, specialized, change.flag, _index(fc, flow, prefix + cancel))
 
 
 def _market_bottle(fc: evfl.Flowchart, change: GiftChange) -> None:
@@ -917,6 +936,8 @@ def patch_flowchart(fc: evfl.Flowchart, flow: str, changes: Sequence[GiftChange]
         _bowling_order(fc)
     for change in changes:
         vanilla = {step.vanilla_item for step in change.steps}
+        if change.rule.purchase:
+            _purchase(fc, flow, change)
         for step in change.steps:
             if step.flow == flow:
                 _set_item(fc, step, change.item)
@@ -946,8 +967,6 @@ def patch_flowchart(fc: evfl.Flowchart, flow: str, changes: Sequence[GiftChange]
         for ref in change.rule.skip:
             if ref.split("/")[0] == flow:
                 _skip(fc, flow, ref)
-        if change.rule.purchase:
-            _purchase(fc, flow, change)
     # Shared flows are guarded once by bags.changes, after all source edits and key compilation.
     if flow not in {bags.FLOW, bags.HANDOVER_FLOW}:
         bags.patch_grants(fc, literal_only=True)
@@ -1036,6 +1055,20 @@ def game_data_transform(names: Sequence[str]) -> Callable[[bytes], bytes]:
     return transform
 
 
+def _granny_preload(data: bytes) -> bytes:
+    """Register the ordinary get scene used only by a non-refill first reward."""
+    document = byml.load(data)
+    rows = [row for row in document.root if row.get("__RowId") == "Npc_Hylia_053_Adult_D_T"]
+    if len(rows) != 1:
+        raise GiftPatchError(f"Granny purchase: expected one Talk analyzed-event row, got {rows!r}")
+    row = rows[0]
+    row["SubFlowList"] = sorted(set(row.get("SubFlowList", ())) | {"Dm_SY_Get"})
+    out = byml.dump(document)
+    if (difference := byml.difference(document.root, byml.read(out))) is not None:
+        raise GiftPatchError(f"Granny purchase: written preload registration differs: {difference}")
+    return out
+
+
 def file_changes(changes: Sequence[GiftChange], files: Mapping[str, str]) -> dict[str, Callable[[bytes], bytes]]:
     """The transforms of the files ``changes`` touch (``files``: flow name -> romfs path of the flow the game
     loads), for ``clawshot.patch.write``."""
@@ -1047,6 +1080,8 @@ def file_changes(changes: Sequence[GiftChange], files: Mapping[str, str]) -> dic
     names = [change.new_flag for change in changes if change.new_flag]
     if names:
         out[GAME_DATA_LIST] = game_data_transform(names)
+    if any(change.check == GRANNY_CHECK and change.item != change.steps[0].vanilla_item for change in changes):
+        out[ANALYZED] = _granny_preload
     return out
 
 
@@ -1179,11 +1214,23 @@ def shopkeeper_spec(spec: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def logic_spec(spec: Mapping[str, Any], settings: Settings) -> Mapping[str, Any]:
-    """Gift/NPC shuffle's reachability change, dump-free: :func:`shopkeeper_spec` when ``Gift`` or ``NPC`` is
-    shuffled (``NPC`` also covers an effective settings string, where ``Gift`` is expanded to :data:`GIFT_TYPES`),
-    else the spec unchanged. Shared with the tracker's logic world (``clawshot.patch.logic_world``)."""
-    if SHUFFLE in settings.shuffle or "NPC" in settings.shuffle:
-        return shopkeeper_spec(spec)
+    """Gift/NPC shuffle's shared world policy: the shopkeeper check and Granny's non-container pool item.
+
+    An explicit native identity pin uses keep_vanilla and retains Blue Potion outside the fill.
+    The tracker uses the same conversion through clawshot.patch.logic_world.
+    """
+    if SHUFFLE not in settings.shuffle and "NPC" not in settings.shuffle:
+        return spec
+    spec = shopkeeper_spec(spec)
+    granny = spec["locations"].get(GRANNY_CHECK)
+    if granny and granny.get("vanilla") == "Blue Potion" and granny.get("keep_vanilla") is None:
+        spec = {
+            **spec,
+            "locations": {
+                **spec["locations"],
+                GRANNY_CHECK: {**granny, "vanilla": GRANNY_POOL_ITEM},
+            },
+        }
     return spec
 
 
@@ -1211,10 +1258,11 @@ def seed_checks(
     actors: ItemActors,
 ) -> list[str]:
     """The world locations a gift shuffle may move, in world order: a gift check of class ``swap`` or ``rewrite``
-    whose vanilla logic item's actor (``item_actors.toml``) is what every one of its steps gives, so the pool item it
-    adds is the one it gave. A Great Fairy, given once through a new GameDataList flag, is one of them (Kareem, in
-    game, 2026-11-08: the game keeps the flag and an older save loads; 03-game-data.md section 19). The
-    :data:`ANCHORS` stay vanilla in copy-only seed worlds; direct legacy worlds release them with free travel."""
+    whose vanilla logic item's actor (``item_actors.toml``) is what every one of its steps gives. Granny's native
+    refill is the exception: it contributes ordinary Rupees (5), never a new bottle. A Great Fairy, given once
+    through a new GameDataList flag, is one of them (Kareem, in game, 2026-11-08: the game keeps the flag and an
+    older save loads; 03-game-data.md section 19). The :data:`ANCHORS` stay vanilla in copy-only seed worlds;
+    direct legacy worlds release them with free travel."""
     steps = check_steps(gifts, definitions)
     out = []
     for name in movable_checks(world, rules):
@@ -1230,8 +1278,15 @@ def seed_checks(
             if loc.vanilla == item and {s.vanilla_item for s in steps[name]} == native:
                 out.append(name)
             continue
+        if name == GRANNY_CHECK and loc.vanilla == GRANNY_POOL_ITEM:
+            if {s.vanilla_item for s in steps[name]} == {"Item_Bottle_BluePotion"}:
+                out.append(name)
+            continue
         if {actors.aliases.get(s.vanilla_item, s.vanilla_item) for s in steps[name]} != {
-            TUNIC_GIFT_ACTORS.get(actors.actors.get(loc.vanilla), actors.actors.get(loc.vanilla))
+            _MERCHANT_SOURCE_ACTORS.get(
+                actors.actors.get(loc.vanilla),
+                TUNIC_GIFT_ACTORS.get(actors.actors.get(loc.vanilla), actors.actors.get(loc.vanilla)),
+            )
         }:
             continue
         out.append(name)
@@ -1297,10 +1352,15 @@ def seed_step(
 
     def step(placements: Mapping[str, str]) -> dict[str, Callable[[bytes], bytes]]:
         moved = {
-            name: actors.actor(placements[name])
+            name: (
+                steps[name][0].vanilla_item
+                if name == GRANNY_CHECK and placements[name] == "Blue Potion"
+                else actors.actor(placements[name])
+            )
             for name in shuffled
             if placements[name] != vanilla[name]
             or rules[name].once
+            or rules[name].purchase
             or name in progressive.TIERED_GIFTS
             or name in BOWLING_CHECKS
             or any(s.call in VARIABLE_RUPEE_CALLS for s in steps[name])

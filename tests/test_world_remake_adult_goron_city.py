@@ -104,11 +104,12 @@ def test_sign_solution_rejects_unplayed_or_unusable_attacks(age, items):
         (ADULT, ["Progressive Wallet", "Goron Bracelet"], False),
         (ADULT, ["Progressive Wallet", "Megaton Hammer"], True),
         (ADULT, ["Progressive Wallet", "Bomb Bag", "Progressive Strength"], True),
-        (ADULT, ["Megaton Hammer"], False),
+        (ADULT, ["Megaton Hammer"], True),
+        (ADULT, ["Bomb Bag", "Progressive Strength"], True),
         (CHILD, ["Progressive Wallet", "Bomb Bag", "Progressive Strength"], False),
     ],
 )
-def test_medigoron_requires_adult_room_access_and_keeps_wallet_play_hold(age, items, available):
+def test_medigoron_requires_adult_and_verified_room_access_not_a_wallet_upgrade(age, items, available):
     spec = load_spec()
     spec["start"] = "Goron City"
     world = build_world(spec)

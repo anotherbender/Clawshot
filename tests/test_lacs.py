@@ -20,6 +20,7 @@ def test_native_lacs_gift_shuffles_without_changing_trigger_or_story_writes(romf
     assert name in shuffled_locations(world, settings)
     assert world.locations[name].vanilla == "Light Arrows"
     placements = {name: location.vanilla for name, location in world.locations.items()}
+    baseline = step(placements)
     placements[name] = "Boomerang"
     changes = step(placements)
     path = "Event/EventFlow/Dm_TimeTemple_0130.bfevfl.zs"
@@ -36,4 +37,7 @@ def test_native_lacs_gift_shuffles_without_changing_trigger_or_story_writes(romf
     grant.params["ActorName"] = "Item_Arrow_Light"
     assert after == before  # Every branch, binding, history/flag write and timeline stays native.
     assert "Event/EventFlow/AllSage.bfevfl.zs" not in changes
-    assert "GameData/GameDataList.Product.110.byml.zs" not in changes
+    # Identity merchants normalize their saved checks; LACS adds no state beyond that baseline.
+    game_data = gifts.GAME_DATA_LIST
+    raw = dictionaries.decompress(game_data, (romfs / game_data).read_bytes())
+    assert changes[game_data](raw) == baseline[game_data](raw)
