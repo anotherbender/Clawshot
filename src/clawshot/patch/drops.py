@@ -3,8 +3,8 @@
 BossHeart destinations accept the explicit native palette (:data:`NATIVE_ITEMS`) plus the ocarinas' and songs' world
 actors (:func:`floor_items`; ocarina-song-drops-everywhere), never inventory-only Item_* actors or the bare
 known-crashing Obj_Arrow_Fire. The song and ocarina floor actors are built from Obj_Arrow_Fire's pack
-(``patch.songs``, ``patch.ocarina_pickup``); BBender kept them for floors (2026-11-24). The ocarinas stay out of the
-palette as their arrow-based actors passed in game (:data:`FLOOR_OCARINAS`). See r7-drops.md for the eight
+(``patch.songs``, ``patch.ocarina_pickup``). Ocarina admission is per kind (``ocarina_pickup.KINDS``):
+Fairy retains the Gohma BossHeart PASS but not the failed Freestanding delivery. See r7-drops.md for the eight
 Logic_Create gates and the pending King Dodongo Save/Continue check.
 """
 
@@ -39,11 +39,6 @@ OCARINA_PICKUPS = {
     "Ocarina of Time": ocarina_pickup.PICKUPS[ocarina_pickup.TIME],
     "Fairy Ocarina": ocarina_pickup.PICKUPS[ocarina_pickup.FAIRY],
 }
-# Ocarinas admitted to floors (plan 16.4). The native Obj_Ocarina_Time and the first Fairy actor built on it had an
-# invisible box Link hangs on (BBender, run F1, 2026-11-24); the arrow-based actors passed with the floor lift, glow and
-# T1-a receipt: Fairy at Queen Gohma's heart, Time at Kakariko's cow-pen heart piece, no box, played at once (BBender,
-# runs G1 and TG2, 2026-11-24, Longshot stable v3.1.1).
-FLOOR_OCARINAS: frozenset[str] = frozenset(OCARINA_PICKUPS)
 PICKUPS = frozenset(
     {
         *NATIVE_ITEMS.values(),
@@ -70,11 +65,13 @@ def place(path: str, actor: dict, pickup: str) -> None:
     translate[1] = type(translate[1])(float(translate[1]) + FLOOR_LIFT)
 
 
-def floor_items(world: World, settings: Settings, actors: ItemActors) -> dict[str, str]:
-    """Logic item -> the world actor a floor check (BossHeart, Freestanding) shows for it: the native palette, the
-    admitted ocarinas (:data:`FLOOR_OCARINAS`) and, with ``songs = anywhere``, the twelve songs; only items the world
-    has."""
-    extra = {item: actor for item, actor in OCARINA_PICKUPS.items() if item in FLOOR_OCARINAS}
+def floor_items(world: World, settings: Settings, actors: ItemActors, *, kind: str) -> dict[str, str]:
+    """Logic item -> the actor for this floor kind: native pickups, kind-admitted ocarinas and anywhere songs."""
+    extra = {
+        item: actor
+        for item, actor in OCARINA_PICKUPS.items()
+        if kind in ocarina_pickup.KINDS.get(actors.actors.get(item, ""), ())
+    }
     if settings.songs == "anywhere":
         extra |= {
             item: songs.pickup_name(actor) for item, actor in actors.actors.items() if actor in getitem.SONG_MODELS
@@ -150,7 +147,7 @@ def seed_setup(
         if loc.kind != HEART_CONTAINER or loc.actor != HEART or not loc.has_save_flag:
             raise PatchError(f"{name}: not a saved native boss heart")
         linked[name] = loc.id
-    pickups = floor_items(world, settings, item_actors.load())
+    pickups = floor_items(world, settings, item_actors.load(), kind=SHUFFLE)
     palettes = dict(settings.location_type_items)
     palette = [item for item in pickups if item in palettes.get(SHUFFLE, pickups)]
     pickups = {item: pickups[item] for item in palette}

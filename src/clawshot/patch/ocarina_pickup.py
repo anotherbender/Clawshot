@@ -22,7 +22,7 @@ the song floor actors use (``songs.pickup_pack``; played at floors, boss hearts 
 
 One actor per ocarina serves the boss heart and free-standing floors and the Skulltula drop (as the Token donor; the
 native ``Obj_Ocarina_Time`` donor left the Fairy as the instrument until a reload, run TB3). A seed gets them only
-when the settings could place an ocarina where one is needed (:func:`pickups_possible`).
+when the settings could place that ocarina where one is needed (:func:`pickups_for`).
 """
 
 import copy
@@ -49,8 +49,8 @@ GAME_ACTOR_INFO = "RSDB/GameActorInfo.Product.111.rstbl.byml.zs"
 POUCH_ACTOR_INFO = "RSDB/PouchActorInfo.Product.111.rstbl.byml.zs"
 POUCH_ROW_DROPPED = "OcarinaTypeValue"
 FLOOR_KINDS = ("BossHeart", "Freestanding")
-# Where each ocarina needs its actor: on floors and at Skulltulas (each is its own Token donor).
-KINDS = {FAIRY: ("Token", *FLOOR_KINDS), TIME: ("Token", *FLOOR_KINDS)}
+# Fairy's Freestanding first acquisition failed; BossHeart retains the Gohma PASS. Token awaits d-prime's ruling.
+KINDS = {FAIRY: ("Token", "BossHeart"), TIME: ("Token", *FLOOR_KINDS)}
 DROPPED = PICKUP_DROPPED
 ROW_DROPPED = ("SLinkUserName",)
 USERS = {FAIRY: "Clawshot_Ocarina_Fairy", TIME: "Clawshot_Ocarina_Time"}  # the glow's ELink users
@@ -216,14 +216,16 @@ class Delivery:
     new_files: Mapping[str, NewFile]
 
 
-def pickups_possible(shuffle: Iterable[str]) -> bool:
-    """Whether the settings could put an ocarina at a kind of :data:`KINDS`: a Gift kind is on (the ocarinas can move)
-    and Token, BossHeart or Freestanding is. A seed gets :func:`build` and :func:`receipt_changes` exactly then, as
-    PR #41's settings rule for the get-display steps, so the settings string says which build a seed has; a seed
-    whose placements need the actors without it is refused (S8)."""
+def pickups_for(shuffle: Iterable[str]) -> list[str]:
+    """Native ocarina identities whose world actors the settings can need, in stable policy order.
+
+    Keep PR #41's settings-selected rule: a Gift kind plus an admitted destination, not actual placements.
+    A Freestanding-only recipe builds Time, while BossHeart can still build Fairy.
+    """
     shuffle = set(shuffle)
-    kinds = {kind for kinds in KINDS.values() for kind in kinds}
-    return bool(getitem.gift_kinds(shuffle)) and bool(shuffle & kinds)
+    if not getitem.gift_kinds(shuffle):
+        return []
+    return [ocarina for ocarina, kinds in KINDS.items() if shuffle.intersection(kinds)]
 
 
 def needed(placements: Mapping[str, str], world: World, actors: ItemActors) -> list[str]:
@@ -391,13 +393,3 @@ def receipt_changes(romfs: str | Path) -> FileChanges:
 
         changes[path] = transform
     return changes
-
-
-def picked_up(placements: Mapping[str, str], world: World, actors: ItemActors) -> bool:
-    """Whether the seed places an ocarina where a world pickup grants it (a Skulltula, a boss heart, a floor), the
-    native Ocarina of Time Skulltula donor included: those seeds get :func:`receipt_changes`."""
-    kinds = {"Token", *FLOOR_KINDS}
-    return any(
-        actors.actors.get(placements.get(name, "")) in PICKUPS and location.type in kinds
-        for name, location in world.locations.items()
-    )

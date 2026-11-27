@@ -42,7 +42,6 @@ def every_kind_spec() -> dict:
 @pytest.fixture
 def new_members(monkeypatch):
     """The Token policy and floor palette as they will be once the new members are admitted (plans 13.2, 16.4)."""
-    monkeypatch.setattr(drops, "FLOOR_OCARINAS", frozenset(OCARINAS))
     members = {
         "Fairy Ocarina": ("Obj_Clawshot_Ocarina_Fairy", "ocarina"),
         **{song: ("Obj_Clawshot_Melody_" + song.replace(" ", ""), "song") for song in SONGS},
@@ -53,14 +52,17 @@ def new_members(monkeypatch):
 def seed_settings(spec: dict, songs: str) -> Settings:
     world = build_world(spec)
     actors = item_actors.load()
-    floors = tuple(drops.floor_items(world, Settings(songs=songs), actors))
+    floors = {
+        kind: tuple(drops.floor_items(world, Settings(songs=songs), actors, kind=kind))
+        for kind in ("BossHeart", "Freestanding")
+    }
     held = gifts.held_items(world, (*OCARINAS, *SONGS), actors, set(), songs=songs, token_shuffle=True)
     return Settings(
         shuffle=KINDS + ("Song",),
         songs=songs,
         item_location_types=held,
         exclusive_location_types=("Song",) if songs == "song" else (),
-        location_type_items={"BossHeart": floors, "Freestanding": floors},
+        location_type_items=floors,
     )
 
 
@@ -78,7 +80,7 @@ def test_with_songs_on_song_lessons_no_song_reaches_another_kind(new_members):
                 assert seed.world.locations[name].type == "Song", (number, name)
 
 
-def test_with_songs_anywhere_the_new_kinds_accept_songs_and_ocarinas(new_members):
+def test_with_songs_anywhere_the_kind_matrix_holds_for_songs_and_ocarinas(new_members):
     spec = every_kind_spec()
     settings = seed_settings(spec, "anywhere")
     _, world = prepare(spec, settings)
@@ -86,7 +88,9 @@ def test_with_songs_anywhere_the_new_kinds_accept_songs_and_ocarinas(new_members
         for item in (*OCARINAS, *SONGS):
             if kind == "Token" and item == "Ocarina of Time":
                 continue  # admitted long before this feature; in the world palette as in the real one
-            assert allowed(world, settings, f"{kind} Check", item), (kind, item)
+            assert allowed(world, settings, f"{kind} Check", item) == (
+                kind != "Freestanding" or item != "Fairy Ocarina"
+            ), (kind, item)
 
 
 def test_shops_never_take_an_ocarina_or_a_song():

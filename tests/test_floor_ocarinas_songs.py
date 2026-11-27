@@ -10,7 +10,7 @@ from clawshot.census.definitions import Definition
 from clawshot.census.scan import Location
 from clawshot.formats import byml
 from clawshot.formats.byml import F32, U64
-from clawshot.generate import Settings, prepare
+from clawshot.generate import FillError, Settings, from_placements, prepare
 from clawshot.patch import drops, freestanding, getitem, ocarina_pickup, songs
 from clawshot.patch import items as item_actors
 from clawshot.patch.plan import PatchError
@@ -37,39 +37,36 @@ def test_twelve_songs_map_to_their_floor_actors():
     assert set(SONG_PICKUPS.values()) == {songs.pickup_name(actor) for actor in getitem.SONG_MODELS}
 
 
-@pytest.fixture
-def floor_ocarinas(monkeypatch):
-    """Both ocarinas admitted to floors, as plan 16.4 will do once their arrow-based actors pass in game."""
-    monkeypatch.setattr(drops, "FLOOR_OCARINAS", frozenset(OCARINAS))
-
-
 def test_the_ocarinas_floor_actors_are_the_generated_ones():
     assert drops.OCARINA_PICKUPS == OCARINAS
     assert "Obj_Ocarina_Time" not in drops.PICKUPS  # its moat Box body is an invisible box on a floor (F1-c)
 
 
-def test_both_ocarinas_are_admitted_to_floors_after_their_runs():
-    """Plan 16.1 gated them after run F1; 16.4 lifted the gate after runs G1 and TG2 (BBender, 2026-11-24)."""
-    assert frozenset(OCARINAS) == drops.FLOOR_OCARINAS
-    found = drops.floor_items(world(*OCARINAS, *SONG_ITEMS), Settings(songs="anywhere"), ACTORS)
-    assert found == {**drops.NATIVE_ITEMS, **OCARINAS, **SONG_PICKUPS}
+@pytest.mark.parametrize("kind", ["BossHeart", "Freestanding"])
+def test_each_floor_kind_keeps_its_admitted_ocarinas(kind):
+    found = drops.floor_items(world(*OCARINAS, *SONG_ITEMS), Settings(songs="anywhere"), ACTORS, kind=kind)
+    ocarinas = OCARINAS if kind == "BossHeart" else {"Ocarina of Time": OCARINAS["Ocarina of Time"]}
+    assert found == {**drops.NATIVE_ITEMS, **ocarinas, **SONG_PICKUPS}
 
 
 def test_a_gated_ocarina_stays_off_floors(monkeypatch):
-    monkeypatch.setattr(drops, "FLOOR_OCARINAS", frozenset())
-    found = drops.floor_items(world(*OCARINAS, *SONG_ITEMS), Settings(songs="anywhere"), ACTORS)
+    monkeypatch.setattr(ocarina_pickup, "KINDS", {ocarina_pickup.FAIRY: (), ocarina_pickup.TIME: ()})
+    found = drops.floor_items(world(*OCARINAS, *SONG_ITEMS), Settings(songs="anywhere"), ACTORS, kind="BossHeart")
     assert found == {**drops.NATIVE_ITEMS, **SONG_PICKUPS}
 
 
+@pytest.mark.parametrize("kind", ["BossHeart", "Freestanding"])
 @pytest.mark.parametrize("mode", ["song", "anywhere"])
-def test_the_floor_palette_takes_admitted_ocarinas_and_songs_only_anywhere(mode, floor_ocarinas):
-    found = drops.floor_items(world(*OCARINAS, *SONG_ITEMS), Settings(songs=mode), ACTORS)
-    expected = {**drops.NATIVE_ITEMS, **OCARINAS, **(SONG_PICKUPS if mode == "anywhere" else {})}
+def test_the_floor_palette_takes_admitted_ocarinas_and_songs_only_anywhere(mode, kind):
+    found = drops.floor_items(world(*OCARINAS, *SONG_ITEMS), Settings(songs=mode), ACTORS, kind=kind)
+    ocarinas = OCARINAS if kind == "BossHeart" else {"Ocarina of Time": OCARINAS["Ocarina of Time"]}
+    expected = {**drops.NATIVE_ITEMS, **ocarinas, **(SONG_PICKUPS if mode == "anywhere" else {})}
     assert found == expected
 
 
-def test_items_outside_the_world_stay_out_of_the_palette(floor_ocarinas):
-    assert drops.floor_items(world(), Settings(songs="anywhere"), ACTORS) == drops.NATIVE_ITEMS
+@pytest.mark.parametrize("kind", ["BossHeart", "Freestanding"])
+def test_items_outside_the_world_stay_out_of_the_palette(kind):
+    assert drops.floor_items(world(), Settings(songs="anywhere"), ACTORS, kind=kind) == drops.NATIVE_ITEMS
 
 
 def test_the_native_palette_itself_is_unchanged():
@@ -123,6 +120,10 @@ def floor_tree():
 @pytest.mark.parametrize("pickup", NEW_PICKUPS)
 def test_both_floor_writers_swap_a_saved_heart_to_an_ocarina_or_song_actor(pickup):
     for writer, loc, tree in ((drops, boss_heart(), boss_tree()), (freestanding, floor_heart(), floor_tree())):
+        if writer is freestanding and pickup == OCARINAS["Fairy Ocarina"]:
+            with pytest.raises(PatchError, match="not a supported floor pickup"):
+                writer.changes({loc.id: pickup}, [loc])
+            continue
         (transform,) = writer.changes({loc.id: pickup}, [loc]).values()
         after = byml.read(transform(byml.write(tree)))
         assert after["Actors"][0]["Gyaml"] == pickup
@@ -147,7 +148,7 @@ def test_generated_floor_actors_are_lifted_and_native_ones_are_not():
 def test_a_lifted_pickup_without_a_position_is_refused():
     tree = floor_tree()
     del tree["Actors"][0]["Translate"]
-    (transform,) = freestanding.changes({44: ocarina_pickup.PICKUP}, [floor_heart()]).values()
+    (transform,) = freestanding.changes({44: OCARINAS["Ocarina of Time"]}, [floor_heart()]).values()
     with pytest.raises(PatchError, match="Translate"):
         transform(byml.write(tree))
 
@@ -180,7 +181,7 @@ def boss_setup(*items):
 
 
 @pytest.mark.parametrize("mode", ["song", "anywhere"])
-def test_boss_heart_setup_holds_the_settings_palette_and_writes_its_actor(mode, floor_ocarinas):
+def test_boss_heart_setup_holds_the_settings_palette_and_writes_its_actor(mode):
     spec, census, definitions = boss_setup("Fairy Ocarina", "Zeldas Lullaby")
     settings = Settings(shuffle=("Chest", "BossHeart"), songs=mode)
     _, prepared = prepare(spec, settings)
@@ -202,41 +203,54 @@ def test_a_replayed_palette_without_the_new_items_stays_native():
     assert set(effective.location_type_items["BossHeart"]) == set(drops.NATIVE_ITEMS)
 
 
-def test_freestanding_setup_holds_the_same_palette(floor_ocarinas):
-    spec, census, definitions = boss_setup("Ocarina of Time", "Prelude of Light")
+@pytest.mark.parametrize("item", [*OCARINAS, *SONG_ITEMS])
+def test_freestanding_setup_refuses_fairy_and_writes_time_and_every_song(item):
+    spec, census, definitions = boss_setup(item)
     spec["locations"]["Heart A"] = {"type": "Collectable", "vanilla": "Piece of Heart"}
     spec["items"]["Piece of Heart"] = {"class": "normal"}
     spec["regions"][0]["area"] = "Test"
     census = [floor_heart()]
     definitions = [Definition(44, "freestanding", "Test", "Heart A", "Obj_Heart_Piece", "Heart A")]
-    settings = Settings(shuffle=("Chest", "Freestanding"), songs="anywhere")
+    settings = Settings(
+        shuffle=("Chest", "Freestanding"),
+        songs="anywhere",
+        location_type_items={"Freestanding": (item, "Piece of Heart")},
+    )
     restricted = freestanding.restrict_spec(spec, definitions)
     _, prepared = prepare(restricted, settings)
     effective, step = freestanding.seed_setup(prepared, settings, census, definitions, {})
-    assert {"Ocarina of Time", "Prelude of Light"} <= set(effective.location_type_items["Freestanding"])
-    (transform,) = step({"Heart A": "Prelude of Light"}).values()
-    gyaml = byml.read(transform(byml.write(floor_tree())))["Actors"][0]["Gyaml"]
-    assert gyaml == songs.pickup_name("Item_Melody_LightPrelude")
+    if item == "Fairy Ocarina":
+        assert item not in effective.location_type_items["Freestanding"]
+        with pytest.raises(PatchError, match="no floor pickup"):
+            step({"Heart A": item})
+        with pytest.raises(FillError, match="may not hold"):
+            from_placements(restricted, 1, effective, {"Heart A": item, "Chest": "Piece of Heart"})
+        safe = from_placements(restricted, 1, effective, {"Heart A": "Piece of Heart", "Chest": item})
+        assert safe.placements["Chest"] == item
+    else:
+        assert item in effective.location_type_items["Freestanding"]
+        (transform,) = step({"Heart A": item}).values()
+        gyaml = byml.read(transform(byml.write(floor_tree())))["Actors"][0]["Gyaml"]
+        expected = OCARINAS[item] if item in OCARINAS else SONG_PICKUPS[item]
+        assert gyaml == expected
 
 
 @pytest.mark.parametrize("item", [*OCARINAS, *SONG_ITEMS])
-def test_a_seed_with_an_ocarina_or_song_on_a_floor_also_writes_that_actor(item, floor_ocarinas):
-    """A8.2: the actor the floor writer names is one the seed's own steps create."""
-    places = {"Floor": {"type": "BossHeart", "vanilla": "Heart Container", "rule": "True"}}
-    spec_world = build_world(
-        {
-            "start": "Root",
-            "goal": "True",
-            "items": {"Heart Container": {}, item: {"type": "Song"} if item in SONG_ITEMS else {}},
-            "regions": [{"name": "Root", "locations": places}],
-        }
+@pytest.mark.parametrize("kind", ["BossHeart", "Freestanding"])
+def test_each_admitted_floor_item_is_written_with_source_identity_intact(item, kind):
+    pickups = drops.floor_items(world(item), Settings(songs="anywhere"), ACTORS, kind=kind)
+    writer, loc, tree = (
+        (drops, boss_heart(), boss_tree()) if kind == "BossHeart" else (freestanding, floor_heart(), floor_tree())
     )
-    placements = {"Floor": item}
-    actor = drops.floor_items(spec_world, Settings(songs="anywhere"), ACTORS)[item]
-    if item in SONG_ITEMS:
-        assert songs.moved_songs(placements, spec_world, ACTORS) == ["Floor"]  # songs.build runs in this seed
-        assert actor in {songs.pickup_name(song) for song in getitem.SONG_MODELS}  # one of its new packs
-    else:
-        ocarina = ACTORS.actors[item]
-        assert ocarina_pickup.needed(placements, spec_world, ACTORS) == [ocarina]  # ocarina_pickup.build runs
-        assert actor == ocarina_pickup.PICKUPS[ocarina]  # its new pack
+    if item == "Fairy Ocarina" and kind == "Freestanding":
+        assert item not in pickups
+        with pytest.raises(PatchError, match="not a supported floor pickup"):
+            writer.changes({loc.id: OCARINAS[item]}, [loc])
+        return
+    (transform,) = writer.changes({loc.id: pickups[item]}, [loc]).values()
+    after = byml.read(transform(byml.write(tree)))
+    actor = after["Actors"][0]
+    assert actor["Gyaml"] == pickups[item]
+    assert actor["Hash"] == loc.id
+    actor["Gyaml"], actor["Translate"] = tree["Actors"][0]["Gyaml"], tree["Actors"][0]["Translate"]
+    assert byml.same(after, tree)

@@ -326,5 +326,57 @@ Approved daylight d′ finished **before code changes**, on unchanged7968343/set
 
 Production build/all pool/admission/screens/physical-trap/goal/age-return/tier oracles passed with23spheres; Saria and Market Fairy are sphere3, roof Bolero sphere9. Complete original baseline/dry-run, exactly one scratch boot and startup verifier passed; independent written-actor/grant and four-file SHA256 readback passed. Both instruments/Saria/Bolero never owned, source pair/roof unset, Din1/tokens4/life12/pieces0. Readback's first invocation printed the engine-built-in Default pouch leaf missing; specifying that known built-in boundary corrected the decoder, without rebuilding/booting/editing artifacts. Ready launcher: `work/r22-pr42/line26-large/tokenprime2/ingame/pr42-924202.bat`; exact crate/Market directions and OPTIONAL second Bolero summit/owl/roof pickup are in PLAY.md. Lock released and READY posted14:12. Pickups remain unplayed.
 
-Kareem then approved **option1**, implemented only on this branch without rebase: reverse179600d's generated Fairy GetType/PouchGetType overrides, keep native classification/grant/parent bytes and historical records, and add the separately scoped Fairy Freestanding hold. Tests retain native preservation and inherited-contract coverage rather than deleting it with the ineffective Large expectation. BossHeart remains supported on the Gohma PASS; chests/NPC delivery, Time and songs remain unchanged. Token policy is parameterized/pending d′; no final Token decision, release, full gate or GitHub comment is claimed.
+Kareem approved **option1** with d′ build/boot first; only after that completion were the changes implemented on this branch without rebase: reverse179600d's generated Fairy GetType/PouchGetType overrides, keep native classification/grant/parent bytes and historical records, and add the separately scoped Fairy Freestanding hold. Tests retain native preservation and inherited-contract coverage rather than deleting it with the ineffective Large expectation. BossHeart remains supported on the Gohma PASS; chests/NPC delivery, Time and songs remain unchanged. Token policy is parameterized/pending d′; no final Token decision, release, full gate or GitHub comment is claimed.
+
+
+### Kind-scoped implementation and contributor preservation mapping
+
+Classification revert: **89becb88488a351b59d58716b81f2527c8934028**, with Assisted-by trailer, no rebase.
+Historical experiment documentation is retained instead of erasing played records; native preservation tests
+are adapted to inherited Small/Time Large semantics rather than discarded. `ocarina_pickup.KINDS` now excludes
+Fairy from Freestanding but keeps BossHeart and the unchanged pending Token entry. `drops.floor_items` requires
+an explicit kind at every caller. The Freestanding raw writer and seed palette refuse Fairy, including broad
+caller palettes/external assignments; Fairy remains in its pool and can still occupy its supported chest/NPC
+source. Time and every song continue through both raw floor writers.
+
+`pickups_for(shuffle)` replaces the old boolean selector and returns per-identity settings-selected production:
+Gift+Freestanding builds Time's world pack/three rows/glow and no Fairy world pack/donor; Gift+BossHeart can
+still build both. No new public option or release version is introduced. Tests parameterize Fairy's future
+Token presence/absence on the kind matrix while production Token admission/catalogue stay unchanged; Claude
+must post the final kind set after d′. No full gate or new post-cutover seed packet/boot has been run.
+
+| Original test/field/helper | Original assertion or purpose | Retained/adapted consumer coverage |
+| --- | --- | --- |
+| `test_both_ocarinas_are_admitted_to_floors_after_their_runs` | Same two-instrument palette for both floor kinds | `test_each_floor_kind_keeps_its_admitted_ocarinas`: Fairy BossHeart retained/Freestanding refused, Time/all12songs/native five preserved. |
+| `test_the_floor_palette_takes_admitted_ocarinas_and_songs_only_anywhere` | Both instruments and song-mode intersection | Retained, parameterized by kind and mode; only Fairy Freestanding changes. |
+| `test_both_floor_writers_swap_a_saved_heart_to_an_ocarina_or_song_actor` | Every generated actor swaps with source identity/lift intact | Retained positive Time/song/boss-Fairy transforms; Fairy Freestanding now explicitly refuses before a transform. |
+| `test_freestanding_setup_holds_the_same_palette` | Time/Prelude palette and produced actor | `test_freestanding_setup_refuses_fairy_and_writes_time_and_every_song`: Time/all12songs serialize; Fairy cannot survive a broad supplied palette or screened external placement; its supported chest assignment remains. |
+| `test_a_seed_with_an_ocarina_or_song_on_a_floor_also_writes_that_actor` | Wiring-only palette/needed-helper agreement, no actual output | `test_each_admitted_floor_item_is_written_with_source_identity_intact` serializes both kinds; `test_settings_build_only_admitted_world_packs_rows_and_token_donors` writes actual packs/rows/effect users and assembles the real donor set; native composition checks the common writer. |
+| `test_the_world_pickup_kinds_are_the_shuffle_kinds` | Literal global-kind set equality | Removed implementation pin; the settings-build test above and per-kind seed/raw-writer/external refusal cover the actual behavior. |
+| `test_build_writes_only_the_needed_packs_and_rows` | Explicit Time-only pack/rows/glow, native input and duplicate-pack refusal | Adapted as `test_settings_build_only_admitted_world_packs_rows_and_token_donors`, parameterized over Freestanding/BossHeart/Token and future Token policy; retains original native bytes/glow/static/empty/duplicate-pack checks. |
+| `test_with_songs_anywhere_the_new_kinds_accept_songs_and_ocarinas` | Blanket positive special-kind admission | `test_with_songs_anywhere_the_kind_matrix_holds_for_songs_and_ocarinas`: only Fairy Freestanding negative; song-lessons/shops/missable/reward restrictions remain. |
+| `test_dump_a_floor_heart_per_group_is_swapped_and_keeps_its_wiring` Fairy/Freestanding case | Native Fairy floor positive | Retained parameter as explicit native producer refusal; every other parameter retains written actor, lift, groups/links and resource-size checks. |
+| `FLOOR_OCARINAS` and its forcing fixture | Global two-floor ocarina gate | Removed in favor of `KINDS` plus mandatory floor kind; no alias. Native palette and allowed actor capability registry remain for BossHeart. |
+| `pickups_possible` | Settings-selected union boolean, followed by building both identities | Replaced cleanly by per-identity `pickups_for`; all callers/current docs migrated; actual asset/donor tests preserve option2 and prove narrower production. |
+| `picked_up` | Old placement-selected receipt-demand helper | Not covered: no callers or tests remain, so dead helper removed. Actual settings-selected receipt composition remains covered by both receipt-flow behavioral/native suites. |
+
+The focused runner records imported checkout, actual BelowNormal priority, one generator worker/two pytest
+workers, exact commands/logs and source hashes under `work/r22-pr42/line26-large/option1-focused/`.
+Initial scoped format output identified only two wrapping hunks and the deleted helper's trailing blanks;
+those exact edits were applied. Initial lint printed two import-order hunks and the removed constant test's
+unused import; LSP offered no code actions, so those printed fixes were applied manually. No full checks were
+started or disguised as focused results.
+
+### Focused result — PASS, full gate held
+
+Actual imported source is this worktree. **249 passed in70.84s**, no skips/failures, across the pickup,
+kind-specific floor palettes/raw writers/external assignment, native song/ocarina/Token composition,
+normal/no-player receipt and keep-Time, Freestanding, boss-drop and song-composition modules. The nine-file
+scoped format check passed; the cause-corrected scoped lint passed. Priority0x4000, CLAWSHOT_WORKERS1,
+pytest-xdist2, read-only OOT_ROMFS canonical dump; exact commands/results/source hashes are in
+`work/r22-pr42/line26-large/option1-focused/{run_focused.py,result.json,lint.log,focused.log}`.
+
+No post-cutover full pytest, whole dump tier, sweep, packet generation/boot, version bump, rebase, push or
+GitHub PR42 comment. **Token admission remains unchanged and final-kind/full-gate approval waits for played d′.**
+The frozen ready7968343 packet and all historical/played profiles remain untouched.
 

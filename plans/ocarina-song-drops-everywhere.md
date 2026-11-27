@@ -453,3 +453,26 @@ omfs\...`; no `CRASH:` lines. It looked
   Ocarina of Time needs no new actor on floors.
 - The `ocarina` family shape (`patch/tokens.FAMILIES`) accepts GetType Small or Large with deal `Ocarina`, so the
   Fairy Ocarina's row should already match it. Songs need a new `song` family shape (deal `Melody`, R11 audit).
+
+## 2026-11-27 kind cutover (Kareem/Claude; supersedes the shared-floor admission in I4/I6)
+
+Kareem approved reverting ineffective generated-Fairy Large normalization179600d and holding **only Fairy at
+Freestanding** after the original child's empty roof. **Fairy BossHeart remains admitted on the Gohma PASS**;
+Time and all twelve songs keep every already-admitted kind and the existing song-mode restriction. Fairy stays
+in its pool and supported chest/NPC deliveries. Its Token entry remains unchanged pending the played daylight
+Market GS row d′ and Claude's final kind set; this is not a new Token approval.
+
+`ocarina_pickup.KINDS` is the per-native-identity kind matrix. `drops.floor_items(..., kind=...)` supplies distinct
+BossHeart/Freestanding palettes; both writers/production external admission enforce them. Settings-selected
+`pickups_for(shuffle)` returns only the identities those kinds can need, so Freestanding-only world production
+and its generated donor set contain Time, not Fairy, while BossHeart still builds Fairy. The obsolete global
+`FLOOR_OCARINAS` gate, boolean `pickups_possible` selector and unused placement-era `picked_up` helper are removed,
+not retained as aliases. The option2 settings-selected step rule, native get models, receipts and provenance stay.
+
+Historical played evidence above is preserved, not re-labelled as a current Fairy Freestanding pass. Adult a/b
+duplicate-Fairy fixtures are retired controls; c's first-acquisition blocker is not declared fixed. The unchanged
+7968343 daylight d′ packet was production-built/all-oracle verified and scratch-booted exactly once before this
+cutover; Market Fairy comes first and an optional Bolero roof pickup second in the same original-child profile.
+The initial Saria-roof cycle failed the full oracle (fixed Bracelet/bombs/Saria dependency); the user chose a
+different-song discriminator. Focused tests only now; full gate and GitHub PR42 comment remain held.
+

@@ -204,7 +204,7 @@ def step_module(transform):
 
 def ocarina_step(output) -> int:
     """The index of the ocarina get model's step. Only the song get effects (Gift shuffle lets songs move, so the seed
-    gets them; song-get-effects) and the ocarina world actors (Gift and Token: ``ocarina_pickup.pickups_possible``)
+    gets them; song-get-effects) and the ocarina world actors (Gift and Token: ``ocarina_pickup.pickups_for``)
     may follow it, each adding rows of its own to ActorInfo; neither touches the ocarina packs."""
     steps = [{step_module(t) for t in step.values()} for step in output.extra_changes]
     index = max(i for i, modules in enumerate(steps) if getitem.__name__ in modules)

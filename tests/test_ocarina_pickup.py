@@ -8,7 +8,7 @@ from synthetic_effects import HEART_USERS, build_table
 from test_songs import arrow_pack, static_doc
 
 from clawshot.formats import byml, elink, sarc, vfx
-from clawshot.patch import drops, freestanding, getitem, ocarina_pickup, songs
+from clawshot.patch import drops, getitem, ocarina_pickup, songs
 from clawshot.patch.items import ItemActors
 from clawshot.patch.plan import PatchError
 from clawshot.world.load import build_world
@@ -277,19 +277,12 @@ def kinds_world():
     )
 
 
-def test_the_world_pickup_kinds_are_the_shuffle_kinds():
-    from clawshot.generate import tokens
-
-    assert set(ocarina_pickup.KINDS[FAIRY]) == {tokens.SHUFFLE, drops.SHUFFLE, freestanding.SHUFFLE}
-    assert set(ocarina_pickup.KINDS[TIME]) == {tokens.SHUFFLE, drops.SHUFFLE, freestanding.SHUFFLE}
-
-
 @pytest.mark.parametrize(
     "place, item, wanted",
     [
         ("Skulltula", "Fairy Ocarina", [FAIRY]),
         ("Boss Heart", "Fairy Ocarina", [FAIRY]),
-        ("Floor", "Fairy Ocarina", [FAIRY]),
+        ("Floor", "Fairy Ocarina", []),
         ("Boss Heart", "Ocarina of Time", [TIME]),
         ("Floor", "Ocarina of Time", [TIME]),
         ("Skulltula", "Ocarina of Time", [TIME]),  # its own donor since run TB3 (finding TB3-a)
@@ -309,8 +302,25 @@ def test_both_ocarinas_are_listed_in_a_fixed_order():
     assert ocarina_pickup.needed(placements, kinds_world(), ACTORS) == [FAIRY, TIME]
 
 
-def test_build_writes_only_the_needed_packs_and_rows(tmp_path, zsdic_pack):
+@pytest.mark.parametrize(
+    "shuffle, fairy_token, expected",
+    [
+        (("Gift", "Freestanding"), True, [TIME]),
+        (("Gift", "BossHeart"), True, [FAIRY, TIME]),
+        (("Gift", "Token"), True, [FAIRY, TIME]),
+        (("Gift", "Token"), False, [TIME]),
+        (("Gift", "BossHeart"), False, [FAIRY, TIME]),
+    ],
+)
+def test_settings_build_only_admitted_world_packs_rows_and_token_donors(
+    tmp_path, zsdic_pack, monkeypatch, shuffle, fairy_token, expected
+):
     from test_songs import write_romfs
+
+    from clawshot.patch import tokens
+
+    if not fairy_token:
+        monkeypatch.setitem(ocarina_pickup.KINDS, FAIRY, ("BossHeart",))
 
     tables = {
         ocarina_pickup.ACTOR_INFO: byml.write(actor_info()),
@@ -329,15 +339,22 @@ def test_build_writes_only_the_needed_packs_and_rows(tmp_path, zsdic_pack):
     }
     write_romfs(tmp_path, zsdic_pack, files)
     time_pack = f"Pack/Actor/{ocarina_pickup.PICKUPS[TIME]}.pack.zs"
-    delivery = ocarina_pickup.build(tmp_path, [TIME])
-    assert list(delivery.new_files) == [time_pack]
-    assert sarc.read(delivery.new_files[time_pack].data) == built(TIME)[0]
+    delivery = ocarina_pickup.build(tmp_path, ocarina_pickup.pickups_for(shuffle))
+    expected_packs = {f"Pack/Actor/{ocarina_pickup.PICKUPS[actor]}.pack.zs" for actor in expected}
+    assert set(delivery.new_files) == expected_packs
+    for actor in expected:
+        path = f"Pack/Actor/{ocarina_pickup.PICKUPS[actor]}.pack.zs"
+        assert sarc.read(delivery.new_files[path].data) == built(actor)[0]
     assert set(delivery.changes) == {*tables, songs.ELINK, songs.STATIC}
     for path in tables:
         ids = {r["__RowId"] for r in byml.read(delivery.changes[path](tables[path]))}
-        assert ocarina_pickup.PICKUPS[TIME] in ids and ocarina_pickup.PICKUP not in ids
+        for actor, pickup in ocarina_pickup.PICKUPS.items():
+            assert (pickup in ids) == (actor in expected)
     users = elink.decode(delivery.changes[songs.ELINK](files[songs.ELINK])).user_names()
-    assert ocarina_pickup.USERS[TIME] in users and ocarina_pickup.USERS[FAIRY] not in users
+    for actor in ocarina_pickup.PICKUPS:
+        assert (ocarina_pickup.USERS[actor] in users) == (actor in expected)
+    donors = tokens.generated_donors(tmp_path, [(delivery.changes, delivery.new_files)])
+    assert set(donors) == {ocarina_pickup.PICKUPS[actor] for actor in expected}
     grown = byml.read(delivery.changes[songs.STATIC](files[songs.STATIC]))["PtclBin"].data
     assert songs.LIGHT in vfx.effect_names(grown)
     # A seed whose song step already grows static leaves it to that step.
@@ -400,16 +417,16 @@ def test_a_table_already_holding_a_glow_user_is_refused():
 @pytest.mark.parametrize(
     "shuffle, expected",
     [
-        (("Chest", "Gift", "Token"), True),
-        (("Gift", "BossHeart"), True),
-        (("NPC", "Freestanding"), True),  # a Gift kind counts as Gift (getitem.gift_kinds)
-        (("Chest", "Token", "BossHeart", "Freestanding"), False),  # no Gift kind: the ocarinas cannot move
-        (("Chest", "Gift", "Scrub"), False),  # no world-pickup kind
+        (("Chest", "Gift", "Token"), [FAIRY, TIME]),
+        (("Gift", "BossHeart"), [FAIRY, TIME]),
+        (("NPC", "Freestanding"), [TIME]),  # an expanded Gift kind still supplies the native get model
+        (("Chest", "Token", "BossHeart", "Freestanding"), []),  # no Gift kind
+        (("Chest", "Gift", "Scrub"), []),  # no world-pickup kind
     ],
 )
 def test_the_pickups_run_by_setting_as_the_get_display_steps(shuffle, expected):
     """PR #41's rule (the maintainers' option 2): a step runs when the settings could produce what it shows."""
-    assert ocarina_pickup.pickups_possible(shuffle) is expected
+    assert ocarina_pickup.pickups_for(shuffle) == expected
 
 
 def test_the_pickup_step_is_named_in_the_spoiler_steps():

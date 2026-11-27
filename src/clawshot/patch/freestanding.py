@@ -16,6 +16,7 @@ from clawshot.formats import byml
 from clawshot.generate import Settings
 from clawshot.generate.fill import shuffled_locations
 from clawshot.patch import items as item_actors
+from clawshot.patch import ocarina_pickup
 from clawshot.patch.drops import NATIVE_ITEMS as NATIVE_ITEMS  # the native palette, shared with drops
 from clawshot.patch.drops import PICKUPS, floor_items, place
 from clawshot.patch.plan import PatchError
@@ -63,7 +64,10 @@ def changes(placements: Mapping[int, str], census: Sequence[Location]) -> FileCh
         loc = locations.get(actor_id)
         if loc is None or not _saved_heart(loc):
             raise PatchError(f"{actor_id}: not a saved freestanding heart piece")
-        if pickup not in PICKUPS:
+        if pickup not in PICKUPS or any(
+            pickup == actor and SHUFFLE not in ocarina_pickup.KINDS[ocarina]
+            for ocarina, actor in ocarina_pickup.PICKUPS.items()
+        ):
             raise PatchError(f"{actor_id}: {pickup!r} is not a supported floor pickup")
         for path in loc.files:
             files.setdefault(path, {})[actor_id] = (loc.actor, pickup)
@@ -121,7 +125,7 @@ def seed_setup(
         if not _saved_heart(loc) or loc.area != world.locations[name].area:
             raise PatchError(f"{name}: not a saved native heart piece in its world area")
         linked[name] = loc
-    pickups = floor_items(world, settings, item_actors.load())
+    pickups = floor_items(world, settings, item_actors.load(), kind=SHUFFLE)
     palettes = dict(settings.location_type_items)
     palette = [item for item in pickups if item in palettes.get(SHUFFLE, pickups)]
     pickups = {item: pickups[item] for item in palette}

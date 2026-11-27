@@ -195,9 +195,9 @@ def make_seed(
     if not song_pickups and (placed := songs.placed_pickups(shuffled_placements, out.world, table)):
         raise PatchError(f"{placed} hold a song as a world pickup, but the settings do not build the song pickups")
     ocarina_delivery = None
-    if ocarina_pickup.pickups_possible(settings.shuffle):
+    if ocarinas := ocarina_pickup.pickups_for(settings.shuffle):
         # The ocarinas' glow reuses the songs' light clone in static: added here only when no song step adds it.
-        ocarina_delivery = ocarina_pickup.build(romfs, ocarina_pickup.PICKUPS, with_static=song_delivery is None)
+        ocarina_delivery = ocarina_pickup.build(romfs, ocarinas, with_static=song_delivery is None)
     elif ocarinas := ocarina_pickup.needed(shuffled_placements, out.world, table):
         raise PatchError(f"{ocarinas} sit at world pickups, but the settings do not run the ocarina pickups")
     if token_sources:
@@ -348,7 +348,7 @@ def make_seed(
         new_files.update(delivery.new_files)
         steps.append(SONG_GET_EFFECTS)
     # The ocarinas' world actors, glow and pickup receipt: when the settings could put an ocarina on a floor or at a
-    # Skulltula (ocarina_pickup.pickups_possible). Rows inserted by name.
+    # Skulltula (ocarina_pickup.pickups_for). Rows inserted by name.
     if ocarina_delivery is not None:
         delivery = ocarina_delivery
         changes += (delivery.changes,)

@@ -85,7 +85,7 @@ in chests only; see [Progressive items](#progressive-items).
 | `Gift` | Eligible NPC and song gifts, including Great Fairies, Kokiri shopkeeper, the adult Rolling Goron's and King Zora's tunic gifts, all seven frog checks, and the first paid item from Medigoron, Granny and the Wasteland carpet seller. These families have in-game evidence, not every individual swap. The shopkeeper's late window passed. See the remaining held checks below. |
 | `Scrub` | Four kinds of one-time Deku Scrub sale; repeat vendors unchanged. The adult Mirror Shield purchase that previously froze now finishes; other item/age combinations are not all played. |
 | `BossHeart` | Eight boss-heart checks, off by default. Limited to the floor palette below (five native pickups, both ocarinas, songs with `--songs anywhere`). King Dodongo's Hylian Shield grant/no-respawn was observed; not every combination. |
-| `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; same floor palette. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
+| `Freestanding` | Fourteen anchored floor Heart Pieces, off by default; the native five, Ocarina of Time and songs with `--songs anywhere`. Fairy Ocarina is excluded after the empty original-child roof failure; BossHeart/chest/NPC delivery stays admitted. Ranch tower Hylian Shield collected/equipped with its saved Hash set; other surfaces, underwater pickup and complete reload coverage are not all verified. |
 | `Token` | All 100 native Gold Skulltulas, off in both presets; needs `Chest` (Token alone is refused). Admitted rewards: native tokens, fixed Boomerang/Hammer, shields/swords/boots/tunics, new empty/Milk bottles, all rupee colours, Heart Pieces/Containers, fixed Nut/Stick capacity, ordinary arrow/bomb/nut/stick bundles, Bombchus, magic jars/spells/arrows, Lens, Echo Gem, Double Defense, Scrub Business Seed, both ocarinas and (with `--songs anywhere`) the twelve songs. Core, packets 1–3 and the separate first-Time-ocarina part passed on rc.3; each catalogue member still needs its own native structural check, not every member/boundary was played. See `src/clawshot/data/token_rewards.toml`. Tokens spill only into shuffled chests; non-token grants add no token. The Field tree works by day, the ranch tower needs night/retrieval, and wetlands needs the child wall kill before the adult crate. |
 
 The windmill floor check is in logic only through its adult approach from Dampé's grave, not
@@ -150,7 +150,7 @@ with `--manifest`, `--baseline`, `--save` and `--phase` to check a staged family
 
 **Ocarinas and songs at Skulltulas and on floors.** Both instruments use generated
 `Obj_Clawshot_Ocarina_*` actors; songs use `Obj_Clawshot_Melody_*`. These packs are selected by settings:
-a Gift kind plus Token/BossHeart/Freestanding for instruments, additionally `--songs anywhere` for songs.
+a Gift kind plus an admitted destination for that instrument (`Token`/`BossHeart` for Fairy, also `Freestanding` for Time); additionally `--songs anywhere` for songs.
 The native moat `Obj_Ocarina_Time` is not their world donor. Pickups float above the original spot;
 ocarinas glow warm white, songs use their own effect, and every non-token Skulltula reward spins.
 BBender's H1/H2/TG2/TB3/TB4/SP1 records span Longshot 3.1.1 and 3.2.0, not every source/reward pair.
@@ -160,9 +160,14 @@ until Save/Continue. Time is owned/selected; Kareem confirmed both instruments f
 accepted this as cosmetic. The five remaining floor/GrottoScrub/song-use/spin checks are planned separately,
 not claimed played: [integration record](../plans/rounds/r22-pr42-integration.md).
 
-The floor palette (BossHeart, Freestanding) is **Heart Container, Piece of Heart, Deku Shield, Hylian
-Shield and red rupee**, plus **both ocarinas** and, with `--songs anywhere`, **the twelve songs**. Other
-major items on the floor can crash. Heart Containers from chests have no recorded in-game acceptance.
+Fairy's Token admission is unchanged on this private integration branch pending the daylight Market GS play and
+the maintainers' final kind set. The ineffective generated-Fairy Large override is reverted; native classification,
+grant identity, physics and receipts stay unchanged. No claim that c's empty roof is fixed.
+
+Both floor kinds keep **Heart Container, Piece of Heart, Deku Shield, Hylian Shield and red rupee**,
+**Ocarina of Time** and, with `--songs anywhere`, **the twelve songs**. **Fairy Ocarina is BossHeart-only
+among floors**, retaining the played Gohma case; it cannot be generated or forced externally at Freestanding.
+Other major items on the floor can crash. Heart Containers from chests have no recorded in-game acceptance.
 
 ### Starting inventory (experimental)
 

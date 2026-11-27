@@ -1,8 +1,7 @@
 """Ocarinas and songs at Skulltulas and on floors, on the player's dump (ocarina-song-drops-everywhere 3.2, 2.5).
 
-The real steps build both ocarinas' floor actors (``Obj_Clawshot_Ocarina_*``), a Skulltula drop for each new item
-group (Fairy Ocarina, Ocarina of Time, a song) and a boss-heart and a free-standing heart swapped to each group's floor
-actor; the common writer
+The real steps build both ocarinas' world actors, a Skulltula drop for each admitted new item group, both ocarinas
+at boss hearts, and Time/songs at Freestanding hearts. Fairy Freestanding is explicitly refused. The common writer
 writes them all, and every written file reads back with the expected contents and size entry.
 """
 
@@ -12,7 +11,7 @@ from clawshot.census.scan import FREESTANDING, GOLD_SKULLTULA, HEART_CONTAINER, 
 from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.patch import drops, freestanding, getitem, ocarina_pickup, songs, tokens
 from clawshot.patch.actor_packs import closure, resolve_node
-from clawshot.patch.plan import Plan
+from clawshot.patch.plan import PatchError, Plan
 from clawshot.patch.write import write
 
 pytestmark = pytest.mark.dump
@@ -50,7 +49,10 @@ def written(romfs, tmp_path_factory):
     sources = dict(zip(skulltulas, GROUPS.values(), strict=False))
     delivery = tokens.build(romfs, sources, census, rewards=FAMILIES, generated=generated)
     boss = {loc.id: actor for loc, actor in zip(hearts, FLOORS.values(), strict=False)}
-    floor = {loc.id: actor for loc, actor in zip(pieces, FLOORS.values(), strict=False)}
+    floor = {
+        loc.id: actor
+        for loc, actor in zip(pieces, (actor for group, actor in FLOORS.items() if group != "fairy"), strict=False)
+    }
     floor_changes = (drops.changes(boss, census), freestanding.changes(floor, census))
     changes = (delivery.changes, song.changes, fairy.changes, *floor_changes)
     new_files = {**delivery.new_files, **song.new_files, **fairy.new_files}
@@ -145,6 +147,11 @@ def test_dump_a_skulltula_drop_per_group_reads_back(written, group):
 @pytest.mark.parametrize("kind", ["boss", "floor"])
 def test_dump_a_floor_heart_per_group_is_swapped_and_keeps_its_wiring(written, romfs, group, kind):
     read = written["read"]
+    if kind == "floor" and group == "fairy":
+        heart = next(loc for loc in written["census"].values() if freestanding._saved_heart(loc))
+        with pytest.raises(PatchError, match="not a supported floor pickup"):
+            freestanding.changes({heart.id: FLOORS[group]}, [heart])
+        return
     (heart,) = [hash_ for hash_, actor in written[kind].items() if actor == FLOORS[group]]
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)
     for path in written["census"][heart].files:
