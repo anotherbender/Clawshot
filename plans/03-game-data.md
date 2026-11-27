@@ -2419,7 +2419,8 @@ shuffled families. Questions and exercised full-output/price boundaries: `plans/
 ## 35. Round 8: gift checks, native identities and success-only merchant sales (cs8d)
 
 Build e0f3ccfa; full command/result ledger and player checklists: `plans/rounds/r8-gifts.md`.
-No agent game run. New/corrected families remain held vanilla until Kareem's results.
+No agent game run. New/corrected families remain held vanilla until Kareem's results; the three
+merchants were admitted later, in round 22 (subsection below).
 
 ### Cows: placements are not independent checks
 
@@ -2481,9 +2482,11 @@ private SimpleShop entries; the original SimpleShop entries, beans and other con
 Flags are set inside successful grants, never after an outer call that also returns on refusal.
 Choice, funds, capacity and fees remain native. Before the shuffled reward, Medigoron's two
 sword-ownership reads become check reads; the private grant does not consume a broken knife.
-After the saved check, each caller dispatches to a pristine native transaction: Granny sells
-repeat Blue Potions, the carpet seller repeat Bombchus, and Medigoron replacement Knives under
-his native intact-Knife/Biggoron restrictions. Only the shuffled reward is once-only.
+After the saved check, each caller dispatches to a pristine native transaction: Granny refills
+an existing empty bottle with Blue Potion for 100 (never a new bottle), the carpet seller sells
+Bombchus (10) for 90, and Medigoron sells the Knife for 200 under his native intact-Knife/
+Biggoron restrictions (played: a replacement after a genuine break). Only the shuffled reward
+is once-only.
 
 Granny's unchanged Blue Potion assignment keeps the native owned-empty-bottle fill wrapper
 and its internal charge, then records completion. Other shuffled prizes use an ordinary gift
@@ -2498,15 +2501,26 @@ native Blue Potion outside the fill using keep_vanilla plus the scoped native sa
 
 Round22, Claude's 2026-11-26 ruling after Kareem's packet-v2 play: the old generic identity
 grant added a third bottle while the second stayed empty, and old completion gates removed
-native repeat services. The refill/native-repeat repair and semantic regressions are required
-before new play and admission (r22-merchants.md). Native graph round-trips are not live proof.
+native repeat services. The refill/native-repeat repair and its semantic regressions landed
+before the v3 play (r22-merchants.md). Native graph round-trips are not live proof.
 
-Data-sourced rules retain adult/trade/room/approach predicates and Granny's bottle requirement.
-The copied A-Knife/A-Granny controls show native default-wallet purchases at 200/100 rupees
-(r22-merchants.md, packet-v2 native-control receipts); carpet's price is 90. The approved v2
-admission/wallet data is active only on r22/merchants, not main. New repeat/refill play and the
-full paired sweep are still required before merge. Graph/state, serialization, allocation and
-saved-Bool proofs do not establish engine presentation, actual grants/use or Save/Continue.
+Data-sourced rules retain adult/trade/room/approach predicates and Granny's bottle requirement;
+no merchant needs a wallet upgrade. The packet-v2 native controls bought at exactly 200/100
+rupees with the default wallet (r22-merchants.md); carpet's price is 90. Medigoron's room still
+needs adult plus blast or smash. The carpet seller needs the Fortress side of the Wasteland plus
+Hover Boots or Longshot, or the pre-existing opt-in `logic_wasteland_crossing` (default false):
+the shared region gate, byte-identical to main 5dcb21b; his own rule is only can_jumpslash.
+
+Status (round 22, r22-merchants.md): with Gift on, each merchant sells one shuffled item once at
+its normal price (Medigoron 200, Granny 100, carpet 90), then his normal sales resume. Kareem's
+v3 play passed all four rows (Granny-Identity, Granny-Swapped, Carpet-Swapped, Medigoron-Swapped):
+the first reward once, then the native repeat after reloading the saved purchase; Granny's rows
+kept two bottles throughout. Kareem confirmed that Medigoron's further talk with an intact
+replacement Knife was only the native come-back-if-it-breaks dialogue, not a purchase prompt.
+The separately funded intact-Knife refusal step was waived as native. Claude accepted line25's full
+Gift-on/Gift-off paired sweep on c5625a0 with no post-play rerun (generation code unchanged
+since), and Kareem approved the merge. Graph/state, serialization, allocation and saved-Bool
+proofs alone still do not establish engine presentation, actual grants/use or Save/Continue.
 
 ### D31: native child-trade sequence
 
@@ -2860,6 +2874,7 @@ Gift, section 40's free child bottle/access model remains. Existing names/direct
 random/item/Way of the Hero hints cover both locations.
 
 Expert galleries, merchant experiments and unreleased Skulltula House rewards stay held.
+(Merchants: admitted in round 22, section 35 and `rounds/r22-merchants.md`.)
 Kareem subsequently confirmed the two bowling prizes (Storms, Epona, then red-rupee filler)
 and child gallery (Echo Gem, then red rupee), R10-MINIGAMES-CHILD-JABU; together with
 R10-MINIGAMES-ADULT this accepts both normal galleries. Bowling still advertises its

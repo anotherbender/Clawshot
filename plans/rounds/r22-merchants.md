@@ -3,6 +3,12 @@
 Branch `r22/merchants`, base `874f30a`, assigned by Claude after the gift-gates audit, 2026-11-25.
 0.2.9 shipped the Medigoron tightening only (main `5dcb21b`, merge `9895d54`); merchant admission targets the next release. Do not lift the three holds without Kareem's play and a full paired sweep.
 
+**Current status, 2026-11-27:** all four v3 merchant rows PASS. Kareem confirmed the final
+Medigoron talk was native conditional replacement dialogue, not another Buy prompt, and
+approved merging. Line25 stands; no repeat sweep. Claude will review the player-docs cutover
+and perform the merge himself. Earlier holds and failures below are the dated history, not
+the current admission status.
+
 ## Requested scope and direction split
 
 Kareem wants Medigoron shuffled. Claude requested all three round-8 merchant checks: GC Medigoron,
@@ -868,3 +874,31 @@ Remaining holds only: Claude is asking Kareem whether the further Knife offer wa
 actual Yes/No Buy prompt or native Talk_07 conditional dialogue; await that answer.
 Merge requires **Kareem's explicit OK**. No replay, source change or merge is authorized
 or performed. PLAY.md records these rulings.
+
+## All v3 rows accepted; player documentation cutover
+
+Kareem confirmed Medigoron's second talk was the native come-back-if-it-breaks line, not a
+Yes/No purchase prompt. Medigoron PASS; all four v3 merchant rows PASS. This resolves the
+last play clarification, without another purchase or replay. Kareem approved merging
+r22/merchants into main; Claude will review this one docs-only commit and perform the
+`--no-ff` merge himself. No agent merge was performed.
+
+Player documentation now covers one shuffled sale per merchant under Gift, normal prices,
+then normal repeat services; Granny refills an existing empty bottle rather than adding one,
+and her plain Blue Potion contributes Rupees (5) instead to the shuffled pool. It also records
+Medigoron's default-wallet price and the inherited Fortress-side Wasteland crossing requirements.
+README, settings, Discord, logic and tracker guidance are reconciled, along with section35
+and pointers from old merchant holds. Dated failures and unrelated holds remain historical.
+
+The documentation search covered root docs, docs/, all plans/ Markdown, contributor notes and
+report templates. No dedicated documentation-content tests, Markdown formatter or link-check
+suite exists; the nearest tests only mention documentation file paths, not their contents.
+Code/data/test files were not changed. In particular the old held wording in the source
+citations of data/location_names.toml2709/2741/2797 remains outside this docs-only cutover.
+
+Checks, all OOT variables unset and the UI extra installed:
+- `uv run --frozen --extra ui ruff format --check`:613 files already formatted.
+- `uv run --frozen --extra ui ruff check`:All checks passed.
+
+Line25's accepted complete same-SHA paired sweep still stands; no redundant generation,
+full gate or post-play re-sweep was run. This commit changes documentation only.

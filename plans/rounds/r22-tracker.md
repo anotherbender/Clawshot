@@ -97,7 +97,8 @@ The initial safety claim was only partly correct (base `2091387`, file:line):
 - But fixed locations start with their vanilla rewards (`fill.py:1166-1170`) and beatability collects them
   (`:1279`). D25 does not screen those rewards. The Wasteland Bombchu Salesman always stays vanilla
   (`remake/gifts.toml:98-102`; `haunted_wasteland.toml:76` gives Bombchus (10)); its Hover Boots/Longshot access
-  and jumpslash do not need the bag. The 40-token House reward is another fixed pack without Gift shuffle.
+  and jumpslash do not need the bag. Since the round 22 merchant admission he stays vanilla only without
+  Gift shuffle (`r22-merchants.md`). The 40-token House reward is another fixed pack without Gift shuffle.
   Therefore the generator could count a fixed pack as explosives before the bag, not merely the tracker.
 
 `remake/bombchus.toml` guards found/usable supply; `shops.toml` guards refill capability (the shop catalog is
