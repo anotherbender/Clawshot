@@ -11,7 +11,7 @@ import pytest
 from clawshot.census.scan import FREESTANDING, GOLD_SKULLTULA, HEART_CONTAINER, scan
 from clawshot.formats import byml, rstb, sarc, zsdic
 from clawshot.patch import drops, freestanding, getitem, ocarina_pickup, songs, tokens
-from clawshot.patch.actor_packs import closure
+from clawshot.patch.actor_packs import closure, resolve_node
 from clawshot.patch.plan import Plan
 from clawshot.patch.write import write
 
@@ -121,7 +121,10 @@ def test_dump_a_skulltula_drop_per_group_reads_back(written, group):
     if group == "fairy":
         components = closure([pack], pickup).components
         own_pouch = components["PouchContentRef"].removeprefix("?")
-        assert byml.same(byml.read(pack[own_pouch])["GetType"], byml.U32(0x681AE117))
+        pouch = resolve_node(
+            [pack], own_pouch, builtin="Component/PouchContentParam/Default.game__component__PouchContentParam.bgyml"
+        )
+        assert byml.same(pouch["GetType"], byml.U32(0x681AE117))
         rows = {row["__RowId"]: row for row in byml.read(read(ocarina_pickup.POUCH_ACTOR_INFO))}
         assert rows[pickup]["PouchGetType"] == "Large"
     for path in written["census"][source].files:
