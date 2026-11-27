@@ -838,3 +838,33 @@ sweep after final human play (line25 predates these plays); obtain explicit revi
 approval. Intact-Knife refusal is waived/UNPLAYED, not a blocker. PLAY.md now preserves
 Kareem's reported words and these limits. No game patch, logic rule, admission or merge
 was changed by this investigation.
+
+## Claude's readiness rulings — line25 stands; inherited crossing retained
+
+Claude explicitly accepts line25's complete paired sweep on c5625a0: no post-play rerun.
+Generation is deterministic and subsequent branch changes are documentation/receipts only;
+repeating the same-SHA generation adds no evidence. This supersedes the post-play timing
+hold in the preceding section. No sweep or new gate was launched.
+
+The carpet crossing condition meets Claude's inheritance test. Direct inspection of main
+5dcb21b shows the existing trick `logic_wasteland_crossing` in
+`src/clawshot/data/world/haunted_wasteland.toml:17`:
+Wasteland Near Fortress→Haunted Wasteland requires that trick or usable Hover Boots/Longshot.
+The return edge at46 uses the same expression. This is the shared region gate, already
+serving Wasteland Chest (33), Wasteland GS (42), and onward Wasteland Crate Near Colossus
+(56, through exit45), then Colossus via exits60/70 with the existing additional conditions.
+Main `world/settings.toml:197` defaults the trick false; reverse-wasteland is a separate
+false-default setting at172. Main `world/remake/gifts.toml:106–110` already gave the seller
+the local can_jumpslash rule plus a keep_vanilla hold, not a new crossing exception.
+
+Git-object comparison proves haunted_wasteland.toml, world/settings.toml and
+remake/child_warp_returns.toml byte-identical between main5dcb21b and candidatec5625a0.
+The candidate merely admits the merchant behind the pre-existing shared gate. Under
+Claude's conditional ruling it may retain this opt-in trick; no rule tightening is needed
+and none was made. This supersedes the crossing-policy hold above, not an in-game
+certification of the trick or the noclip fixture approach.
+
+Remaining holds only: Claude is asking Kareem whether the further Knife offer was an
+actual Yes/No Buy prompt or native Talk_07 conditional dialogue; await that answer.
+Merge requires **Kareem's explicit OK**. No replay, source change or merge is authorized
+or performed. PLAY.md records these rulings.
