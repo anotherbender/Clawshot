@@ -117,3 +117,30 @@ Ownership transitioned in place to queue24; the lock was not released between au
 
 The first line24 capture stopped before any seed: the shared play-builder loader imported PR42-only `ocarina_pickup`, absent from main0.2.9. Printed full error and preserved scripts/logs/receipt in `work/r22-pr42/sweep24-ca62f1e6ac/diagnosis/attempt1-main-import`. Corrected only external capture imports to common production APIs with pinned-source/metadata checks. One cause-directed measurement launch uses unchanged heads, recipes and seed lists; no generated seed is repeated.
 
+## Line24 final PASS and owned-lock release
+
+Both frozen arms completed **500recipe/seed cases**,1,000total, with **zero exhausted, rejected or pool/goal/age-return/tier failures**. Candidate absolute acceptance passed; all planned recipe/seed pairs are present. Standard300 = Broad200+Defaults50+Recommended50; binding WorldPickupsAnywhere adds200per arm.
+
+| Cohort | Seeds/arm | First failures main | Candidate | Extra attempts main | Candidate | Max attempts main/candidate |
+|---|---:|---:|---:|---:|---:|---|
+| Broad | 200 | 0 | 0 | 0 | 0 | 1 / 1 |
+| Defaults | 50 | 1 | 1 | 2 | 2 | 3 / 3 |
+| Recommended | 50 | 0 | 0 | 0 | 0 | 1 / 1 |
+| WorldPickupsAnywhere | 200 | 9 | 8 | 9 | 10 | 2 / 3 |
+
+The binding comparison is **nearest main equivalent**: the same effective kinds and empty fast-start, main songs=`song` versus candidate songs=`anywhere`. No exact placement/sphere equality comparison or improvement claim is made for that cohort; candidate's zero-exhaustion/oracle bar is independent. Defaults and Recommended each have50identical placement/sphere digests; Broad has0of200identical. Production retry attempts are retained per seed, not discarded or manually repeated.
+
+Binding coverage proves the new destinations were exercised:
+
+| Binding source kind | Shuffled/arm | Ocarinas main | Candidate | Songs main | Candidate |
+|---|---:|---:|---:|---:|---:|
+| BossHeart | 1600 | 0 | 33 | 0 | 206 |
+| Freestanding | 2800 | 0 | 63 | 0 | 343 |
+| Token | 20000 | 67 | 76 | 0 | 579 |
+
+Every completed seed records each special floor placement's logical item, source location, kind and grant actor in `floor_special_placements`; these are actual generated placement records, not an assumed palette. Primary results are under `E:/OOTRemake/work/r22-pr42/sweep24-ca62f1e6ac/`: `paired-results.json`, `{main,candidate}-rows.jsonl`, arm results/capture records and the driver receipt/log. Main remains full SHA5dcb21b5e29b78e96e8c254d0106647267ad4d87; candidate remains full SHAca62f1e6ac3bcea7f2b9b4d0535e007f2eb11581. This measurement writes no native mod and proves no in-game result.
+
+Detached actual priority0x4000, four workers, two successful ten-minute progress/direct-thread polls; all five capture/sweep/report stages exit0. Total driver time2,250.55s. The owned lock was removed after matching its exact owner, and **LOCK RELEASED cs22c line24** was posted with **@cs22d at22:52**, allowing line25. `lock-released.txt` preserves the posted handoff. Herdr delivery was unavailable, so the CLI explicitly reported the message persisted to the watched thread rather than claiming an agent notification.
+
+**Preparation work complete; gameplay still pending.** `work/r22-pr42/PLAY.md` links the faithful adult roof replay, open-roof normal-path control and original-child row2c Time comparison. Each has its own untouched baseline/profile, pinned ca62 mod and one startup proof. The expected normal/no-player branches and child roof appearance/collection remain unplayed, not inferred from startup. Version remains0.2.9; old failures, saves and outputs stay preserved; GitHub comment/push remains held.
+
