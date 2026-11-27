@@ -781,3 +781,60 @@ The actual prepared-profile `ensure` also passed. Playable saves remain untouche
 unconsumed; Kareem was told to run the same launcher, type R, continue the broken-Knife
 save and buy the replacement. R records the real edit automatically, linked to its approval.
 No agent launched the game. Medigoron's replacement purchase remains pending.
+
+## v3 Medigoron replacement played; second-offer interpretation and readiness
+
+Claude relayed Kareem: R, bought the replacement Knife, used it without issue; afterwards
+Medigoron offered another Knife. `fixtures.py inspect Medigoron-Swapped` ran with the game
+closed and copied saves/log before parsing. Receipt:
+`packet-v3/receipts/Medigoron-Swapped-inspect-1795786922790665100-read-only-inspection.json`.
+Latest slots01/02 pass native_repeat:200→0, usable Knife stock0→1, Broken Knife stock1→0,
+Hammer stock1 retained, private completion Bool true, two bottles unchanged. Historical
+Broken Knife IsGet remains true. R's real receipt records one rupee-word0→200 edit in
+each purchased slot00/01. Old slot00 is the funded pre-replacement state, not a failed
+replacement. Bound Medigoron, SimpleShop and GameDataList runtime checks pass.
+
+Native Npc_Goron_Medigoron_Adult Talk: Event54→Event19 (Biggoron pouch check), then Event16/
+SageOfFire_Check→Event6 (EventQueryIsExistInPouch, Weapon_Sword_Giant, Num1). Present case0
+reaches Event36/Event34→Event5/Talk_07 or Event35/Talk_19→END, without the sale choice.
+Absent case1 reaches Event7/BrokenGiant and the price200/Event11 sale. The intact branch's
+Talk_07 conditionally invites a future replacement after breakage. Event38's Bool
+GetSwordBigGoron_IsAfterShowBrokenSword_Medigoron_Adult belongs to the separate
+ShowBrokenSword entry; no prior-break flag branch bypasses Event6 in Talk.
+
+At c5625a0, gifts.py680–686 selects the pristine clone using saved Bool
+Clawshot.Gift.Npc_Goron_Medigoron_Adult.Event11 (true case0). The clone is made before
+the uncollected path's ownership neutralization at728–738. The actual bound mod's37
+cloned nodes match native after index normalization; all original SimpleShop nodes
+remain unchanged. Proof: `packet-v3/receipts/Medigoron-Swapped-native-repeat-branch-proof.json`.
+Thus an actual fresh Buy choice with an intact replacement is not explained by the
+native graph or a changed repeat-dispatch branch. Native conditional replacement
+dialogue is fine; the reported wording does not distinguish them. Do not claim a
+second sale native or dispatch-caused without the missing UI evidence. No replay
+requested. V2 C-Knife's old refusal used the rewritten completion gate/Biggoron-owned
+dialogue (above500–506), not a pristine native intact-Knife control.
+
+Carpet default access matches the reported Fortress-side plus Longshot/Hover requirement:
+gerudo_fortress.toml13/52 gates adult+Card,172–180 leads outside to Wasteland Near Fortress;
+haunted_wasteland.toml17 requires crossing trick or usable Hover Boots/Longshot. The
+merchant's local override is only can_jumpslash (remake/gifts.toml105–108); the region
+gate is additional, not removed. Colossus reverse access is False
+(remake/child_warp_returns.toml20–23). Crossing/reverse tricks default false
+(world/settings.toml197/172). The opt-in crossing trick still bypasses equipment;
+this noclip row verifies neither that trick nor the inherited local jumpslash predicate.
+No rule was changed; the all-settings equipment requirement needs a maintainer ruling.
+
+The old Giant's Knife ItemActorError is fixed on c5625a0, not worked around by exclusion:
+item_actors.toml66 maps Giants Knife→Item_Sword_Giant; gifts.py119 locally matches its
+native Shop_Sword_Giant source. Actor lookup succeeded and Medigoron is not keep_vanilla.
+The actual canonical sweep settings restrict it to Boss/Cutscene/NPC, plus Song in the
+Broad songs-anywhere recipe (held_items1471–1483). It can move to other Gift destinations;
+it is not admitted to Chest/floor, and has no chest_verified receipt. No placements or
+spoilers were read for this eligibility check.
+
+Merge remains held: resolve whether the further Knife offer was conditional native text
+or an actual Buy choice; decide the crossing-trick policy; run the required full paired
+sweep after final human play (line25 predates these plays); obtain explicit review/merge
+approval. Intact-Knife refusal is waived/UNPLAYED, not a blocker. PLAY.md now preserves
+Kareem's reported words and these limits. No game patch, logic rule, admission or merge
+was changed by this investigation.
