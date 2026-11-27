@@ -715,3 +715,29 @@ packet-v3; driver proof: `play23-c5625a0118/status.json`.
 Human play and admission remain pending. Line25 regenerates the full paired sweep on
 c5625a0118, Gift-on versus Gift-off, only after line24's explicit release. The updated
 queue inserts cs22c's22b after this line23 release and before24. No main merge is authorized.
+
+## Line25 complete — paired merchant sweep on c5625a0118
+
+Started only after cs22c's explicit 22:52 line24 release. The frozen source remained
+`c5625a0118fe82266d06ebab3bb88ae92799876a`, not the later documentation-only HEAD.
+Detached BelowNormal was asserted as `0x4000`; six workers, one clawshot worker each.
+Player count was zero at preflight and every stage boundary. Driver finished at 23:06
+with exit0 and stage `paired-sweep-complete`.
+
+| Recipe | Pairs | Gift-off first-attempt failures / attempts | Gift-on first-attempt failures / attempts |
+|---|---:|---:|---:|
+| Broad | 200 | 1 / 201 | 0 / 200 |
+| Defaults | 50 | 0 / 50 | 0 / 50 |
+| Recommended | 50 | 0 / 50 | 1 / 51 |
+
+Both arms completed every seed: no exhausted seeds or rejected oracle results. Identical
+seed lists and non-shuffle input settings were checked. All three merchants were selected
+only in Gift-on; its ordinary pool contained no plain Blue Potion. Pool conservation and
+tier checks passed, alongside the generator's goal/age/return verification. Placement and
+sphere digests differed for every pair; no placements or spoilers were published.
+
+Evidence: `work/r22-merchants/line25-c5625a0118/{status,comparison}.json`, driver/stage
+logs and each arm's settings, seed list and digest-only rows/results. The saved line24
+release is alongside them. This completes the ordered automated work; the four v3 human
+merchant transactions, persisted repeats and explicit admission decision remain pending.
+No live merchant-play result, admission approval or main merge is claimed.
