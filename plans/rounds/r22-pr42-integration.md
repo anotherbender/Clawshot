@@ -223,3 +223,38 @@ Recommend one **200-seed merged-tree Gift-on WorldPickupsAnywhere** cohort with 
 
 Measured line24 binding200 totals1,989.40seed-seconds, ideal8.29minutes at4workers; capture45.59s, whole500candidate arm1,081.77s. Estimate **10–15minutes for the new single binding200**, or20–25minutes for a whole single-arm500, BelowNormal/four workers, plus queue/player waits and possibly extra retry cost. Absolute production pool/admission/goal/age-return/tier/retry acceptance, not false exact placement equality across changed policy. The assessment will accompany the gate result; **Claude decides, no sweep auto-start**.
 
+## Line26 stale layered fixture and authorized resumption
+
+The first full gate on7968343 completed with format/lint PASS, synthetic **4995 passed/925 skipped**
+and native **891 passed/1 skipped/31 setup errors in2935.77s**. Every setup error is the same missing
+`Pack/Actor/Item_BombchuBundle_Medium.pack.zs` in the old `work/rounds/r22/layered-dump`, not a
+failed placement assertion. Failed logs/receipt remain in `work/r22-pr42/integration/gate26-7968343e54508d909c47ab32b37d55b57d0d3db7`.
+The read-only canonical RomFS has that file. No oracle, admission, placement or save was changed.
+
+Claude directed asking cs22d for the passing gate23 inputs. Its `run_line23_gate.sh` lines64–66
+and cs22d's10:30 confirmation agree: OOT_ROMFS=`E:/Games/Hookshot/romfs`,
+OOT_NUP=`E:/Games/Hookshot/The Legend of Zelda Ocarina of Time [0400486024DEC000][v131072].nup`,
+OOT_DUMP=`E:/OOTRemake/work/r22-merchants/layered-dump-main-b98fb9b`.
+Claude's final instruction is **use that layered cache directly, read-only; dump tier only**.
+The rerun started at BelowNormal on the same immutable7968343 snapshot, n8/workers3,
+under the retained line26 lock; original format/lint/synthetic passes stand. `local_romfs`
+materializes its disposable output elsewhere and the native fixture asserts source size/mtime unchanged.
+No dump PASS or row readiness is claimed while it runs.
+
+Before the final direct-use instruction, cs22c had already made the then-authorized fresh owned
+`work/rounds/r22/line26-layered-7968343` copy. It is **unused, not the rerun input**. The current1299
+required resources all match canonical RomFS bytes and none was missing from cs22d's cache.
+Both prior layered inputs and canonical working members retain size/mtime; proof is
+`work/r22-pr42/line26-large/verification/complete-layered-cache.json`.
+
+Claude now **approves** the combined **200 WorldPickupsAnywhere seeds on7968343**, only after
+dump PASS: Gift on, all three merchants genuinely shuffled (no play-row identity pins),
+songs anywhere, PR42 expanded floor palettes, four BelowNormal workers. Bar: **zero exhausted**;
+report first-fail seeds and retry attempts. Same fixed line24 binding seed list2026112600–2026112799;
+absolute pool/screened admission/goal/age-return/tier acceptance, not cross-policy placement equality.
+Prepared single-arm measurement reuses the unchanged line24 backend and additionally asserts all three
+merchant checks are shuffled in every completed seed and both instruments/all12songs remain admitted
+at Token/BossHeart/Freestanding. It does not execute capture or fill before the dump-pass guard.
+After that sweep passes, build and boot rows a–d (adult roof, open roof, original child Fairy, Token)
+as already specified, keeping the lock throughout; release explicitly with @cs22d and launchers.
+
