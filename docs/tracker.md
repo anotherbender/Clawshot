@@ -174,6 +174,12 @@ Kakariko Shooting Gallery prize and the man on the Kakariko roof. These show no 
 Reading these records needs a seed made by this same Clawshot version; for other seeds the tracker says
 so in one line and reads gifts as before ([design record](../plans/tracker-auto-checks.md)).
 
+**Merchants.** With Gift shuffle, Medigoron (**Medigoron's Blade**), Granny (**Granny's Blue Potion Sale**)
+and the Wasteland carpet seller (**Mirage Desert Carpet Merchant**) each sell one shuffled item once. The seed
+saves its own record of that sale only when the purchase completes, and the tracker reads it, so these checks
+need no mark; declining leaves them open. Their later ordinary sales (Granny's Blue Potion refill, the carpet
+seller's Bombchus, Medigoron's replacement Knife) are not checks.
+
 **Vanilla pick-ups.** Some places your seed does not shuffle still hold an item the logic needs.
 Ruto's Letter at the bottom of Lake Hylia is one: until you hold it, Jabu-Jabu's Belly stays out of
 logic. So the tracker also lists these places in their area, tagged **vanilla**, with their usual item

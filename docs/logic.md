@@ -116,9 +116,31 @@ requires `Bomb_Bag` whatever `free_bombchu_drops` says (`has_bombchus` and `foun
 every seed, still picks the supply: on, a found Bombchus item (and only then are Bombchus explosives);
 off, a purchase, with `found_bombchus` the bag alone. Before, a Bombchus item held without a bag
 counted as explosives: in the tracker, a bought stock read from the save; in generation, a pack that
-stays vanilla (the Wasteland Bombchu Salesman in every seed, the 40-token reward unless gifts are
-shuffled). Shuffled packs already went only where the bag is guaranteed (D25). The tracker's in-logic
-view rebuilds the same world, so it follows. [Decision D30](../plans/decisions.md).
+stayed vanilla (the Wasteland Bombchu Salesman, then held vanilla in every seed, and the 40-token reward
+unless gifts were shuffled). Shuffled packs already went only where the bag is guaranteed (D25); with Gift
+shuffle the salesman's pack is now one of them (merchants below). The tracker's in-logic view rebuilds the
+same world, so it follows. [Decision D30](../plans/decisions.md).
+
+**Merchants under Gift shuffle.** With Gift shuffle, `GC Medigoron`, `Kak Granny Buy Blue Potion` and
+`Wasteland Bombchu Salesman` are shuffled checks. Each sells one shuffled item once at its native price
+(200, 100 and 90 Rupees); the patch saves the check only after a completed purchase, and later visits run
+the untouched native sale. Afterwards Granny fills an existing empty bottle with Blue Potion for 100 and
+never adds a bottle, the carpet seller sells Bombchus for 90, and Medigoron sells a replacement Giant's Knife
+only after a genuine Knife breaks (with an intact Knife, "come back if it breaks" is dialogue, not a sale).
+Without Gift shuffle all three keep their native sales. Medigoron's rule is `is_adult and can_blast_or_smash`
+(his room access stays) and Granny's keeps her empty bottle and Odd Mushroom trade prerequisites; neither
+requires `Progressive_Wallet`, because both prices fit the default 200-Rupee wallet. On Longshot 3.2.0,
+unmodded with no wallet upgrade (2026-11-26), Kareem bought the Giant's Knife (rupees 200→0,
+`Weapon_Sword_Giant` 0→1) and Granny's Blue Potion (100→0, an empty bottle filled); on test seeds
+(2026-11-27) he bought shuffled items from all three (200→0, 100→0, 90→0), then their native repeat sales.
+Owning the Biggoron Sword does not block Medigoron's check: the patch neutralises his sword-ownership reads
+until it is bought (static trace, not played). The carpet seller adds only its inherited `can_jumpslash` to
+the shared Wasteland gate, unchanged from 0.2.9: the Gerudo Fortress side, then usable Hover Boots or
+Longshot, or the opt-in `logic_wasteland_crossing` trick (default off) that already gates the other Wasteland
+and Colossus checks. There is no merchant-specific trick. Granny's plain Blue Potion is a refill, not a bottle,
+so it never enters the pool: `gifts.logic_spec` replaces it one-for-one with `Rupees (5)` (no Blue Potion
+alias exists); only an explicit `keep_vanilla` pin keeps her native refill.
+[Player summary](settings.md#gifts-enabled-versus-held), [play record and traces](../plans/rounds/r22-merchants.md).
 
 **Bag bombs without the Bracelet (experimental, default off):** `bombs_without_bracelet` is paired with
 `patch.bombs`, which lowers only `Item_Bomb`'s required lift grade. `remake/bombs.toml` then requires the
@@ -457,8 +479,10 @@ implementation: `src/clawshot/tracker/logic.py` and `src/clawshot/tracker/marks.
 **Shared logic-world builder (D15).** `clawshot.patch.logic_world.logic_world(settings, spec=None)` returns
 `(settings, world)` for the world the seed's beatability search ran on, without the dump. `validate` plus
 `prepare` alone is not that world: before `prepare` the seed pipeline applies two spec steps that change
-reachability. `gifts.logic_spec` (Gift or NPC shuffled) turns the Kokiri shopkeeper's free Deku Shield
-event into a placed check, which the search would otherwise grant on reaching the shop.
+reachability. `gifts.logic_spec` (Gift or NPC shuffled) applies `gifts.shopkeeper_spec`, which turns the
+Kokiri shopkeeper's free Deku Shield event into a placed check that the search would otherwise grant on
+reaching the shop. Its only other change gives Granny's Blue Potion sale `Rupees (5)` as its pool item,
+unless a `keep_vanilla` pin keeps her native refill.
 `scrubs.logic_spec` (Scrub shuffled) adds each one-time sale's wallet tier to its rule. The pipeline
 (`gifts.seed_setup`, and `make_seed` through `scrubs.seed_setup`) takes both steps from these same
 functions, so a tracker and the generator cannot drift. The other pre-`prepare` changes only hold checks

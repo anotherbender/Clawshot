@@ -1,7 +1,13 @@
 # Round 22 merchants — cs22d
 
 Branch `r22/merchants`, base `874f30a`, assigned by Claude after the gift-gates audit, 2026-11-25.
-Target 0.2.9. Do not merge or lift the three holds without Kareem's play.
+0.2.9 shipped the Medigoron tightening only (main `5dcb21b`, merge `9895d54`); merchant admission targets the next release. Do not lift the three holds without Kareem's play and a full paired sweep.
+
+**Current status, 2026-11-27:** all four v3 merchant rows PASS. Kareem confirmed the final
+Medigoron talk was native conditional replacement dialogue, not another Buy prompt, and
+approved merging. Line25 stands; no repeat sweep. Claude will review the player-docs cutover
+and perform the merge himself. Earlier holds and failures below are the dated history, not
+the current admission status.
 
 ## Requested scope and direction split
 
@@ -280,3 +286,619 @@ No gameplay/purchase result is claimed; startup does not prove merchant-area fil
 All three shipping holds and wallet predicates remain. Admission, purchase identity normalization
 and its regression still land together only after PLAY and a full paired sweep; no admission
 or dormant implementation was shipped by this turn. The owned lock release is the final handoff.
+
+## Packet-v2 rebuild — copied, funded, independent rows
+
+Claude reported the original first-adult route unplayable: horse/song/trade work, repeated trade
+and money farming were not acceptable. `work/r22-merchants/PLAY.md` now supersedes that route
+with the PR42-style launcher/start-state/steps/expected-numbers table. Each row starts with a
+debug teleport to its merchant area (Granny at noon); no position/clock save edits or route/quest
+grind. Five minutes is a target, not a measured gameplay result.
+
+The read-only backup survey first copied2963 progress files and2963 captions, then parsed only
+those copies:777 distinct payloads,217 adult. No default-wallet save was strictly past the
+Granny sale gate. Completed-trade sources were Giant's Wallet and therefore rejected. The
+chosen genuine main first-adult source is the November9 backup's slot01, SHA256
+`e63eba9d8173c7c03e1e5338c48ec2dc90cbd2f9b2cad1e487022d5cb46c761c`:
+default wallet,76 rupees, genuine Bomb Bag/bombs6, BottleA Bug and BottleB Empty; no Knife,
+Hammer, Iron Boots or Hover Boots. Later `main`-named test copies were not needed as source.
+
+Byte-decoding the existing written Granny flow with cached dictionaries showed Event167 is
+the Odd Powder handover, not a quest scalar setter. Event3 reads the strict
+`SubEvent_GetSwordBigGoron_IsAfter_Step05_01_Exp`; minimum saved step is Step06.
+Claude explicitly authorized only `Step_SubEvent_GetSwordBigGoron` Ready398436934 -> Step06567736888
+on Granny copies, plus the separately authorized rupees. No Odd Potion/pouch history is
+fabricated; the mismatch is expected and PLAY prohibits visiting Biggoron on these copies.
+
+Native A-Granny is first and uses the same edited starting bytes as B/C Granny. Its real
+100->0 Blue Potion purchase is required to establish the vanilla post-trade sale; if it fails,
+candidate rows are VOID. The three progress baselines are byte-identical, SHA256
+`b5d931ba4f07e208ee4fa7eb783864bfcf3bb23b01ff0d292e496052b38ee725`.
+
+Six profiles are materialized in `work/r22-merchants/packet-v2/ingame/`, each equal to its frozen
+baseline. Initial field edits/readbacks are exact:
+
+| Profiles | CurrentRupee | Trade enum | Other saved fields |
+|---|---|---|---|
+| A/B/C Granny | 76 ->100 | Ready398436934 -> Step06567736888 | unchanged |
+| A/C Knife | 76 ->200 | Ready unchanged | unchanged |
+| B carpet | 76 ->90 | Ready unchanged | unchanged |
+| B Medigoron | actual A-Knife result0 ->200, after play | unchanged | genuine Knife and opened walls inherited, never invented |
+
+`fixtures.py` uses existing `clawshot.save`/PR42 `SaveView` and `table_offsets` tools, typed
+entry/whole-save delta checks and separate physical copies. No original save, old profile,
+age, position, wallet, inventory, bottle or collection flag was edited. B-Medigoron is the only
+true dependency: its complete first-launch copy path requires A's actual saved Knife stock1
+and rupees0; it cannot be materialized or certified before that result exists.
+
+Seven current-template, pinned Longshot3.2.0 launchers passed actual cmd dry-runs; all existing
+profiles stayed unchanged. The new copy-before-parse inspector read back C-Granny as100,
+Step06, Odd Powder stock0/unowned, genuine empty bottle and default wallet. An active-game
+guard test refused boot staging with players2 and created no scratch; this is an expected
+guard result, not a startup test. Receipts: `packet-v2/verification.json`, `dry-runs.json`,
+`rows.json`, `launchers.json`, `survey/` and per-row `receipts/*-before.json`, all outside git.
+
+Claude approved dropping below-price rows and same-launcher funded repetition. On B/C's
+R mode, after a real purchase/Save/quit, the tool freezes the actual saves/log first and funds
+only CurrentRupee0->price on the copied working profile. It never resets a merchant flag or
+grants/removes an item. C-Granny saves the genuine potion before funding, then drinks it in
+game before the funded revisit. The readback can establish saved state, not visual/live-use
+PASS. No-empty-bottle refusal is not claimed by these one-empty-bottle quick rows.
+
+No gate, sweep, seed generation or boot ran during this rebuild. Existing seeds2211250002/3
+and mod trees stand. `packet-v2/boot-queue.json` queues fresh fixture/scratch checks for explicit
+idle handoff; native controls expect0 mods, B/C exactly1. B-Medigoron's check waits for A's
+genuine result. The old seed startup PASS does not certify the new fixtures.
+
+Production holds/wallet predicates remain. Admission still requires actual PLAY and a full
+paired sweep; merge current main into this branch when admission resumes, never rebase.
+
+## Native controls played — 2026-11-26
+
+Claude relayed Kareem's A-Granny: "Offers purchase for 100, Blue Potion filled empty bottle,
+persists after reload." A-Knife: "Declining works, buying works, equip/swing okay."
+While Kareem was moving to B-Medigoron's first visit, only read-only physical snapshots and
+small receipt checks ran. No profile/save edits, seeds, boots, gates or heavy work.
+
+| Row | Result | Saved proof against frozen start |
+|---|---|---|
+| A-Granny | PASS: native sale/reload gate | Slots00/01: rupees100->0; BottleB Empty->Blue Potion; BottleA Bug unchanged; valid bottles2->2. Default wallet capacity200, Medium/Large unowned. Step06 567736888 retained; Odd Potion stock0/unowned. |
+| A-Knife | PASS: native default-wallet Knife control | Slots01/02: rupees200->0; Weapon_Sword_Giant stock0->1, IsGet/HavePlayedGetEvent true; Broken Knife absent. Default wallet capacity200, Medium/Large unowned. Bottles and Ready trade step unchanged. |
+
+Copied snapshots are `packet-v2/receipts/A-Granny/1795717225344007700-read-only-inspection/`
+and `A-Knife/1795717225651724500-read-only-inspection/`. Both copied logs identify Longshot
+3.2.0, their own row profiles and `mods: none` in `native-empty-mods`.
+Full slot facts, hashes, checks and tester quotations are in
+`packet-v2/receipts/A-Granny-PLAY-20261126.json` and `A-Knife-PLAY-20261126.json`;
+the top of PLAY links these receipts.
+
+A-Knife slot00 is an older pre-purchase200/no-Knife save, not a failed purchase. Bomb ammo is
+6 initially,7 in slot01 and6 in slot02; these values do not independently prove pickup/use or
+wall-opening method. Granny decline was not explicitly reported and is not certified.
+Equip/swing and reload execution remain explicitly attributed to Kareem, not inferred from
+static saved stock. Native rows have no Clawshot merchant fields; missing fields remain null.
+
+The Step06-only trade edit now has a played vanilla-sale control, validating B/C-Granny's
+starting trade state. This is not a B/C transaction/repeat PASS or an admission approval.
+Claude reports B-Medigoron ROW_PREPARED from A's real Knife snapshot, with rupees0->200 as its
+only fixture change; its first-visit result is still pending. Holds and the full paired-sweep
+requirement remain.
+
+## B play receipts and native repeat-service design issue — 2026-11-26
+
+Kareem via Claude: B-Medigoron "working great", but its post-purchase text references Biggoron's
+Sword despite not owning it. B-Granny: decline/purchase/Iron Boots work; funded revisit silently
+focuses Granny then exits, retaining100 rupees. No additional use/decline detail is inferred
+from Medigoron's general report.
+
+Copied B profiles/logs were inspected without editing them. Frozen real-purchase receipts
+prove200->0/Hammer1/own Bool true for Medigoron and100->0/Iron Boots1/own Bool true for Granny.
+Existing funding receipts change only CurrentRupee0->price. New copied Medigoron slots00/01
+retain200, Hammer1, genuine Knife1, Biggoron0 and own Bool true. Granny slots01/02 retain100,
+Iron Boots1, an empty bottle and own Bool true; its slot00 is an older pre-purchase save.
+Other merchant Bools are false; both retain default200 wallet and two valid bottles.
+Both PASS the existing one-time transaction/persisted funded-state contract, not admission.
+Granny also has the design hold below.
+
+Runtime proof in the copied logs: exactly one swapped mod, the actual merchant flow, GameData,
+analyzed table and merged resource table; Medigoron also loads SimpleShop. Full hashes, slot
+facts, exact checks and quotations: `packet-v2/receipts/B-Medigoron-PLAY-20261126.json` and
+`B-Granny-PLAY-20261126.json`, linked from PLAY.
+
+### Medigoron ownership gates and message labels
+
+Cached native inputs and the actual B mod were physically copied, then decoded outside git
+in `packet-v2/research-20261126/`. English labels/text are native, unchanged in the candidate:
+first Biggoron-owned comment Event26/`EventFlowMsg/Npc_Goron_Medigoron_Adult:Talk_08`;
+later Event84/`Talk_30`; Event27 alternatives Event20/`Talk_12` (brother's sword aura) and
+Event28/`Talk_13`. His copied Event26 talk-history Bool was false before funding and true
+after the revisit, while Biggoron stock remains0. The tester did not quote the exact random
+follow-up sentence, so it is not pinned more narrowly. These are specifically the native
+Biggoron-owned branch, not neutral already-sold text; Knife-owned text is Talk_07/Talk_19.
+
+Native Talk -> Event19 queries actual `Weapon_Sword_Biggoron`: present routes to dialogue/
+return, excluding sale regardless of acquisition source. Absent continues via SageOfFire_Check
+to Event6/`Weapon_Sword_Giant`; owned Knife also returns without sale. Event7/BrokenGiant only
+selects different introductions: both paths converge on price200 and Event11/SimpleShop.
+Native SimpleShop removes a broken Knife after a successful replacement purchase.
+The GetSwordBigGoron_IsAfterShowBrokenSword_Medigoron_Adult Bool belongs to the separate
+ShowBrokenSword_Medigoron_Adult entry's dialogue history, not a quest-step gate on Talk sales.
+
+Actual B Event19 AND Event6 already read the independent merchant collected Bool. Its private
+SimpleShop grant bypasses broken-sword removal. Therefore the traced candidate does not need
+not-Biggoron logic: retain the existing ownership-neutralizing patch. This is a static proof,
+not a Biggoron-owned first-purchase play row. The inaccurate dialogue is a presentation issue.
+
+Published `5dcb21b` still has Medigoron's keep_vanilla and
+`is_adult and Progressive_Wallet and can_blast_or_smash`;0.2.9 shipped room tightening only.
+Native Biggoron ownership still suppresses the unshuffled Knife shop, as before. This does
+not invalidate that tightening or expose a newly admitted progression check in0.2.9.
+
+### Granny repeat shop: product decision required, no code change
+
+Vanilla eligible Talk -> Event3/after-Step05_01 -> Event31 calls Buy_BluePotion on every visit.
+Event143/FirstTalk and Event144/IsAfterFirstTalk_MakeBluePotion only select the introduction,
+then still offer the purchase. Accept -> funds100/Event11 -> empty bottle/Event15 ->
+price100/Event179 -> Event12/GetInEventInBottle_BlueBottleShop; the native wrapper fills
+the bottle and charges, then returns to thanks/close. No sale-completion Bool is tested/set.
+Thus native Blue Potion purchases repeat with money and an empty bottle.
+
+Patched Buy_BluePotion starts at ClawshotGift155: collected=true/case0 -> NONE/immediate
+return; uncollected -> Event143. Caller Event31 also returns. There is NO done-message node
+on the collected branch. The silent focus/exit is our added gate, not a native done branch.
+Current once-only normalization has removed a vanilla repeatable Blue Potion service.
+This is a DESIGN HOLD despite the technical PASS, not approval of the removed service.
+
+cs22d proposes, for maintainers to choose:
+- Recommended: one shuffled reward, then a pristine native Blue Potion sale graph on repeats.
+  Keep the collected Bool true; never route back into the mutated randomized-gift Event12.
+- Explicitly approve one-time shop closure and intentional done dialogue, accepting loss of
+  the native repeat service.
+- Keep Granny vanilla/held until the decision is settled.
+
+Preserving repeats would also change C-Granny's current no-second-sale expectation and the
+persisted-repeat regression's contract: once-only randomized completion versus subsequent
+legitimate native potion purchases. Neither code nor tests were changed.
+Full external report: `packet-v2/FLOW-REVIEW-20261126.md`. No original dump, spoilers or
+placement files were opened; no source save edits, gates, sweeps, seeds, boots or heavy work.
+
+## Final packet receipts: carpet PASS old contract, Granny identity FAIL — 2026-11-26
+
+Before parsing, B-Carpet/C-Granny profiles and logs were physically copied into
+`packet-v2/receipts/B-Carpet/1795718965086250000-read-only-inspection/` and
+`C-Granny/1795718965403125700-read-only-inspection/`. Supplied screenshots in
+`packet-v2/kareem-evidence/` were read and their hashes recorded. No originals were edited.
+
+B-Carpet PASS under the old once-only randomized contract: real purchase90->0, Hover Boots1,
+own Bool true; currency-only funding0->90; copied slots01/02 retain90/Hover1/own Bool true,
+other merchant Bools false. Kareem declined/bought and obtained Hover Boots. On funded revisit
+the visible90 offer remains, but choosing buy cancels without charging/granting. The screenshot
+shows that offer and90 wallet. This misleading offer and loss of repeat merchandise require
+the approved redesign, not an admission PASS. Older slot00 is pre-purchase.
+
+Kareem approached from Gerudo Fortress and reports crossing needs Longshot/Hover Boots; he
+used approved travel noclip. That makes the merchant transaction usable for testing, not an
+access/beatability proof. Hover Boots at the carpet in2211250002 is explicitly user-reported;
+no seed/spoiler/placement files were opened to look it up.
+
+C-Granny product FAIL: paid100->0 and collected Bool saved true, but BottleA Bug and BottleB
+Empty persist while new BottleC Blue Potion becomes valid. Count2->3 instead of native A's2->2:
+free bottle/pool duplication. R correctly rejects the changed count before the currency edit.
+The new copied progress hash equals the failed-R snapshot exactly; no successful funding
+receipt exists. Guard PASS, not a fixture problem. C-Granny is STOPPED; no R retry, loosening,
+repair/drinking away the evidence or revisit before redesign. PLAY's old identity replay
+instructions were replaced with this stop; `fixtures.py` is unchanged.
+
+Full per-row evidence/checks/quoted observations/load-log references and hashes are
+`packet-v2/receipts/B-Carpet-PLAY-20261126.json` and `C-Granny-PLAY-20261126.json`.
+Logs prove the one intended mod and actual merchant flow, GameData/analyzed table/merged
+resource table (SimpleShop for carpet, Dm_SY_GetInEvent for both).
+
+Claude's design ruling accepts one shuffled reward followed by pristine native repeat sales:
+Granny, carpet, and Medigoron's Knife replacements if native repeats after breakage. The
+earlier no-second-purchase product assumption is superseded, not the once-only shuffled check.
+`packet-v2/REVISED-CONTRACT.md` records success-only completion, native repeat/refusal behavior,
+prices, saved-repeat regression changes and new post-fix play-row specifications. No new
+launchers are staged. The Blue Potion fix/test needs explicit OK; no implementation now.
+
+### Packet ends with C-Knife PASS
+
+Kareem via Claude: opened Medigoron, declined first, bought the Knife successfully; funded
+repeat showed Biggoron-owned dialogue and no repeat sale. Copied profile/log:
+`packet-v2/receipts/C-Knife/1795719389557874700-read-only-inspection/`.
+Frozen purchase proves200->0 and Knife0->1 with the merchant Bool true. Currency-only funding
+restores200; new slots00/01 retain200/Knife1/own Bool true/other merchant Bools false.
+Runtime loads prove the identity mod's Medigoron and SimpleShop plus GameData/analyzed table/
+merged table. Receipt `C-Knife-PLAY-20261126.json` PASS old contract. This is not a post-redesign
+broken-Knife replacement play. Packet v2's seven rows are now complete; no further replay.
+
+### Blue Potion root cause, published exposure and fix proposal (no code)
+
+Candidate admission adds `Blue Potion -> Item_Bottle_BluePotion` in item_actors.toml. Identity
+purchase normalization still calls Granny's `_purchase`, which replaces the native
+GetInEventInBottle_BlueBottleShop fill wrapper with GetInEvent_NotTurn_NotNpc. That generic
+wrapper calls GetPouchContentByActorName_ForGetInEvent: a filled-bottle/container grant, not a
+refill of the selected owned bottle. It allocates C while B stays Empty. The native sale uses
+PushToSelectedBottle and preserves the valid count; the identity row directly exposed this
+semantic mismatch, not a bad fixture.
+
+Published main0.2.9 was checked directly at git object5dcb21b (not assumed from another tree):
+- Plain Blue Potion has one vanilla logic location, Granny's sale, and that location is held.
+- item_actors has no Blue Potion or Bottle with Blue Potion mapping. The only bottle-container
+  mappings are Bottle and Bottle with Milk. Buy Blue Potion is a shop-type logic definition,
+  but no native shelf contributes it; Bottle with Blue Potion is also only a logic definition.
+- fill.py pools vanilla items from shuffled_locations, which excludes keep_vanilla checks;
+  normalize_pool only expands native progressive chains, none a potion/bottle chain.
+Thus the erroneous Blue Potion payload cannot reach the generic grant through supported
+0.2.9 seed pools/locations. The generic container machinery is reachable and correct for
+genuine Bottle/Milk prizes. Native held Granny still refills normally. No shipping hotfix is
+established by this candidate bug.
+
+cs22d's proposed fix, requiring explicit OK: preserve Granny's native Blue Potion wrapper
+for a plain Blue Potion assignment, with the existing empty-bottle/funds/decline checks and
+the private completion flag written only after success. Let the native wrapper charge once;
+do not also append the generic replacement's charge. Other randomized prizes remain gifts.
+After completion, route to a pristine native sale graph under the approved repeat contract.
+Plain potion refill semantics must remain distinct from an intentional new filled-bottle
+item at any admitted destination; do not globally redefine bottle-container grants, silently
+drop the identity case, or ban its placement instead of fixing it.
+
+Proposed regression updates the existing merchant state oracle, not a callee-name assertion:
+synthetic A Bug/B Empty/C invalid,100,uncollected ->0/A Bug/B Blue Potion/C invalid/count2/
+collected; no-empty-bottle or insufficient-funds refusal leaves money/pouch/completion unchanged.
+Serialize/reload, normally empty the potion, buy native repeat for100 ->0 with count2 and the
+same completion Bool; a non-potion first reward must not be repeated. Preserve real Bottle/
+Milk container semantics. The current generic path must fail by adding a third valid bottle.
+Existing actor-echo rewards assertions are insufficient and must not be re-pinned to that bug.
+No code, test changes or test runs were made; the bottle guard remains unchanged.
+
+### Native repeat applicability and carpet rule settled
+
+Native and actual B Npc_Hylia_044_Adult files were physically copied and decoded by the parent
+in `packet-v2/research-20261126/`. Both native Event1/Buy-flag cases lead through offer
+Event15/Talk_08 or Event16/Talk_09 to Event3/SimpleShopRoot: the flag changes dialogue, not
+availability. SimpleShop tests choice/funds/capacity then buys; native Bombchu sales repeat.
+Actual B Event3 calls its private entry after the unchanged offer. Collected ClawshotGift171
+routes to ClawshotGift159_Event26/Sub_ShopCancel, explaining the misleading offer/cancel.
+
+Native Medigoron repeats replacement Knife purchases: no intact Giant -> Event7/BrokenGiant
+(either outcome) ->200 sale; successful native SimpleShop Event25/Event115 consumes the broken
+weapon. Native Biggoron/intact-Knife ownership restrictions remain part of post-check fallback,
+not blockers for the first shuffled reward. Granny native repeatability was already traced.
+Thus Claude's native-repeat ruling applies to all three merchants, not just Granny.
+
+The effective Fortress-side carpet route retains adult+Membership Card at GF Gate Open
+(gerudo_fortress.toml13/52), then GF Outside Gate -> Wasteland Near Fortress. The seller is
+inside Haunted Wasteland; its incoming exit is
+`logic_wasteland_crossing or can_use(Hover_Boots) or can_use(Longshot)`
+(haunted_wasteland.toml17; reverse46). Crossing trick defaults false (world/settings.toml197).
+The candidate local override is only can_jumpslash (remake/gifts.toml105-108); no remake gate/
+crossing override removes the region prerequisite. Existing jumpslash remains unverified.
+So Hover Boots parked at the seller cannot bootstrap this default route. An independently
+reachable Longshot can cross; the placement alone does not establish deadlock. Noclip play
+does not prove access and no seed search/placement inspection was run.
+
+### Consolidated handoff
+
+`work/r22-merchants/packet-v2/RESULTS.md` is the one complete seven-row summary:
+A-Granny PASS native sale/reload; A-Knife PASS native wallet/Knife; B-Medigoron, B-Granny,
+B-Carpet and C-Knife PASS the old one-time contract; C-Granny FOUND BUG/FAIL, guard PASS/STOP.
+It includes the Blue Potion mapping/wrapper root cause, directly checked main0.2.9 exclusion,
+refill/semantic regression proposal, confirmed native repeats and carpet access caveats.
+PLAY links it and `REVISED-CONTRACT.md`; all old-packet replay instructions are closed.
+No code, tests, fixture guard or original saves were changed. No new seeds, gates, sweeps,
+boots or heavy work. Packet complete is not admission; wait for explicit code OK, then the
+revised regressions/new human rows and required full paired sweep. Merge main, never rebase.
+
+## Approved implementation: refill and native repeats
+
+Claude authorized implementation while idle, merging published main5dcb21b without rebase.
+Merge33a6771 completed cleanly. The requested trailer is `Assisted-by: Claude Opus 5.5`.
+
+The writer preserves a pristine native transaction before mutating the randomized caller.
+The saved check dispatches through a local native-entry call after completion; its subflow
+registration is retained. Granny's unchanged Blue Potion uses the native fill/charge wrapper,
+then the success Bool; non-refill first rewards use a generic grant and one explicit fee.
+Medigoron's initial ownership reads remain neutralized; the native fallback preserves sword
+ownership and BrokenGiant replacement consumption. Carpet repeats no longer enter a hidden
+private cancellation gate after its native offer. Original shared native shop consumers remain.
+The Granny Talk preload adds Dm_SY_Get only for a non-refill first reward, not the identity.
+Purchase identity normalization is now explicit in seed_step.
+
+Focused proof before admission changes:89 tests passed in5.32s (`test_gifts_merchants`,
+`test_gifts`, `test_gifts_bottle`, `test_gifts_release`), all OOT variables unset, UI extra,
+xdist-n2/CLAWSHOT_WORKERS1. One helper-only oracle self-test was subsequently discarded;
+all88 consumer/contract cases remain. A formatter-reported line wrap was corrected without
+changing the expression. Eight transforms of already-copied native flow files also round-tripped
+(four flows, both Granny reward forms). No live repeat/potion result is inferred from that proof.
+
+Semantic tests now execute serialized synthetic NPC callers across local/shared subflows,
+money, saved completion, bottle contents/counts, stock/capacity, and broken-Knife replacement.
+They compare completed visits against pristine native behavior rather than pinning a private
+callee or reward echo. The flow-transform count assertion remains; the Granny analyzed-table
+transform has a dedicated row-only round-trip oracle. No game fixture is stored in the repo.
+
+Claude's subsequent admission/pool ruling is a separate next commit: port frozen v2 admission
+data onto this repair, lift holds on the branch only, then replace shuffled Granny's Blue Potion
+pool contribution with one existing junk item. cs22d chooses Rupees(5): already mapped ordinary
+junk, no progression or bottle capacity. Native Blue Potion survives only an explicit Granny
+identity plan pin; it is never a global actor alias. Final focused proof/gate23/play rows/sweep25
+must all bind the final admitted SHA, with no merge before new play plus paired sweep PASS.
+
+## Admitted branch pool policy and final focused proof
+
+Claude authorized the frozen-v2 admission port as its own commit after the refill repair:
+repair `31d4fd15acb344a708b4b499dc207d1547df7fae`, admission data
+`e6fab017f497a4c228fcbb175dea2e8f0ed691eb`. The latter commit records every ported file
+and its candidate-src SHA-256; candidate-src remains untouched provenance. Holds are lifted
+on this branch only; main still waits for new human play and the full paired sweep.
+
+Under gift/NPC shuffle, Granny contributes Rupees (5), replacing her plain Blue Potion
+one-for-one. It is existing mapped junk, no progression or bottle capacity. The shared
+logic_spec conversion preserves source data and is idempotent. There is no Blue Potion actor
+alias. An explicit keep_vanilla identity pin retains native Blue Potion at Granny alone;
+its separate scoped sale step uses the native refill wrapper and composes saved flags with
+the ordinary gift step. Real Bottle and Bottle with Milk prizes remain container grants.
+
+Final focused proof:75 passed in34.29s (`test_gifts_merchants`, `test_gifts_fill`,
+`test_gifts_release`, `test_world_remake_adult_goron_city`), all OOT variables unset,
+UI extra, xdist-n2/CLAWSHOT_WORKERS1. Consumer cases cover pool-count conservation/no Blue
+Potion across ordinary seeds, identity-only refill, serialized repeat sales, funds/capacity/
+decline gates, bottle counts and Medigoron's native replacement restrictions. The wallet
+contract now reflects the played default-wallet sale; LACS/Great Fairy flag oracles compare
+against the normalized identity-merchant baseline rather than asserting no GameData change.
+Changed Python files pass the narrow format check. Dump/full-gate and live proof are not
+claimed here. Gate23, fresh play rows and sweep25 must bind the final admitted commit.
+
+## Line23 test-infrastructure recovery — 2026-11-26
+
+The first gate on3967848c7f stopped on the old shopkeeper-only spec equality. Per Claude,
+the test was narrowed, not deleted: preserve unchanged behavior without Gift/NPC, require
+the whole shuffled spec to equal shopkeeper_spec except Granny's Rupees (5), check the
+tracker's actual vanilla conversion, and cover keep_vanilla retaining native Blue Potion.
+Test-only child `f06f2362bd58135bcee7cfb790e2e870904dce8d` passed19 focused cases.
+
+The full restart onf06 passed format/lint and4835 synthetic cases, then failed only
+`test_tracker_logic_ui.py::test_age_control_defaults_to_either`: tracker-render through
+`C:/Program Files/Volta/node.EXE` exceeded its10-second subprocess deadline under parallel
+load (-n8, BelowNormal). Claude classified this as test infrastructure, not the merchant
+change; the case passed in the396 run and cs22c's line22 gate.
+
+Claude required five isolated runs without xdist, with the same shim/deadline. All passed:
+pytest-reported seconds9.37,0.32,8.83,0.32,0.32; full-command wall seconds
+10.332,1.074,9.568,1.052,1.055. Exact outputs and commands are outside the repo in
+`work/r22-merchants/tracker-volta-alone-{1..5}.log` and
+`tracker-volta-alone-results.json`. No test timeout, Node resolution or product code changed.
+
+Approved recovery: retain same-SHA f06 format/lint results; rerun only synthetic, then dump,
+under the retained line23 lock. Play builds and sweep still bind f06 and wait for the
+complete gate. Candidate infrastructure fixes are deferred to main: resolve the real
+node.exe once per session, or allow that subprocess more time. Neither lands on this branch.
+
+## Native registration coverage-pair correction
+
+The f06 recovery passed4836 synthetic cases, then native910 passed/1 skipped/1 failed
+in3309.73s. The broad event-registration harness moved Bombchus (5) from a scrub to
+KF Shop Item2. Its pair selector used allowed() on an unscreened world; production
+from_placements correctly applied the D25 container/tier screens and rejected that move.
+
+cs22d corrected only the harness: construct with_screens from the generated shuffled pool
+and fixed placements before selecting either side of the pair. Fill rules, the pool-preserving
+swap, ordinary replay validation, all writer/dependency/debt assertions and the Dampé-cycle
+check remain. Focused native broad recipe passed1 in130.81s, BelowNormal/n2/workers1;
+the modified file passes its format check. No whitelist, location or ammo special case.
+
+Test-only child `c5625a0118fe82266d06ebab3bb88ae92799876a` is the new gate/play/sweep
+candidate; production code is unchanged. Full gate restarts on that clean frozen checkout.
+The first temporary f06 tier-recovery launch used the wrong cwd; its own process tree was
+stopped, its log marked ABORTED/not gate evidence, and the driver corrected before the
+accepted f06 recovery. All failed and aborted logs remain outside the repository.
+
+## Line23 complete on c5625a0118 — fresh v3 packet boot-only ready
+
+Exact frozen `c5625a0118fe82266d06ebab3bb88ae92799876a` passed the full restart:
+format613 clean, lintPASS, synthetic4836 passed/914 skipped in439.70s, native911 passed/
+1 skipped in4034.11s. Detached BelowNormal, n8/workers4 synthetic with all OOT variables
+unset and the UI extra, then n8/workers3 with all three native layers. No Node/timeout fix
+or verification waiver is included in this final gate. Logs: `work/r22-merchants/gate23-c5625a0118`.
+
+Both fresh constrained seeds were built directly from that same clean checkout:
+2211250003 identity (Medigoron Giant's Knife; Granny explicit native-refill pin; carpet
+unpinned), and2211250002 swapped. Binding verified source/receipt SHA, the composed saved
+flags, native refill calls and no plain-Blue new-container alias. All four actual launchers
+passed dry-run with profiles byte-identical; exactly one fresh-scratch Longshot3.2.0 boot
+per row passed with one bound mod, its GameDataList loaded, mounted scratch save and no
+crash/fatal lines. These are startup proofs only, not merchant area-load or transaction play.
+
+`work/r22-merchants/packet-v3/PLAY.md` is ready for Granny-Identity (the fresh C-Granny
+case), Granny-Swapped, Carpet-Swapped and Medigoron-Swapped. Every copied profile matches
+its frozen baseline. Granny/carpet payloads are byte-identical to their source copies;
+Medigoron has exactly one changed Int word: CurrentRupee0->200 at byte offset84164.
+No position, clock, flag or inventory edits. Original saves and all packet-v2/failed-C
+evidence remain untouched. Build, binding, edit, dry-run and per-row boot receipts are in
+packet-v3; driver proof: `play23-c5625a0118/status.json`.
+
+Human play and admission remain pending. Line25 regenerates the full paired sweep on
+c5625a0118, Gift-on versus Gift-off, only after line24's explicit release. The updated
+queue inserts cs22c's22b after this line23 release and before24. No main merge is authorized.
+
+## Line25 complete — paired merchant sweep on c5625a0118
+
+Started only after cs22c's explicit 22:52 line24 release. The frozen source remained
+`c5625a0118fe82266d06ebab3bb88ae92799876a`, not the later documentation-only HEAD.
+Detached BelowNormal was asserted as `0x4000`; six workers, one clawshot worker each.
+Player count was zero at preflight and every stage boundary. Driver finished at 23:06
+with exit0 and stage `paired-sweep-complete`.
+
+| Recipe | Pairs | Gift-off first-attempt failures / attempts | Gift-on first-attempt failures / attempts |
+|---|---:|---:|---:|
+| Broad | 200 | 1 / 201 | 0 / 200 |
+| Defaults | 50 | 0 / 50 | 0 / 50 |
+| Recommended | 50 | 0 / 50 | 1 / 51 |
+
+Both arms completed every seed: no exhausted seeds or rejected oracle results. Identical
+seed lists and non-shuffle input settings were checked. All three merchants were selected
+only in Gift-on; its ordinary pool contained no plain Blue Potion. Pool conservation and
+tier checks passed, alongside the generator's goal/age/return verification. Placement and
+sphere digests differed for every pair; no placements or spoilers were published.
+
+Evidence: `work/r22-merchants/line25-c5625a0118/{status,comparison}.json`, driver/stage
+logs and each arm's settings, seed list and digest-only rows/results. The saved line24
+release is alongside them. This completes the ordered automated work; the four v3 human
+merchant transactions, persisted repeats and explicit admission decision remain pending.
+No live merchant-play result, admission approval or main merge is claimed.
+
+## v3 human play — three repeats confirmed; Medigoron early break approved
+
+Kareem reported declining, buying the shuffled/native identity reward, using R, buying the
+native repeat and seeing the repeat offer continue for Granny-Identity, Granny-Swapped
+and Carpet-Swapped. With the game closed, `fixtures.py inspect` copied every row's saves
+and runtime log before parsing. Latest slots02/03 classify `native_repeat` without failures;
+the saved check Bool is true and the bound merchant flow/GameDataList load checks pass.
+
+| Row | First purchase rupees | Repeat rupees | Saved inventory/bottle evidence |
+|---|---|---|---|
+| Granny-Identity | 100→0 | 100→0 | BottleB Blue Potion; two valid bottles throughout |
+| Granny-Swapped | 100→0 | 100→0 | Iron Boots stock1 retained; BottleB Empty→Blue Potion; two bottles |
+| Carpet-Swapped | 90→0 | 90→0 | Hover Boots stock1 retained; Bombchu stock0→10 |
+
+Medigoron: Kareem declined and bought Hammer, then broke the genuine Knife normally
+before quitting, and saw the replacement Knife offered for200 with Broken Knife in hand.
+Claude ruled this order deviation benign; intact-Knife refusal is **UNPLAYED/skipped,
+native, not a blocker**. The first operation preserved saves and log in packet-v3
+`receipts/Medigoron-Swapped/1795779196332001200-approved-early-knife-break-preserved`.
+Copied slot00 contains Hammer1/intact Knife1/rupees0; newer slot01 contains Hammer1,
+Knife stock0, Broken Knife stock1, equipped Broken Knife, rupees0, saved check true.
+The tracked actor delta is exactly Hammer plus the Knife pair; bottles, wallet and other
+merchant checks pass the original purchase guards. Raw scalar/vector drift is preserved
+separately, including movement, equipment, Navi and unnamed counter fields; unnamed
+fields are not assigned invented meanings.
+
+The original error included Item_Hammer because it prints the entire actor delta, even
+though it tests that delta minus the allowed reward. The extra Knife pair caused refusal.
+No game patch or general purchase guard was relaxed. The external v3 helper accepts this
+exception only for Medigoron, the exact preserved slot SHA, the exact Knife-pair-only
+failure and the genuine broken stock values. Approval: `Medigoron-Swapped-approved-early-break.json`.
+
+The launcher's actual `fund_repeat` handler passed on disposable profile copies:
+`receipts/R-handler-proof-1795779382031664300`. Each of the two purchased slots changes
+only one CurrentRupee word0→200; byte prefixes/suffixes outside that word are identical.
+The actual prepared-profile `ensure` also passed. Playable saves remain untouched and R
+unconsumed; Kareem was told to run the same launcher, type R, continue the broken-Knife
+save and buy the replacement. R records the real edit automatically, linked to its approval.
+No agent launched the game. Medigoron's replacement purchase remains pending.
+
+## v3 Medigoron replacement played; second-offer interpretation and readiness
+
+Claude relayed Kareem: R, bought the replacement Knife, used it without issue; afterwards
+Medigoron offered another Knife. `fixtures.py inspect Medigoron-Swapped` ran with the game
+closed and copied saves/log before parsing. Receipt:
+`packet-v3/receipts/Medigoron-Swapped-inspect-1795786922790665100-read-only-inspection.json`.
+Latest slots01/02 pass native_repeat:200→0, usable Knife stock0→1, Broken Knife stock1→0,
+Hammer stock1 retained, private completion Bool true, two bottles unchanged. Historical
+Broken Knife IsGet remains true. R's real receipt records one rupee-word0→200 edit in
+each purchased slot00/01. Old slot00 is the funded pre-replacement state, not a failed
+replacement. Bound Medigoron, SimpleShop and GameDataList runtime checks pass.
+
+Native Npc_Goron_Medigoron_Adult Talk: Event54→Event19 (Biggoron pouch check), then Event16/
+SageOfFire_Check→Event6 (EventQueryIsExistInPouch, Weapon_Sword_Giant, Num1). Present case0
+reaches Event36/Event34→Event5/Talk_07 or Event35/Talk_19→END, without the sale choice.
+Absent case1 reaches Event7/BrokenGiant and the price200/Event11 sale. The intact branch's
+Talk_07 conditionally invites a future replacement after breakage. Event38's Bool
+GetSwordBigGoron_IsAfterShowBrokenSword_Medigoron_Adult belongs to the separate
+ShowBrokenSword entry; no prior-break flag branch bypasses Event6 in Talk.
+
+At c5625a0, gifts.py680–686 selects the pristine clone using saved Bool
+Clawshot.Gift.Npc_Goron_Medigoron_Adult.Event11 (true case0). The clone is made before
+the uncollected path's ownership neutralization at728–738. The actual bound mod's37
+cloned nodes match native after index normalization; all original SimpleShop nodes
+remain unchanged. Proof: `packet-v3/receipts/Medigoron-Swapped-native-repeat-branch-proof.json`.
+Thus an actual fresh Buy choice with an intact replacement is not explained by the
+native graph or a changed repeat-dispatch branch. Native conditional replacement
+dialogue is fine; the reported wording does not distinguish them. Do not claim a
+second sale native or dispatch-caused without the missing UI evidence. No replay
+requested. V2 C-Knife's old refusal used the rewritten completion gate/Biggoron-owned
+dialogue (above500–506), not a pristine native intact-Knife control.
+
+Carpet default access matches the reported Fortress-side plus Longshot/Hover requirement:
+gerudo_fortress.toml13/52 gates adult+Card,172–180 leads outside to Wasteland Near Fortress;
+haunted_wasteland.toml17 requires crossing trick or usable Hover Boots/Longshot. The
+merchant's local override is only can_jumpslash (remake/gifts.toml105–108); the region
+gate is additional, not removed. Colossus reverse access is False
+(remake/child_warp_returns.toml20–23). Crossing/reverse tricks default false
+(world/settings.toml197/172). The opt-in crossing trick still bypasses equipment;
+this noclip row verifies neither that trick nor the inherited local jumpslash predicate.
+No rule was changed; the all-settings equipment requirement needs a maintainer ruling.
+
+The old Giant's Knife ItemActorError is fixed on c5625a0, not worked around by exclusion:
+item_actors.toml66 maps Giants Knife→Item_Sword_Giant; gifts.py119 locally matches its
+native Shop_Sword_Giant source. Actor lookup succeeded and Medigoron is not keep_vanilla.
+The actual canonical sweep settings restrict it to Boss/Cutscene/NPC, plus Song in the
+Broad songs-anywhere recipe (held_items1471–1483). It can move to other Gift destinations;
+it is not admitted to Chest/floor, and has no chest_verified receipt. No placements or
+spoilers were read for this eligibility check.
+
+Merge remains held: resolve whether the further Knife offer was conditional native text
+or an actual Buy choice; decide the crossing-trick policy; run the required full paired
+sweep after final human play (line25 predates these plays); obtain explicit review/merge
+approval. Intact-Knife refusal is waived/UNPLAYED, not a blocker. PLAY.md now preserves
+Kareem's reported words and these limits. No game patch, logic rule, admission or merge
+was changed by this investigation.
+
+## Claude's readiness rulings — line25 stands; inherited crossing retained
+
+Claude explicitly accepts line25's complete paired sweep on c5625a0: no post-play rerun.
+Generation is deterministic and subsequent branch changes are documentation/receipts only;
+repeating the same-SHA generation adds no evidence. This supersedes the post-play timing
+hold in the preceding section. No sweep or new gate was launched.
+
+The carpet crossing condition meets Claude's inheritance test. Direct inspection of main
+5dcb21b shows the existing trick `logic_wasteland_crossing` in
+`src/clawshot/data/world/haunted_wasteland.toml:17`:
+Wasteland Near Fortress→Haunted Wasteland requires that trick or usable Hover Boots/Longshot.
+The return edge at46 uses the same expression. This is the shared region gate, already
+serving Wasteland Chest (33), Wasteland GS (42), and onward Wasteland Crate Near Colossus
+(56, through exit45), then Colossus via exits60/70 with the existing additional conditions.
+Main `world/settings.toml:197` defaults the trick false; reverse-wasteland is a separate
+false-default setting at172. Main `world/remake/gifts.toml:106–110` already gave the seller
+the local can_jumpslash rule plus a keep_vanilla hold, not a new crossing exception.
+
+Git-object comparison proves haunted_wasteland.toml, world/settings.toml and
+remake/child_warp_returns.toml byte-identical between main5dcb21b and candidatec5625a0.
+The candidate merely admits the merchant behind the pre-existing shared gate. Under
+Claude's conditional ruling it may retain this opt-in trick; no rule tightening is needed
+and none was made. This supersedes the crossing-policy hold above, not an in-game
+certification of the trick or the noclip fixture approach.
+
+Remaining holds only: Claude is asking Kareem whether the further Knife offer was an
+actual Yes/No Buy prompt or native Talk_07 conditional dialogue; await that answer.
+Merge requires **Kareem's explicit OK**. No replay, source change or merge is authorized
+or performed. PLAY.md records these rulings.
+
+## All v3 rows accepted; player documentation cutover
+
+Kareem confirmed Medigoron's second talk was the native come-back-if-it-breaks line, not a
+Yes/No purchase prompt. Medigoron PASS; all four v3 merchant rows PASS. This resolves the
+last play clarification, without another purchase or replay. Kareem approved merging
+r22/merchants into main; Claude will review this one docs-only commit and perform the
+`--no-ff` merge himself. No agent merge was performed.
+
+Player documentation now covers one shuffled sale per merchant under Gift, normal prices,
+then normal repeat services; Granny refills an existing empty bottle rather than adding one,
+and her plain Blue Potion contributes Rupees (5) instead to the shuffled pool. It also records
+Medigoron's default-wallet price and the inherited Fortress-side Wasteland crossing requirements.
+README, settings, Discord, logic and tracker guidance are reconciled, along with section35
+and pointers from old merchant holds. Dated failures and unrelated holds remain historical.
+
+The documentation search covered root docs, docs/, all plans/ Markdown, contributor notes and
+report templates. No dedicated documentation-content tests, Markdown formatter or link-check
+suite exists; the nearest tests only mention documentation file paths, not their contents.
+Code/data/test files were not changed. In particular the old held wording in the source
+citations of data/location_names.toml2709/2741/2797 remains outside this docs-only cutover.
+
+Checks, all OOT variables unset and the UI extra installed:
+- `uv run --frozen --extra ui ruff format --check`:613 files already formatted.
+- `uv run --frozen --extra ui ruff check`:All checks passed.
+
+Line25's accepted complete same-SHA paired sweep still stands; no redundant generation,
+full gate or post-play re-sweep was run. This commit changes documentation only.

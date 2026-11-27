@@ -161,8 +161,18 @@ sale are enabled; not every shuffled sale has recorded acceptance.
 With Gift shuffle, the child Market Potion Shop bottle tutorial and Dampé's graveyard digging
 prize now give shuffled rewards. Both passed their in-game checks on 2026-11-10
 (`R10-MARKET-BOTTLE-FIX`, `R10-DIGGING`); the corrected shop swap passed re-entry and shopping.
-Digging still shows a heart prize but gives the shuffled item. First expert gallery rewards,
-merchant experiments and some Skulltula House rewards stay unchanged until tested.
+Digging still shows a heart prize but gives the shuffled item.
+
+With **Gift** on, Medigoron, Granny and the Wasteland carpet seller each sell one shuffled item
+once at their normal price, then return to normal sales. Granny refills an existing empty bottle
+with Blue Potion for 100 rupees; the carpet seller sells Bombchus; Medigoron sells a replacement
+Knife only after it breaks. Granny's Blue Potion leaves the shuffled pool, replaced by Rupees (5).
+Medigoron needs no wallet upgrade. Reach the carpet seller from the Fortress side of the Wasteland
+with Hover Boots or Longshot, or the existing opt-in crossing trick. Kareem passed the purchases
+and normal repeats after saved returns on Longshot 3.2.0 (2026-11-27). An intact-Knife “come back
+if it breaks” line is not a purchase prompt. See [merchant prices and requirements](../settings.md#gifts-enabled-versus-held).
+
+First expert gallery rewards and some Skulltula House rewards stay unchanged until tested.
 The Door of Time's song-only and open modes passed a first check each.
 
 Gold Skulltula shuffle is optional, off in both presets and requires chests: all 100 native sources

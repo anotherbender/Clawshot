@@ -26,7 +26,7 @@ from clawshot.census.gifts import FLOW_DIR, FLOW_SUFFIX, FLOW_VERSIONS, flow_fil
 from clawshot.census.scan import read_romfs_byml
 from clawshot.formats import byml, evfl, zsdic
 from clawshot.generate import Settings, from_placements
-from clawshot.generate.fill import FillError, allowed
+from clawshot.generate.fill import FillError, allowed, with_screens
 from clawshot.patch import SeedOutput, gifts, make_seed, scrubs
 from clawshot.patch.keys import ANALYZED, SETTINGS
 from clawshot.world.load import load_spec
@@ -558,7 +558,14 @@ def generate(romfs: Path, seed: int, settings: Settings, options: Mapping, *, sc
     targets = [name for name in scrubs.SALES if name in placements]
     if any(placements[name] in shields for name in targets):
         return output
-    world, effective = output.seed.world, output.seed.settings
+    effective = output.seed.settings
+    # The replay uses the same container/tier screens as the fill; pair selection must honor them too.
+    world = with_screens(
+        output.seed.world,
+        output.seed.shuffled,
+        list(placements.values()),
+        {name: item for name, item in output.seed.placements.items() if name not in placements},
+    )
     for target in targets:
         for source, item in placements.items():
             if (

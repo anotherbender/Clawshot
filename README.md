@@ -142,7 +142,17 @@ digging prize now give shuffled rewards. Both passed their in-game checks on 202
 (`R10-MARKET-BOTTLE-FIX`, `R10-DIGGING`). The shop's corrected swap passed re-entry and shopping;
 Dampé still shows a heart prize but gives the shuffled item.
 
-Expert galleries, merchant experiments and some Skulltula House rewards stay unchanged.
+With **Gift** on, **Medigoron, Granny and the Wasteland carpet seller** each sell one shuffled
+item once at their normal price, then return to normal sales. Granny refills an existing empty
+bottle with Blue Potion for 100 rupees; the carpet seller sells Bombchus; Medigoron sells a
+replacement Knife only after it breaks. Granny's Blue Potion is replaced by **Rupees (5)** in
+the shuffled pool. Medigoron needs no wallet upgrade. Reach the carpet seller from the Fortress
+side with Hover Boots or Longshot, or the existing opt-in Wasteland crossing trick.
+Kareem passed the purchases, saved returns and repeat sales on Longshot 3.2.0 (2026-11-27);
+the intact-Knife “come back if it breaks” line is not another purchase offer.
+[Merchant prices and requirements](docs/settings.md#gifts-enabled-versus-held).
+
+Expert galleries and some Skulltula House rewards stay unchanged.
 The 10- and 40-token reward swaps have been observed; the separate 100-token opt-in also passed
 ([100-token reward checks](plans/rounds/r19-tokens.md)). This does not certify every threshold or replacement.
 The Door of Time's earlier song-only and open modes passed a first door/sword-pull check.
