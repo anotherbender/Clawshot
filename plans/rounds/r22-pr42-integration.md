@@ -258,3 +258,60 @@ at Token/BossHeart/Freestanding. It does not execute capture or fill before the 
 After that sweep passes, build and boot rows a–d (adult roof, open roof, original child Fairy, Token)
 as already specified, keeping the lock throughout; release explicitly with @cs22d and launchers.
 
+## Line26 accepted gate and combined sweep
+
+The dump-only rerun on immutable7968343 **passed922/1 skipped in5128.58s**
+(85m28s), using cs22d's layered cache directly. Together with the retained same-SHA
+format/lint and4995/925-skipped synthetic result, the full gate is PASS. Native sources
+remain read-only; no code/oracle change was needed. The accepted four-stage list and hashes
+of both original receipt files are recorded separately in
+`work/r22-pr42/line26-large/verification/full-gate-{receipts,provenance}.json`.
+The case contract now points to that accepted list; failed-source receipts remain unchanged.
+
+After dump completion, the approved combined cohort **passed200/200**, with **zero exhausted
+and zero oracle failures**, on7968343 at four actual BelowNormal workers in763.91s.
+**14 seeds failed their first fill and recovered on attempt2:14 retries, maximum2 attempts.**
+All three merchant checks are genuinely shuffled in every seed, without play-row identity pins.
+Requested Gift/songs-anywhere/empty fast-start and the effective both-instrument/all12-song
+Token/BossHeart/Freestanding admission were retained. Production fill, normalized pool,
+screened external-assignment replay, goal/age-return and tier checks all pass.
+Exact first-fail payloads and per-seed placements/spheres are preserved in the private
+`combined-sweep-7968343/{candidate-results,summary}.json`; this is not native/gameplay proof.
+
+| Actual delivery kind | Shuffled checks across200 seeds | Ocarinas | Songs |
+| --- | ---: | ---: | ---: |
+| BossHeart | 1600 | 31 | 199 |
+| Freestanding | 2800 | 64 | 345 |
+| Token | 20000 | 91 | 577 |
+
+The lock remains held for rows a–d. Row a's original-settings/native-pinned build and
+single scratch boot have started; no startup success or pickup result is claimed here.
+
+## Line26 rows a–d — boot-only ready, lock released
+
+All four original-settings/native-merchant-pinned cases passed production build/oracles,
+complete original four-file baseline validation, launcher dry-run and **exactly one** isolated
+Longshot3.2.0 scratch boot each. The startup verifier accepted the bound mod loads and the
+play profiles' progress hashes stayed unchanged through scratch boot. No target-area pickup,
+native-dispatch execution, animation or Continue behavior is claimed.
+
+| Row | Case | Source/profile contract | Launcher under `work/r22-pr42/line26-large/` |
+| --- | --- | --- | --- |
+| a | adult Impa roof | Original adult, both instruments owned, Time selected; exact map | `roof/ingame/pr42-924202.bat` |
+| b | open lab roof | Independent original adult; only roof/lab Rupees20 exchange | `open/ingame/pr42-924202.bat` |
+| c | original child Fairy roof | Original row2, Din's Fire owned, both instruments never owned; owl route | `child/ingame/pr42-924202.bat` |
+| d | child Token Fairy | Independent original child, GS Near Gate Guard; verified ZD three-cycle, token stock4 | `token/ingame/pr42-924202.bat` |
+
+Per-case `run-result.json` records all stage commands/statuses, manifest and actual boot-log
+hashes; `handoff.json` collects their exact paths. `PLAY.md` gives full item-get/correct-text,
+Time persistence where owned versus never-Time child Fairy selection, leave/re-entry,
+Save/quit/Continue, source-once and life/piece expectations. The Token row must not increase
+token stock. It also requires copying every played profile/log before analysis and prohibits
+save/flag/inventory repair. Old line22/22b profiles and frozen packets were not reset.
+
+The pre-release native process probe returned **[]**. The exact owned queue26 lock text was
+archived to `line26-large/lock-owner.txt`; only that owner file and the empty lock directory
+were removed. **LOCK RELEASED for @cs22d.** Launchers/checklist are ready for maintainer play.
+Fairy exclusion fallback remains documented and **unapplied**; a played failure returns to
+Claude for the decision. No release version bump, GitHub push or gameplay claim.
+
