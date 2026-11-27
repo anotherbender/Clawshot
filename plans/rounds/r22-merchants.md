@@ -741,3 +741,43 @@ logs and each arm's settings, seed list and digest-only rows/results. The saved 
 release is alongside them. This completes the ordered automated work; the four v3 human
 merchant transactions, persisted repeats and explicit admission decision remain pending.
 No live merchant-play result, admission approval or main merge is claimed.
+
+## v3 human play — three repeats confirmed; Medigoron early break approved
+
+Kareem reported declining, buying the shuffled/native identity reward, using R, buying the
+native repeat and seeing the repeat offer continue for Granny-Identity, Granny-Swapped
+and Carpet-Swapped. With the game closed, `fixtures.py inspect` copied every row's saves
+and runtime log before parsing. Latest slots02/03 classify `native_repeat` without failures;
+the saved check Bool is true and the bound merchant flow/GameDataList load checks pass.
+
+| Row | First purchase rupees | Repeat rupees | Saved inventory/bottle evidence |
+|---|---|---|---|
+| Granny-Identity | 100→0 | 100→0 | BottleB Blue Potion; two valid bottles throughout |
+| Granny-Swapped | 100→0 | 100→0 | Iron Boots stock1 retained; BottleB Empty→Blue Potion; two bottles |
+| Carpet-Swapped | 90→0 | 90→0 | Hover Boots stock1 retained; Bombchu stock0→10 |
+
+Medigoron: Kareem declined and bought Hammer, then broke the genuine Knife normally
+before quitting, and saw the replacement Knife offered for200 with Broken Knife in hand.
+Claude ruled this order deviation benign; intact-Knife refusal is **UNPLAYED/skipped,
+native, not a blocker**. The first operation preserved saves and log in packet-v3
+`receipts/Medigoron-Swapped/1795779196332001200-approved-early-knife-break-preserved`.
+Copied slot00 contains Hammer1/intact Knife1/rupees0; newer slot01 contains Hammer1,
+Knife stock0, Broken Knife stock1, equipped Broken Knife, rupees0, saved check true.
+The tracked actor delta is exactly Hammer plus the Knife pair; bottles, wallet and other
+merchant checks pass the original purchase guards. Raw scalar/vector drift is preserved
+separately, including movement, equipment, Navi and unnamed counter fields; unnamed
+fields are not assigned invented meanings.
+
+The original error included Item_Hammer because it prints the entire actor delta, even
+though it tests that delta minus the allowed reward. The extra Knife pair caused refusal.
+No game patch or general purchase guard was relaxed. The external v3 helper accepts this
+exception only for Medigoron, the exact preserved slot SHA, the exact Knife-pair-only
+failure and the genuine broken stock values. Approval: `Medigoron-Swapped-approved-early-break.json`.
+
+The launcher's actual `fund_repeat` handler passed on disposable profile copies:
+`receipts/R-handler-proof-1795779382031664300`. Each of the two purchased slots changes
+only one CurrentRupee word0→200; byte prefixes/suffixes outside that word are identical.
+The actual prepared-profile `ensure` also passed. Playable saves remain untouched and R
+unconsumed; Kareem was told to run the same launcher, type R, continue the broken-Knife
+save and buy the replacement. R records the real edit automatically, linked to its approval.
+No agent launched the game. Medigoron's replacement purchase remains pending.
