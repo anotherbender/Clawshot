@@ -103,10 +103,10 @@
 "Small Key (Ganons Castle)" = { actor = "Item_Dungeon_SmallKey", source = "census: 1 chest in InsideGanonCastle" }
 "Small Key (Thieves Hideout)" = { actor = "Item_Dungeon_SmallKey", source = "r18-keys: canonical named Fortress credit; four native guard floor sources, D39 card unchanged" }
 
-# Native shop pouch actors may also be granted through the chest get event.
+# Native pouch actors may also be granted through the chest get event.
 # Counts/targets come from PouchActorInfo; in-game certification remains per family (D15).
-"Goron Tunic" = { actor = "Shop_Armor_Goron", source = "PouchActorInfo Shop_Armor_Goron; native Shop actor pack, build e0f3ccfa" }
-"Zora Tunic" = { actor = "Shop_Armor_Zora", source = "PouchActorInfo Shop_Armor_Zora; native Shop actor pack, build e0f3ccfa" }
+"Goron Tunic" = { actor = "Obj_Armor_Goron", source = "Native Obj pack: PouchContent_PickUpItem performer, build e0f3ccfa; plans/rounds/r23-r07-tunic-model.md" }
+"Zora Tunic" = { actor = "Obj_Armor_Zora", source = "Native Obj pack: PouchContent_PickUpItem performer, build e0f3ccfa; plans/rounds/r23-r07-tunic-model.md" }
 "Buy Heart" = { actor = "Shop_Heart", source = "PouchActorInfo Shop_Heart; native Shop actor pack, build e0f3ccfa" }
 "Buy Magic Jar" = { actor = "Shop_MagicJar_Small", source = "PouchActorInfo Shop_MagicJar_Small; native Shop actor pack, build e0f3ccfa" }
 "Buy Deku Nut (5)" = { actor = "Shop_DekuNutBundle_01", source = "PouchActorInfo Shop_DekuNutBundle_01; native Shop actor pack, build e0f3ccfa" }
@@ -198,3 +198,6 @@
 "Obj_Rupee_Green" = "TBox_Rupee_Green"
 # Same Shield pouch/equipment row as TBox_Shield_Deku (both ages Weapon_Shield_Deku); section 28.
 "Obj_Shield_Deku" = "TBox_Shield_Deku"
+# Native shelf actors retain their identity in the census and shop tables; reverse lookup only.
+"Shop_Armor_Goron" = "Obj_Armor_Goron"
+"Shop_Armor_Zora" = "Obj_Armor_Zora"

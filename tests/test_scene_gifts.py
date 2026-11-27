@@ -169,7 +169,7 @@ def test_vanilla_grants_do_not_add_heals_or_change_native_displays():
 
 
 def test_projected_native_tunic_can_generate_at_a_split_scene():
-    actors = items.loads('[items]\n"Goron Tunic"={actor="Shop_Armor_Goron"}\n')
+    actors = items.loads('[items]\n"Goron Tunic"={actor="Obj_Armor_Goron"}\n')
     file = story(scenes.SARIA, item="Obj_Armor_Goron")
     transform = scenes.changes({scenes.SARIA: "Goron Tunic"}, actors)[scenes.path(scenes.SOURCES[scenes.SARIA][0])]
     after = evfl.read(transform(evfl.write(file))).flowchart

@@ -13,7 +13,7 @@ from clawshot.generate.fill import shuffled_locations
 from clawshot.patch import events as chest_events
 from clawshot.patch import items as item_actors
 from clawshot.patch.plan import PatchError, link, make_plan, remake_vanilla
-from clawshot.patch.write import write
+from clawshot.patch.write import patch_tree, write
 from clawshot.world import build_world
 
 CHILD = "Banc/Village/Village_Child_Dynamic.bcett.byml.zs"
@@ -256,6 +256,26 @@ def test_plan_changes_what_moved_and_removes_only_tied_overrides(world, links):
     assert plan.unchanged == [("Temple Map Chest", MAP_CHEST)]
     assert plan.files() == [TEMPLE, ADULT, CHILD]  # sorted romfs paths
     assert plan.as_dict()["changes"][0]["story_state"] == "nothing to restore"
+
+
+@pytest.mark.parametrize(
+    ("item", "native"),
+    [("Goron Tunic", "Obj_Armor_Goron"), ("Zora Tunic", "Obj_Armor_Zora")],
+)
+def test_tunic_chest_uses_pickup_actor_without_changing_source_or_native_event(item, native):
+    spec = world_spec()
+    spec["items"][item] = {}
+    world = build_world(spec)
+    links = link(world, shuffled_locations(world, Settings()), DEFINITIONS, CENSUS)
+    table = item_actors.ItemActors({**TABLE.actors, item: item_actors.load().actor(item)}, TABLE.sources)
+    placements = {**remake_vanilla(world, links, TABLE), "House Chest": item}
+    plan = make_plan(seed_with(world, placements), links, table, EVENTS)
+    for path in (CHILD, ADULT):
+        tree = village_tree(path)
+        expected = copy.deepcopy(tree)
+        expected["Actors"][1]["Dynamic"]["Drop__DropActor"] = native
+        patch_tree(tree, path, plan)
+        assert byml.same(byml.read(byml.write(tree)), expected)
 
 
 def test_an_unchanged_chest_keeps_even_a_tied_override(world, links):

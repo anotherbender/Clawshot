@@ -21,7 +21,8 @@ def test_tunic_shop_and_native_gift_actors_credit_identical_pouch_equipment(romf
     dictionaries = zsdic.Dictionaries.from_romfs(romfs)
     path = shops.POUCH_TABLE
     rows = {row["__RowId"]: row for row in byml.read(dictionaries.decompress(path, (romfs / path).read_bytes()))}
-    for shop, native in gifts.TUNIC_GIFT_ACTORS.items():
+    for item in ("Goron Tunic", "Zora Tunic"):
+        shop, native = shops.native_items()[item]["display"], items.load().actor(item)
         assert {k: v for k, v in rows[shop].items() if k != "__RowId"} == {
             k: v for k, v in rows[native].items() if k != "__RowId"
         }
