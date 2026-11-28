@@ -24,6 +24,9 @@ CORE = {TREE: "Item_Boomerang", TOWER: "Obj_Shield_Hylian", LONE: "Item_Token_Go
 CORE_REWARDS = {"Item_Boomerang": "fixed_major", "Obj_Shield_Hylian": "equipment", "Item_Token_Gold": "token"}
 CANONICAL = {"Item_Boomerang": "Item_Boomerang", "Obj_Shield_Hylian": "Weapon_Shield_Hylian"}
 PRODUCTION = {actor: family for actor, family in token_policy.REWARDS.values()}
+# Members whose donor is in the dump; the generated ones (tokens.GENERATED_PREFIX, the ocarina and song world actors a
+# seed creates) have no dump row and are checked by test_ocarina_song_drops_dump.py.
+NATIVE_PRODUCTION = {a: f for a, f in PRODUCTION.items() if not a.startswith(tokens.GENERATED_PREFIX)}
 
 
 @pytest.fixture(scope="module")
@@ -241,20 +244,20 @@ def test_every_admitted_member_has_its_native_shape_and_a_checked_pickup(romfs, 
     row names a BundleActor. Structure only: members beyond each family's played representative are unplayed."""
     table = items.load()
     rows = {row["__RowId"]: row for row in byml.read(original(tokens.POUCH_ACTOR_INFO))}
-    shapes = {actor: tokens.grant_family(rows[actor]) for actor in PRODUCTION}
+    shapes = {actor: tokens.grant_family(rows[actor]) for actor in NATIVE_PRODUCTION}
     print(f"native shapes {shapes}")
-    assert shapes == PRODUCTION
+    assert shapes == NATIVE_PRODUCTION
     assert set(PRODUCTION.values()) == token_policy.ADMITTED_FAMILIES == set(tokens.FAMILIES)
     for item, (actor, family) in token_policy.REWARDS.items():
-        if family in CORE_REWARDS.values():
-            continue  # the core packet's families, played with their own actors
+        if family in CORE_REWARDS.values() or actor not in NATIVE_PRODUCTION:
+            continue  # the core packet's families, played with their own actors; generated donors (above)
         chest = table.actor(item)
         assert tokens.grant_family(rows[chest]) == family, (item, actor, chest)
         assert grant_fields(rows[actor]) == grant_fields(rows[chest]), item
-    members = sorted(actor for actor in PRODUCTION if actor != "Item_Token_Gold")
+    members = sorted(actor for actor in NATIVE_PRODUCTION if actor != "Item_Token_Gold")
     sources = sorted(location.id for location in census)
     placements = {**dict(zip(sources, members, strict=False)), sources[-1]: "Item_Token_Gold"}
-    delivery, grants = check_written_delivery(romfs, census, original, tmp_path / "out", placements, PRODUCTION)
+    delivery, grants = check_written_delivery(romfs, census, original, tmp_path / "out", placements, NATIVE_PRODUCTION)
     assert sorted(delivery.pickups) == members
     assert len(delivery.new_files) == len(members)
     print(f"grants {grants}")

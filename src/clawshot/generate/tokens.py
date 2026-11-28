@@ -36,6 +36,8 @@ SHUFFLE = "Token"
 """The shuffle kind, and the location type its checks take in a seed's world."""
 SOURCE_TYPE = "GS Token"
 """The world data's (OoT Randomizer's) type of a Gold Skulltula check."""
+SONG_TYPE = "Song"
+"""A song item: a Token reward only with ``songs = anywhere``."""
 TOKEN_ITEM = "Gold Skulltula Token"
 HOUSE_REWARD = "Kak 100 Gold Skulltula Reward"
 TOKEN_DESTINATIONS = ("Chest", SHUFFLE)
@@ -61,10 +63,12 @@ ADMITTED_FAMILIES = frozenset(
         "double_defense",
         "scrub_seed",
         "ocarina",
+        "song",
     }
 )
-"""All 19 native grant families of ``clawshot.patch.tokens.FAMILIES``: after the rc.3 packet2, packet3 and S1
-Time-Ocarina plays (Claude, 2026-11-15), each is admitted by the played evidence in ``token_rewards.toml``."""
+"""All 20 grant families of ``clawshot.patch.tokens.FAMILIES``: the 19 native ones after the rc.3 packet2, packet3
+and S1 Time-Ocarina plays (Claude, 2026-11-15), and ``song`` after BBender's runs T1 and TB3 (2026-11-24), each
+admitted by the played evidence in ``token_rewards.toml``."""
 DATA = Path(__file__).resolve().parents[1] / "data" / "token_rewards.toml"
 
 
@@ -158,9 +162,12 @@ def restrict_settings(world: World, settings: Settings) -> Settings:
     unchanged when the seed does not shuffle ``Token``."""
     if SHUFFLE not in settings.shuffle:
         return settings
+    songs = []
     for item in REWARDS:
         info = world.items.get(item)
-        if info is not None and (info.dungeon is not None or info.type not in ("Item", "Token")):
+        if info is not None and info.type == SONG_TYPE and info.dungeon is None:
+            songs.append(item)
+        elif info is not None and (info.dungeon is not None or info.type not in ("Item", "Token")):
             raise FillError(f"token_rewards.toml admits {item!r}, a {info.type} item, which keeps its own holds")
     given = settings.location_type_items.get(SHUFFLE)
     if given is not None and (unsafe := sorted(set(given) - set(REWARDS))):
@@ -168,7 +175,9 @@ def restrict_settings(world: World, settings: Settings) -> Settings:
             f"location_type_items gives Token checks {unsafe}, which a Gold Skulltula cannot give; "
             f"admitted: {list(REWARDS)}"
         )
-    palette = tuple(item for item in REWARDS if given is None or item in given)
+    # Songs leave the song lessons only with songs = anywhere (spec 1.3, 1.5).
+    kept = REWARDS if settings.songs == "anywhere" else [item for item in REWARDS if item not in songs]
+    palette = tuple(item for item in kept if given is None or item in given)
     if not palette:
         raise FillError("location_type_items gives Token checks no item")
     held = dict(settings.item_location_types)

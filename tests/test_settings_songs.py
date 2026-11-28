@@ -151,6 +151,31 @@ def test_direct_story_and_hand_over_destinations_have_distinct_model_requirement
         assert allowed(world, settings, name, item)
 
 
+@pytest.mark.parametrize("item", ["Fairy Ocarina", "Ocarina of Time"])
+@pytest.mark.parametrize("call", [DIRECT, "GetPouchContent:GetPouchContentByActorName"])
+def test_gift_only_ocarinas_still_have_direct_story_destinations(item, call):
+    places = {
+        "Story Scene": {"type": "NPC", "vanilla": item, "rule": "True"},
+        "Hand Over": {"type": "NPC", "vanilla": "Rupees (20)", "rule": "True", "excluded_items": [item]},
+    }
+    spec = {
+        "start": "Root",
+        "goal": repr(item),
+        "items": {item: {}, "Rupees (20)": {"class": "normal"}},
+        "regions": [{"name": "Root", "locations": places}],
+        "locations": {name: dict(info) for name, info in places.items()},
+    }
+    steps = {
+        "Story Scene": (gift_step(call),),
+        "Hand Over": (gift_step("Dm_SY_GetInEvent:GetInEvent_NotTurn_NotNpc"),),
+    }
+    spec = gifts.restrict_spec(spec, places, steps)
+    world = build_world(spec)
+    held = gifts.held_items(world, world.items, items.load(), set(), songs="anywhere")
+    seed = generate(spec, 1, Settings(shuffle=("NPC",), item_location_types=held), attempts=1)
+    assert seed.placements == {"Story Scene": item, "Hand Over": "Rupees (20)"}
+
+
 @pytest.mark.parametrize("kind", ["Scrub", "GrottoScrub"])
 def test_ocarina_scrub_sales_are_model_requiring_destinations(kind):
     places = {
@@ -169,6 +194,8 @@ def test_ocarina_scrub_sales_are_model_requiring_destinations(kind):
     settings = Settings(shuffle=("Chest", kind))
     assert gifts.is_hand_over(kind, ())
     assert allowed(world, settings, "Sale", "Fairy Ocarina")
+    seed = generate(spec, 1, settings, attempts=1)
+    assert sorted(seed.placements.values()) == ["Fairy Ocarina", "Rupees (20)"]
 
 
 @pytest.mark.parametrize(

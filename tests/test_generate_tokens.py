@@ -28,21 +28,22 @@ GS = SOURCE_TYPE
 SPILL = ("GS A", "GS B", "GS C", "GS D")
 FORCED = {"Boomerang": (SHUFFLE,), "Hylian Shield": (SHUFFLE,)}
 ADMITTED_RUPEES = "Rupees (5)"  # a member of the admitted rupee family
-FAIRY = "Fairy Ocarina"  # its ocarina family is admitted through Ocarina of Time; it has no world pickup to give
+FAIRY = "Fairy Ocarina"  # admitted with its generated world actor (BBender, runs T1 and TB3, 2026-11-24)
+UNADMITTED = "Keaton Mask"  # keeps its own holds, never a Skulltula reward (the Fairy Ocarina was this example)
 CARD = "Gerudo Membership Card"  # keeps its own holds, never a Skulltula reward
 
 
 def spill_spec(other: str = "Chest") -> dict:
-    """Four Skulltulas, two chests (Boomerang, Hylian Shield) and two checks of ``other`` kind (the Fairy Ocarina,
+    """Four Skulltulas, two chests (Boomerang, Hylian Shield) and two checks of ``other`` kind (the Keaton Mask,
     which the goal needs, and the Gerudo card: neither is a Skulltula reward)."""
     return {
         "start": "Start",
-        "goal": "Boomerang and Hylian_Shield and Fairy_Ocarina and (Gold_Skulltula_Token, 4)",
+        "goal": "Boomerang and Hylian_Shield and Keaton_Mask and (Gold_Skulltula_Token, 4)",
         "items": {
             TOKEN_ITEM: {"type": "Token"},
             "Boomerang": {},
             "Hylian Shield": {},
-            FAIRY: {},
+            UNADMITTED: {},
             CARD: {},
         },
         "regions": [
@@ -52,7 +53,7 @@ def spill_spec(other: str = "Chest") -> dict:
                     **{name: {"rule": "True", "type": GS, "vanilla": TOKEN_ITEM} for name in SPILL},
                     "Chest A": {"rule": "True", "type": "Chest", "vanilla": "Boomerang"},
                     "Chest B": {"rule": "True", "type": "Chest", "vanilla": "Hylian Shield"},
-                    "Other A": {"rule": "True", "type": other, "vanilla": FAIRY},
+                    "Other A": {"rule": "True", "type": other, "vanilla": UNADMITTED},
                     "Other B": {"rule": "True", "type": other, "vanilla": CARD},
                 },
             }
@@ -61,23 +62,23 @@ def spill_spec(other: str = "Chest") -> dict:
 
 
 def temple_spec(held: str | None = None) -> dict:
-    """A dungeon whose Skulltulas could take its small key by area, and an overworld chest with the Fairy Ocarina."""
+    """A dungeon whose Skulltulas could take its small key by area, and an overworld chest with the Keaton Mask."""
     temple = {"rule": "True", "type": GS, "vanilla": TOKEN_ITEM}
     return {
         "start": "Start",
-        "goal": "Small_Key_Temple and Fairy_Ocarina and (Gold_Skulltula_Token, 3)",
+        "goal": "Small_Key_Temple and Keaton_Mask and (Gold_Skulltula_Token, 3)",
         "items": {
             TOKEN_ITEM: {"type": "Token"},
             "Small Key (Temple)": {"type": "SmallKey", "dungeon": "Temple"},
             ADMITTED_RUPEES: {"class": "normal"},
-            FAIRY: {},
+            UNADMITTED: {},
         },
         "regions": [
             {
                 "name": "Start",
                 "exits": {"Temple": "True"},
                 "locations": {
-                    "Start Chest": {"rule": "True", "type": "Chest", "vanilla": FAIRY},
+                    "Start Chest": {"rule": "True", "type": "Chest", "vanilla": UNADMITTED},
                     "Start GS": {**temple, **({"keep_vanilla": held} if held else {})},
                 },
             },
@@ -139,7 +140,7 @@ def test_a_skulltula_reward_and_a_chest_token_in_one_seed_keep_one_token_per_sou
     assert not tokens_at(seed, GS)
     assert sorted(seed.placements[name] for name in SPILL) == sorted(["Boomerang", "Hylian Shield", *[TOKEN_ITEM] * 2])
     chests = ("Chest A", "Chest B", "Other A", "Other B")  # all four are chests here
-    assert Counter(seed.placements[name] for name in chests) == Counter({TOKEN_ITEM: 2, FAIRY: 1, CARD: 1})
+    assert Counter(seed.placements[name] for name in chests) == Counter({TOKEN_ITEM: 2, UNADMITTED: 1, CARD: 1})
     assert Counter(seed.placements.values())[TOKEN_ITEM] == len(SPILL)  # no bonus token, none lost
 
 
@@ -148,7 +149,7 @@ def test_tokens_spill_only_into_chests_never_another_shuffled_kind(other):
     settings = Settings(shuffle=("Chest", other, SHUFFLE), item_location_types=FORCED)
     seed = generate(spill_spec(other), 5, settings)
     assert [seed.placements[name] for name in ("Chest A", "Chest B")] == [TOKEN_ITEM, TOKEN_ITEM]
-    assert sorted(seed.placements[name] for name in ("Other A", "Other B")) == sorted([FAIRY, CARD])
+    assert sorted(seed.placements[name] for name in ("Other A", "Other B")) == sorted([UNADMITTED, CARD])
     assert seed.settings.item_location_types[TOKEN_ITEM] == TOKEN_DESTINATIONS
 
 
@@ -161,10 +162,10 @@ def test_small_keys_and_unadmitted_items_never_take_a_skulltula_even_in_their_du
     assert not allowed(world, unheld, "Temple GS 1", "Small Key (Temple)")  # the dungeon-item hold stops it too
     assert not allowed(world, effective, "Temple GS 1", "Small Key (Temple)")
     assert allowed(world, effective, "Temple GS 1", ADMITTED_RUPEES)
-    assert not allowed(world, effective, "Temple GS 1", FAIRY)
+    assert not allowed(world, effective, "Temple GS 1", UNADMITTED)
     seed = generate(spec, 1, settings)
     assert {seed.placements[name] for name in ("Start GS", "Temple GS 1", "Temple GS 2")} == {TOKEN_ITEM}
-    assert {seed.placements["Start Chest"], seed.placements["Temple Chest"]} == {"Small Key (Temple)", FAIRY}
+    assert {seed.placements["Start Chest"], seed.placements["Temple Chest"]} == {"Small Key (Temple)", UNADMITTED}
 
 
 def test_off_leaves_skulltulas_native_and_the_settings_untouched():
@@ -196,9 +197,9 @@ def test_effective_settings_replay_to_the_same_constraints_and_seed():
     "settings, message",
     [
         (Settings(shuffle=("Chest", GS)), "not a shuffle kind"),
-        (Settings(shuffle=("Chest", SHUFFLE), location_type_items={SHUFFLE: (FAIRY,)}), "cannot give"),
+        (Settings(shuffle=("Chest", SHUFFLE), location_type_items={SHUFFLE: (UNADMITTED,)}), "cannot give"),
         (Settings(shuffle=("Chest", SHUFFLE), item_location_types={TOKEN_ITEM: ("NPC",)}), "may go only to"),
-        (Settings(shuffle=("Chest", SHUFFLE), item_location_types={FAIRY: ("Chest", SHUFFLE)}), "cannot give it"),
+        (Settings(shuffle=("Chest", SHUFFLE), item_location_types={UNADMITTED: ("Chest", SHUFFLE)}), "cannot give it"),
         (Settings(shuffle=("Chest", SHUFFLE), item_location_types={CARD: (SHUFFLE,)}), "cannot give it"),
     ],
 )
@@ -318,15 +319,14 @@ EARLIER = (
     "Deku Stick Capacity",
 )
 # Plain items that keep their own policy and are never Skulltula rewards, beside every other kind (songs, keys, maps,
-# compasses, shop stock), the bought goods, and the progressive copies and tiers: the Fairy Ocarina, the Gerudo card,
-# and the child and adult trade sequences' items.
+# compasses, shop stock), the bought goods, and the progressive copies and tiers: the Gerudo card and the child and
+# adult trade sequences' items. (The Fairy Ocarina left this list on 2026-11-24: admitted after runs T1 and TB3.)
 EXCLUDED = (
-    FAIRY,
     CARD,
     "Weird Egg",
     "Chicken",
     "Zeldas Letter",
-    "Keaton Mask",
+    UNADMITTED,
     "Skull Mask",
     "Spooky Mask",
     "Bunny Hood",
@@ -362,7 +362,7 @@ def test_the_whole_world_holds_every_skulltula_to_exactly_the_admitted_members_a
     assert {"Song", "SmallKey", "BossKey", "Map", "Compass", "Shop"} <= {world.items[name].type for name in own_kind}
     bought = {name for name in world.items if name.startswith(SHOP_ONLY_PREFIX)}
     kept = {*EXCLUDED, *own_kind, *bought, *world.progressive, *(set(FAMILY_BY_ITEM) & set(world.items))}
-    expected = {*EARLIER, *ADDED}
+    expected = {*EARLIER, *ADDED, FAIRY}  # the Fairy Ocarina: admitted 2026-11-24 (runs T1, TB3)
     for name in live:
         given = {item for item in world.items if allowed(world, effective, name, item)}
         assert given == expected and not given & kept, name
@@ -478,13 +478,13 @@ def test_mixed_keys_anywhere_seed7_keeps_token_and_sword_in_shared_progression()
     """Freezing Sword on the gated GS sends its token to the only starter chest, stranding Boomerang."""
     spec = {
         "start": "Start",
-        "goal": "Kokiri_Sword and Boomerang and Fairy_Ocarina and Gold_Skulltula_Token",
-        "items": {TOKEN_ITEM: {"type": "Token"}, "Kokiri Sword": {}, "Boomerang": {}, FAIRY: {}},
+        "goal": "Kokiri_Sword and Boomerang and Keaton_Mask and Gold_Skulltula_Token",
+        "items": {TOKEN_ITEM: {"type": "Token"}, "Kokiri Sword": {}, "Boomerang": {}, UNADMITTED: {}},
         "regions": [
             {
                 "name": "Start",
                 "locations": {
-                    "Starter Chest": {"rule": "True", "type": "Chest", "vanilla": FAIRY},
+                    "Starter Chest": {"rule": "True", "type": "Chest", "vanilla": UNADMITTED},
                     "Gated GS": {"rule": "Boomerang", "type": GS, "vanilla": TOKEN_ITEM},
                     "Late Chest A": {
                         "rule": "Kokiri_Sword",
@@ -505,7 +505,7 @@ def test_mixed_keys_anywhere_seed7_keeps_token_and_sword_in_shared_progression()
     seed = generate(spec, 7, Settings(shuffle=("Chest", SHUFFLE), dungeon_items="anywhere"), attempts=1)
     assert seed.placements["Starter Chest"] == "Kokiri Sword"
     assert seed.placements["Gated GS"] == TOKEN_ITEM
-    assert {seed.placements["Late Chest A"], seed.placements["Late Chest B"]} == {"Boomerang", FAIRY}
+    assert {seed.placements["Late Chest A"], seed.placements["Late Chest B"]} == {"Boomerang", UNADMITTED}
 
 
 def test_app_offers_token_with_chest_and_refuses_token_alone():
@@ -611,3 +611,92 @@ def test_existing_empty_nut_bag_allows_a_refill_without_a_capacity_upgrade():
     assert (
         sum(item == "Deku Nuts (5)" for name, item in placements.items() if world.locations[name].type == SHUFFLE) == 1
     )
+
+
+# ocarina-song-drops-everywhere 1.3: the Fairy Ocarina and the songs as Skulltula rewards. Admitted in
+# token_rewards.toml since BBender's runs T1 and TB3 (2026-11-24); the fixture pins the two these tests use.
+NEW_MEMBERS = {
+    FAIRY: ("Obj_Clawshot_Ocarina_Fairy", "ocarina"),
+    "Zeldas Lullaby": ("Obj_Clawshot_Melody_ZeldaLullaby", "song"),
+}
+
+
+@pytest.fixture
+def new_members(monkeypatch):
+    from types import MappingProxyType
+
+    from clawshot.generate import tokens
+
+    monkeypatch.setattr(tokens, "REWARDS", MappingProxyType({**tokens.REWARDS, **NEW_MEMBERS}))
+
+
+def song_spec() -> dict:
+    return {
+        "start": "Start",
+        "goal": "(Gold_Skulltula_Token, 1) and Fairy_Ocarina and Zeldas_Lullaby",
+        "items": {TOKEN_ITEM: {"type": "Token"}, FAIRY: {}, "Zeldas Lullaby": {"type": "Song"}},
+        "regions": [
+            {
+                "name": "Start",
+                "locations": {
+                    "Open GS": {"rule": "True", "type": GS, "vanilla": TOKEN_ITEM},
+                    "Other GS": {"rule": "True", "type": GS, "vanilla": "Zeldas Lullaby"},
+                    "Chest": {"rule": "True", "type": "Chest", "vanilla": FAIRY},
+                },
+            }
+        ],
+    }
+
+
+@pytest.mark.parametrize("songs", ["song", "anywhere"])
+def test_the_token_palette_takes_the_fairy_ocarina_and_songs_only_anywhere(new_members, songs):
+    from clawshot.generate import tokens
+
+    settings, world = prepare(song_spec(), Settings(shuffle=("Chest", SHUFFLE), songs=songs))
+    palette = tokens.restrict_settings(world, settings).location_type_items[SHUFFLE]
+    assert FAIRY in palette
+    assert ("Zeldas Lullaby" in palette) == (songs == "anywhere")
+
+
+@pytest.mark.parametrize("item", [FAIRY, "Zeldas Lullaby"])
+def test_a_new_member_held_to_skulltulas_lands_on_one(new_members, item):
+    settings = Settings(shuffle=("Chest", SHUFFLE), songs="anywhere", item_location_types={item: (SHUFFLE,)})
+    seed = generate(song_spec(), 1, settings)
+    (where,) = [name for name in seed.shuffled if seed.placements[name] == item]
+    assert seed.world.locations[where].type == SHUFFLE
+    assert allowed(seed.world, seed.settings, where, item)
+
+
+def test_with_songs_on_song_locations_a_song_never_takes_a_skulltula(new_members):
+    for number in range(10):
+        seed = generate(song_spec(), number, Settings(shuffle=("Chest", SHUFFLE), songs="song"))
+        assert all(
+            seed.placements[name] != "Zeldas Lullaby" or seed.world.locations[name].type != SHUFFLE
+            for name in seed.shuffled
+        )
+
+
+def test_the_fairy_ocarina_and_every_song_are_admitted_with_their_played_evidence():
+    """Plan 13.2/20 (BBender, 2026-11-24): runs T1 and TB3; the ten unplayed songs are inferred from Prelude of
+    Light and Zeldas Lullaby. Both ocarinas give their generated world actor (finding TB3-a moved Time's)."""
+    from clawshot.generate import tokens
+
+    songs = {name for name, info in load_spec()["items"].items() if info.get("type") == "Song"}
+    assert len(songs) == 12 and songs <= set(REWARDS)
+    assert {REWARDS[song][1] for song in songs} == {"song"}
+    assert all(REWARDS[song][0].startswith("Obj_Clawshot_Melody_") for song in songs)
+    assert REWARDS[FAIRY] == ("Obj_Clawshot_Ocarina_Fairy", "ocarina")
+    assert REWARDS["Ocarina of Time"] == ("Obj_Clawshot_Ocarina_Time", "ocarina")
+    assert "song" in tokens.ADMITTED_FAMILIES
+
+
+def test_the_song_family_needs_its_played_evidence(tmp_path):
+    from clawshot.generate import tokens
+
+    text = tokens.DATA.read_text(encoding="utf-8")
+    lines = [line for line in text.splitlines() if not line.startswith("song = ")]
+    assert len(lines) == len(text.splitlines()) - 1
+    path = tmp_path / "token_rewards.toml"
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="must give the evidence"):
+        tokens._load(path)

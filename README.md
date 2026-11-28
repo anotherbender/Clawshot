@@ -110,8 +110,8 @@ that proves the model, not that every route has been verified in the game.
 | Shops | Shuffled native shop items and purchases work in game. Arbitrary major items cannot use a stand-in shelf display. |
 | NPC gifts and songs | Gift swaps and Great Fairy once-only rewards work in game, as does the Kokiri shopkeeper's extended gift window. All seven frog checks have passed their in-game experiment. The adult Rolling Goron's and King Zora's tunic gifts are shuffled too; each gave its shuffled item once in game. Not every gift or item combination has been played. |
 | One-time Business Scrubs | Four kinds of one-time Deku Scrub sale are enabled; repeat vendors stay unchanged. The adult Mirror Shield purchase that previously froze now finishes. Not every shuffled sale or item/age combination has been played. |
-| Boss hearts and floor Heart Pieces | Optional, off by default. A Hylian Shield worked at King Dodongo and the ranch tower. Only native floor pickups are allowed; other locations and pickup combinations are not all verified. |
-| Gold Skulltulas | Optional, off in both presets; requires Chest shuffle. All 100 native sources are admitted, including the played Field tree, ranch tower and cross-age wetlands route. The lone tree works by day; tower retrieval remains night-only. Played reward families now include container-backed ammo/Bombchus, magic, special upgrades and Ocarina of Time; Fairy Ocarina and the [other explicit exclusions](docs/settings.md#what-enters-the-shuffle) remain held. Each member still needs its native structural check. |
+| Boss hearts and floor Heart Pieces | Optional, off by default. The five native floor pickups, Ocarina of Time and, with songs anywhere, the twelve songs are admitted. Fairy Ocarina stays at BossHeart (Gohma PASS) but is excluded from Freestanding after the empty child-roof failure. Other source/reward pairs remain subject to the [integration play record](plans/rounds/r22-pr42-integration.md). |
+| Gold Skulltulas | Optional, off in both presets; requires Chest shuffle. All 100 native sources are admitted, each with its structural check. Generated donors add Fairy Ocarina and songs with songs anywhere; ten songs are accepted by analogy, not individually played. All non-token rewards spin. Other [destination restrictions](docs/settings.md#what-enters-the-shuffle) remain. |
 | 100-token House reward | Separate experimental, default-off option; requires Gift shuffle. Allows progression at the first reward without changing the native repeating payout. [Settings and played evidence](docs/settings.md#what-enters-the-shuffle). |
 | Hints and convenience options | Gossip Stones speak hints without the Mask of Truth by default; this, fast start, the forest option that opens only the exit bridge (`--forest closed_deku`) and 10-rupee Kokiri prices have in-game evidence. |
 | Scene handoffs | Lessons use a normal get only with zero stock of both ocarinas; either instrument retains the native lesson, at either age. Saria's separate farewell skip remains experimental and off by default. [Settings and played evidence](docs/settings.md#scene-handoffs-experimental). |
@@ -310,9 +310,9 @@ Story-dialogue skipping is not available yet; it is withdrawn for 0.2.3.
   receive it from her; that native hand-over clears the fortress, not merely finding the card.
   Older Gift seeds could move it without clearing the guards; existing seeds and saves are not repaired.
   This follows the [static game-data trace](plans/rounds/r13-gerudo-card.md), not a played D39 acceptance test.
-- A song found in a chest shows a green rupee with the song's own text; the song works normally. Only some
-  songs have been individually played from chests. Ocarinas show their own model, in chests and when an NPC
-  hands one over.
+- With Gift shuffle, song pickups show an ocarina and their own effect, not a green rupee.
+  After a Time Skulltula pickup while Fairy is active, Fairy's model/sound may remain until Save/Continue;
+  Time is owned/selected and song gameplay is unaffected. Not every floor placement is played.
 - **Saria can hold two ocarinas before Gohma.** Her carried ocarina overlaps the farewell's props; a red ocarina
   can be pinned to her right hand while she presents the Fairy Ocarina. The same pre-Gohma save showed the double
   with no Clawshot mod on **Longshot 3.0.0**; it persisted in Kareem's **Longshot 3.2.0** checks. The attempted

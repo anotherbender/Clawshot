@@ -1306,7 +1306,7 @@ def is_hand_over(source_type: str | None, steps: Iterable[Gift]) -> bool:
 def restrict_spec(
     spec: Mapping[str, Any], shuffled: Iterable[str], steps: Mapping[str, tuple[Gift, ...]] | None = None
 ) -> dict[str, Any]:
-    """Keep unsupported gifts vanilla and exclude unsafe items at show-item hand-overs.
+    """Keep unsupported gifts vanilla, and exclude unsafe items at show-item hand-overs.
 
     Direct pouch grants and the ordinary GetPouchContent wrapper do not create the
     item actor. All other admitted gift wrappers, plus scrub sales, do (r11-ocarina).

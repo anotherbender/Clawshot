@@ -301,7 +301,7 @@ def working_files(source: "NupRomfs | NxRomfs | StackedRomfs | FolderRomfs", spe
     from fnmatch import fnmatchcase
 
     from clawshot.generate import tokens as token_policy
-    from clawshot.patch import floor_keys, getitem, items, jail_keys, shops, songs, tokens
+    from clawshot.patch import floor_keys, getitem, items, jail_keys, ocarina_pickup, shops, songs, tokens
 
     actors = set(items.load().actors.values())
     slots = shops.load()
@@ -316,8 +316,11 @@ def working_files(source: "NupRomfs | NxRomfs | StackedRomfs | FolderRomfs", spe
     wanted.update(jail_keys.native_inputs())
     # Every seed's ocarina get model reads the ocarina packs, its donor and the animation files it names.
     wanted.update(getitem.native_inputs())
-    # The song get effects read the ELink table, static, the song and donor packs and three actor tables.
-    wanted.update(songs.native_inputs())
+    # The song get effects read the ELink table, static, the song and donor packs and three actor tables; with the
+    # song floor pickups (songs = anywhere with a Skulltula or floor kind) also the arrow donor. The ocarina pickups
+    # read the same tables and their own packs.
+    wanted.update(songs.native_inputs(pickups=True))
+    wanted.update(ocarina_pickup.native_inputs())
     wanted.update(path for path in source.files if any(fnmatchcase(path, pattern) for pattern in spec["patterns"]))
     return wanted
 

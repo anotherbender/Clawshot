@@ -121,7 +121,7 @@ source = "Claude, Round 6 review, 2026-11-08: all twelve Item_Melody_* share the
 
 [hand_over]
 excluded_items = []
-source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 gallery07/08: both ocarinas PASS only with PR40 packs and ActorInfo, now mandatory in patch.make_seed for display hand-overs; native Time09 still crashes and has no output fallback; plans/rounds/r22-lifts.md"
+source = "Kareem via Claude, Longshot 3.2.0, 2026-11-25 R22 gallery07/08: both ocarinas PASS only with PR40 packs and ActorInfo, mandatory in patch.make_seed; native Time09 crashes and has no fallback (plans/rounds/r22-lifts.md). BBender, Longshot 3.1.1, 2026-11-24 H1/H2: both ocarinas at KF Shopkeeper Gift and LW Deku Scrub Near Bridge with the model, owned and immediately played; native-pack crash reproduced in4.1 (plans/ocarina-song-drops-everywhere.md)."
 
 # Claude, r14 Track E, 2026-11-13: public native seeds refuse unpaired
 # access overrides. Unchanged world defaults are always allowed.
