@@ -2,6 +2,7 @@
 5.6; plans/event-items.md "Hand-read marks", 2026-11-27). Synthetic texts only."""
 
 import re
+from dataclasses import replace
 
 import pytest
 
@@ -9,7 +10,7 @@ from clawshot.census import definitions
 from clawshot.formats import msbt, sarc
 from clawshot.formats.msbt import Tag
 from clawshot.generate.rewards import catalog
-from clawshot.patch import event_lines, gifts, text
+from clawshot.patch import event_lines, gifts, talon, text
 from clawshot.patch.event_lines import Line, Marks
 from clawshot.patch.plan import PatchError
 
@@ -153,6 +154,25 @@ def test_lines_of_checks_that_keep_their_vanilla_item_change_nothing_and_moved_o
         [EN, DE], {EN.check: "Piece of Heart"}, {EN.check: "Quiver (40)"}, {"Piece of Heart": "Obj_Heart_Piece"}.get
     )
     assert moved == {(FILE, "Talk_04"): [(EN, "Obj_Heart_Piece")], (FILE, "Talk_03"): [(DE, "Obj_Heart_Piece")]}
+
+
+def test_merchants_that_return_to_their_native_sale_keep_their_native_text():
+    # Their shuffled first sale and their repeat sales speak the same messages (main's merchant sales).
+    assert {*gifts.MERCHANT_SHOPS, gifts.GRANNY_CHECK} == event_lines.REPEAT_SALES
+    for check in sorted(event_lines.REPEAT_SALES):
+        line = replace(EN, check=check)
+        assert event_lines.moved_lines([line], {check: "Piece of Heart"}, {check: "Bombchus (10)"}, str) == {}
+    assert {line.check for line in event_lines.load()} >= event_lines.REPEAT_SALES
+
+
+def test_talons_lines_are_left_to_main_s_talon_patch():
+    # A moved prize: main rewrites his first-prize lines; his repeat prize and milk sale still give milk.
+    assert {talon.CHECK} == event_lines.WRITTEN_ELSEWHERE
+    line = replace(EN, check=talon.CHECK)
+    assert (
+        event_lines.moved_lines([line], {talon.CHECK: "Piece of Heart"}, {talon.CHECK: "Bottle with Milk"}, str) == {}
+    )
+    assert talon.CHECK in {line.check for line in event_lines.load()}
 
 
 def test_the_data_format_is_read_and_checked():

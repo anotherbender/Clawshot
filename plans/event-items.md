@@ -5,6 +5,35 @@ in the main checkout, made off `feature/ocarina-song-drops-everywhere` at `ceab0
 Dump: romfs 1.1.1. Builds on `plans/chest-ocarina-model.md` (PR #40; Saria farewell known issue) and the fix design in
 `plans/rounds/r21-pr40.md:429-442`.
 
+## Handoff 2026-11-28 (Claude, after the final run)
+
+- Committed and rebased onto main `5ea1c58` (PR #42 merged with Kareem's changes), then `69dfe92` (R07 chest tunics); PR opened (BBender, 2026-11-28:
+  "make the changes ... rebase onto main ... Then open a PR. If you need any decisions go with the recommended for now
+  but note them"). Backup of the pre-rebase branch: `backup/event-items-pre-rebase` (local).
+- Rebase decisions (Claude, recommended, for BBender to confirm):
+  - main's `display` rule (`_display_item`, 9e5b97a) and this branch's (`_set_display`, get windows and Notes targets)
+    are one field: `_set_display` takes main's literal-actor checks and error wording, main's validation in `loads`
+    stays, the two extra refs stay (`Dm_MelodyGet_Time/Event280`, `Dm_Kokiri_0155/Event58`).
+  - merchants (`GC Medigoron`, `Kak Granny Buy Blue Potion`, `Wasteland Bombchu Salesman`, shuffled on main since
+    #42) speak the same messages for their shuffled first sale and their native repeat sales: their marks wait
+    (`event_lines.REPEAT_SALES`), as decision D's re-offers.
+  - Talon's Cucco game (main's `talon.py`, round 22 scenes): with a moved prize main writes neutral English in his
+    first-prize lines (`Talk_09_2`, `Talk_29`, its D26) and keeps the repeat prize (`Talk_11`, `Talk_56`) and the milk
+    sale (`Talk_57`) native. The dump suite caught the clash (our CNzh fingerprint on main's rewritten line); all five
+    Talon marks wait (`event_lines.WRITTEN_ELSEWHERE`). Naming the given item in the first-prize lines instead of
+    main's neutral words is a question for the maintainers.
+  - main's `test_gift_display_dump.py` checked only get windows: it now accepts the declared Notes targets too.
+  - main's direct-pouch ocarina seed runs `containers`' ActorInfo rows before the ocarina step: added to the test's
+    `ROW_STEPS` (`tests/test_getitem_ocarina_dump.py`).
+- Suites after the rebase: synthetic 5176 passed, 967 skipped; dump 877 passed, 7 failed, 16 errors, all from Talon's
+  lines and the display test above; after the fixes the affected files rerun green (90 passed, then the one ActorInfo
+  test, 4 passed). After the rebase onto `69dfe92`: synthetic 5184 passed, 967 skipped; tunic, gift, display and
+  event-line dump tests 35 passed.
+- Next: rerun the fairies whose lines changed (J, K): castle (`child-castle-great-fairy`), summit
+  (`child-death-mountain-great-fairy` or the mislabelled `adult-death-mountain-crater-great-fairy`), desert
+  (`adult-desert-colossus-great-fairy-500r`), Zora's Fountain (`child-zoras-fountain-great-fairy`, needs rupees);
+  the older handoff below is history.
+
 ## Handoff 2026-11-26 (Claude, for the next session)
 
 Read this first. Nothing is committed; no commit or PR until BBender confirms. Work folder:

@@ -20,7 +20,7 @@ from pathlib import Path
 
 from clawshot.formats import msbt, sarc, zsdic
 from clawshot.formats.msbt import Part
-from clawshot.patch import text
+from clawshot.patch import talon, text
 from clawshot.patch.plan import PatchError
 from clawshot.patch.write import FileChanges
 
@@ -32,6 +32,16 @@ FORMS_TAG = (201, 10)
 # The grammar tag a language puts before a name (its gender and number); it belongs to the word that follows.
 GENDER_TAG = (201, 0)
 FINGERPRINT_SIZE = 16  # hex digits of the sha256 of the raw text
+# Merchants whose first sale is a shuffled check and who return to their native sale afterwards (main's merchant
+# sales: gifts.MERCHANT_SHOPS and gifts.GRANNY_CHECK). Both sales speak the same messages, so a renamed offer would
+# keep naming the shuffled item on every repeat sale: their marks wait, like decision D's re-offers (Claude,
+# 2026-11-28, rebase onto main; for BBender to confirm).
+REPEAT_SALES = frozenset({"GC Medigoron", "Kak Granny Buy Blue Potion", "Wasteland Bombchu Salesman"})
+# Talon's Cucco game (main's talon.py): with a moved prize, his first-prize lines (Talk_09_2, Talk_29) are main's
+# neutral lines (its D26), and his repeat prize (Talk_11, Talk_56) and milk sale (Talk_57) still give milk. None of
+# the five marked lines names the given item any more, so their marks wait (Claude, 2026-11-28, rebase onto main;
+# for BBender to confirm; naming the item in the first-prize lines instead is a question for the maintainers).
+WRITTEN_ELSEWHERE = frozenset({talon.CHECK})
 
 Message = tuple[str, str]  # (message file in the archive, label)
 Span = tuple[int, int]  # (start, length) in the raw text
@@ -258,11 +268,12 @@ def moved_lines(
     lines: Sequence[Line], placements: Mapping[str, str], vanilla: Mapping[str, str], actor: Callable[[str], str]
 ) -> dict[Message, list[tuple[Line, str]]]:
     """Message -> (line, given actor) for the lines of checks whose placed item is not their vanilla one
-    (``actor``: logic item -> the actor the grant gives)."""
+    (``actor``: logic item -> the actor the grant gives); :data:`REPEAT_SALES` and :data:`WRITTEN_ELSEWHERE` keep
+    their native text."""
     out: dict[Message, list[tuple[Line, str]]] = {}
     for line in lines:
         item = placements.get(line.check)
-        if item is None or item == vanilla.get(line.check):
+        if item is None or item == vanilla.get(line.check) or line.check in REPEAT_SALES | WRITTEN_ELSEWHERE:
             continue
         out.setdefault((line.file, line.label), []).append((line, actor(item)))
     return out
