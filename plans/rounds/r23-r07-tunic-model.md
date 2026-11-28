@@ -1,7 +1,8 @@
 # R23 R07 — canonical tunic pickup actors
 
 cs22d (`openai-codex/gpt-6.1-sol`), 2026-11-27. Branch `r23/r07-tunic-model`, original base main
-`a4d474bb92e5a6350012e8a1f9b90015942a0513`. **Source implementation complete; in-game model acceptance pending.**
+`a4d474bb92e5a6350012e8a1f9b90015942a0513`. **Source implementation complete; paired in-game tunic
+model/text result confirmed by Kareem.** Zora credit and persistence are not established by this play receipt.
 Claude accepted the design and authorized this scoped implementation on 2026-11-27; Kareem's product
 constraints are unchanged. No new shuffle admission, logic, pool, native shop price/service or runtime change.
 
@@ -56,11 +57,11 @@ no dump result or full synthetic-suite result is claimed.
 **7 files already formatted; all checks passed.** Python navigation was attempted before the exported
 remap removal; the configured ruff LSP does not implement references, so explicit literal callers were traced.
 
-## Play hold
+## Offline staging requirements
 
-**Both R07 rows are staged offline; no R07 game was booted or launched.** Claude accepted the paired
+At offline staging, both R07 rows were built without a game boot/launch by cs22d. Claude accepted the paired
 design and separately authorized staging after the refresh below. Matched profiles, source eligibility,
-the visible selector and entrance-facing source identities are qualified; see the final receipt below.
+the visible selector and entrance-facing source identities were qualified; see the receipts below.
 
 A maintainer must observe each actual held-up model/text/credit and persistence, with the runtime's
 `mods: <changed file> <- <arm path>` proof. Source tests establish the actor choice, not visible in-game
@@ -110,3 +111,25 @@ future model/text/credit/persistence checklist are in the private packet's `PLAY
 `qualification.json`, `profiles.json`, `output-comparison.json`, `dry-runs.json` and per-arm generation receipts.
 Gate lock released after generation/comparison. **Zero native boots/launches; all runtime acceptance remains
 pending.** No generated output, game data or extracted native table is committed here.
+
+## Paired in-game result — Kareem, 2026-11-27
+
+Claude supplied both human `RESULT.md` records and screenshots under the private packet's
+`control/runs/claude` and `fix/runs/claude`; no save contents or screenshots are committed.
+Both records cite the runtime loading the child Kokiri Forest Static/Dynamic Banc from that arm's
+`mods/r07-tunic` path and the same qualified outdoor-path autosave.
+
+| Arm | Goron Tunic get pose | Zora Tunic get pose | Text / grant evidence |
+|---|---|---|---|
+| Main control `5ea1c585` | Empty hands, no model | Empty hands, no model | Correct text for both; Goron ownership, stock and chest completion confirmed |
+| Fix `bcad1546` | Red tunic model above Link's hands | Blue tunic model above Link's hands, slightly tilted | Correct text for both; Goron ownership, stock and chest completion confirmed |
+
+Control evidence: `02-goron-get.png`, `03-now.png`; fix evidence: `02-goron-get.png`, `03-zora-get.png`,
+beside the corresponding private `RESULT.md`. **The missing held-up models are observed on main, and both
+models are observed on the fix.** Orientation/spinning was not the claim. These observations replace the
+earlier prediction and model-play hold; they do not establish Zora ownership readback, equip behavior,
+persistence, gift-model behavior or a completed full gate. No additional play is claimed.
+
+Claude reports the game closed and Kareem finished for the night; no further native launch is authorized.
+This follow-up changes documentation only. cs22c owns the R07 full gate; no construction gate lock is
+needed for the separately authorized H4/I1235 diagnostic saves. Code pin remains `bcad1546`.
