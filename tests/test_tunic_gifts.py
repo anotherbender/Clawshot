@@ -83,6 +83,8 @@ def test_a_tunic_added_by_gift_shuffle_keeps_existing_shop_and_chest_destination
             ],
         }
     )
-    settings = Settings(item_location_types=gifts.held_items(world, [item], items.load(), set()))
+    held = gifts.held_items(world, [item], items.load(), set())
+    assert held == {}
+    settings = Settings(item_location_types=held)
     for location in ("Gift", "Chest", "Shelf"):
         assert allowed(world, settings, location, item)

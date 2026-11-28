@@ -296,7 +296,7 @@ def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
             data = dicts.decompress(s.file, (tmp_path / "seed" / "romfs" / s.file).read_bytes())
             event = next(e for e in evfl.read(data).flowchart.events if e.name == s.event)
             actor = actors.actor(seed.placements[name])
-            assert event.params[s.param] == gifts.TUNIC_GIFT_ACTORS.get(actor, actor), s.id
+            assert event.params[s.param] == actor, s.id
     rules = gifts.load()
     for name in seed.shuffled:
         if name in rules:
@@ -328,7 +328,7 @@ def test_dump_gift_shuffle_slice_writes_each_moved_gift(romfs, tmp_path):
             original = dicts.decompress(s.file, (romfs / s.file).read_bytes())
             event = next(e for e in evfl.read(transforms[s.file](original)).flowchart.events if e.name == s.event)
             actor = actors.actor(item)
-            assert event.params[s.param] == gifts.TUNIC_GIFT_ACTORS.get(actor, actor), s.id
+            assert event.params[s.param] == actor, s.id
 
 
 @pytest.mark.dump
