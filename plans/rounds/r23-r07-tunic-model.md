@@ -56,13 +56,11 @@ no dump result or full synthetic-suite result is claimed.
 **7 files already formatted; all checks passed.** Python navigation was attempted before the exported
 remap removal; the configured ruff LSP does not implement references, so explicit literal callers were traced.
 
-## Play hold / next authorized stage
+## Play hold
 
-**No R07 play rows, profiles, mods or launchers were staged; no R07 game was launched.** PR #42 is now
-merged and the source rebase/focused rerun below are complete. Claude requested the two-row design only;
-staging still needs a separate go. Both future rows use the same early tunic chests, independent matched
-starting families, HOS_CONTROL/MEMro and safe-default no-pause launchers. Qualify actual source identities,
-on-screen save selectors and unowned tunics first; never manufacture eligibility.
+**Both R07 rows are staged offline; no R07 game was booted or launched.** Claude accepted the paired
+design and separately authorized staging after the refresh below. Matched profiles, source eligibility,
+the visible selector and entrance-facing source identities are qualified; see the final receipt below.
 
 A maintainer must observe each actual held-up model/text/credit and persistence, with the runtime's
 `mods: <changed file> <- <arm path>` proof. Source tests establish the actor choice, not visible in-game
@@ -85,3 +83,30 @@ normal openings and persistence reloads. Qualification issue disclosed: historic
 Hash IDs a left pair; current location definitions call them top/bottom right. Hashes, not that ambiguous
 side label, govern; identify the actual pair before any future staging. The backup timestamp is not a
 verified on-screen save selector. No original save, spoiler or seed placements were read for this design.
+
+## Authorized offline paired staging — 2026-11-27
+
+Claude accepted `E:/OOTRemake/work/rounds/r23/r07-paired-play-design.md` and authorized both rows under
+`E:/OOTRemake/work/rounds/r23/r07-tunic`, explicitly forbidding native boot/launch tonight. **READY OFFLINE,
+UNPLAYED.** Real detached checkouts main5ea1c585 and fixbcad1546 each generated/wrote the same constrained
+production play seed at BelowNormal, one worker, with fail-closed CIM/tasklist guards before each generation
+stage. Both beatability searches passed,23 spheres and180 runtime resources each; exact shuffled pools and
+identical logical placements. Full182-file comparison:179 byte-identical. Only child/adult Kokiri Bancs'
+two `Drop__DropActor` leaves differ (Shop_Armor_Goron/Zora → Obj_Armor_Goron/Zora), plus those two strings in
+our new seed's plan metadata. Entire remaining decoded Banc trees and all other files are equal.
+
+The complete copied R14 rebased-4 family is unmodified: **13 November2026,2:33p.m., Kokiri Forest,
+AUTOSAVE,3full hearts**, stored14:33:43, photo child Link outdoors on the ground path. Another2:33 autosave
+shows the treehouse platform/ladder: do not choose it. Child age, both tunics unowned/stock0 and both chest
+flags clear. Native child/adult placements resolve the previously ambiguous Right names: entering the
+house and facing its chests, Hash4555665598794293658 is near-left (Goron) and12786193094758345086 far-left
+(Zora). Names and hashes unchanged; no chest moved. This is data/caption qualification, not new human play.
+
+Independent profile copies match all nine bytesets, including the frozen common G1–G3 INI and R14
+account/options. HOS_CONTROL/MEMro safe-default no-pause launchers, private paths, explicit live flag/gate.
+Six actual Python/batch/default/live+dry plans passed without starting anything, even with an inherited live
+gate. Output/profile hashes, guard receipts, provenance, literal selector, complete diff explanation and
+future model/text/credit/persistence checklist are in the private packet's `PLAY.md`, `arms.json`,
+`qualification.json`, `profiles.json`, `output-comparison.json`, `dry-runs.json` and per-arm generation receipts.
+Gate lock released after generation/comparison. **Zero native boots/launches; all runtime acceptance remains
+pending.** No generated output, game data or extracted native table is committed here.
